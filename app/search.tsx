@@ -63,12 +63,18 @@ import {
   getSearchAvatarSize,
   sortPlayersForSearchList,
 } from '../utils/leaderDisplay';
+import { getAllTimeBlock } from '../utils/seasonStats';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
 
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
 
 const SEARCH_NEWCOMER_MAX_MS = 2 * 24 * 60 * 60 * 1000;
+/** Верх абсолютной панели поиска/фильтров (под заголовком страницы). */
+const SEARCH_PANEL_TOP = 41;
+/** Стартовая высота панели до первого onLayout (поиск + 3 ряда фильтров + кнопка). */
+const SEARCH_PANEL_DEFAULT_HEIGHT = 62;
 
 type ScoutListRow =
   | { key: string; kind: 'full'; player: Player }
@@ -212,34 +218,24 @@ function buildSearchPlayerSubtitle(
   }
 
   const isGoalkeeper = isGoalkeeperPosition(item.position);
+  // Показатели в поиске — суммарные за все сезоны
+  const total = getAllTimeBlock(item);
 
   if (isGoalkeeper) {
-    if (item.shots && item.saves) {
-      const shotsNum = parseInt(item.shots, 10) || 0;
-      const savesNum = parseInt(item.saves, 10) || 0;
-      if (shotsNum > 0) {
-        const sv = (savesNum / shotsNum).toFixed(3);
-        parts.push(`SV%: ${sv}`);
-      }
+    const shotsNum = total.shots ?? 0;
+    const savesNum = total.saves ?? 0;
+    const minutesNum = total.minutes ?? 0;
+    if (shotsNum > 0) {
+      parts.push(`SV%: ${(savesNum / shotsNum).toFixed(3)}`);
     }
-
-    if (item.minutes && item.shots && item.saves) {
-      const minutesNum = parseInt(item.minutes, 10) || 0;
-      const shotsNum = parseInt(item.shots, 10) || 0;
-      const savesNum = parseInt(item.saves, 10) || 0;
-      if (minutesNum > 0) {
-        const goalsAgainst = shotsNum - savesNum;
-        const gaa = ((goalsAgainst * 60) / minutesNum).toFixed(2);
-        parts.push(`GAA: ${gaa}`);
-      }
+    if (minutesNum > 0 && shotsNum > 0) {
+      parts.push(`GAA: ${(((shotsNum - savesNum) * 60) / minutesNum).toFixed(2)}`);
     }
-  } else if (item.goals && item.assists && item.games) {
-    const goalsNum = parseInt(item.goals, 10) || 0;
-    const assistsNum = parseInt(item.assists, 10) || 0;
-    const gamesNum = parseInt(item.games, 10) || 0;
-    if (gamesNum > 0) {
-      const ppg = ((goalsNum + assistsNum) / gamesNum).toFixed(2);
-      parts.push(`PPG: ${ppg}`);
+  } else {
+    const gamesNum = total.games ?? 0;
+    const pts = (total.goals ?? 0) + (total.assists ?? 0);
+    if (gamesNum > 0 && pts > 0) {
+      parts.push(`PPG: ${(pts / gamesNum).toFixed(2)}`);
     }
   }
 
@@ -269,6 +265,7 @@ function searchPlayerRowDataEqual(a: Player, b: Player): boolean {
     a.shots === b.shots &&
     a.saves === b.saves &&
     a.minutes === b.minutes &&
+    a.seasonStats === b.seasonStats &&
     (a.photos?.[0] ?? '') === (b.photos?.[0] ?? '')
   );
 }
@@ -544,6 +541,9 @@ export default function SearchScreen() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filtersPanelHeight, setFiltersPanelHeight] = useState(SEARCH_PANEL_DEFAULT_HEIGHT);
+  // Фильтры свёрнуты по умолчанию — панель компактная, раскрывается по кнопке
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   
   // Debounce для поиска - обновляем фильтр с задержкой 300мс
@@ -966,9 +966,7 @@ export default function SearchScreen() {
   const ppgOptions = useMemo(() => {
     const hasFieldPlayersWithPPG = players.some(p => {
       if (isGoalkeeperPosition(p.position)) return false;
-      if (!p.goals || !p.assists || !p.games) return false;
-      const gamesNum = parseInt(p.games) || 0;
-      return gamesNum > 0;
+      return (getAllTimeBlock(p).games ?? 0) > 0;
     });
     
     if (!hasFieldPlayersWithPPG) return [];
@@ -990,9 +988,7 @@ export default function SearchScreen() {
   const svOptions = useMemo(() => {
     const hasGoalkeepersWithSV = players.some(p => {
       if (!isGoalkeeperPosition(p.position)) return false;
-      if (!p.shots || !p.saves) return false;
-      const shotsNum = parseInt(p.shots) || 0;
-      return shotsNum > 0;
+      return (getAllTimeBlock(p).shots ?? 0) > 0;
     });
     
     if (!hasGoalkeepersWithSV) return [];
@@ -1013,9 +1009,8 @@ export default function SearchScreen() {
   const gaaOptions = useMemo(() => {
     const hasGoalkeepersWithGAA = players.some(p => {
       if (!isGoalkeeperPosition(p.position)) return false;
-      if (!p.minutes || !p.shots || !p.saves) return false;
-      const minutesNum = parseInt(p.minutes) || 0;
-      return minutesNum > 0;
+      const total = getAllTimeBlock(p);
+      return (total.minutes ?? 0) > 0 && (total.shots ?? 0) > 0;
     });
     
     if (!hasGoalkeepersWithGAA) return [];
@@ -1134,14 +1129,13 @@ export default function SearchScreen() {
       }
       
       // Фильтр по PPG (для полевых игроков)
+      // Фильтры по показателям — суммарные за все сезоны (как и рейтинг)
+      const totalStats = getAllTimeBlock(player);
       const matchesPPG = ignorePPG || !selectedPPG || (() => {
         // Вратари уже исключены выше
-        if (!player.goals || !player.assists || !player.games) return false;
-        const goalsNum = parseInt(player.goals) || 0;
-        const assistsNum = parseInt(player.assists) || 0;
-        const gamesNum = parseInt(player.games) || 0;
+        const gamesNum = totalStats.games ?? 0;
         if (gamesNum === 0) return false;
-        const ppg = (goalsNum + assistsNum) / gamesNum;
+        const ppg = ((totalStats.goals ?? 0) + (totalStats.assists ?? 0)) / gamesNum;
         
         if (selectedPPG === '< 0.3') return ppg < 0.3;
         if (selectedPPG === '> 0.3') return ppg > 0.3;
@@ -1157,9 +1151,8 @@ export default function SearchScreen() {
       // Фильтр по SV% (для вратарей)
       const matchesSV = ignoreSV || !selectedSV || (() => {
         // Полевые игроки уже исключены выше
-        if (!player.shots || !player.saves) return false;
-        const shotsNum = parseInt(player.shots) || 0;
-        const savesNum = parseInt(player.saves) || 0;
+        const shotsNum = totalStats.shots ?? 0;
+        const savesNum = totalStats.saves ?? 0;
         if (shotsNum === 0) return false;
         const sv = savesNum / shotsNum;
         
@@ -1176,11 +1169,10 @@ export default function SearchScreen() {
       // Фильтр по GAA (для вратарей)
       const matchesGAA = ignoreGAA || !selectedGAA || (() => {
         if (!isGoalkeeperPosition(player.position)) return false; // Полевые игроки не имеют GAA
-        if (!player.minutes || !player.shots || !player.saves) return false;
-        const minutesNum = parseInt(player.minutes) || 0;
-        const shotsNum = parseInt(player.shots) || 0;
-        const savesNum = parseInt(player.saves) || 0;
-        if (minutesNum === 0) return false;
+        const minutesNum = totalStats.minutes ?? 0;
+        const shotsNum = totalStats.shots ?? 0;
+        const savesNum = totalStats.saves ?? 0;
+        if (minutesNum === 0 || shotsNum === 0) return false;
         const goalsAgainst = shotsNum - savesNum;
         const gaa = (goalsAgainst * 60) / minutesNum;
         
@@ -1500,6 +1492,7 @@ export default function SearchScreen() {
         <View>
           {pairSection ? (
             <View style={styles.sectionLabelRow}>
+              <View style={[styles.sectionDot, pairSection === 'leaders' ? styles.sectionDotGold : styles.sectionDotRed]} />
               <Text style={styles.sectionLabelText}>
                 {pairSection === 'leaders'
                   ? (leadersShareTitle || t('search.topByPoints') || 'Top by points')
@@ -1517,6 +1510,27 @@ export default function SearchScreen() {
     },
     [currentUser?.status, language, openPlayerFromSearch, searchLeaderPositions, firstNewcomerId, firstLeaderId, leadersShareTitle, leaderShareEntries.length, handleShareRating, isExportingRating, t]
   );
+
+  const activeFilterChips = useMemo(() => {
+    const chips: { key: string; label: string; clear: () => void }[] = [];
+    const findLabel = (list: ({ translated: string; original: string | null } | null)[], value: string | null) =>
+      list.find((o) => o?.original === value)?.translated ?? value ?? '';
+    if (selectedCountry) chips.push({ key: 'country', label: findLabel(countries, selectedCountry), clear: () => setSelectedCountry(null) });
+    if (selectedTeam) {
+      const team = teamsFromPlayers.find((tm) => tm.id === selectedTeam);
+      chips.push({ key: 'team', label: team ? (language === 'ru' ? team.name_ru || team.name : team.name) : selectedTeam, clear: () => setSelectedTeam(null) });
+    }
+    if (selectedPosition) chips.push({ key: 'position', label: findLabel(positions, selectedPosition), clear: () => setSelectedPosition(null) });
+    if (selectedYear) chips.push({ key: 'year', label: String(selectedYear), clear: () => setSelectedYear(null) });
+    if (selectedHand) chips.push({ key: 'grip', label: selectedHand, clear: () => setSelectedHand(null) });
+    if (selectedMinHeight) chips.push({ key: 'height', label: `${t('search.heightFrom')} ${selectedMinHeight}`, clear: () => setSelectedMinHeight(null) });
+    if (selectedMinWeight) chips.push({ key: 'weight', label: `${t('search.weightFrom')} ${selectedMinWeight}`, clear: () => setSelectedMinWeight(null) });
+    if (selectedPPG) chips.push({ key: 'ppg', label: `PPG ${selectedPPG}`, clear: () => setSelectedPPG(null) });
+    if (selectedSV) chips.push({ key: 'sv', label: `SV% ${selectedSV}`, clear: () => setSelectedSV(null) });
+    if (selectedGAA) chips.push({ key: 'gaa', label: `GAA ${selectedGAA}`, clear: () => setSelectedGAA(null) });
+    return chips;
+  }, [selectedCountry, selectedTeam, selectedPosition, selectedYear, selectedHand, selectedMinHeight, selectedMinWeight, selectedPPG, selectedSV, selectedGAA, countries, teamsFromPlayers, positions, language, t]);
+  const activeFilterCount = activeFilterChips.length;
 
   // Показываем загрузку пока проверяем авторизацию
   // Если пользователь не авторизован, показываем загрузку или перенаправляем
@@ -1540,7 +1554,7 @@ export default function SearchScreen() {
                 </TouchableOpacity>
                 <Text style={styles.pageTitle}>{t('search.title')}</Text>
               </View>
-              <SkeletonList rows={7} />
+              <SkeletonList rows={7} topInset={52} />
             </View>
           </CachedBackground>
         </View>
@@ -1564,7 +1578,7 @@ export default function SearchScreen() {
               </TouchableOpacity>
               <Text style={styles.pageTitle}>{t('search.title')}</Text>
             </View>
-            <SkeletonList rows={7} />
+            <SkeletonList rows={7} topInset={52} />
           </View>
         </CachedBackground>
       </View>
@@ -1594,22 +1608,67 @@ export default function SearchScreen() {
             tint="dark"
             style={styles.searchSectionBlur}
           >
-            <View style={styles.searchSection}>
+            <View
+              style={styles.searchSection}
+              onLayout={(e) => setFiltersPanelHeight(Math.round(e.nativeEvent.layout.height))}
+            >
               {/* Полупрозрачный оверлей */}
               <View style={styles.searchSectionOverlay}>
-              {/* Поле поиска */}
-              <View style={styles.searchContainer}>
-              <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
-              <TextInput
-                style={styles.searchInput}
-                placeholder={t('search.placeholder')}
-                placeholderTextColor="#888"
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-              />
-            </View>
+              {/* Поле поиска + кнопка фильтров */}
+              <View style={styles.searchRow}>
+                <View style={[styles.searchContainer, styles.searchContainerInRow]}>
+                  <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder={t('search.placeholder')}
+                    placeholderTextColor="#888"
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                  />
+                </View>
+                <TouchableOpacity
+                  style={[
+                    styles.filtersToggle,
+                    (filtersOpen || activeFilterCount > 0) && styles.filtersToggleActive,
+                  ]}
+                  onPress={() => {
+                    setFiltersOpen((v) => !v);
+                    setActiveFilter(null);
+                    setOpenFilters(new Set());
+                  }}
+                  activeOpacity={0.8}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('search.filters') || 'Filters'}
+                >
+                  <Ionicons name={filtersOpen ? 'close' : 'options-outline'} size={20} color="#fff" />
+                  {!filtersOpen && activeFilterCount > 0 && (
+                    <View style={styles.filtersBadge}>
+                      <Text style={styles.filtersBadgeText}>{activeFilterCount}</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              </View>
+
+              {/* Свёрнуто: активные фильтры как чипы, каждый снимается одним тапом */}
+              {!filtersOpen && activeFilterCount > 0 && (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  style={styles.chipsScroll}
+                  contentContainerStyle={styles.chipsRow}
+                  keyboardShouldPersistTaps="handled"
+                >
+                  {activeFilterChips.map((chip) => (
+                    <TouchableOpacity key={chip.key} style={styles.chip} onPress={chip.clear} activeOpacity={0.8}>
+                      <Text style={styles.chipText} numberOfLines={1}>{chip.label}</Text>
+                      <Ionicons name="close" size={13} color="rgba(255,255,255,0.75)" />
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              )}
 
             {/* Контейнер фильтров */}
+            {filtersOpen && (
             <View style={styles.filtersContainer}>
               {/* Первая строка: Страна, Команда, Позиция */}
               <View style={styles.filterRow}>
@@ -1826,7 +1885,16 @@ export default function SearchScreen() {
                 </Text>
               </TouchableOpacity>
             </View>
+            )}
             </View>
+            {/* тонкая фирменная кромка панели — чуть цвета на тёмных экранах */}
+            <LinearGradient
+              colors={['rgba(250,47,64,0)', 'rgba(250,47,64,0.55)', 'rgba(250,47,64,0)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.panelEdge}
+              pointerEvents="none"
+            />
             </View>
           </BlurOrSolid>
 
@@ -1837,7 +1905,12 @@ export default function SearchScreen() {
             renderItem={renderPlayerItem}
             keyExtractor={keyExtractor}
             ListEmptyComponent={ListEmptyComponent}
-            contentContainerStyle={[styles.playersList, isDesktop && styles.playersListDesktop]}
+            contentContainerStyle={[
+              styles.playersList,
+              // Панель фильтров абсолютная и разной высоты (PPG / вратарские фильтры) — отступ по факту
+              { paddingTop: SEARCH_PANEL_TOP + filtersPanelHeight + 8 },
+              isDesktop && styles.playersListDesktop,
+            ]}
             removeClippedSubviews={Platform.OS === 'android'}
             maxToRenderPerBatch={8}
             updateCellsBatchingPeriod={80}
@@ -1931,7 +2004,7 @@ const styles = StyleSheet.create({
   },
   searchSectionBlur: {
     position: 'absolute',
-    top: 41, // Под заголовком
+    top: SEARCH_PANEL_TOP, // Под заголовком
     left: 0,
     right: 0,
     zIndex: 1001,
@@ -1955,6 +2028,80 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.12)',
     height: 44,
+    width: '100%',
+  },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  searchContainerInRow: {
+    flex: 1,
+    width: undefined,
+  },
+  filtersToggle: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(22, 22, 26, 0.7)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+  },
+  filtersToggleActive: {
+    backgroundColor: '#fa2f40',
+    borderColor: '#fa2f40',
+    shadowColor: '#fa2f40',
+    shadowOpacity: 0.45,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 3 },
+  },
+  filtersBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    paddingHorizontal: 4,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filtersBadgeText: {
+    color: '#fa2f40',
+    fontSize: 11,
+    fontFamily: 'Gilroy-Bold',
+  },
+  chipsScroll: {
+    marginTop: 8,
+    marginHorizontal: -20,
+  },
+  chipsRow: {
+    paddingHorizontal: 20,
+    gap: 6,
+  },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    height: 28,
+    paddingLeft: 11,
+    paddingRight: 8,
+    borderRadius: 14,
+    backgroundColor: 'rgba(250,47,64,0.14)',
+    borderWidth: 1,
+    borderColor: 'rgba(250,47,64,0.45)',
+  },
+  chipText: {
+    color: '#fff',
+    fontSize: 12,
+    fontFamily: 'Gilroy-Bold',
+    maxWidth: 160,
+  },
+  panelEdge: {
+    height: 1.5,
     width: '100%',
   },
   searchIcon: {
@@ -2093,7 +2240,6 @@ const styles = StyleSheet.create({
     paddingBottom: 96,
     zIndex: 1,
     elevation: 1,
-    marginTop: 210
   },
   playersListDesktop: {
     paddingHorizontal: 8,
@@ -2220,6 +2366,26 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginTop: 5,
     marginBottom: 6
+  },
+  sectionDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: 8,
+  },
+  sectionDotGold: {
+    backgroundColor: '#E8B86D',
+    shadowColor: '#E8B86D',
+    shadowOpacity: 0.9,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 0 },
+  },
+  sectionDotRed: {
+    backgroundColor: '#fa2f40',
+    shadowColor: '#fa2f40',
+    shadowOpacity: 0.9,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 0 },
   },
   sectionLabelText: {
     color: '#fff',
@@ -2361,6 +2527,7 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
     <>
       {sectionLabel ? (
         <View style={styles.sectionLabelRow}>
+          <View style={[styles.sectionDot, sectionLabel === 'leaders' ? styles.sectionDotGold : styles.sectionDotRed]} />
           <Text style={styles.sectionLabelText}>
             {sectionLabel === 'leaders'
               ? (leadersSectionTitle || t('search.topByPoints') || 'Top by points')

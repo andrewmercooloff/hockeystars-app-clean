@@ -1,5 +1,6 @@
 import React from 'react';
 import { Image } from 'expo-image';
+import { getSupabaseOriginVersion, subscribeSupabaseOrigin } from '../utils/supabase';
 import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAvatarCache } from '../utils/AvatarCache';
@@ -45,6 +46,18 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
   const [retryNonce, setRetryNonce] = React.useState(0);
   const retryCountRef = React.useRef(0);
   const prevUrlRef = React.useRef<string | null>(null);
+  // Failover direct ↔ proxy: URL пересчитывается через rewriteSupabasePublicUrl при рендере,
+  // поэтому достаточно форсировать рендер — иначе картинка висит на мёртвом origin.
+  const [, setOriginVersion] = React.useState(getSupabaseOriginVersion);
+  React.useEffect(
+    () =>
+      subscribeSupabaseOrigin(() => {
+        setOriginVersion(getSupabaseOriginVersion());
+        retryCountRef.current = 0;
+        setRetryNonce((n) => n + 1);
+      }),
+    []
+  );
   const lastGoodUrlRef = React.useRef<string | null>(null);
 
   React.useEffect(() => {
@@ -109,7 +122,9 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
 
   const displayAvatarUrl = effectiveAvatarUrl || lastGoodUrlRef.current;
 
+  const loadedRef = React.useRef(false);
   const handleLoad = React.useCallback(() => {
+    loadedRef.current = true;
     setImageError(false);
     retryCountRef.current = 0;
     onLoad?.();
@@ -163,6 +178,18 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
     const separator = displayAvatarUrl.includes('?') ? '&' : '?';
     return `${displayAvatarUrl}${separator}r=${retryNonce}`;
   }, [displayAvatarUrl, retryNonce]);
+
+  // Сторожок зависшей загрузки: у expo-image нет таймаута, а недоступный origin
+  // (например, прокси за VPN) держит запрос минутами — шайба остаётся чёрной.
+  React.useEffect(() => {
+    loadedRef.current = false;
+    const isRemote = !!sourceUri && (sourceUri.startsWith('http://') || sourceUri.startsWith('https://'));
+    if (!isRemote) return;
+    const tid = setTimeout(() => {
+      if (!loadedRef.current) handleError();
+    }, 8000);
+    return () => clearTimeout(tid);
+  }, [sourceUri, handleError]);
 
   if (status === 'scout') {
     return (

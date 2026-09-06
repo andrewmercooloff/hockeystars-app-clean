@@ -1342,17 +1342,20 @@ export default function MessagesScreen() {
 
   // Empty component
   const ListEmptyComponent = useCallback(() => (
-    <View style={styles.emptyContainer}>
-      {!inboxReady ? (
-        <SkeletonList rows={7} rowHeight={76} />
-      ) : (
+    !inboxReady ? (
+      // Top-aligned: a centered column overflows upward under the fixed header.
+      <View style={styles.skeletonContainer}>
+        <SkeletonList rows={5} rowHeight={76} />
+      </View>
+    ) : (
+      <View style={styles.emptyContainer}>
         <EmptyState
           icon="chatbubble-outline"
           title={t('messages.noMessages')}
           subtitle={t('messages.startConversation')}
         />
-      )}
-    </View>
+      </View>
+    )
   ), [t, inboxReady]);
 
   const listFooterElement = useMemo(
@@ -1415,7 +1418,7 @@ export default function MessagesScreen() {
               </TouchableOpacity>
               <Text style={styles.pageTitle}>{t('messages.title')}</Text>
             </View>
-            <SkeletonList rows={7} rowHeight={76} />
+            <SkeletonList rows={7} rowHeight={76} topInset={52} />
           </View>
         </CachedBackground>
       </View>
@@ -1603,6 +1606,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 60,
+  },
+  skeletonContainer: {
+    width: '100%',
+    alignSelf: 'stretch',
   },
   emptyContent: {
     backgroundColor: 'rgba(22, 22, 26, 0.86)',

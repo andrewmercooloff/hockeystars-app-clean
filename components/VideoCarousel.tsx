@@ -21,10 +21,68 @@ import { getVideoThumbnailUrl } from '../utils/videoUrls';
 import { getVideoTileSize } from '../utils/mediaTileSize';
 import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
 import { rewriteSupabasePublicUrl } from '../utils/supabase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as FileSystem from 'expo-file-system/legacy';
 
 // Кеш для успешных форматов превью (чтобы не перебирать форматы каждый раз)
 const thumbnailFormatCache = new Map<string, number>();
 const generatedThumbCache = new Map<string, string>();
+
+/** Кадры, снятые на устройстве для роликов без серверного превью — переживают перезапуск. */
+const GENERATED_THUMBS_KEY = 'hs_video_thumbs_v1';
+let generatedThumbsLoaded: Promise<void> | null = null;
+const loadGeneratedThumbs = () => {
+  if (!generatedThumbsLoaded) {
+    generatedThumbsLoaded = AsyncStorage.getItem(GENERATED_THUMBS_KEY)
+      .then((raw) => {
+        if (!raw) return;
+        for (const [url, uri] of Object.entries(JSON.parse(raw) as Record<string, string>)) {
+          if (!generatedThumbCache.has(url)) generatedThumbCache.set(url, uri);
+        }
+      })
+      .catch(() => {});
+  }
+  return generatedThumbsLoaded;
+};
+if (Platform.OS !== 'web') void loadGeneratedThumbs();
+const rememberGeneratedThumb = (url: string, uri: string) => {
+  generatedThumbCache.set(url, uri);
+  if (Platform.OS === 'web') return;
+  const persisted: Record<string, string> = {};
+  generatedThumbCache.forEach((v, k) => {
+    if (!v.startsWith('data:')) persisted[k] = v;
+  });
+  AsyncStorage.setItem(GENERATED_THUMBS_KEY, JSON.stringify(persisted)).catch(() => {});
+};
+
+const nativeThumbInFlight = new Map<string, Promise<string | null>>();
+/** Native: снять кадр прямо из удалённого mp4 (expo-video-thumbnails умеет по URL), сохранить в кэш-папку. */
+const captureNativeVideoFrame = (videoUrl: string): Promise<string | null> => {
+  const existing = nativeThumbInFlight.get(videoUrl);
+  if (existing) return existing;
+  const task = (async () => {
+    try {
+      const VideoThumbnails = await import('expo-video-thumbnails');
+      const { uri } = await VideoThumbnails.getThumbnailAsync(videoUrl, { time: 800, quality: 0.6 });
+      const dir = FileSystem.cacheDirectory;
+      if (!dir) return uri;
+      const stable = `${dir}vthumb_${Math.abs(hashString(videoUrl))}.jpg`;
+      await FileSystem.copyAsync({ from: uri, to: stable }).catch(() => {});
+      return stable;
+    } catch {
+      return null;
+    } finally {
+      nativeThumbInFlight.delete(videoUrl);
+    }
+  })();
+  nativeThumbInFlight.set(videoUrl, task);
+  return task;
+};
+const hashString = (s: string): number => {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return h;
+};
 
 function captureWebVideoFrame(videoUrl: string): Promise<string | null> {
   if (Platform.OS !== 'web' || typeof document === 'undefined') {
@@ -121,26 +179,46 @@ export const DirectVideoThumbnail = React.memo(function DirectVideoThumbnail({ v
     setDisplayUri(null);
   }, [resolvedUrl, serverThumb, serverThumbFailed]);
 
+  // Нет серверного превью — снимаем кадр сами (web: canvas, native: expo-video-thumbnails)
+  // и на native дозагружаем его в бакет, чтобы у остальных превью пришло с сервера.
   React.useEffect(() => {
-    if (displayUri || Platform.OS !== 'web') return;
+    if (displayUri) return;
+    if (serverThumb && !serverThumbFailed) return;
     let cancelled = false;
     void (async () => {
-      const frame = await captureWebVideoFrame(resolvedUrl);
+      if (Platform.OS !== 'web') await loadGeneratedThumbs();
+      if (cancelled) return;
+      const cached = generatedThumbCache.get(resolvedUrl);
+      if (cached) {
+        setDisplayUri(cached);
+        return;
+      }
+      const frame =
+        Platform.OS === 'web'
+          ? await captureWebVideoFrame(resolvedUrl)
+          : await captureNativeVideoFrame(resolvedUrl);
       if (cancelled || !frame) return;
-      generatedThumbCache.set(resolvedUrl, frame);
+      rememberGeneratedThumb(resolvedUrl, frame);
       setDisplayUri(frame);
+      if (Platform.OS !== 'web' && serverThumb) {
+        const { backfillVideoThumbnail } = await import('../utils/uploadImage');
+        void backfillVideoThumbnail(resolvedUrl, frame);
+      }
     })();
     return () => {
       cancelled = true;
     };
-  }, [displayUri, resolvedUrl]);
+  }, [displayUri, resolvedUrl, serverThumb, serverThumbFailed]);
 
   const handleImageError = React.useCallback(() => {
     if (serverThumb && displayUri === serverThumb) {
       setServerThumbFailed(true);
+    } else if (displayUri && generatedThumbCache.get(resolvedUrl) === displayUri) {
+      // локальный файл кэша вычищен системой — снимем кадр заново
+      generatedThumbCache.delete(resolvedUrl);
     }
     setDisplayUri(null);
-  }, [displayUri, serverThumb]);
+  }, [displayUri, serverThumb, resolvedUrl]);
 
   if (displayUri) {
     return (
@@ -438,6 +516,17 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [likeRefreshTrigger, setLikeRefreshTrigger] = useState(0);
+
+  // Греем серверные превью всех роликов сразу — карусель не ждёт каждую картинку по очереди
+  useEffect(() => {
+    videos.forEach((v) => {
+      const resolved = rewriteSupabasePublicUrl(v.url) || v.url;
+      const thumb = getVideoThumbnailUrl(resolved);
+      if (thumb && !generatedThumbCache.has(resolved)) {
+        ExpoImage.prefetch(thumb, { cachePolicy: 'memory-disk' }).catch(() => {});
+      }
+    });
+  }, [videos]);
 
   const panResponder = useRef(
     PanResponder.create({

@@ -614,6 +614,30 @@ export const uploadVideoToStorage = async (
   }
 };
 
+const backfilledThumbs = new Set<string>();
+
+/**
+ * Дозагрузка превью для старых роликов, у которых `_thumb.jpg` в бакете нет:
+ * кадр, снятый на устройстве, кладём рядом с mp4 — следующим зрителям он придёт с сервера.
+ */
+export const backfillVideoThumbnail = async (videoPublicUrl: string, thumbUri: string): Promise<void> => {
+  if (backfilledThumbs.has(videoPublicUrl)) return;
+  backfilledThumbs.add(videoPublicUrl);
+  try {
+    const url = new URL(videoPublicUrl);
+    const parts = url.pathname.split('/videos/');
+    if (parts.length < 2 || !/\.mp4$/i.test(parts[1])) return;
+    const thumbPath = parts[1].replace(/\.mp4$/i, '_thumb.jpg');
+    const res = await fetch(thumbUri);
+    if (!res.ok) return;
+    const buf = await res.arrayBuffer();
+    if (!buf.byteLength) return;
+    await supabase.storage.from('videos').upload(thumbPath, buf, { contentType: 'image/jpeg', upsert: true });
+  } catch (err) {
+    console.warn('⚠️ backfillVideoThumbnail:', err);
+  }
+};
+
 // Удаление видео из Supabase Storage по публичному URL
 export const deleteVideoFromStorage = async (publicUrl: string): Promise<void> => {
   try {

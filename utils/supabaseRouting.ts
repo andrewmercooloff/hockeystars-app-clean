@@ -192,9 +192,14 @@ export async function revalidateSupabaseOriginInBackground(
   const likelyRu = isLikelyRussia();
 
   if (likelyRu) {
+    // Сидим на direct после аварийного failover — возвращаемся на proxy,
+    // только когда он снова отвечает (иначе снова получим пустой экран).
     if (currentUrl !== SUPABASE_PROXY_URL) {
-      await writeCachedOrigin(SUPABASE_PROXY_URL);
-      await onSwitch(SUPABASE_PROXY_URL);
+      const proxy = await probeSupabaseOrigin(SUPABASE_PROXY_URL, anonKey, 3000);
+      if (proxy.ok) {
+        await writeCachedOrigin(SUPABASE_PROXY_URL);
+        await onSwitch(SUPABASE_PROXY_URL);
+      }
     }
     return;
   }

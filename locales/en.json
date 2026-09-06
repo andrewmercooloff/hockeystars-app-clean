@@ -30,7 +30,8 @@
     "super": "Super!",
     "left": "Left",
     "right": "Right",
-    "offline": "No connection"
+    "offline": "No connection",
+    "info": "Info"
   },
   "winger": "Winger",
   "center": "Center",
@@ -71,7 +72,8 @@
     "oneVideo": "new video",
     "multipleVideos": "{count} new videos",
     "video": "video",
-    "videos": "videos"
+    "videos": "videos",
+    "fullScreen": "Full screen"
   },
   "avatarNotification": {
     "title": "New Avatar",
@@ -247,7 +249,9 @@
       "saveError": "Failed to mark exercise as completed",
       "generalError": "An error occurred while saving",
       "times": "time",
-      "timesPlural": "times"
+      "timesPlural": "times",
+      "loginRequired": "Sign in to complete exercises",
+      "title": "Exercise"
     },
     "difficulty": {
       "Начинающий": "Beginner",
@@ -3145,7 +3149,9 @@
         "difficulty": "Начинающий",
         "duration": "10 мин"
       }
-    }
+    },
+    "exerciseNumber": "Exercise #{id}",
+    "timesPlural": "times"
   },
   "items": {
     "autograph": "autograph",
@@ -3239,7 +3245,9 @@
     "errorProcessFriendRequest": "Failed to process friend request",
     "errorProcessRequest": "Failed to process request",
     "errorSendMessage": "Failed to send message",
-    "phoneOrEmailPlaceholderShort": "+48… or email"
+    "phoneOrEmailPlaceholderShort": "+48… or email",
+    "email": "Email",
+    "errorSwitchingToEmail": "Could not switch to email sign-in"
   },
   "profile": {
     "title": "Profile",
@@ -3559,7 +3567,25 @@
     "city": "City",
     "addAddress": "Add address",
     "addressesHint": "You can add several addresses",
-    "previousSeason": "Previous season"
+    "previousSeason": "Previous season",
+    "cover": "Cover",
+    "changeCover": "Change cover",
+    "removeCover": "Remove cover",
+    "teamLogo": "Team logo",
+    "uploadTeamLogo": "Upload logo",
+    "coverUpdated": "Cover updated",
+    "teamLogoUpdated": "Team logo updated",
+    "coverUploadFailed": "Could not upload the image",
+    "scoutPrivacyNote": "Other users will not see your photo or name — to them you are “Scout”.",
+    "positionCover": "Position the cover",
+    "positionCoverHint": "Drag with one finger, pinch to zoom until the frame fits",
+    "allTime": "All time",
+    "seasonsCount": "{count} seasons",
+    "currentSeasonHint": "Current season",
+    "editAchievement": "Edit achievement",
+    "errorEnterCompetition": "Enter the competition name",
+    "errorEnterYear": "Enter the year",
+    "fullScreen": "Full screen"
   },
   "register": {
     "title": "Registration",
@@ -3625,7 +3651,10 @@
     "seconds": "seconds",
     "times": "times",
     "sprint": "100 meters",
-    "_cache_clear": "2024-01-16-9"
+    "_cache_clear": "2024-01-16-9",
+    "scoutPrivacyNote": "Other users will not see a scout’s photo or name — you appear as “Scout”.",
+    "emailFormatError": "Please enter a valid email address",
+    "registrationFailed": "Registration failed"
   },
   "navigation": {
     "home": "Home",
@@ -3688,7 +3717,8 @@
     "errorCreatingUser": "Failed to create user",
     "fillRequiredFields": "Please fill in all required fields",
     "enterValidPhone": "Please enter a valid phone number with country code",
-    "requiredForPlayers": "For players and stars, birth date and position are required"
+    "requiredForPlayers": "For players and stars, birth date and position are required",
+    "adminPanel": "Admin panel"
   },
   "adminGifts": {
     "title": "Gift Management",
@@ -3910,7 +3940,8 @@
     "shareRatingFooter": "hockeystars.com",
     "ratingPointsLabel": "points",
     "allCountries": "All countries",
-    "allYears": "All years"
+    "allYears": "All years",
+    "filters": "Filters"
   },
   "messages": {
     "title": "Messages",
@@ -3925,7 +3956,8 @@
     "massSend": "Mass Send",
     "recipients": "Recipients",
     "typeMessage": "Type a message...",
-    "send": "Send"
+    "send": "Send",
+    "searchHistoryLoading": "Searching message history…"
   },
   "notifications": {
     "title": "Notifications",

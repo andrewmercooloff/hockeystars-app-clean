@@ -48,6 +48,7 @@ import {
 import { dataCache, CACHE_KEYS } from '../utils/DataCache';
 import { safeHideSplashScreen } from '../utils/splashScreenUtils';
 import { useOtaUpdates } from '../hooks/useOtaUpdates';
+import AnimatedSplash from '../components/AnimatedSplash';
 
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
@@ -1344,7 +1345,14 @@ export default function RootLayout() {
   React.useEffect(() => {
     const notificationListener = Notifications.addNotificationResponseReceivedListener(response => {
       const data = response.notification.request.content.data;
-      const deepLink = data?.deepLink;
+      let deepLink = data?.deepLink;
+      // Старые/сторонние пуши без deepLink, но с player_id (например scout_report) — ведём в профиль.
+      if (!deepLink && typeof data?.player_id === 'string' && data.player_id) {
+        deepLink =
+          data.type === 'scout_report'
+            ? `/player/${data.player_id}?scrollToAnalysis=true`
+            : `/player/${data.player_id}`;
+      }
       
       if (deepLink) {
         console.log('🔗 Deep link из уведомления:', deepLink);
@@ -1727,7 +1735,7 @@ export default function RootLayout() {
                 ...(Platform.OS === 'android' ? { backgroundColor: colors.scene } : {}),
               }}
             >
-              <CachedBackground style={{ flex: 1 }} vignette={false}>
+              <CachedBackground style={{ flex: 1 }} vignette={false} lighting={false}>
                 <StatusBar 
                   barStyle="light-content" 
                   backgroundColor="#050008" 
@@ -2050,14 +2058,7 @@ export default function RootLayout() {
               elevation: 9999,
               opacity: splashOpacity,
             }}>
-              <Image 
-                source={require('../assets/images/splash-icon.png')} 
-                style={{ 
-                  width: 200, // Оптимизированный размер для лучшего соответствия нативному splash
-                  height: 200
-                }}
-                resizeMode="contain"
-              />
+              <AnimatedSplash opacity={splashOpacity} />
             </Animated.View>
           )}
           

@@ -659,23 +659,41 @@ export const searchTeams = async (searchTerm: string, language: string = 'ru'): 
 };
 
 // Создание новой команды
+/** Год/сезон в названии («Динамо 2008», «Лида 2014-2015») — это возрастная группа, а не другая команда. */
+const TEAM_YEAR_RE = /\s*[-–/]?\s*(19|20)\d{2}(\s*[-/–]\s*(19|20)?\d{2})?/g;
+
+export const cleanTeamName = (name: string): string =>
+  name.replace(TEAM_YEAR_RE, ' ').replace(/\s+/g, ' ').trim();
+
+/** Ключ для сравнения команд: регистр, ё/е, дефисы, кавычки и годы не важны. */
+export const normalizeTeamKey = (name: string): string =>
+  cleanTeamName(name)
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/[^a-zа-я0-9]+/gi, ' ')
+    .trim();
+
 export const createTeam = async (teamData: Omit<Team, 'id'>): Promise<Team | null> => {
   try {
-    
-    // Сначала проверяем, существует ли уже команда с таким названием
-    const { data: existingTeam, error: checkError } = await supabase
+    const cleanName = cleanTeamName(teamData.name) || teamData.name.trim();
+    const key = normalizeTeamKey(cleanName);
+
+    // Ищем существующую команду с тем же нормализованным названием, чтобы не плодить
+    // «СКА Стрельна» / «Ска-стрельна» / «СКА Стрельна 2012».
+    const stem = cleanName.split(/\s+/)[0]?.replace(/[^a-zа-я0-9ё]/gi, '') || cleanName;
+    const { data: candidates, error: checkError } = await supabase
       .from('teams')
       .select('*')
-      .eq('name', teamData.name)
-      .single();
-    
-    if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows returned
+      .ilike('name', `%${escapeIlikeTerm(stem)}%`)
+      .limit(60);
+
+    if (checkError) {
       console.error('❌ Ошибка проверки существующей команды:', checkError);
       return null;
     }
-    
-    if (existingTeam) {
 
+    const existingTeam = (candidates || []).find((t: any) => normalizeTeamKey(t.name) === key);
+    if (existingTeam) {
       return {
         id: existingTeam.id,
         name: existingTeam.name,
@@ -688,7 +706,7 @@ export const createTeam = async (teamData: Omit<Team, 'id'>): Promise<Team | nul
     const { data, error } = await supabase
       .from('teams')
       .insert({
-        name: teamData.name,
+        name: cleanName,
         type: teamData.type,
         country: teamData.country,
         city: teamData.city
@@ -7951,7 +7969,12 @@ export const notifyFriendsAboutScoutReport = async (playerId: string, playerName
       const title = tr?.pushTitles?.scoutReport || SCOUT_REPORT_TITLE[lang] || SCOUT_REPORT_TITLE.en;
       try {
         const { sendNotificationToUser } = await import('./notificationService');
-        await sendNotificationToUser(friend.id, '📋 ' + title, `${playerName} ${received}`, { type: 'scout_report', player_id: playerId, action: 'open_player' });
+        await sendNotificationToUser(friend.id, '📋 ' + title, `${playerName} ${received}`, {
+          type: 'scout_report',
+          player_id: playerId,
+          action: 'open_player',
+          deepLink: `/player/${playerId}?scrollToAnalysis=true`,
+        });
         await supabase.rpc('increment_unread_notifications', { user_id: friend.id });
       } catch (e) {
         console.error('⚠️ Ошибка push/scout_report:', e);
@@ -8641,8 +8664,9 @@ export const getSmartPlayerSelection = (
 ): Player[] => {
   try {
     // 0. Константы
-    const MAX_BASE_PLAYERS = 24; // +3 для топ-лидеров по рейтингу
-    const MAX_TOTAL_WITH_SCOUT = 25;
+    // 24 → 18: на телефоне 30 шайб перекрывали друг друга, лёд не читался
+    const MAX_BASE_PLAYERS = 18; // +3 для топ-лидеров по рейтингу
+    const MAX_TOTAL_WITH_SCOUT = 19;
 
     // 1. Фильтруем скрытые профили (кроме текущего пользователя и админов)
     const visiblePlayers = players.filter(player => {

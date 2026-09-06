@@ -30,7 +30,8 @@
     "rejectRequestConfirm": "Вы уверены, что хотите отклонить этот запрос?",
     "left": "Левый",
     "right": "Правый",
-    "offline": "Нет соединения"
+    "offline": "Нет соединения",
+    "info": "Информация"
   },
   "winger": "Крайний нападающий",
   "center": "Центральный нападающий",
@@ -71,7 +72,8 @@
     "oneVideo": "новое видео",
     "multipleVideos": "{count} новых видео",
     "video": "видео",
-    "videos": "видео"
+    "videos": "видео",
+    "fullScreen": "На весь экран"
   },
   "avatarNotification": {
     "title": "Новый аватар",
@@ -249,7 +251,9 @@
       "saveError": "Не удалось отметить упражнение как выполненное",
       "generalError": "Произошла ошибка при сохранении",
       "times": "раз",
-      "timesPlural": "раза"
+      "timesPlural": "раза",
+      "loginRequired": "Войдите, чтобы выполнять упражнения",
+      "title": "Упражнение"
     },
     "difficulty": {
       "Начинающий": "Начинающий",
@@ -2916,7 +2920,8 @@
         "difficulty": "Начинающий",
         "duration": "10 мин"
       }
-    }
+    },
+    "timesPlural": "раз"
   },
   "items": {
     "autograph": "автограф",
@@ -3010,7 +3015,9 @@
     "errorProcessFriendRequest": "Не удалось обработать запрос в друзья",
     "errorProcessRequest": "Не удалось обработать запрос",
     "errorSendMessage": "Не удалось отправить сообщение",
-    "phoneOrEmailPlaceholderShort": "+48… или email"
+    "phoneOrEmailPlaceholderShort": "+48… или email",
+    "email": "Email",
+    "errorSwitchingToEmail": "Не удалось переключиться на вход по email"
   },
   "profile": {
     "addFriend": "Добавить в друзья",
@@ -3323,7 +3330,22 @@
     "city": "Город",
     "addAddress": "Добавить адрес",
     "addressesHint": "Можно указать несколько адресов",
-    "previousSeason": "Прошлый сезон"
+    "previousSeason": "Прошлый сезон",
+    "cover": "Обложка",
+    "changeCover": "Сменить обложку",
+    "removeCover": "Убрать обложку",
+    "teamLogo": "Лого команды",
+    "uploadTeamLogo": "Загрузить лого",
+    "coverUpdated": "Обложка обновлена",
+    "teamLogoUpdated": "Логотип команды обновлён",
+    "coverUploadFailed": "Не удалось загрузить изображение",
+    "scoutPrivacyNote": "Ваше фото и имя не увидят другие пользователи — для них вы «Скаут».",
+    "positionCover": "Расположите обложку",
+    "positionCoverHint": "Двигайте пальцем и растягивайте двумя, чтобы кадр лёг в шапку",
+    "allTime": "За всё время",
+    "seasonsCount": "{count} сез.",
+    "currentSeasonHint": "Текущий сезон",
+    "fullScreen": "На весь экран"
   },
   "register": {
     "title": "Регистрация",
@@ -3374,7 +3396,10 @@
     "fillRequiredFields": "Пожалуйста, заполните все обязательные поля",
     "fillAllFields": "Пожалуйста, заполните все поля",
     "phoneFormatError": "Пожалуйста, введите корректный номер телефона с кодом страны (например: +1234567890)",
-    "parentEmailFormatError": "Пожалуйста, введите корректный email родителя"
+    "parentEmailFormatError": "Пожалуйста, введите корректный email родителя",
+    "scoutPrivacyNote": "Фото и имя скаута не видят другие пользователи — вы отображаетесь как «Скаут».",
+    "emailFormatError": "Введите корректный email",
+    "registrationFailed": "Ошибка регистрации"
   },
   "navigation": {
     "home": "Главная",
@@ -3439,7 +3464,8 @@
     "errorCreatingUser": "Не удалось создать пользователя",
     "fillRequiredFields": "Пожалуйста, заполните все обязательные поля",
     "enterValidPhone": "Пожалуйста, введите корректный номер телефона с кодом страны",
-    "requiredForPlayers": "Для игроков и звезд обязательно указать дату рождения и позицию"
+    "requiredForPlayers": "Для игроков и звезд обязательно указать дату рождения и позицию",
+    "adminPanel": "Панель администратора"
   },
   "adminGifts": {
     "title": "Управление подарками",
@@ -3667,7 +3693,8 @@
     "shareRatingFooter": "hockeystars.com",
     "ratingPointsLabel": "очков",
     "allCountries": "Все страны",
-    "allYears": "Все года"
+    "allYears": "Все года",
+    "filters": "Фильтры"
   },
   "messages": {
     "title": "Сообщения",
@@ -3682,7 +3709,8 @@
     "massSend": "Массовая отправка",
     "recipients": "Получатели",
     "typeMessage": "Введите сообщение...",
-    "send": "Отправить"
+    "send": "Отправить",
+    "searchHistoryLoading": "Ищем в истории сообщений…"
   },
   "notifications": {
     "title": "Уведомления",

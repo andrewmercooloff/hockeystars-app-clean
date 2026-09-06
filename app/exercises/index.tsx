@@ -208,7 +208,7 @@ export default function ExercisesScreen() {
               </TouchableOpacity>
               <Text style={styles.pageTitle}>{t('exercises.title')}</Text>
             </View>
-            <SkeletonList rows={6} avatar={false} rowHeight={112} />
+            <SkeletonList rows={6} avatar={false} rowHeight={112} topInset={52} />
           </View>
         </CachedBackground>
       </View>

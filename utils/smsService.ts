@@ -997,7 +997,6 @@ export const sendSMSViaSmsBy = async (phone: string, code: string): Promise<bool
     // ВАЖНО: Все endpoints возвращают 404. Возможно, нужен другой домен или формат.
     // После одобрения альфа-имени "Hockeystars" нужно проверить правильный endpoint в документации sms.by
     // Пробуем разные варианты endpoints sms.by
-    // API ключ: REDACTED_HEX_SECRET
     // Документация: https://app.sms.by/api/docs
     const endpoints = [
       // Попробуем sendQuickSMS с системным именем SMSBY_DAY и номером со знаком +

@@ -28,7 +28,8 @@
     "left": "Vasen",
     "right": "Oikein",
     "offline": "Ei yhteyttä",
-    "and": "ja"
+    "and": "ja",
+    "info": "Tiedote"
   },
   "winger": "Laituri",
   "center": "Keskushyökkääjä",
@@ -201,7 +202,9 @@
       "saveError": "Harjoitusta ei voi merkitä suoritetuksi",
       "generalError": "Tallennettaessa tapahtui virhe",
       "times": "kerran",
-      "timesPlural": "kertaa"
+      "timesPlural": "kertaa",
+      "loginRequired": "Kirjaudu sisään suorittaaksesi harjoituksia",
+      "title": "Harjoitus"
     },
     "difficulty": {
       "Начинающий": "Alku",
@@ -3092,7 +3095,8 @@
       "Intermediate": "Keskitaso",
       "Advanced": "Edistynyt",
       "Easy": "Helppo"
-    }
+    },
+    "timesPlural": "kertaa"
   },
   "items": {
     "autograph": "nimikirjoitus",
@@ -3186,7 +3190,9 @@
     "errorProcessFriendRequest": "Ystäväpyyntöäsi ei voi käsitellä.",
     "errorProcessRequest": "Pyyntösi käsittely epäonnistui",
     "errorSendMessage": "Viestin lähettäminen epäonnistui",
-    "phoneOrEmailPlaceholderShort": "+358… tai sähköposti"
+    "phoneOrEmailPlaceholderShort": "+358… tai sähköposti",
+    "email": "Sähköposti",
+    "errorSwitchingToEmail": "Sähköpostikirjautumiseen vaihtaminen epäonnistui"
   },
   "profile": {
     "addFriend": "Lisää kaveriksi",
@@ -3472,7 +3478,22 @@
     "city": "Kaupunki",
     "addAddress": "Lisää osoite",
     "addressesHint": "Voit lisätä useita osoitteita",
-    "previousSeason": "Previous season"
+    "previousSeason": "Previous season",
+    "cover": "Kansikuva",
+    "changeCover": "Vaihda kansikuva",
+    "removeCover": "Poista kansikuva",
+    "teamLogo": "Joukkueen logo",
+    "uploadTeamLogo": "Lataa logo",
+    "coverUpdated": "Kansikuva päivitetty",
+    "teamLogoUpdated": "Joukkueen logo päivitetty",
+    "coverUploadFailed": "Kuvan lataus epäonnistui",
+    "scoutPrivacyNote": "Muut käyttäjät eivät näe kuvaasi tai nimeäsi – heille olet ”Kykyjenetsijä”.",
+    "positionCover": "Aseta kansikuva",
+    "positionCoverHint": "Siirrä yhdellä sormella, zoomaa nipistämällä, kunnes rajaus sopii",
+    "allTime": "Kaikki ajat",
+    "seasonsCount": "{count} kautta",
+    "currentSeasonHint": "Nykyinen kausi",
+    "fullScreen": "Koko näyttö"
   },
   "register": {
     "title": "Rekisteröinti",
@@ -3523,7 +3544,10 @@
     "fillRequiredFields": "Täytä kaikki pakolliset kentät",
     "fillAllFields": "Täytä kaikki kentät",
     "phoneFormatError": "Syötä kelvollinen puhelinnumero maakoodilla (esim. +1234567890)",
-    "parentEmailFormatError": "Syötä kelvollinen vanhemman sähköpostiosoite"
+    "parentEmailFormatError": "Syötä kelvollinen vanhemman sähköpostiosoite",
+    "scoutPrivacyNote": "Muut eivät näe kykyjenetsijän kuvaa tai nimeä – näyt nimellä ”Kykyjenetsijä”.",
+    "emailFormatError": "Syötä kelvollinen sähköpostiosoite",
+    "registrationFailed": "Rekisteröinti epäonnistui"
   },
   "navigation": {
     "home": "Kotiin",
@@ -3582,7 +3606,8 @@
     "errorCreatingUser": "Käyttäjän luominen epäonnistui",
     "fillRequiredFields": "Täytä kaikki pakolliset kentät.",
     "enterValidPhone": "Anna kelvollinen puhelinnumero ja maakoodi.",
-    "requiredForPlayers": "Pelaajille ja tähdille on pakollista ilmoittaa syntymäaika ja paikka"
+    "requiredForPlayers": "Pelaajille ja tähdille on pakollista ilmoittaa syntymäaika ja paikka",
+    "adminPanel": "Hallintapaneeli"
   },
   "museum": {
     "title": "Museo",
@@ -3789,7 +3814,8 @@
     "shareRatingFooter": "hockeystars.com",
     "ratingPointsLabel": "pistettä",
     "allCountries": "Kaikki maat",
-    "allYears": "Kaikki vuodet"
+    "allYears": "Kaikki vuodet",
+    "filters": "Suodattimet"
   },
   "messages": {
     "title": "Viestit",
@@ -3804,7 +3830,8 @@
     "massSend": "Massalähetys",
     "recipients": "Vastaanottajat",
     "typeMessage": "Kirjoita viesti...",
-    "send": "Lähetä"
+    "send": "Lähetä",
+    "searchHistoryLoading": "Haetaan viestihistoriasta…"
   },
   "notifications": {
     "title": "Ilmoitukset",
@@ -4282,5 +4309,8 @@
     "scanQr": "Skannaa puhelimella — App Store tai Google Play avautuu",
     "appStoreCta": "Lataa App Storesta",
     "playStoreCta": "Lataa Google Playsta"
+  },
+  "videoNotification": {
+    "fullScreen": "Koko näyttö"
   }
 }

@@ -592,26 +592,37 @@ export default function RegisterScreen() {
         return;
       }
 
-      // Для США/Канады отправляем email, для остальных - SMS через Twilio Verify
+      // Для США/Канады отправляем email, для остальных - SMS через сервер
       if (isUSOrCanada) {
         // Email: генерируем код, сохраняем в БД, отправляем
-      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-      await saveVerificationCode(contactValue, verificationCode);
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+        await saveVerificationCode(contactValue, verificationCode);
         console.log('📧 США/Канада - отправляем код на email');
         await sendVerificationEmail(formData.email, verificationCode);
       } else {
-        // SMS: Twilio Verify сам генерирует и управляет кодами!
-        console.log('📱 Отправляем код через Twilio Verify API');
-        await sendVerificationSMS(formData.phone);
+        // SMS: сразу показываем экран кода — ответ сервера может прийти позже SMS
+        console.log('📱 Отправляем код через сервер HockeyStars (фон)');
+        setStep('verification');
+        setResendTimer(60);
+        setCanResend(false);
+        Keyboard.dismiss();
+
+        void sendVerificationSMS(formData.phone).then((smsOk) => {
+          if (!smsOk) {
+            showAlert(
+              t('common.error'),
+              t('auth.errorSendingCodeMessage') ||
+                'Не удалось подтвердить отправку SMS. Если код не пришёл — нажмите «Отправить снова».',
+              'warning'
+            );
+          }
+        });
+        return;
       }
-      
+
       setStep('verification');
-      
-      // Запускаем таймер для повторной отправки (60 секунд)
       setResendTimer(60);
       setCanResend(false);
-      
-      // Скрываем клавиатуру и показываем уведомление с задержкой
       Keyboard.dismiss();
       
     } catch (error) {
@@ -638,8 +649,11 @@ export default function RegisterScreen() {
         await saveVerificationCode(formData.email, verificationCode);
         await sendVerificationEmail(formData.email, verificationCode);
       } else {
-        // SMS: Twilio Verify сам генерирует и управляет кодами!
-        await sendVerificationSMS(formData.phone);
+        const smsOk = await sendVerificationSMS(formData.phone);
+        if (!smsOk) {
+          showAlert(t('common.error'), t('auth.errorResendingCodeMessage') || 'Не удалось отправить SMS', 'error');
+          return;
+        }
       }
       
       // Запускаем таймер снова
@@ -1267,6 +1281,13 @@ export default function RegisterScreen() {
               autoFocus={false}
             />
           </View>
+
+          {formData.status === 'scout' && (
+            <View style={styles.scoutPrivacyNote}>
+              <Ionicons name="eye-off-outline" size={16} color="rgba(255,255,255,0.6)" />
+              <Text style={styles.scoutPrivacyNoteText}>{t('register.scoutPrivacyNote')}</Text>
+            </View>
+          )}
 
           {/* Фото/Логотип - обязательно для всех кроме скаута */}
           {formData.status !== 'scout' && (
@@ -2071,6 +2092,25 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.14)',
     // Убираем width, чтобы поле адаптировалось к контейнеру
+  },
+  scoutPrivacyNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  scoutPrivacyNoteText: {
+    flex: 1,
+    fontFamily: 'Gilroy-Regular',
+    fontSize: 13,
+    lineHeight: 18,
+    color: 'rgba(255,255,255,0.7)',
   },
   pickerContainer: {
     flexDirection: 'row',

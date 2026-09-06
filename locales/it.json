@@ -28,7 +28,8 @@
     "left": "Sinistra",
     "right": "Giusto",
     "offline": "Nessuna connessione",
-    "and": "e"
+    "and": "e",
+    "info": "Info"
   },
   "winger": "Ala",
   "center": "Centravanti",
@@ -201,7 +202,9 @@
       "saveError": "Impossibile contrassegnare l'esercizio come completato",
       "generalError": "Si è verificato un errore durante il salvataggio",
       "times": "una volta",
-      "timesPlural": "volte"
+      "timesPlural": "volte",
+      "loginRequired": "Accedi per completare gli esercizi",
+      "title": "Esercizio"
     },
     "difficulty": {
       "Начинающий": "Inizio",
@@ -3092,7 +3095,8 @@
       "Intermediate": "Intermedio",
       "Advanced": "Avanzato",
       "Easy": "Facile"
-    }
+    },
+    "timesPlural": "volte"
   },
   "items": {
     "autograph": "autografo",
@@ -3186,7 +3190,9 @@
     "errorProcessFriendRequest": "Impossibile elaborare la tua richiesta di amicizia.",
     "errorProcessRequest": "Impossibile elaborare la tua richiesta",
     "errorSendMessage": "Impossibile inviare il messaggio",
-    "phoneOrEmailPlaceholderShort": "+39… o email"
+    "phoneOrEmailPlaceholderShort": "+39… o email",
+    "email": "Email",
+    "errorSwitchingToEmail": "Impossibile passare all’accesso via email"
   },
   "profile": {
     "addFriend": "Aggiungi come amico",
@@ -3480,7 +3486,22 @@
     "city": "Città",
     "addAddress": "Aggiungi indirizzo",
     "addressesHint": "Puoi inserire più indirizzi",
-    "previousSeason": "Previous season"
+    "previousSeason": "Previous season",
+    "cover": "Copertina",
+    "changeCover": "Cambia copertina",
+    "removeCover": "Rimuovi copertina",
+    "teamLogo": "Logo della squadra",
+    "uploadTeamLogo": "Carica il logo",
+    "coverUpdated": "Copertina aggiornata",
+    "teamLogoUpdated": "Logo della squadra aggiornato",
+    "coverUploadFailed": "Caricamento dell’immagine non riuscito",
+    "scoutPrivacyNote": "Gli altri utenti non vedranno la tua foto né il tuo nome: per loro sei “Scout”.",
+    "positionCover": "Posiziona la copertina",
+    "positionCoverHint": "Trascina con un dito, pizzica per ingrandire finché l’inquadratura non è giusta",
+    "allTime": "Totale carriera",
+    "seasonsCount": "{count} stagioni",
+    "currentSeasonHint": "Stagione corrente",
+    "fullScreen": "Schermo intero"
   },
   "register": {
     "title": "Registrazione",
@@ -3531,7 +3552,10 @@
     "fillRequiredFields": "Si prega di compilare tutti i campi obbligatori",
     "fillAllFields": "Si prega di compilare tutti i campi",
     "phoneFormatError": "Si prega di inserire un numero di telefono valido con il codice paese (es. +1234567890)",
-    "parentEmailFormatError": "Si prega di inserire un'email genitore valida"
+    "parentEmailFormatError": "Si prega di inserire un'email genitore valida",
+    "scoutPrivacyNote": "Foto e nome dello scout non sono visibili agli altri: appari come “Scout”.",
+    "emailFormatError": "Inserisci un indirizzo email valido",
+    "registrationFailed": "Registrazione non riuscita"
   },
   "navigation": {
     "home": "Casa",
@@ -3588,7 +3612,8 @@
     "errorCreatingUser": "Impossibile creare l'utente",
     "fillRequiredFields": "Si prega di compilare tutti i campi obbligatori.",
     "enterValidPhone": "Inserisci un numero di telefono valido con prefisso internazionale.",
-    "requiredForPlayers": "Per i giocatori e le stelle è obbligatorio indicare la data di nascita e la posizione"
+    "requiredForPlayers": "Per i giocatori e le stelle è obbligatorio indicare la data di nascita e la posizione",
+    "adminPanel": "Pannello admin"
   },
   "museum": {
     "title": "Museo",
@@ -3795,7 +3820,8 @@
     "shareRatingFooter": "hockeystars.com",
     "ratingPointsLabel": "punti",
     "allCountries": "Tutti i paesi",
-    "allYears": "Tutti gli anni"
+    "allYears": "Tutti gli anni",
+    "filters": "Filtri"
   },
   "messages": {
     "title": "Messaggi",
@@ -3810,7 +3836,8 @@
     "massSend": "Invio di massa",
     "recipients": "Destinatari",
     "typeMessage": "Scrivi un messaggio...",
-    "send": "Invia"
+    "send": "Invia",
+    "searchHistoryLoading": "Ricerca nella cronologia…"
   },
   "notifications": {
     "title": "Notifiche",
@@ -4288,5 +4315,8 @@
     "scanQr": "Scansiona con il telefono — si apre App Store o Google Play",
     "appStoreCta": "Scarica dall'App Store",
     "playStoreCta": "Scarica da Google Play"
+  },
+  "videoNotification": {
+    "fullScreen": "Schermo intero"
   }
 }

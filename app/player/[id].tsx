@@ -48,6 +48,10 @@ import AchievementsSection from '../../components/AchievementsSection';
 import ActivityRating from '../../components/ActivityRating';
 import SeasonStatsHeader from '../../components/SeasonStatsHeader';
 import PreviousSeasonStatsSection from '../../components/PreviousSeasonStatsSection';
+import AllTimeStatsSection from '../../components/AllTimeStatsSection';
+import TeamCover from '../../components/TeamCover';
+import CoverPositionModal, { type CoverSource } from '../../components/CoverPositionModal';
+import { prefetchPlayerCover, prefetchTeamLogo, removePlayerCover, uploadPlayerCover, uploadTeamLogo } from '../../utils/teamAssets';
 import { buildSeasonStatsForSave, playerHasArchivedSeasonStats } from '../../utils/seasonStats';
 import CurrentTeamsSection from '../../components/CurrentTeamsSection';
 import CustomAlert from '../../components/CustomAlert';
@@ -949,18 +953,8 @@ export default function PlayerProfile() {
         return;
       }
       
-      // На web bootstrap уже стартовал в <head> — лишняя задержка только вредит
-      if (Platform.OS !== 'web') {
-        await new Promise(resolve => setTimeout(resolve, 50));
-      }
-      
-      // Проверяем еще раз после задержки
-      const checkId = Array.isArray(id) ? id[0] : id;
-      if (checkId !== normalizedId || currentLoadingIdRef.current !== normalizedId) {
-        console.log('⚠️ ID изменился после задержки, отменяем:', normalizedId, '->', checkId, 'currentLoadingId:', currentLoadingIdRef.current);
-        return;
-      }
-      
+      // Без искусственной паузы: смена id во время загрузки отсекается по currentLoadingIdRef ниже
+
       // Профиль + команды сразу; currentUser не блокирует первый paint
       const [playerData, teamsFromNetwork] = await Promise.all([
         getPlayerById(normalizedId as string, { skipCache: forceRefreshProfile }),
@@ -2204,6 +2198,109 @@ export default function PlayerProfile() {
         }
       ]
     );
+  };
+
+  // ---- Обложка профиля / логотип команды (файлы в бакете avatars, без колонок в БД) ----
+  const [coverRefresh, setCoverRefresh] = useState(0);
+  const [coverSource, setCoverSource] = useState<CoverSource | null>(null);
+  const [coverAspect, setCoverAspect] = useState(3.2);
+  const coverTeam = useMemo(() => {
+    const primary = playerTeams[0];
+    if (!primary) return null;
+    const key = `teams.${primary.teamName}`;
+    const translated = t(key);
+    const name = translated === key || translated.startsWith('teams.') ? primary.teamName : translated;
+    return { teamId: primary.id, teamName: name };
+  }, [playerTeams, t]);
+
+  // Греем обложку сразу по id из маршрута — параллельно с загрузкой профиля,
+  // а эмблему — как только известна команда. 404 запоминается, фолбэк не ждёт сеть.
+  useEffect(() => {
+    const pid = Array.isArray(routeIdParam) ? routeIdParam[0] : routeIdParam;
+    if (pid) void prefetchPlayerCover(String(pid));
+  }, [routeIdParam]);
+  useEffect(() => {
+    if (coverTeam) void prefetchTeamLogo(coverTeam.teamId);
+  }, [coverTeam?.teamId]);
+
+  const pickAssetImage = async (aspect?: [number, number]): Promise<CoverSource | null> => {
+    if (!(Platform.OS === 'android' && Platform.Version >= 33)) {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        showCustomAlert(t('common.error'), 'Нет доступа к галерее', 'error');
+        return null;
+      }
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: !!aspect,
+      aspect,
+      quality: 0.9,
+    });
+    if (result.canceled || !result.assets[0]) return null;
+    const a = result.assets[0];
+    return { uri: a.uri, width: a.width || 1, height: a.height || 1 };
+  };
+
+  // Фото выбирается без системного кропа: пользователь сам двигает кадр в CoverPositionModal.
+  const handlePickCover = async () => {
+    if (!player) return;
+    try {
+      const asset = await pickAssetImage();
+      if (!asset) return;
+      setCoverSource(asset);
+    } catch (e) {
+      console.error('cover pick', e);
+      showCustomAlert(t('common.error'), t('profile.coverUploadFailed'), 'error');
+    }
+  };
+
+  const handleConfirmCover = async (croppedUri: string) => {
+    if (!player) return;
+    try {
+      const url = await uploadPlayerCover(croppedUri, player.id);
+      if (!url) {
+        showCustomAlert(t('common.error'), t('profile.coverUploadFailed'), 'error');
+        return;
+      }
+      setCoverRefresh((n) => n + 1);
+    } catch (e) {
+      console.error('cover upload', e);
+      showCustomAlert(t('common.error'), t('profile.coverUploadFailed'), 'error');
+    } finally {
+      setCoverSource(null);
+    }
+  };
+
+  const handleRemoveCover = () => {
+    if (!player) return;
+    showCustomAlert(
+      t('profile.removeCover'),
+      '',
+      'warning',
+      async () => {
+        const ok = await removePlayerCover(player.id);
+        if (ok) setCoverRefresh((n) => n + 1);
+      },
+      true
+    );
+  };
+
+  const handlePickTeamLogo = async () => {
+    if (!coverTeam) return;
+    try {
+      const asset = await pickAssetImage();
+      if (!asset) return;
+      const url = await uploadTeamLogo(asset.uri, coverTeam.teamId);
+      if (!url) {
+        showCustomAlert(t('common.error'), t('profile.coverUploadFailed'), 'error');
+        return;
+      }
+      setCoverRefresh((n) => n + 1);
+      showCustomAlert(t('common.success'), t('profile.teamLogoUpdated'), 'success');
+    } catch (e) {
+      console.error('team logo upload', e);
+      showCustomAlert(t('common.error'), t('profile.coverUploadFailed'), 'error');
+    }
   };
 
   const pickFromGallery = async () => {
@@ -3707,11 +3804,10 @@ export default function PlayerProfile() {
           isCurrent: false
         }));
         
-        // Проверяем изменились ли команды
-        const currentTeamsEqual = JSON.stringify(savedCurrentTeams.sort((a, b) => a.id.localeCompare(b.id))) === 
-                                   JSON.stringify(currentTeamsForCompare.sort((a, b) => a.id.localeCompare(b.id)));
-        const pastTeamsEqual = JSON.stringify(savedPastTeams.sort((a, b) => a.id.localeCompare(b.id))) === 
-                               JSON.stringify(pastTeamsForCompare.sort((a, b) => a.id.localeCompare(b.id)));
+        // Сравниваем С УЧЁТОМ ПОРЯДКА: сохранённые команды приходят по team_order,
+        // а смена порядка — тоже изменение, которое надо синхронизировать.
+        const currentTeamsEqual = JSON.stringify(savedCurrentTeams) === JSON.stringify(currentTeamsForCompare);
+        const pastTeamsEqual = JSON.stringify(savedPastTeams) === JSON.stringify(pastTeamsForCompare);
         
         teamsChanged = !currentTeamsEqual || !pastTeamsEqual;
         
@@ -4876,7 +4972,31 @@ export default function PlayerProfile() {
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
               <View pointerEvents="box-none" style={isDesktop ? styles.desktopContentWrap : undefined}>
             {/* Фото и основная информация */}
-            <View style={[styles.profileSection, isDesktop && styles.profileSectionDesktop]}>
+            <View style={[styles.profileSection, isDesktop ? [styles.profileSectionDesktop, styles.profileSectionDesktopWithCover] : styles.profileSectionWithCover]}>
+              {/* Клубная шапка за аватаром: свой ковер → эмблема команды → бренд */}
+              {player && (
+                <TeamCover
+                  playerId={player.id}
+                  team={coverTeam}
+                  style={isDesktop ? styles.coverBandDesktop : styles.coverBand}
+                  onMeasure={({ width: w, height: h }) => {
+                    if (w > 0 && h > 0) setCoverAspect(w / h);
+                  }}
+                  refreshKey={coverRefresh}
+                  canEditCover={!!isEditing && player.status !== 'scout' && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
+                  canEditTeamLogo={!!isEditing && currentUser?.status === 'admin'}
+                  onPickCover={handlePickCover}
+                  onRemoveCover={handleRemoveCover}
+                  onPickTeamLogo={handlePickTeamLogo}
+                />
+              )}
+              <CoverPositionModal
+                visible={!!coverSource}
+                source={coverSource}
+                aspect={coverAspect}
+                onCancel={() => setCoverSource(null)}
+                onConfirm={handleConfirmCover}
+              />
               {/* Кнопка с 3 точками в правом верхнем углу профиля */}
               {/* Для чужих профилей: показывается всегда (кроме админов) */}
               {/* Для своего профиля: показывается только в режиме редактирования */}
@@ -5046,8 +5166,8 @@ export default function PlayerProfile() {
                 )}
               </View>
               
-              {/* Социальные ссылки */}
-              {!isEditing && (
+              {/* Социальные ссылки (скаут ничего своего не публикует) */}
+              {!isEditing && player.status !== 'scout' && (
                 <SocialLinks
                   instagram={player.instagram}
                   tiktok={player.tiktok}
@@ -5076,6 +5196,12 @@ export default function PlayerProfile() {
                    player.status === 'star' ? t('profile.star') : t('profile.player')}
                 </Text>
               </View>
+              {player.status === 'scout' && currentUser?.id === player.id && (
+                <View style={styles.scoutPrivacyNote}>
+                  <Ionicons name="eye-off-outline" size={14} color="rgba(255,255,255,0.55)" />
+                  <Text style={styles.scoutPrivacyNoteText}>{t('profile.scoutPrivacyNote')}</Text>
+                </View>
+              )}
               {playerTeams.length > 0 && (
                 <View style={[styles.playerTeamsContainer, isDesktop && styles.playerTeamsContainerDesktop]}>
                   {playerTeams.map((team, index) => {
@@ -5238,8 +5364,6 @@ export default function PlayerProfile() {
 
             </View>
 
-
-
             {/* Если пользователь заблокирован - показываем только основную информацию и сообщение */}
             {isUserBlockedState && currentUser && currentUser.id !== player.id ? (
               <SectionCard>
@@ -5282,6 +5406,13 @@ export default function PlayerProfile() {
                   >
                     <Ionicons name="settings-outline" size={20} color="#fff" />
                     <Text style={styles.adminPanelButtonText}>{t('admin.adminPanel') || 'Панель администратора'}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.adminPanelButton, styles.adminPanelButtonDark]}
+                    onPress={() => router.push('/_debug-connection' as any)}
+                  >
+                    <Ionicons name="pulse-outline" size={20} color="#fff" />
+                    <Text style={styles.adminPanelButtonText}>Диагностика сети</Text>
                   </TouchableOpacity>
                 </View>
               </SectionCard>
@@ -5623,6 +5754,7 @@ export default function PlayerProfile() {
                       statsGridStyle={styles.statsGrid}
                       statItemStyle={styles.statItem}
                     />
+                    {!isEditing && <AllTimeStatsSection player={player} isGoalkeeper={isGoalkeeper} />}
                     {mergeStatsWithPhysicalOnDesktop ? renderPhysicalDataBody({ compactTop: true }) : null}
                   </SectionCard>
                 ) : null;
@@ -5769,6 +5901,7 @@ export default function PlayerProfile() {
                       statsGridStyle={styles.statsGrid}
                       statItemStyle={styles.statItem}
                     />
+                    {!isEditing && <AllTimeStatsSection player={player} isGoalkeeper={isGoalkeeper} />}
                     {mergeStatsWithPhysicalOnDesktop ? renderPhysicalDataBody({ compactTop: true }) : null}
                   </SectionCard>
                 ) : null;
@@ -6343,7 +6476,7 @@ export default function PlayerProfile() {
               )}
 
             {/* Социальные сети */}
-              {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) && (
+              {isEditing && player.status !== 'scout' && (currentUser?.status === 'admin' || currentUser?.id === player.id) && (
                <SectionCard>
                  <Text style={styles.sectionTitle}>{t('editProfile.socialLinks')}</Text>
                  <View style={styles.infoGrid}>
@@ -6393,8 +6526,8 @@ export default function PlayerProfile() {
                </SectionCard>
             )}
 
-            {/* Секция команд - не показываем для магазинов, заточки коньков и администраторов */}
-            {player.status !== 'shop' && player.status !== 'skateSharpening' && player.status !== 'admin' && (() => {
+            {/* Секция команд - не показываем для магазинов, заточки коньков, администраторов и скаутов */}
+            {player.status !== 'shop' && player.status !== 'skateSharpening' && player.status !== 'admin' && player.status !== 'scout' && (() => {
               const isOwner = currentUser && currentUser.id === player.id;
               const isEditingMode = isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id);
               const hasTeams = playerTeams.length > 0 || pastTeams.length > 0;
@@ -6793,10 +6926,12 @@ export default function PlayerProfile() {
 {/* Game videos are now inside AIAnalysisCard above */}
 
             {/* Фотографии - не показываем для звезд и администраторов, для магазинов и заточки коньков доступны всем */}
-            {player.status !== 'star' && player.status !== 'admin' && (() => {
+            {player.status !== 'star' && player.status !== 'admin' && player.status !== 'scout' && (() => {
               const isShopOrSkateSharpening = player.status === 'shop' || player.status === 'skateSharpening';
+              // Scouts evaluate players — full profile access without friendship
               const canSeePhotos = (currentUser && currentUser.id === player.id) || 
                                    (currentUser?.status === 'admin') ||
+                                   (currentUser?.status === 'scout') ||
                                    friendshipStatus === 'friends' ||
                                    isShopOrSkateSharpening;
               const isEditingPhotos = isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id);
@@ -7151,6 +7286,7 @@ export default function PlayerProfile() {
               (currentUser && currentUser.id === player.id) || 
               (currentUser?.status === 'admin') ||
               (currentUser?.status === 'star') ||
+              (currentUser?.status === 'scout') ||
               friendshipStatus === 'friends' ? (
                 // Показываем контейнер музея если:
                 // 1. Это владелец профиля, админ или звезда - всегда показываем
@@ -8779,6 +8915,34 @@ const styles = StyleSheet.create({
     marginTop: 20,
     position: 'relative',
   },
+  // Шапка — фон всего верхнего блока (аватар → имя → статус → команды → стаж):
+  // стартует у верха контента и уходит за края горизонтального паддинга 20.
+  profileSectionWithCover: {
+    marginTop: 8,
+    marginBottom: 18,
+    paddingTop: 16,
+    paddingBottom: 18,
+  },
+  coverBand: {
+    position: 'absolute',
+    top: -8,
+    bottom: 0,
+    left: -20,
+    right: -20,
+    borderBottomLeftRadius: 26,
+    borderBottomRightRadius: 26,
+  },
+  profileSectionDesktopWithCover: {
+    overflow: 'hidden',
+  },
+  coverBandDesktop: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    borderRadius: 24,
+  },
   avatarContainer: {
     position: 'relative',
     alignItems: 'center',
@@ -8923,6 +9087,22 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'Gilroy-Regular',
     color: '#fff',
+  },
+  scoutPrivacyNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 6,
+    paddingHorizontal: 24,
+    maxWidth: 360,
+  },
+  scoutPrivacyNoteText: {
+    flexShrink: 1,
+    fontFamily: 'Gilroy-Regular',
+    fontSize: 12,
+    lineHeight: 16,
+    color: 'rgba(255,255,255,0.55)',
+    textAlign: 'center',
   },
   playerTeamsContainer: {
     flexDirection: 'row',

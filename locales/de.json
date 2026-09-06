@@ -28,7 +28,8 @@
     "left": "Links",
     "right": "Rechts",
     "offline": "Keine Verbindung",
-    "and": "und"
+    "and": "und",
+    "info": "Info"
   },
   "winger": "Flügelspieler",
   "center": "Mittelstürmer",
@@ -201,7 +202,9 @@
       "saveError": "Übung kann nicht als abgeschlossen markiert werden",
       "generalError": "Beim Speichern ist ein Fehler aufgetreten",
       "times": "einmal",
-      "timesPlural": "mal"
+      "timesPlural": "mal",
+      "loginRequired": "Melde dich an, um Übungen zu absolvieren",
+      "title": "Übung"
     },
     "difficulty": {
       "Начинающий": "Anfang",
@@ -3092,7 +3095,8 @@
       "Intermediate": "Mittelstufe",
       "Advanced": "Fortgeschritten",
       "Easy": "Einfach"
-    }
+    },
+    "timesPlural": "Mal"
   },
   "items": {
     "autograph": "Autogramm",
@@ -3186,7 +3190,9 @@
     "errorProcessFriendRequest": "Ihre Freundschaftsanfrage konnte nicht verarbeitet werden.",
     "errorProcessRequest": "Ihre Anfrage konnte nicht bearbeitet werden",
     "errorSendMessage": "Senden der Nachricht fehlgeschlagen",
-    "phoneOrEmailPlaceholderShort": "+49… oder E-Mail"
+    "phoneOrEmailPlaceholderShort": "+49… oder E-Mail",
+    "email": "E-Mail",
+    "errorSwitchingToEmail": "Wechsel zur E-Mail-Anmeldung fehlgeschlagen"
   },
   "profile": {
     "addFriend": "Als Freund hinzufügen",
@@ -3480,7 +3486,22 @@
     "city": "Stadt",
     "addAddress": "Adresse hinzufügen",
     "addressesHint": "Sie können mehrere Adressen angeben",
-    "previousSeason": "Previous season"
+    "previousSeason": "Previous season",
+    "cover": "Titelbild",
+    "changeCover": "Titelbild ändern",
+    "removeCover": "Titelbild entfernen",
+    "teamLogo": "Teamlogo",
+    "uploadTeamLogo": "Teamlogo hochladen",
+    "coverUpdated": "Titelbild aktualisiert",
+    "teamLogoUpdated": "Teamlogo aktualisiert",
+    "coverUploadFailed": "Bild konnte nicht hochgeladen werden",
+    "scoutPrivacyNote": "Andere Nutzer sehen weder dein Foto noch deinen Namen – für sie bist du „Scout“.",
+    "positionCover": "Titelbild ausrichten",
+    "positionCoverHint": "Mit einem Finger verschieben, mit zwei zoomen, bis der Ausschnitt passt",
+    "allTime": "Gesamt",
+    "seasonsCount": "{count} Saisons",
+    "currentSeasonHint": "Aktuelle Saison",
+    "fullScreen": "Vollbild"
   },
   "register": {
     "title": "Anmeldung",
@@ -3531,7 +3552,10 @@
     "fillRequiredFields": "Bitte füllen Sie alle erforderlichen Felder aus",
     "fillAllFields": "Bitte füllen Sie alle Felder aus",
     "phoneFormatError": "Bitte geben Sie eine gültige Telefonnummer mit Ländercode ein (z.B. +1234567890)",
-    "parentEmailFormatError": "Bitte geben Sie eine gültige E-Mail-Adresse des Elternteils ein"
+    "parentEmailFormatError": "Bitte geben Sie eine gültige E-Mail-Adresse des Elternteils ein",
+    "scoutPrivacyNote": "Foto und Name eines Scouts sind für andere nicht sichtbar – du erscheinst als „Scout“.",
+    "emailFormatError": "Bitte gib eine gültige E-Mail-Adresse ein",
+    "registrationFailed": "Registrierung fehlgeschlagen"
   },
   "navigation": {
     "home": "Heim",
@@ -3588,7 +3612,8 @@
     "errorCreatingUser": "Fehler beim Erstellen des Benutzers",
     "fillRequiredFields": "Bitte füllen Sie alle erforderlichen Felder aus.",
     "enterValidPhone": "Bitte geben Sie eine gültige Telefonnummer mit Landesvorwahl ein.",
-    "requiredForPlayers": "Bei Spielern und Stars ist die Angabe des Geburtsdatums und der Position obligatorisch"
+    "requiredForPlayers": "Bei Spielern und Stars ist die Angabe des Geburtsdatums und der Position obligatorisch",
+    "adminPanel": "Admin-Bereich"
   },
   "adminGifts": {
     "title": "Geschenkverwaltung",
@@ -3814,7 +3839,8 @@
     "shareRatingFooter": "hockeystars.com",
     "ratingPointsLabel": "Punkte",
     "allCountries": "Alle Länder",
-    "allYears": "Alle Jahre"
+    "allYears": "Alle Jahre",
+    "filters": "Filter"
   },
   "messages": {
     "title": "Nachrichten",
@@ -3829,7 +3855,8 @@
     "massSend": "Massensendung",
     "recipients": "Empfänger",
     "typeMessage": "Nachricht eingeben...",
-    "send": "Senden"
+    "send": "Senden",
+    "searchHistoryLoading": "Nachrichtenverlauf wird durchsucht…"
   },
   "notifications": {
     "title": "Benachrichtigungen",
@@ -4307,5 +4334,8 @@
     "scanQr": "Mit dem Handy scannen — App Store oder Google Play öffnet sich",
     "appStoreCta": "Im App Store laden",
     "playStoreCta": "Bei Google Play laden"
+  },
+  "videoNotification": {
+    "fullScreen": "Vollbild"
   }
 }

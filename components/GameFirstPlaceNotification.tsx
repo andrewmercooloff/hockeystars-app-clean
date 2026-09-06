@@ -6,6 +6,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import CachedAvatar from './CachedAvatar';
 import { formatPrize } from '../data/hockeyQuiz/utils';
 import type { Language } from '../contexts/LanguageContext';
+import { NOTIFICATION_CARD, NOTIFICATION_CARD_BLUR } from '../utils/notificationCard';
 
 interface GameFirstPlaceNotificationProps {
   playerName: string;
@@ -76,15 +77,10 @@ const GameFirstPlaceNotification = React.memo<GameFirstPlaceNotificationProps>((
 
 const styles = StyleSheet.create({
   containerBlur: {
-    marginHorizontal: 0,
-    marginVertical: 0,
+    ...NOTIFICATION_CARD_BLUR,
   },
   container: {
-    backgroundColor: 'transparent',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
+    ...NOTIFICATION_CARD,
     flexDirection: 'row',
     alignItems: 'center',
   },

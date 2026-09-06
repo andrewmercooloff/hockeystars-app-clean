@@ -1,9 +1,12 @@
 const { createClient } = require('@supabase/supabase-js');
 
-// Конфигурация Supabase с service role key
-const supabaseUrl = 'https://jvsypfwiajuwsyuzkyda.supabase.co';
-// Попробуем найти service role key в других файлах
-const serviceKey = 'REDACTED_SUPABASE_SERVICE_ROLE_KEY';
+// Use SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY from env — never commit the service role key.
+const supabaseUrl = process.env.SUPABASE_URL || 'https://jvsypfwiajuwsyuzkyda.supabase.co';
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+if (!serviceKey) {
+  console.error('Set SUPABASE_SERVICE_ROLE_KEY in the environment');
+  process.exit(1);
+}
 
 const supabase = createClient(supabaseUrl, serviceKey);
 

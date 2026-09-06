@@ -30,7 +30,8 @@
     "left": "Pa kreisi",
     "right": "Pareizi",
     "offline": "Nav savienojuma",
-    "and": "un"
+    "and": "un",
+    "info": "Informācija"
   },
   "winger": "Malējais uzbrucējs",
   "center": "Centra uzbrucējs",
@@ -220,7 +221,9 @@
       "saveError": "Vingrinājumu nevar atzīmēt kā pabeigtu",
       "generalError": "Saglabāšanas laikā radās kļūda",
       "times": "vienreiz",
-      "timesPlural": "reizes"
+      "timesPlural": "reizes",
+      "loginRequired": "Piesakieties, lai veiktu vingrinājumus",
+      "title": "Vingrinājums"
     },
     "difficulty": {
       "Начинающий": "Sākums",
@@ -3105,7 +3108,8 @@
         "difficulty": "Начинающий",
         "duration": "10 мин"
       }
-    }
+    },
+    "timesPlural": "reizes"
   },
   "items": {
     "autograph": "autogrāfs",
@@ -3199,7 +3203,9 @@
     "errorProcessFriendRequest": "Nevar apstrādāt jūsu draudzības pieprasījumu.",
     "errorProcessRequest": "Neizdevās apstrādāt jūsu pieprasījumu",
     "errorSendMessage": "Neizdevās nosūtīt ziņojumu",
-    "phoneOrEmailPlaceholderShort": "+371… vai e-pasts"
+    "phoneOrEmailPlaceholderShort": "+371… vai e-pasts",
+    "email": "E-pasts",
+    "errorSwitchingToEmail": "Neizdevās pārslēgties uz pieteikšanos ar e-pastu"
   },
   "profile": {
     "addFriend": "Pievienot kā draugu",
@@ -3494,7 +3500,22 @@
     "city": "Pilsēta",
     "addAddress": "Pievienot adresi",
     "addressesHint": "Var norādīt vairākas adreses",
-    "previousSeason": "Previous season"
+    "previousSeason": "Previous season",
+    "cover": "Vāka attēls",
+    "changeCover": "Mainīt vāku",
+    "removeCover": "Noņemt vāku",
+    "teamLogo": "Komandas logotips",
+    "uploadTeamLogo": "Augšupielādēt logotipu",
+    "coverUpdated": "Vāks atjaunināts",
+    "teamLogoUpdated": "Komandas logotips atjaunināts",
+    "coverUploadFailed": "Neizdevās augšupielādēt attēlu",
+    "scoutPrivacyNote": "Citi lietotāji neredzēs jūsu fotoattēlu un vārdu — viņiem jūs esat “Skauts”.",
+    "positionCover": "Novietojiet vāku",
+    "positionCoverHint": "Velciet ar vienu pirkstu, tuviniet ar diviem, līdz kadrs iederas",
+    "allTime": "Kopā",
+    "seasonsCount": "{count} sez.",
+    "currentSeasonHint": "Pašreizējā sezona",
+    "fullScreen": "Pilnekrāns"
   },
   "register": {
     "title": "Reģistrācija",
@@ -3545,7 +3566,10 @@
     "fillRequiredFields": "Lūdzu, aizpildiet visus obligātos laukus",
     "fillAllFields": "Lūdzu, aizpildiet visus laukus",
     "phoneFormatError": "Lūdzu, ievadiet derīgu tālruņa numuru ar valsts kodu (piem., +1234567890)",
-    "parentEmailFormatError": "Lūdzu, ievadiet derīgu vecāka e-pasta adresi"
+    "parentEmailFormatError": "Lūdzu, ievadiet derīgu vecāka e-pasta adresi",
+    "scoutPrivacyNote": "Citi neredz skauta fotoattēlu un vārdu — jūs tiekat rādīts kā “Skauts”.",
+    "emailFormatError": "Ievadiet derīgu e-pasta adresi",
+    "registrationFailed": "Reģistrācija neizdevās"
   },
   "navigation": {
     "home": "Sākums",
@@ -3604,7 +3628,8 @@
     "errorCreatingUser": "Neizdevās izveidot lietotāju",
     "fillRequiredFields": "Lūdzu, aizpildiet visus obligātos laukus.",
     "enterValidPhone": "Lūdzu, ievadiet derīgu tālruņa numuru ar valsts kodu.",
-    "requiredForPlayers": "Spēlētājiem un zvaigznēm obligāti jānorāda dzimšanas datums un pozīcija"
+    "requiredForPlayers": "Spēlētājiem un zvaigznēm obligāti jānorāda dzimšanas datums un pozīcija",
+    "adminPanel": "Administratora panelis"
   },
   "museum": {
     "title": "Muzejs",
@@ -3813,7 +3838,8 @@
     "shareRatingFooter": "hockeystars.com",
     "ratingPointsLabel": "punktu",
     "allCountries": "Visas valstis",
-    "allYears": "Visi gadi"
+    "allYears": "Visi gadi",
+    "filters": "Filtri"
   },
   "messages": {
     "title": "Ziņojumi",
@@ -3828,7 +3854,8 @@
     "massSend": "Masveida sūtīšana",
     "recipients": "Saņēmēji",
     "typeMessage": "Ievadiet ziņojumu...",
-    "send": "Nosūtīt"
+    "send": "Nosūtīt",
+    "searchHistoryLoading": "Meklē ziņu vēsturē…"
   },
   "notifications": {
     "title": "Paziņojumi",
@@ -4296,7 +4323,8 @@
     "oneVideo": "jaunu video",
     "multipleVideos": "{count} jaunus video",
     "video": "video",
-    "videos": "video"
+    "videos": "video",
+    "fullScreen": "Pilnekrāns"
   },
   "avatarNotification": {
     "changed": "mainīja avataru"

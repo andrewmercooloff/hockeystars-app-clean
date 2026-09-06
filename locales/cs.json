@@ -28,7 +28,8 @@
     "left": "Vlevo",
     "right": "Právo",
     "offline": "Bez připojení",
-    "and": "a"
+    "and": "a",
+    "info": "Informace"
   },
   "winger": "Křídelník",
   "center": "Střed dopředu",
@@ -201,7 +202,9 @@
       "saveError": "Cvičení nelze označit jako dokončené",
       "generalError": "Při ukládání došlo k chybě",
       "times": "jednou",
-      "timesPlural": "časy"
+      "timesPlural": "časy",
+      "loginRequired": "Přihlaste se, abyste mohli plnit cvičení",
+      "title": "Cvičení"
     },
     "difficulty": {
       "Начинающий": "Začátek",
@@ -3092,7 +3095,8 @@
       "Intermediate": "Střední",
       "Advanced": "Pokročilý",
       "Easy": "Snadný"
-    }
+    },
+    "timesPlural": "krát"
   },
   "items": {
     "autograph": "autogram",
@@ -3186,7 +3190,9 @@
     "errorProcessFriendRequest": "Vaši žádost o přátelství nelze zpracovat.",
     "errorProcessRequest": "Zpracování vašeho požadavku se nezdařilo",
     "errorSendMessage": "Odeslání zprávy se nezdařilo",
-    "phoneOrEmailPlaceholderShort": "+420… nebo email"
+    "phoneOrEmailPlaceholderShort": "+420… nebo email",
+    "email": "E-mail",
+    "errorSwitchingToEmail": "Nepodařilo se přepnout na přihlášení e-mailem"
   },
   "profile": {
     "addFriend": "Přidat jako přítele",
@@ -3472,7 +3478,22 @@
     "city": "Město",
     "addAddress": "Přidat adresu",
     "addressesHint": "Můžete zadat více adres",
-    "previousSeason": "Previous season"
+    "previousSeason": "Previous season",
+    "cover": "Obálka",
+    "changeCover": "Změnit obálku",
+    "removeCover": "Odebrat obálku",
+    "teamLogo": "Logo týmu",
+    "uploadTeamLogo": "Nahrát logo",
+    "coverUpdated": "Obálka aktualizována",
+    "teamLogoUpdated": "Logo týmu aktualizováno",
+    "coverUploadFailed": "Obrázek se nepodařilo nahrát",
+    "scoutPrivacyNote": "Ostatní uživatelé neuvidí vaši fotku ani jméno – jste pro ně „Skaut“.",
+    "positionCover": "Umístěte obálku",
+    "positionCoverHint": "Posouvejte jedním prstem, přibližujte dvěma, dokud výřez nesedí",
+    "allTime": "Celkem",
+    "seasonsCount": "{count} sez.",
+    "currentSeasonHint": "Aktuální sezóna",
+    "fullScreen": "Celá obrazovka"
   },
   "register": {
     "title": "Registrace",
@@ -3523,7 +3544,10 @@
     "fillRequiredFields": "Prosím vyplňte všechna povinná pole",
     "fillAllFields": "Prosím vyplňte všechna pole",
     "phoneFormatError": "Prosím zadejte platné telefonní číslo s kódem země (např. +1234567890)",
-    "parentEmailFormatError": "Prosím zadejte platný email rodiče"
+    "parentEmailFormatError": "Prosím zadejte platný email rodiče",
+    "scoutPrivacyNote": "Fotku a jméno skauta ostatní nevidí – zobrazujete se jako „Skaut“.",
+    "emailFormatError": "Zadejte platnou e-mailovou adresu",
+    "registrationFailed": "Registrace se nezdařila"
   },
   "navigation": {
     "home": "Domov",
@@ -3580,7 +3604,8 @@
     "errorCreatingUser": "Vytvoření uživatele se nezdařilo",
     "fillRequiredFields": "Vyplňte prosím všechna povinná pole.",
     "enterValidPhone": "Zadejte prosím platné telefonní číslo s kódem země.",
-    "requiredForPlayers": "U hráčů a hvězd je povinné uvést datum narození a pozici"
+    "requiredForPlayers": "U hráčů a hvězd je povinné uvést datum narození a pozici",
+    "adminPanel": "Panel správce"
   },
   "museum": {
     "title": "Muzeum",
@@ -3787,7 +3812,8 @@
     "shareRatingFooter": "hockeystars.com",
     "ratingPointsLabel": "bodů",
     "allCountries": "Všechny země",
-    "allYears": "Všechny roky"
+    "allYears": "Všechny roky",
+    "filters": "Filtry"
   },
   "messages": {
     "title": "Zprávy",
@@ -3802,7 +3828,8 @@
     "massSend": "Hromadné odesílání",
     "recipients": "Příjemci",
     "typeMessage": "Napište zprávu...",
-    "send": "Odeslat"
+    "send": "Odeslat",
+    "searchHistoryLoading": "Hledáme v historii zpráv…"
   },
   "notifications": {
     "title": "Oznámení",
@@ -4282,5 +4309,8 @@
     "scanQr": "Naskenujte telefonem — otevře se App Store nebo Google Play",
     "appStoreCta": "Stáhnout z App Store",
     "playStoreCta": "Stáhnout z Google Play"
+  },
+  "videoNotification": {
+    "fullScreen": "Celá obrazovka"
   }
 }

@@ -21,6 +21,16 @@ import { isSupabaseNetworkError } from '../utils/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useUser } from '../contexts/UserContext';
 import { sendVerificationSMS, verifyCode, verifySMSCode, saveVerificationCode, sendVerificationEmail } from '../utils/emailService';
+
+const LOOKUP_TIMEOUT_MS = 15000;
+
+const withLookupTimeout = <T,>(promise: Promise<T>): Promise<T> =>
+  Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error('lookup_timeout')), LOOKUP_TIMEOUT_MS)
+    ),
+  ]);
 import { ICE_BACKGROUND } from '../utils/iceBackground';
 
 export default function LoginScreen() {
@@ -316,8 +326,8 @@ export default function LoginScreen() {
       
       // ПРОВЕРЯЕМ существование пользователя ПЕРЕД отправкой кода
       const existingPlayer = inputType === 'email'
-        ? await getPlayerByEmail(cleanedContact)
-        : await getPlayerByPhone(cleanedContact);
+        ? await withLookupTimeout(getPlayerByEmail(cleanedContact))
+        : await withLookupTimeout(getPlayerByPhone(cleanedContact));
         
       if (!existingPlayer) {
         setLoading(false);
@@ -338,31 +348,46 @@ export default function LoginScreen() {
         console.log('📧 Автоопределение: отправляем код на email');
         await sendVerificationEmail(cleanedContact, verificationCode);
       } else {
-        // SMS: Twilio Verify сам генерирует и управляет кодами!
-        console.log('📱 Отправляем код через Twilio Verify API');
-        await sendVerificationSMS(cleanedContact);
+        // SMS: сразу показываем экран кода — ответ сервера может прийти позже SMS
+        console.log('📱 Отправляем код через сервер HockeyStars (фон)');
+        setStep('code');
+        setResendTimer(60);
+        setCanResend(false);
+        Keyboard.dismiss();
+        setTimeout(() => codeRef.current?.focus(), 100);
+
+        void sendVerificationSMS(cleanedContact).then((smsOk) => {
+          if (!smsOk) {
+            setAlert({
+              visible: true,
+              title: t('common.error'),
+              message:
+                t('auth.errorSendingCodeMessage') ||
+                'Не удалось подтвердить отправку SMS. Если код не пришёл — нажмите «Отправить снова».',
+              type: 'warning',
+            });
+          }
+        });
+        return;
       }
 
-      
       setStep('code');
-      
-      // Запускаем таймер на 60 секунд
       setResendTimer(60);
       setCanResend(false);
-      
-      // Скрываем клавиатуру и показываем уведомление с задержкой
       Keyboard.dismiss();
-      
-      setTimeout(() => {
-        codeRef.current?.focus();
-      }, 100);
+      setTimeout(() => codeRef.current?.focus(), 100);
       
     } catch (error) {
       console.error('❌ Ошибка отправки кода:', error);
+      const isTimeout =
+        error instanceof Error &&
+        (error.message.includes('timeout') || error.message.includes('Timeout'));
       showAuthError(
         error,
         t('auth.errorSendingCode'),
-        t('auth.errorSendingCodeMessage')
+        isTimeout
+          ? 'Сервер не ответил вовремя. Проверьте интернет и попробуйте снова.'
+          : t('auth.errorSendingCodeMessage')
       );
     } finally {
       setLoading(false);
@@ -388,8 +413,16 @@ export default function LoginScreen() {
         await saveVerificationCode(cleanedContact, verificationCode);
         await sendVerificationEmail(cleanedContact, verificationCode);
       } else {
-        // SMS: Twilio Verify сам генерирует и управляет кодами!
-        await sendVerificationSMS(cleanedContact);
+        const smsOk = await sendVerificationSMS(cleanedContact);
+        if (!smsOk) {
+          setAlert({
+            visible: true,
+            title: t('common.error'),
+            message: t('auth.errorSendingCodeMessage') || 'Не удалось отправить SMS',
+            type: 'error',
+          });
+          return;
+        }
       }
 
       // Запускаем таймер на 60 секунд
