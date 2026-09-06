@@ -198,8 +198,8 @@ const VIDEO_EDIT_GRID_GAP = 10;
 // scroll padding (20×2) + section padding (20×2) + section border (2×2)
 const VIDEO_EDIT_SECTION_INSET = 84;
 /** Высота клубной шапки за аватаром (телефон / десктоп). */
-const COVER_HEIGHT = 168;
-const COVER_HEIGHT_DESKTOP = 132;
+const COVER_HEIGHT = 84;
+const COVER_HEIGHT_DESKTOP = 66;
 
 
 export default function PlayerProfile() {
@@ -4967,7 +4967,7 @@ export default function PlayerProfile() {
                   height={isDesktop ? COVER_HEIGHT_DESKTOP : COVER_HEIGHT}
                   style={isDesktop ? styles.coverBandDesktop : styles.coverBand}
                   refreshKey={coverRefresh}
-                  canEditCover={!!isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
+                  canEditCover={!!isEditing && player.status !== 'scout' && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
                   canEditTeamLogo={!!isEditing && currentUser?.status === 'admin'}
                   onPickCover={handlePickCover}
                   onRemoveCover={handleRemoveCover}
@@ -5143,8 +5143,8 @@ export default function PlayerProfile() {
                 )}
               </View>
               
-              {/* Социальные ссылки */}
-              {!isEditing && (
+              {/* Социальные ссылки (скаут ничего своего не публикует) */}
+              {!isEditing && player.status !== 'scout' && (
                 <SocialLinks
                   instagram={player.instagram}
                   tiktok={player.tiktok}
@@ -5173,6 +5173,12 @@ export default function PlayerProfile() {
                    player.status === 'star' ? t('profile.star') : t('profile.player')}
                 </Text>
               </View>
+              {player.status === 'scout' && currentUser?.id === player.id && (
+                <View style={styles.scoutPrivacyNote}>
+                  <Ionicons name="eye-off-outline" size={14} color="rgba(255,255,255,0.55)" />
+                  <Text style={styles.scoutPrivacyNoteText}>{t('profile.scoutPrivacyNote')}</Text>
+                </View>
+              )}
               {playerTeams.length > 0 && (
                 <View style={[styles.playerTeamsContainer, isDesktop && styles.playerTeamsContainerDesktop]}>
                   {playerTeams.map((team, index) => {
@@ -6445,7 +6451,7 @@ export default function PlayerProfile() {
               )}
 
             {/* Социальные сети */}
-              {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) && (
+              {isEditing && player.status !== 'scout' && (currentUser?.status === 'admin' || currentUser?.id === player.id) && (
                <SectionCard>
                  <Text style={styles.sectionTitle}>{t('editProfile.socialLinks')}</Text>
                  <View style={styles.infoGrid}>
@@ -6495,8 +6501,8 @@ export default function PlayerProfile() {
                </SectionCard>
             )}
 
-            {/* Секция команд - не показываем для магазинов, заточки коньков и администраторов */}
-            {player.status !== 'shop' && player.status !== 'skateSharpening' && player.status !== 'admin' && (() => {
+            {/* Секция команд - не показываем для магазинов, заточки коньков, администраторов и скаутов */}
+            {player.status !== 'shop' && player.status !== 'skateSharpening' && player.status !== 'admin' && player.status !== 'scout' && (() => {
               const isOwner = currentUser && currentUser.id === player.id;
               const isEditingMode = isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id);
               const hasTeams = playerTeams.length > 0 || pastTeams.length > 0;
@@ -6895,7 +6901,7 @@ export default function PlayerProfile() {
 {/* Game videos are now inside AIAnalysisCard above */}
 
             {/* Фотографии - не показываем для звезд и администраторов, для магазинов и заточки коньков доступны всем */}
-            {player.status !== 'star' && player.status !== 'admin' && (() => {
+            {player.status !== 'star' && player.status !== 'admin' && player.status !== 'scout' && (() => {
               const isShopOrSkateSharpening = player.status === 'shop' || player.status === 'skateSharpening';
               // Scouts evaluate players — full profile access without friendship
               const canSeePhotos = (currentUser && currentUser.id === player.id) || 
@@ -9053,6 +9059,22 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'Gilroy-Regular',
     color: '#fff',
+  },
+  scoutPrivacyNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 6,
+    paddingHorizontal: 24,
+    maxWidth: 360,
+  },
+  scoutPrivacyNoteText: {
+    flexShrink: 1,
+    fontFamily: 'Gilroy-Regular',
+    fontSize: 12,
+    lineHeight: 16,
+    color: 'rgba(255,255,255,0.55)',
+    textAlign: 'center',
   },
   playerTeamsContainer: {
     flexDirection: 'row',
