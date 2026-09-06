@@ -34,24 +34,43 @@ const AnimatedSplash: React.FC<Props> = ({ opacity }) => {
       useNativeDriver: true,
     }).start();
 
-    const breathe = Animated.loop(
-      Animated.sequence([
-        Animated.timing(glow, {
-          toValue: 1,
-          duration: 1400,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-        Animated.timing(glow, {
-          toValue: 0,
-          duration: 1400,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-      ])
-    );
-    breathe.start();
-    return () => breathe.stop();
+    // Breathing glow with a soft haptic on each peak — the logo "beats".
+    let alive = true;
+    let current: Animated.CompositeAnimation | null = null;
+    const inhale = () => {
+      if (!alive) return;
+      current = Animated.timing(glow, {
+        toValue: 1,
+        duration: 1100,
+        easing: Easing.inOut(Easing.sin),
+        useNativeDriver: true,
+      });
+      current.start(({ finished }) => {
+        if (!alive || !finished) return;
+        if (Platform.OS !== 'web') {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft).catch(() => {});
+        }
+        exhale();
+      });
+    };
+    const exhale = () => {
+      if (!alive) return;
+      current = Animated.timing(glow, {
+        toValue: 0,
+        duration: 1100,
+        easing: Easing.inOut(Easing.sin),
+        useNativeDriver: true,
+      });
+      current.start(({ finished }) => {
+        if (alive && finished) inhale();
+      });
+    };
+    inhale();
+
+    return () => {
+      alive = false;
+      current?.stop();
+    };
   }, [enter, glow]);
 
   const enterScale = enter.interpolate({ inputRange: [0, 1], outputRange: [0.82, 1] });
