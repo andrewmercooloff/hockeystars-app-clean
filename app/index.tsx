@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Image as ExpoImage } from 'expo-image';
 import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useIsFocused } from '@react-navigation/native';
-import Animated, { Easing as ReEasing, useAnimatedStyle, useSharedValue, withDelay, withTiming, runOnJS } from 'react-native-reanimated';
+import Animated, { Easing as ReEasing, useAnimatedStyle, useFrameCallback, useSharedValue, withDelay, withTiming, runOnJS } from 'react-native-reanimated';
 
 /**
  * The whole puck layer fades in as one group when the home tab (re)mounts.
@@ -1688,21 +1688,45 @@ const OriginalPuckAnimator = React.memo(({
     top: animatedY.value,
   }), []);
 
-  // След на льду: снежная стружка за шайбой. Длина и яркость — от скорости,
-  // направление — против вектора движения. Всё на UI-потоке, без setState.
+  // След на льду: снежная стружка за шайбой. Интенсивность не берётся напрямую
+  // из скорости, а «догоняет» её: вспыхивает быстро, а гаснет медленно —
+  // стружка как бы замерзает и растворяется, а не обрывается вместе с движением.
   const trailLen = position.size * 2.2;
-  const trailStyle = useAnimatedStyle(() => {
+  const trailT = useSharedValue(0);
+  const trailAngle = useSharedValue(0);
+  const trailFrozen = useSharedValue(1); // 1 — свежий след, 0 — «замёрз» и растаял
+  useFrameCallback((frame) => {
+    if (lowEndTrail) return;
+    const dt = Math.min(64, frame.timeSincePreviousFrame ?? 16) / 16.67;
     const vx = velX.value;
     const vy = velY.value;
     const speed = Math.sqrt(vx * vx + vy * vy);
-    const t = Math.min(1, Math.max(0, (speed - 0.25) / 3.2));
+    const target = Math.min(1, Math.max(0, (speed - 0.25) / 3.2));
+    const cur = trailT.value;
+    if (target > cur) {
+      trailT.value = cur + (target - cur) * Math.min(1, 0.32 * dt);
+      trailFrozen.value = 1;
+      if (speed > 0.15) trailAngle.value = Math.atan2(vy, vx);
+    } else {
+      // ~1.2 c до полного исчезновения при остановке
+      trailT.value = Math.max(0, cur - 0.014 * dt);
+      trailFrozen.value = Math.max(0, trailFrozen.value - 0.02 * dt);
+    }
+  }, !lowEndTrail);
+
+  const trailStyle = useAnimatedStyle(() => {
+    const t = trailT.value;
+    const frozen = trailFrozen.value;
     const scale = 0.25 + 0.75 * t;
+    // При замерзании след чуть сжимается к шайбе и гаснет по мягкой кривой.
+    const fade = Math.pow(t, 1.4) * (0.45 + 0.55 * frozen);
     return {
-      opacity: t * 0.7,
+      opacity: fade * 0.7,
       transform: [
-        { rotate: `${Math.atan2(vy, vx)}rad` },
+        { rotate: `${trailAngle.value}rad` },
         { translateX: -(trailLen * scale) / 2 - position.size * 0.15 },
         { scaleX: scale },
+        { scaleY: 0.7 + 0.3 * frozen },
       ],
     };
   }, [trailLen, position.size]);
