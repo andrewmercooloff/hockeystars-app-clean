@@ -158,8 +158,30 @@ const normalizeFetchInput = (input: RequestInfo | URL): RequestInfo | URL => {
   return input;
 };
 
+/** Без таймаута fetch на iOS висит до минуты — экран крутится «бесконечно». */
+const FETCH_TIMEOUT_READ_MS = 15000;
+const FETCH_TIMEOUT_WRITE_MS = 40000;
+
+const fetchWithTimeout = async (
+  input: RequestInfo | URL,
+  init: RequestInit | undefined,
+): Promise<Response> => {
+  if (init?.signal) {
+    return fetch(input, init);
+  }
+  const controller = new AbortController();
+  const timeoutMs = isRetryableMethod(init) ? FETCH_TIMEOUT_READ_MS : FETCH_TIMEOUT_WRITE_MS;
+  const tid = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(tid);
+  }
+};
+
 /**
  * Ретраи на сетевые сбои/502/503/504 + подмена origin на активный маршрут.
+ * Failover в обе стороны: direct ↔ Moscow proxy — какой путь жив, тем и идём.
  */
 export const supabaseFetch: typeof fetch = async (input, init) => {
   const maxAttempts = SUPABASE_RETRY_DELAYS_MS.length + 1;
@@ -168,10 +190,13 @@ export const supabaseFetch: typeof fetch = async (input, init) => {
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const normalizedInput = normalizeFetchInput(input);
     try {
-      const response = await fetch(normalizedInput, init);
+      const response = await fetchWithTimeout(normalizedInput, init);
       if (shouldFailoverToProxy(undefined, response)) {
         await failoverToSupabaseProxy();
-        return fetch(normalizeFetchInput(input), init);
+        return fetchWithTimeout(normalizeFetchInput(input), init);
+      }
+      if (isRetryableResponse(response) && (await failoverToSupabaseDirect())) {
+        return fetchWithTimeout(normalizeFetchInput(input), init);
       }
       if (
         isRetryableMethod(init) &&
@@ -186,7 +211,10 @@ export const supabaseFetch: typeof fetch = async (input, init) => {
       lastError = error;
       if (shouldFailoverToProxy(error)) {
         await failoverToSupabaseProxy();
-        return fetch(normalizeFetchInput(input), init);
+        return fetchWithTimeout(normalizeFetchInput(input), init);
+      }
+      if (isSupabaseNetworkError(error) && (await failoverToSupabaseDirect())) {
+        return fetchWithTimeout(normalizeFetchInput(input), init);
       }
       if (isRetryableMethod(init) && isSupabaseNetworkError(error) && attempt < maxAttempts - 1) {
         await sleep(SUPABASE_RETRY_DELAYS_MS[attempt] ?? 1000);
@@ -232,6 +260,37 @@ async function failoverToSupabaseProxy(): Promise<void> {
     });
   }
   await proxyFailoverPromise;
+}
+
+let directProbePromise: Promise<boolean> | null = null;
+let lastDirectProbeFailAt = 0;
+const DIRECT_PROBE_COOLDOWN_MS = 20000;
+
+/**
+ * Proxy (VPS) не отвечает с этого устройства — пробуем прямой Supabase.
+ * Переключаемся только если direct реально отвечает; неудачную пробу не
+ * повторяем чаще раз в 20 с, чтобы не удваивать таймауты на каждом запросе.
+ */
+async function failoverToSupabaseDirect(): Promise<boolean> {
+  if (ENV_LOCKED_URL) return false;
+  if (activeSupabaseUrl !== SUPABASE_PROXY_URL) return false;
+  if (Date.now() - lastDirectProbeFailAt < DIRECT_PROBE_COOLDOWN_MS) return false;
+  if (!directProbePromise) {
+    directProbePromise = (async () => {
+      const { probeSupabaseOrigin } = await import('./supabaseRouting');
+      const direct = await probeSupabaseOrigin(SUPABASE_DIRECT_URL, supabaseAnonKey, 4000);
+      if (!direct.ok) {
+        lastDirectProbeFailAt = Date.now();
+        return false;
+      }
+      console.warn('🌐 Proxy недоступен — переключаемся на прямой Supabase');
+      await applySupabaseOrigin(SUPABASE_DIRECT_URL);
+      return true;
+    })().finally(() => {
+      directProbePromise = null;
+    });
+  }
+  return directProbePromise;
 }
 
 const shouldFailoverToProxy = (error?: unknown, response?: Response): boolean => {
