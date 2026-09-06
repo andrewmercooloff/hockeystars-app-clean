@@ -238,6 +238,19 @@ const Puck: React.FC<PuckProps> = ({
               transition={0}
               cachePolicy="memory-disk"
             />
+            {/* Приглушаем логотипы игр: они не должны перебивать аватары игроков */}
+            <View
+              pointerEvents="none"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                borderRadius: dimensions.avatarBorderRadius,
+                backgroundColor: 'rgba(0, 0, 0, 0.32)',
+              }}
+            />
           </View>
         ) : (
             <View style={[
