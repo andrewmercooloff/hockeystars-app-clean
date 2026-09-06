@@ -1,14 +1,27 @@
 import React from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Svg, {
-  Circle,
   Defs,
   Line,
   LinearGradient,
+  Polygon,
   RadialGradient,
   Rect,
   Stop,
 } from 'react-native-svg';
+
+/** Five-point star points (outer radius r, inner radius r*0.46 — the chunky logo proportion). */
+export const starPoints = (cx: number, cy: number, r: number, rotationDeg = 0): string => {
+  const inner = r * 0.46;
+  const rot = (rotationDeg * Math.PI) / 180;
+  const pts: string[] = [];
+  for (let i = 0; i < 10; i++) {
+    const radius = i % 2 === 0 ? r : inner;
+    const a = -Math.PI / 2 + rot + (i * Math.PI) / 5;
+    pts.push(`${(cx + radius * Math.cos(a)).toFixed(1)},${(cy + radius * Math.sin(a)).toFixed(1)}`);
+  }
+  return pts.join(' ');
+};
 
 /**
  * Lighting for bright ice scenes (home, auth, games). Ice stays light —
@@ -45,16 +58,18 @@ export const IceLighting = React.memo(function IceLighting() {
 });
 
 /**
- * Night arena for content screens: one oversized face-off circle bleeding
- * off the top-right edge and a blue line low on the screen. Reads as hockey
- * at a glance without competing with cards or text.
+ * Night arena for content screens: the logo star, oversized and tilted like
+ * in the wordmark, bleeding off the top-right edge so only two rays show —
+ * plus a soft accent line low on the screen. Brand at a glance, never clipart.
  */
 export const RinkAccent = React.memo(function RinkAccent() {
   const { width, height } = useWindowDimensions();
-  const r = Math.max(width, 360) * 0.62;
-  const cx = width * 0.96;
-  const cy = -r * 0.28;
+  const r = Math.max(width, 360) * 0.78;
+  const cx = width * 1.02;
+  const cy = -r * 0.12;
   const blueY = height * 0.78;
+  const outer = starPoints(cx, cy, r, -14);
+  const inner = starPoints(cx, cy, r * 0.9, -14);
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
@@ -79,8 +94,8 @@ export const RinkAccent = React.memo(function RinkAccent() {
         </Defs>
         <Rect x="0" y="0" width={width} height={height} fill="url(#arenaLight)" />
         <Rect x="0" y="0" width={width} height={height} fill="url(#arenaWarm)" />
-        <Circle cx={cx} cy={cy} r={r} stroke="#fa2f40" strokeOpacity={0.085} strokeWidth={2.5} fill="none" />
-        <Circle cx={cx} cy={cy} r={r * 0.94} stroke="#fa2f40" strokeOpacity={0.035} strokeWidth={1} fill="none" />
+        <Polygon points={outer} fill="#fa2f40" fillOpacity={0.028} stroke="#fa2f40" strokeOpacity={0.11} strokeWidth={2.5} strokeLinejoin="round" />
+        <Polygon points={inner} fill="none" stroke="#fa2f40" strokeOpacity={0.035} strokeWidth={1} strokeLinejoin="round" />
         <Line x1={0} y1={blueY} x2={width} y2={blueY} stroke="url(#accentLine)" strokeWidth={3} />
       </Svg>
     </View>
