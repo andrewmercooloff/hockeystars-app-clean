@@ -76,22 +76,6 @@ function isValidNormValue(value: unknown): value is number {
   return Number.isFinite(n) && n > 0;
 }
 
-function parsePuckSpeed(raw?: string): { maxKmh?: number; lastKmh?: number } {
-  if (!raw) return {};
-  try {
-    const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
-    const history = Array.isArray(parsed?.history) ? parsed.history : [];
-    const maxFromHistory = history.length
-      ? Math.max(...history.map((r: { speed?: number }) => Number(r?.speed) || 0))
-      : 0;
-    const maxKmh = Number(parsed?.maxSpeed) || maxFromHistory || undefined;
-    const lastKmh = history.length ? Number(history[history.length - 1]?.speed) || undefined : undefined;
-    return { maxKmh: maxKmh || undefined, lastKmh };
-  } catch {
-    return {};
-  }
-}
-
 function parseExerciseCompletions(raw?: string | Record<string, unknown>): { id: string; count: number }[] {
   if (!raw) return [];
   try {
@@ -236,10 +220,8 @@ function buildTextPrompt(
     for (const line of normativeLines) lines.push(`- ${line}`);
   }
 
-  const puck = parsePuckSpeed(player.puck_speed_data);
-  if (puck.maxKmh) {
-    lines.push(`\nPuck shot speed (app test): max ${puck.maxKmh} km/h${puck.lastKmh ? `, latest ${puck.lastKmh} km/h` : ""}`);
-  }
+  // Puck speed from the in-app radar mini-game is entertainment, not a measured
+  // normative — deliberately excluded from the scouting report.
 
   if (completedExercises.length > 0) {
     lines.push("\nCompleted training exercises in app (normatives / drills):");
@@ -365,7 +347,8 @@ Player position: ${posLabel}. Every recommendation must fit this position.
 
 ${positionFocus}
 
-Use Google Search for "${player.name}" hockey and team context when helpful.${hasVideos ? ` Watch each YouTube link in PLAYER DATA. Track jersey #${player.number || "?"} only.` : ""}
+### EXTERNAL RESEARCH (use Google Search)
+Search for "${player.name}"${player.birth_date ? ` (born ${player.birth_date})` : ""}${player.team ? ` "${player.team}"` : ""} hockey. Prioritise scouting-grade sources: Eliteprospects, league/federation statistics portals, tournament protocols and rosters, club pages, hockey media and scouting blogs. Extract only verified facts: past clubs, tournaments, awards, all-star selections, published stats, coach/scout quotes. Cite each such fact as (web: source name). If nothing reliable is found, write one line "No external records found" and do not speculate.${hasVideos ? ` Watch each YouTube link in PLAYER DATA. Track jersey #${player.number || "?"} only.` : ""}
 
 ### EVIDENCE RULES (CRITICAL — prevents generic reports)
 1. Every strength and every growth zone MUST cite its source in parentheses: (video ~MM:SS), (season stats), (normative: …), or (exercise history: …).
