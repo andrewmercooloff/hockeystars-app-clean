@@ -3804,11 +3804,10 @@ export default function PlayerProfile() {
           isCurrent: false
         }));
         
-        // Проверяем изменились ли команды
-        const currentTeamsEqual = JSON.stringify(savedCurrentTeams.sort((a, b) => a.id.localeCompare(b.id))) === 
-                                   JSON.stringify(currentTeamsForCompare.sort((a, b) => a.id.localeCompare(b.id)));
-        const pastTeamsEqual = JSON.stringify(savedPastTeams.sort((a, b) => a.id.localeCompare(b.id))) === 
-                               JSON.stringify(pastTeamsForCompare.sort((a, b) => a.id.localeCompare(b.id)));
+        // Сравниваем С УЧЁТОМ ПОРЯДКА: сохранённые команды приходят по team_order,
+        // а смена порядка — тоже изменение, которое надо синхронизировать.
+        const currentTeamsEqual = JSON.stringify(savedCurrentTeams) === JSON.stringify(currentTeamsForCompare);
+        const pastTeamsEqual = JSON.stringify(savedPastTeams) === JSON.stringify(pastTeamsForCompare);
         
         teamsChanged = !currentTeamsEqual || !pastTeamsEqual;
         
