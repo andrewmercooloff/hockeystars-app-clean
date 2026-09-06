@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Image as ExpoImage } from 'expo-image';
 import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useIsFocused } from '@react-navigation/native';
-import Animated, { Easing as ReEasing, useAnimatedStyle, useFrameCallback, useSharedValue, withDelay, withTiming, runOnJS } from 'react-native-reanimated';
+import Animated, { Easing as ReEasing, makeMutable, useAnimatedStyle, useSharedValue, withDelay, withTiming, runOnJS, type SharedValue } from 'react-native-reanimated';
 
 /**
  * The whole puck layer fades in as one group when the home tab (re)mounts.
@@ -90,8 +90,10 @@ const usePuckCollisionSystem = (
   physicsActive = true,
   leaderRanks?: Map<string, LeaderRank>,
   basePuckSize?: number,
+  dustEmitter?: React.RefObject<IceDustHandle | null>,
 ) => {
   const puckSize = basePuckSize ?? PUCK_BASE_SIZE;
+  const dustLastEmitRef = useRef<Map<string, number>>(new Map());
   const leaderRanksRef = useRef(leaderRanks);
   leaderRanksRef.current = leaderRanks;
   const sizeForPlayer = useCallback(
@@ -1267,14 +1269,33 @@ const usePuckCollisionSystem = (
       alphaRef.current = alpha;
 
       const physics = physicsPositionsRef.current;
+      // Снежная пыль: не чаще 2 вспышек за кадр на всю сцену — JS→UI трафик ограничен.
+      const dust = dustEmitter?.current;
+      let dustBudget = dust ? 2 : 0;
+      const nowMs = Date.now();
       physics.forEach(physicsPos => {
+        if (dustBudget > 0 && !physicsPos.isDragging) {
+          const speed = Math.sqrt(physicsPos.vx * physicsPos.vx + physicsPos.vy * physicsPos.vy);
+          if (speed > 0.9) {
+            const last = dustLastEmitRef.current.get(physicsPos.id) ?? 0;
+            const interval = Math.max(70, 160 - speed * 18);
+            if (nowMs - last >= interval) {
+              dustLastEmitRef.current.set(physicsPos.id, nowMs);
+              dustBudget--;
+              const half = physicsPos.size / 2;
+              const back = half * 0.55;
+              dust!.emit(
+                physicsPos.x + half - (physicsPos.vx / speed) * back,
+                physicsPos.y + half - (physicsPos.vy / speed) * back,
+                Math.atan2(physicsPos.vy, physicsPos.vx),
+                Math.min(1, (speed - 0.6) / 3),
+                physicsPos.size,
+              );
+            }
+          }
+        }
         const shared = sharedPositionsRef.current.get(physicsPos.id);
         if (shared && shared.x && shared.y) {
-          // Скорость — для следа на льду (UI-поток читает её в worklet)
-          if (shared.vx && shared.vy) {
-            shared.vx.value = physicsPos.isDragging ? 0 : physicsPos.vx;
-            shared.vy.value = physicsPos.isDragging ? 0 : physicsPos.vy;
-          }
           if (!useInterpolation) {
             shared.x.value = physicsPos.x;
             shared.y.value = physicsPos.y;
@@ -1638,62 +1659,98 @@ interface PuckPosition {
 // Импортируем оригинальный PuckAnimator из основного экрана
 // Для этого нужно создать временную копию компонента
 // Мемоизированный компонент шайбы для оптимизации производительности
-type TrailFlake = { x: number; y: number; born: number; angle: number; strength: number };
-const TRAIL_FLAKES = 7;
-const TRAIL_LIFE_MS = 1050;
+export type IceDustHandle = {
+  emit: (x: number, y: number, angle: number, strength: number, puckSize: number) => void;
+};
 
-/**
- * Одно пятно снежной пыли. Живёт в мировых координатах льда, поэтому внутри
- * движущегося контейнера шайбы позиция пересчитывается относительно неё.
- */
-const TrailFlakeView = React.memo(({
-  index,
-  flakes,
-  clock,
-  puckX,
-  puckY,
-  size,
-}: {
-  index: number;
-  flakes: { value: TrailFlake[] };
-  clock: { value: number };
-  puckX: { value: number };
-  puckY: { value: number };
-  size: number;
-}) => {
-  const w = size * 0.56;
-  const h = size * 0.26;
+const DUST_POOL = 40;
+const DUST_LIFE_MS = 1050;
+
+type DustSlot = {
+  x: SharedValue<number>;
+  y: SharedValue<number>;
+  angle: SharedValue<number>;
+  strength: SharedValue<number>;
+  size: SharedValue<number>;
+  progress: SharedValue<number>;
+};
+
+const DustFlake = React.memo(({ slot }: { slot: DustSlot }) => {
   const style = useAnimatedStyle(() => {
-    const f = flakes.value[index];
-    const age = (clock.value - f.born) / TRAIL_LIFE_MS;
-    if (age < 0 || age >= 1 || f.strength <= 0) {
+    const p = slot.progress.value;
+    if (p >= 1 || slot.strength.value <= 0) {
       return { opacity: 0, transform: [{ translateX: -9999 }] };
     }
-    // Быстро проявляется, потом медленно тает; пыль слегка расплывается и оседает.
-    const life = 1 - age;
-    const opacity = f.strength * 0.34 * life * life * Math.min(1, age * 6 + 0.35);
-    const spread = 0.85 + age * 0.55;
+    const w = slot.size.value * 0.56;
+    const h = slot.size.value * 0.26;
+    const life = 1 - p;
+    const spread = 0.85 + p * 0.55;
     return {
-      opacity,
+      opacity: slot.strength.value * 0.34 * life * life * Math.min(1, p * 6 + 0.35),
+      width: w,
+      height: h,
+      borderRadius: h / 2,
       transform: [
-        { translateX: f.x - puckX.value - w / 2 },
-        { translateY: f.y - puckY.value - h / 2 },
-        { rotate: `${f.angle}rad` },
+        { translateX: slot.x.value - w / 2 },
+        { translateY: slot.y.value - h / 2 },
+        { rotate: `${slot.angle.value}rad` },
         { scaleX: spread },
         { scaleY: 0.7 + spread * 0.3 },
       ],
     };
-  }, [index, w, h]);
+  });
+  return <Animated.View pointerEvents="none" style={[styles.trailFlake, style]} />;
+});
+DustFlake.displayName = 'DustFlake';
+
+/**
+ * Снежная пыль на льду — один слой в мировых координатах под всеми шайбами.
+ * Пул фиксированного размера; каждое пятно анимируется withTiming только пока
+ * живо, поэтому на кадр не выполняется никакой лишней работы (в отличие от
+ * покадрового worklet на каждую шайбу).
+ */
+const IceDustLayer = React.forwardRef<IceDustHandle, { enabled: boolean }>(({ enabled }, ref) => {
+  const slots = useRef<DustSlot[] | null>(null);
+  if (!slots.current) {
+    slots.current = Array.from({ length: DUST_POOL }, () => ({
+      x: makeMutable(0),
+      y: makeMutable(0),
+      angle: makeMutable(0),
+      strength: makeMutable(0),
+      size: makeMutable(0),
+      progress: makeMutable(1),
+    }));
+  }
+  const nextRef = useRef(0);
+  React.useImperativeHandle(
+    ref,
+    () => ({
+      emit: (x, y, angle, strength, puckSize) => {
+        if (!enabled) return;
+        const pool = slots.current!;
+        const slot = pool[nextRef.current];
+        nextRef.current = (nextRef.current + 1) % DUST_POOL;
+        slot.x.value = x;
+        slot.y.value = y;
+        slot.angle.value = angle;
+        slot.strength.value = strength;
+        slot.size.value = puckSize;
+        slot.progress.value = 0;
+        slot.progress.value = withTiming(1, { duration: DUST_LIFE_MS, easing: ReEasing.linear });
+      },
+    }),
+    [enabled]
+  );
+  if (!enabled) return null;
   return (
-    <Animated.View
-      pointerEvents="none"
-      style={[styles.trailFlake, { width: w, height: h, borderRadius: h / 2 }, style]}
-    >
-      <View style={[styles.trailFlakeCore, { width: w * 0.62, height: h * 0.55, borderRadius: h / 2 }]} />
-    </Animated.View>
+    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+      {slots.current.map((slot, i) => (
+        <DustFlake key={i} slot={slot} />
+      ))}
+    </View>
   );
 });
-TrailFlakeView.displayName = 'TrailFlakeView';
+IceDustLayer.displayName = 'IceDustLayer';
 
 const OriginalPuckAnimator = React.memo(({
   player,
@@ -1718,7 +1775,6 @@ const OriginalPuckAnimator = React.memo(({
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [hasDragged, setHasDragged] = useState(false);
-  const lowEndTrail = Platform.OS === 'android' && (getAndroidPerformanceLevel?.() || 'medium') === 'low';
   const dragStartRef = useRef({ x: 0, y: 0, pageX: 0, pageY: 0, time: 0, startX: 0, startY: 0 });
   const lastPositionRef = useRef({ x: 0, y: 0 });
   const hasDraggedRef = useRef(false);
@@ -1730,15 +1786,13 @@ const OriginalPuckAnimator = React.memo(({
   // Используем useSharedValue для максимальной плавности на 120 Гц
   const animatedX = useSharedValue(position.x);
   const animatedY = useSharedValue(position.y);
-  const velX = useSharedValue(0);
-  const velY = useSharedValue(0);
   
   // Регистрируем shared values в системе коллизий для прямого обновления
   useEffect(() => {
     if (registerSharedPosition) {
-      registerSharedPosition(position.id, animatedX, animatedY, velX, velY);
+      registerSharedPosition(position.id, animatedX, animatedY);
     }
-  }, [position.id, animatedX, animatedY, velX, velY, registerSharedPosition]);
+  }, [position.id, animatedX, animatedY, registerSharedPosition]);
 
   // Шайба проявляется только с уже декодированным аватаром — при смене фильтров
   // новые шайбы не выскакивают чёрными дисками. Предохранитель на медленной сети.
@@ -1763,46 +1817,6 @@ const OriginalPuckAnimator = React.memo(({
     top: animatedY.value,
     opacity: puckReveal.value,
   }), []);
-
-  // Следы на льду: шайба не тянет за собой «луч», а оставляет позади себя
-  // отдельные пятна снежной пыли на тех местах, где она реально прошла.
-  // Пятна лежат на льду (мировые координаты), расплываются и тают за ~1 с.
-  const flakeCount = lowEndTrail ? 0 : TRAIL_FLAKES;
-  const flakes = useSharedValue<TrailFlake[]>(
-    Array.from({ length: TRAIL_FLAKES }, () => ({ x: 0, y: 0, born: -1e9, angle: 0, strength: 0 }))
-  );
-  const trailClock = useSharedValue(0);
-  const lastEmitRef = useSharedValue(0);
-  const emitIndexRef = useSharedValue(0);
-  useFrameCallback((frame) => {
-    const now = frame.timestamp;
-    trailClock.value = now;
-    const vx = velX.value;
-    const vy = velY.value;
-    const speed = Math.sqrt(vx * vx + vy * vy);
-    if (speed < 0.35) return;
-    // Чем быстрее, тем чаще ложится пыль (плотнее след).
-    const interval = Math.max(55, 130 - speed * 18);
-    if (now - lastEmitRef.value < interval) return;
-    lastEmitRef.value = now;
-    const idx = emitIndexRef.value;
-    emitIndexRef.value = (idx + 1) % TRAIL_FLAKES;
-    const half = position.size / 2;
-    const back = half * 0.55;
-    const nx = vx / speed;
-    const ny = vy / speed;
-    flakes.modify((arr) => {
-      'worklet';
-      arr[idx] = {
-        x: animatedX.value + half - nx * back,
-        y: animatedY.value + half - ny * back,
-        born: now,
-        angle: Math.atan2(vy, vx),
-        strength: Math.min(1, (speed - 0.25) / 3),
-      };
-      return arr;
-    });
-  }, flakeCount > 0);
 
   const handleTouchStart = (e: any) => {
     const touch = e.nativeEvent;
@@ -2030,17 +2044,6 @@ const OriginalPuckAnimator = React.memo(({
       onTouchMove={enableDrag ? handleTouchMove : undefined}
       onTouchEnd={enableDrag ? handleTouchEnd : undefined}
     >
-      {Array.from({ length: flakeCount }, (_, i) => (
-        <TrailFlakeView
-          key={i}
-          index={i}
-          flakes={flakes}
-          clock={trailClock}
-          puckX={animatedX}
-          puckY={animatedY}
-          size={position.size}
-        />
-      ))}
       <Puck
           avatar={player.avatar}
           playerId={player.id}
@@ -2844,6 +2847,7 @@ export default function HomeScreen() {
   // Пока открыта полноэкранная игра (шайбы главного экрана не видны под модалкой),
   // ставим домашнюю физику на паузу — иначе на слабых устройствах работают два движка сразу.
   const effectiveScreenForPhysics = (showGame || showQuizGame) ? 'game-modal' : (currentScreen || undefined);
+  const iceDustRef = useRef<IceDustHandle | null>(null);
 
   const { puckPositions, updatePuckPosition, boundaries, registerSharedPosition, resetPucksMotion } = usePuckCollisionSystem(
     puckPlayersForScene,
@@ -2855,6 +2859,7 @@ export default function HomeScreen() {
     physicsActive,
     homeLeaderRanks,
     scaledPuckSize,
+    iceDustRef,
   );
 
   // На слабом Android: как только шайбы на льду — сразу включаем физику (без второй паузы).
@@ -3245,7 +3250,10 @@ export default function HomeScreen() {
         )}
         
         {/* Шайбы рендерятся через мемоизированный список для оптимизации производительности */}
-        <PuckSceneFade ready={puckPositions.length > 0 && avatarsSettled}>{renderedPucks}</PuckSceneFade>
+        <PuckSceneFade ready={puckPositions.length > 0 && avatarsSettled}>
+          <IceDustLayer ref={iceDustRef} enabled={performanceLevel !== 'low'} />
+          {renderedPucks}
+        </PuckSceneFade>
 
         {/* Внутренняя граница - ТОЛЬКО для визуального эффекта, не блокирует touch */}
         <View style={styles.innerBorder} pointerEvents="box-none"></View>
@@ -3325,12 +3333,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     top: 0,
-    backgroundColor: 'rgba(255,255,255,0.55)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  trailFlakeCore: {
-    backgroundColor: 'rgba(255,255,255,0.75)',
+    backgroundColor: 'rgba(255,255,255,0.6)',
   },
   filtersWrapper: {
     position: 'absolute',
