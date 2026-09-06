@@ -3567,7 +3567,8 @@
     "uploadTeamLogo": "Upload logo",
     "coverUpdated": "Cover updated",
     "teamLogoUpdated": "Team logo updated",
-    "coverUploadFailed": "Could not upload the image"
+    "coverUploadFailed": "Could not upload the image",
+    "scoutPrivacyNote": "Other users will not see your photo or name — to them you are “Scout”."
   },
   "register": {
     "title": "Registration",
@@ -3633,7 +3634,8 @@
     "seconds": "seconds",
     "times": "times",
     "sprint": "100 meters",
-    "_cache_clear": "2024-01-16-9"
+    "_cache_clear": "2024-01-16-9",
+    "scoutPrivacyNote": "Other users will not see a scout’s photo or name — you appear as “Scout”."
   },
   "navigation": {
     "home": "Home",

@@ -1282,6 +1282,13 @@ export default function RegisterScreen() {
             />
           </View>
 
+          {formData.status === 'scout' && (
+            <View style={styles.scoutPrivacyNote}>
+              <Ionicons name="eye-off-outline" size={16} color="rgba(255,255,255,0.6)" />
+              <Text style={styles.scoutPrivacyNoteText}>{t('register.scoutPrivacyNote')}</Text>
+            </View>
+          )}
+
           {/* Фото/Логотип - обязательно для всех кроме скаута */}
           {formData.status !== 'scout' && (
           <View style={styles.inputContainer}>
@@ -2085,6 +2092,25 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.14)',
     // Убираем width, чтобы поле адаптировалось к контейнеру
+  },
+  scoutPrivacyNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  scoutPrivacyNoteText: {
+    flex: 1,
+    fontFamily: 'Gilroy-Regular',
+    fontSize: 13,
+    lineHeight: 18,
+    color: 'rgba(255,255,255,0.7)',
   },
   pickerContainer: {
     flexDirection: 'row',
