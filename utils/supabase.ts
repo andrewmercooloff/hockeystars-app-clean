@@ -33,6 +33,17 @@ export function getActiveSupabaseUrl(): string {
   return activeSupabaseUrl;
 }
 
+/** Компоненты с уже отрендеренными URL (аватары, обложки) перезапрашивают их после failover. */
+const originListeners = new Set<(url: string) => void>();
+export const subscribeSupabaseOrigin = (listener: (url: string) => void): (() => void) => {
+  originListeners.add(listener);
+  return () => {
+    originListeners.delete(listener);
+  };
+};
+let originVersion = 0;
+export const getSupabaseOriginVersion = () => originVersion;
+
 /** Активный URL API (меняется после probe: direct vs Moscow proxy). */
 export function getSupabaseUrl(): string {
   return getActiveSupabaseUrl();
@@ -314,6 +325,14 @@ async function applySupabaseOrigin(nextUrl: string): Promise<void> {
 
   activeSupabaseUrl = nextUrl;
   supabase = buildSupabaseClient(nextUrl);
+  originVersion += 1;
+  originListeners.forEach((listener) => {
+    try {
+      listener(nextUrl);
+    } catch {
+      // ignore
+    }
+  });
 
   if (reconnectUserId) {
     try {
