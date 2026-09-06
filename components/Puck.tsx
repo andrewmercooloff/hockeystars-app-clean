@@ -6,10 +6,12 @@ import Animated from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import CachedAvatar from './CachedAvatar';
 import LeaderShine from './LeaderShine';
-import GamePuckFace from './GamePuckFace';
 import { LEADER_BORDER_COLORS, LEADER_MEDAL_BORDER_WIDTH, type LeaderRank } from '../utils/leaderDisplay';
 
 export const PUCK_SCOUT_LOGO = require('../assets/images/scout.png');
+/** Event puck faces: pre-rendered artwork (matte disc, brand red, wordmark along the edge). */
+const PUCK_FACE_STAR_GOAL = require('../assets/images/puck-star-goal.png');
+const PUCK_FACE_QUIZ = require('../assets/images/puck-quiz.png');
 
 interface PuckProps {
   avatar?: string | null;
@@ -210,7 +212,13 @@ const Puck: React.FC<PuckProps> = ({
               overflow: 'hidden',
             }}
           >
-            <GamePuckFace kind={status === 'game' ? 'game' : 'quiz'} size={dimensions.avatarSize} />
+            <Image
+              source={status === 'game' ? PUCK_FACE_STAR_GOAL : PUCK_FACE_QUIZ}
+              style={{ width: dimensions.avatarSize, height: dimensions.avatarSize }}
+              contentFit="cover"
+              transition={0}
+              cachePolicy="memory-disk"
+            />
           </View>
         ) : (
             <View style={[
