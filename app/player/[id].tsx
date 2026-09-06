@@ -953,18 +953,8 @@ export default function PlayerProfile() {
         return;
       }
       
-      // На web bootstrap уже стартовал в <head> — лишняя задержка только вредит
-      if (Platform.OS !== 'web') {
-        await new Promise(resolve => setTimeout(resolve, 50));
-      }
-      
-      // Проверяем еще раз после задержки
-      const checkId = Array.isArray(id) ? id[0] : id;
-      if (checkId !== normalizedId || currentLoadingIdRef.current !== normalizedId) {
-        console.log('⚠️ ID изменился после задержки, отменяем:', normalizedId, '->', checkId, 'currentLoadingId:', currentLoadingIdRef.current);
-        return;
-      }
-      
+      // Без искусственной паузы: смена id во время загрузки отсекается по currentLoadingIdRef ниже
+
       // Профиль + команды сразу; currentUser не блокирует первый paint
       const [playerData, teamsFromNetwork] = await Promise.all([
         getPlayerById(normalizedId as string, { skipCache: forceRefreshProfile }),
