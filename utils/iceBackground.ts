@@ -3,8 +3,8 @@ import { Image as ExpoImage } from 'expo-image';
 import { Image as RNImage, Platform } from 'react-native';
 
 /**
- * Web: lighter WebP (~68KB). Native: JPEG (universal decode).
- * Same ice look; web avoids downloading ~386KB JPG on every cold start.
+ * Web: lighter WebP. Native: JPEG (universal decode).
+ * Neon hockey mobile background (portrait); web uses WebP to keep cold starts light.
  */
 export const ICE_BACKGROUND =
   Platform.OS === 'web'
@@ -12,7 +12,7 @@ export const ICE_BACKGROUND =
     : require('../assets/images/led.jpg');
 
 /** recyclingKey for expo-image — one decoded bitmap across screens. */
-export const ICE_RECYCLING_KEY = 'hockeystars-ice-led-v3';
+export const ICE_RECYCLING_KEY = 'hockeystars-ice-led-v4';
 
 let warmPromise: Promise<void> | null = null;
 

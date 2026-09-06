@@ -37,7 +37,7 @@ export const darkColors: AppColors = {
   textMuted: '#a1a1aa',
   border: 'rgba(255, 255, 255, 0.08)',
   scene: '#0b0b0e',
-  iceFallback: '#d8e4ea',
+  iceFallback: '#0a0a12',
   success: '#4CAF50',
   warning: '#FF9800',
   card: '#1c1c21',
