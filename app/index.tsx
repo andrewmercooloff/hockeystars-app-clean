@@ -1646,7 +1646,8 @@ const OriginalPuckAnimator = React.memo(({
   onDrag,
   enableDrag = true,
   getAndroidPerformanceLevel,
-  registerSharedPosition
+  registerSharedPosition,
+  onAvatarReady,
 }: {
   player: Player; 
   position: PuckPosition; 
@@ -1656,6 +1657,7 @@ const OriginalPuckAnimator = React.memo(({
   enableDrag?: boolean;
   getAndroidPerformanceLevel?: () => 'high' | 'medium' | 'low';
   registerSharedPosition?: (id: string, x: { value: number }, y: { value: number }, vx?: { value: number }, vy?: { value: number }) => void;
+  onAvatarReady?: (id: string) => void;
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [hasDragged, setHasDragged] = useState(false);
@@ -1974,6 +1976,7 @@ const OriginalPuckAnimator = React.memo(({
           leaderRank={leaderRank}
           isOnline={player.isOnline}
           isNew={player.createdAt ? (Date.now() - new Date(player.createdAt).getTime()) < 2 * 24 * 60 * 60 * 1000 : false}
+          onAvatarReady={onAvatarReady ? () => onAvatarReady(player.id) : undefined}
         />
     </Animated.View>
   );
@@ -3054,6 +3057,39 @@ export default function HomeScreen() {
   // Компоненты получают позиции через shared values, которые обновляются каждый кадр
   // React state обновляется только при изменении списка игроков (добавление/удаление)
   // Используем puckPlayersForScene — тот же набор, что и в физике (без двойной инициализации)
+  // Сцена появляется только когда аватары шайб уже декодированы (или истёк лимит ожидания):
+  // иначе шайбы выезжают чёрными кружками и аватары «проявляются» с задержкой.
+  const AVATARS_SETTLE_MAX_WAIT_MS = 900;
+  const [avatarsSettled, setAvatarsSettled] = useState(false);
+  const readyAvatarIdsRef = useRef<Set<string>>(new Set());
+  const sceneIdsRef = useRef<Set<string>>(new Set());
+  sceneIdsRef.current = new Set(puckPlayersForScene.map((p) => p.id));
+
+  const checkAvatarsSettled = useCallback(() => {
+    const need = sceneIdsRef.current;
+    if (need.size === 0) return;
+    for (const id of need) {
+      if (!readyAvatarIdsRef.current.has(id)) return;
+    }
+    setAvatarsSettled(true);
+  }, []);
+
+  const handlePuckAvatarReady = useCallback(
+    (id: string) => {
+      if (readyAvatarIdsRef.current.has(id)) return;
+      readyAvatarIdsRef.current.add(id);
+      checkAvatarsSettled();
+    },
+    [checkAvatarsSettled]
+  );
+
+  useEffect(() => {
+    if (avatarsSettled || puckPositions.length === 0) return;
+    checkAvatarsSettled();
+    const timeout = setTimeout(() => setAvatarsSettled(true), AVATARS_SETTLE_MAX_WAIT_MS);
+    return () => clearTimeout(timeout);
+  }, [avatarsSettled, puckPositions.length, checkAvatarsSettled]);
+
   const renderedPucks = useMemo(() => {
     // Карта позиций по ID для быстрого доступа
     const positionMap = new Map<string, PuckPosition>();
@@ -3088,10 +3124,11 @@ export default function HomeScreen() {
           enableDrag={!isDesktopLayout}
           getAndroidPerformanceLevel={() => performanceLevel}
           registerSharedPosition={registerSharedPosition}
+          onAvatarReady={handlePuckAvatarReady}
         />
       );
     });
-  }, [puckPositions.length, puckPlayersForScene, homeLeaderRanks, handlePuckPress, handleDrag, performanceLevel, registerSharedPosition, boundaries, scaledPuckSize, isDesktopLayout]);
+  }, [puckPositions.length, puckPlayersForScene, homeLeaderRanks, handlePuckPress, handleDrag, performanceLevel, registerSharedPosition, boundaries, scaledPuckSize, isDesktopLayout, handlePuckAvatarReady]);
 
   // Анимация запущена если есть шайбы
   const isRunning = puckPositions.length > 0;
@@ -3124,7 +3161,7 @@ export default function HomeScreen() {
         )}
         
         {/* Шайбы рендерятся через мемоизированный список для оптимизации производительности */}
-        <PuckSceneFade ready={puckPositions.length > 0}>{renderedPucks}</PuckSceneFade>
+        <PuckSceneFade ready={puckPositions.length > 0 && avatarsSettled}>{renderedPucks}</PuckSceneFade>
 
         {/* Внутренняя граница - ТОЛЬКО для визуального эффекта, не блокирует touch */}
         <View style={styles.innerBorder} pointerEvents="box-none"></View>

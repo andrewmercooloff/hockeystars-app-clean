@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import PressableScale from './PressableScale';
 import { Image } from 'expo-image';
@@ -27,6 +27,8 @@ interface PuckProps {
   leaderRank?: LeaderRank; // топ-1/2/3 лидер — медальная обводка
   /** Много шайб на экране (мини-игра): чуть легче тень на Android — меньше нагрузка на GPU. */
   denseScene?: boolean;
+  /** Аватар декодирован (или его нет / ошибка) — шайбу можно показывать без «чёрной дырки». */
+  onAvatarReady?: () => void;
 }
 
 const Puck: React.FC<PuckProps> = ({ 
@@ -42,8 +44,19 @@ const Puck: React.FC<PuckProps> = ({
   isNew = false,
   leaderRank,
   denseScene = false,
+  onAvatarReady,
 }) => {
   const [imageError, setImageError] = useState(false);
+  const readyNotifiedRef = useRef(false);
+  const notifyAvatarReady = useCallback(() => {
+    if (readyNotifiedRef.current) return;
+    readyNotifiedRef.current = true;
+    onAvatarReady?.();
+  }, [onAvatarReady]);
+  const hasRemoteAvatar = !!avatar && !!playerId && status !== 'scout';
+  useEffect(() => {
+    if (!hasRemoteAvatar) notifyAvatarReady();
+  }, [hasRemoteAvatar, notifyAvatarReady]);
   const avatarCacheKey = useMemo(() => playerId ? `${playerId}-${avatar}` : avatar, [playerId, avatar]);
 
   // Анимация для тени на льду - отключена для лучшей производительности
@@ -178,7 +191,11 @@ const Puck: React.FC<PuckProps> = ({
               style={{
                 borderRadius: dimensions.avatarBorderRadius - 2,
               }}
-              onError={() => setImageError(true)}
+              onLoad={notifyAvatarReady}
+              onError={() => {
+                setImageError(true);
+                notifyAvatarReady();
+              }}
             />
           </View>
         ) : status === 'scout' ? (
