@@ -8664,8 +8664,9 @@ export const getSmartPlayerSelection = (
 ): Player[] => {
   try {
     // 0. Константы
-    const MAX_BASE_PLAYERS = 24; // +3 для топ-лидеров по рейтингу
-    const MAX_TOTAL_WITH_SCOUT = 25;
+    // 24 → 18: на телефоне 30 шайб перекрывали друг друга, лёд не читался
+    const MAX_BASE_PLAYERS = 18; // +3 для топ-лидеров по рейтингу
+    const MAX_TOTAL_WITH_SCOUT = 19;
 
     // 1. Фильтруем скрытые профили (кроме текущего пользователя и админов)
     const visiblePlayers = players.filter(player => {
