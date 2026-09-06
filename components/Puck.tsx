@@ -276,13 +276,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     ...Platform.select({
-      ios: {
-        // Лёгкая тень - минимальный blur для производительности
-        shadowColor: '#000',
-        shadowOffset: { width: 2, height: 3 },
-        shadowOpacity: 0.4,
-        shadowRadius: 2, // Минимальный blur = меньше нагрузки на GPU
-      },
+      // iOS: без CALayer-тени. Тень на слое без готового shadowPath рисуется
+      // прямоугольником на первых кадрах после монтирования (серые "полосы").
       android: {
         // elevation аппаратно ускорен на Android
         elevation: 4,
@@ -292,7 +287,9 @@ const styles = StyleSheet.create({
       },
     }),
     borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.75)',
+    // Непрозрачный цвет (white 75% поверх чёрного): Fabric рисует такую рамку
+    // средствами CoreAnimation, а не битмапом — без кадра "квадрат без скругления".
+    borderColor: '#bfbfbf',
   },
   starPuck: {
     position: 'absolute',
@@ -300,12 +297,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 2, height: 3 },
-        shadowOpacity: 0.4,
-        shadowRadius: 2,
-      },
       android: {
         elevation: 4,
       },
@@ -314,7 +305,7 @@ const styles = StyleSheet.create({
       },
     }),
     borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.75)',
+    borderColor: '#bfbfbf',
   },
   puckTouchable: {
     width: '100%',

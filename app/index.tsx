@@ -11,14 +11,16 @@ import Animated, { Easing as ReEasing, useAnimatedStyle, useSharedValue, withDel
  * rectangles for a few frames; a single opacity ramp on the parent hides
  * that window and reads as "the ice lights up".
  */
-const PuckSceneFade: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const PuckSceneFade: React.FC<{ ready: boolean; children: React.ReactNode }> = ({ ready, children }) => {
   const opacity = useSharedValue(0);
   useEffect(() => {
+    if (!ready) return;
+    // Two frames for native layout/border rendering to settle, then ramp up.
     opacity.value = withDelay(
-      70,
-      withTiming(1, { duration: 340, easing: ReEasing.out(ReEasing.cubic) })
+      120,
+      withTiming(1, { duration: 380, easing: ReEasing.out(ReEasing.cubic) })
     );
-  }, [opacity]);
+  }, [opacity, ready]);
   const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
   return (
     <Animated.View style={[StyleSheet.absoluteFill, style]} pointerEvents="box-none">
@@ -3069,7 +3071,7 @@ export default function HomeScreen() {
         )}
         
         {/* Шайбы рендерятся через мемоизированный список для оптимизации производительности */}
-        <PuckSceneFade>{renderedPucks}</PuckSceneFade>
+        <PuckSceneFade ready={puckPositions.length > 0}>{renderedPucks}</PuckSceneFade>
 
         {/* Внутренняя граница - ТОЛЬКО для визуального эффекта, не блокирует touch */}
         <View style={styles.innerBorder} pointerEvents="box-none"></View>
