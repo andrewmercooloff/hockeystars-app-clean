@@ -3,10 +3,10 @@ import { Image, ImageBackground, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
   LEADER_BORDER_COLORS,
-  computeSavePercentage,
   getMedalLeaderRank,
 } from '../utils/leaderDisplay';
-import { getPlayerSeasonPoints, type Player } from '../utils/playerStorage';
+import { type Player } from '../utils/playerStorage';
+import { getAllTimeGoalieBlock, getAllTimePoints, getSeasonSavePercentage } from '../utils/seasonStats';
 import { getRatingShareCardWidth } from '../utils/ratingShareExport';
 
 export type SearchRatingShareEntry = {
@@ -38,12 +38,13 @@ function formatLeaderStat(
   goalieMode: boolean,
   t: (key: string) => string
 ): string {
+  // Рейтинг поиска — суммарно за все сезоны
   if (goalieMode) {
-    const sv = computeSavePercentage(player);
-    if (sv >= 0) return `SV% ${sv.toFixed(3)}`;
+    const block = getAllTimeGoalieBlock(player);
+    if (block) return `SV% ${getSeasonSavePercentage(block)}`;
     return 'SV% —';
   }
-  const pts = getPlayerSeasonPoints(player);
+  const pts = getAllTimePoints(player);
   return `${pts} ${t('search.ratingPointsLabel') || 'pts'}`;
 }
 

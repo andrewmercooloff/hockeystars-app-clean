@@ -1,5 +1,5 @@
 import type { Player } from './playerStorage';
-import { PREVIOUS_SEASON_KEY } from './seasonConfig';
+import { CURRENT_SEASON_KEY, PREVIOUS_SEASON_KEY } from './seasonConfig';
 
 export type SeasonStatBlock = {
   goals?: number;
@@ -117,6 +117,50 @@ export const getDisplayGoalieBlock = (
     return archived;
   }
   return null;
+};
+
+// ---- All-time totals (current season fields + every archived season) -----------
+
+type StatsPlayer = Pick<Player, 'goals' | 'assists' | 'games' | 'minutes' | 'shots' | 'saves' | 'seasonStats'>;
+
+/** Archived blocks with data, excluding a stray copy of the current season. */
+export const getArchivedSeasonBlocks = (player: Pick<Player, 'seasonStats'>): SeasonStatBlock[] =>
+  Object.entries(player.seasonStats ?? {})
+    .filter(([key, block]) => key !== CURRENT_SEASON_KEY && hasSeasonStatData(block))
+    .map(([, block]) => block);
+
+/** Number of seasons that contribute to the all-time totals. */
+export const countSeasonsWithStats = (player: StatsPlayer): number =>
+  (playerHasCurrentSeasonStats(player) ? 1 : 0) + getArchivedSeasonBlocks(player).length;
+
+export const getAllTimeBlock = (player: StatsPlayer): SeasonStatBlock => {
+  const total: SeasonStatBlock = {};
+  const add = (block: SeasonStatBlock) => {
+    for (const key of STAT_KEYS) {
+      total[key] = toInt(total[key]) + toInt(block[key]);
+    }
+  };
+  add(currentSeasonBlockFromPlayer(player));
+  getArchivedSeasonBlocks(player).forEach(add);
+  return total;
+};
+
+export const getAllTimePoints = (player: StatsPlayer): number => getSeasonPoints(getAllTimeBlock(player));
+
+/** All-time goalie block if it carries a valid GAA/SV% base, else null. */
+export const getAllTimeGoalieBlock = (player: StatsPlayer): SeasonStatBlock | null => {
+  const block = getAllTimeBlock(player);
+  const minutes = toInt(block.minutes);
+  const shots = toInt(block.shots);
+  const saves = toInt(block.saves);
+  return minutes > 0 && shots > 0 && saves >= 0 && saves <= shots ? block : null;
+};
+
+/** All-time GAA; -1 when there is no valid base. */
+export const getAllTimeGAA = (player: StatsPlayer): number => {
+  const block = getAllTimeGoalieBlock(player);
+  if (!block) return -1;
+  return ((toInt(block.shots) - toInt(block.saves)) * 60) / toInt(block.minutes);
 };
 
 export const seasonBlockToPlayerFields = (block: SeasonStatBlock): Pick<

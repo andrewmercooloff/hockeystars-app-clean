@@ -63,6 +63,7 @@ import {
   getSearchAvatarSize,
   sortPlayersForSearchList,
 } from '../utils/leaderDisplay';
+import { getAllTimeBlock } from '../utils/seasonStats';
 import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
 
 // Предотвращаем автоматическое скрытие заставки
@@ -212,34 +213,24 @@ function buildSearchPlayerSubtitle(
   }
 
   const isGoalkeeper = isGoalkeeperPosition(item.position);
+  // Показатели в поиске — суммарные за все сезоны
+  const total = getAllTimeBlock(item);
 
   if (isGoalkeeper) {
-    if (item.shots && item.saves) {
-      const shotsNum = parseInt(item.shots, 10) || 0;
-      const savesNum = parseInt(item.saves, 10) || 0;
-      if (shotsNum > 0) {
-        const sv = (savesNum / shotsNum).toFixed(3);
-        parts.push(`SV%: ${sv}`);
-      }
+    const shotsNum = total.shots ?? 0;
+    const savesNum = total.saves ?? 0;
+    const minutesNum = total.minutes ?? 0;
+    if (shotsNum > 0) {
+      parts.push(`SV%: ${(savesNum / shotsNum).toFixed(3)}`);
     }
-
-    if (item.minutes && item.shots && item.saves) {
-      const minutesNum = parseInt(item.minutes, 10) || 0;
-      const shotsNum = parseInt(item.shots, 10) || 0;
-      const savesNum = parseInt(item.saves, 10) || 0;
-      if (minutesNum > 0) {
-        const goalsAgainst = shotsNum - savesNum;
-        const gaa = ((goalsAgainst * 60) / minutesNum).toFixed(2);
-        parts.push(`GAA: ${gaa}`);
-      }
+    if (minutesNum > 0 && shotsNum > 0) {
+      parts.push(`GAA: ${(((shotsNum - savesNum) * 60) / minutesNum).toFixed(2)}`);
     }
-  } else if (item.goals && item.assists && item.games) {
-    const goalsNum = parseInt(item.goals, 10) || 0;
-    const assistsNum = parseInt(item.assists, 10) || 0;
-    const gamesNum = parseInt(item.games, 10) || 0;
-    if (gamesNum > 0) {
-      const ppg = ((goalsNum + assistsNum) / gamesNum).toFixed(2);
-      parts.push(`PPG: ${ppg}`);
+  } else {
+    const gamesNum = total.games ?? 0;
+    const pts = (total.goals ?? 0) + (total.assists ?? 0);
+    if (gamesNum > 0 && pts > 0) {
+      parts.push(`PPG: ${(pts / gamesNum).toFixed(2)}`);
     }
   }
 
@@ -269,6 +260,7 @@ function searchPlayerRowDataEqual(a: Player, b: Player): boolean {
     a.shots === b.shots &&
     a.saves === b.saves &&
     a.minutes === b.minutes &&
+    a.seasonStats === b.seasonStats &&
     (a.photos?.[0] ?? '') === (b.photos?.[0] ?? '')
   );
 }
@@ -966,9 +958,7 @@ export default function SearchScreen() {
   const ppgOptions = useMemo(() => {
     const hasFieldPlayersWithPPG = players.some(p => {
       if (isGoalkeeperPosition(p.position)) return false;
-      if (!p.goals || !p.assists || !p.games) return false;
-      const gamesNum = parseInt(p.games) || 0;
-      return gamesNum > 0;
+      return (getAllTimeBlock(p).games ?? 0) > 0;
     });
     
     if (!hasFieldPlayersWithPPG) return [];
@@ -1134,14 +1124,13 @@ export default function SearchScreen() {
       }
       
       // Фильтр по PPG (для полевых игроков)
+      // Фильтры по показателям — суммарные за все сезоны (как и рейтинг)
+      const totalStats = getAllTimeBlock(player);
       const matchesPPG = ignorePPG || !selectedPPG || (() => {
         // Вратари уже исключены выше
-        if (!player.goals || !player.assists || !player.games) return false;
-        const goalsNum = parseInt(player.goals) || 0;
-        const assistsNum = parseInt(player.assists) || 0;
-        const gamesNum = parseInt(player.games) || 0;
+        const gamesNum = totalStats.games ?? 0;
         if (gamesNum === 0) return false;
-        const ppg = (goalsNum + assistsNum) / gamesNum;
+        const ppg = ((totalStats.goals ?? 0) + (totalStats.assists ?? 0)) / gamesNum;
         
         if (selectedPPG === '< 0.3') return ppg < 0.3;
         if (selectedPPG === '> 0.3') return ppg > 0.3;
@@ -1157,9 +1146,8 @@ export default function SearchScreen() {
       // Фильтр по SV% (для вратарей)
       const matchesSV = ignoreSV || !selectedSV || (() => {
         // Полевые игроки уже исключены выше
-        if (!player.shots || !player.saves) return false;
-        const shotsNum = parseInt(player.shots) || 0;
-        const savesNum = parseInt(player.saves) || 0;
+        const shotsNum = totalStats.shots ?? 0;
+        const savesNum = totalStats.saves ?? 0;
         if (shotsNum === 0) return false;
         const sv = savesNum / shotsNum;
         
@@ -1176,11 +1164,10 @@ export default function SearchScreen() {
       // Фильтр по GAA (для вратарей)
       const matchesGAA = ignoreGAA || !selectedGAA || (() => {
         if (!isGoalkeeperPosition(player.position)) return false; // Полевые игроки не имеют GAA
-        if (!player.minutes || !player.shots || !player.saves) return false;
-        const minutesNum = parseInt(player.minutes) || 0;
-        const shotsNum = parseInt(player.shots) || 0;
-        const savesNum = parseInt(player.saves) || 0;
-        if (minutesNum === 0) return false;
+        const minutesNum = totalStats.minutes ?? 0;
+        const shotsNum = totalStats.shots ?? 0;
+        const savesNum = totalStats.saves ?? 0;
+        if (minutesNum === 0 || shotsNum === 0) return false;
         const goalsAgainst = shotsNum - savesNum;
         const gaa = (goalsAgainst * 60) / minutesNum;
         

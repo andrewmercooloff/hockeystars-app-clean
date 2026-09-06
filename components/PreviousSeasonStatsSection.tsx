@@ -39,7 +39,7 @@ const FIELD_LABELS: Record<string, string> = {
   saves: 'profile.saves',
 };
 
-function StatPill({ value, label }: { value: string; label: string }) {
+export function StatPill({ value, label }: { value: string; label: string }) {
   return (
     <View style={styles.pill}>
       <Text style={styles.pillValue} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
@@ -52,7 +52,7 @@ function StatPill({ value, label }: { value: string; label: string }) {
   );
 }
 
-function FieldView({ block, t }: { block: SeasonStatBlock; t: (key: string) => string }) {
+export function FieldView({ block, t }: { block: SeasonStatBlock; t: (key: string) => string }) {
   const goals = block.goals ?? 0;
   const assists = block.assists ?? 0;
   const games = block.games ?? 0;
@@ -70,7 +70,7 @@ function FieldView({ block, t }: { block: SeasonStatBlock; t: (key: string) => s
   );
 }
 
-function GoalieView({ block, t }: { block: SeasonStatBlock; t: (key: string) => string }) {
+export function GoalieView({ block, t }: { block: SeasonStatBlock; t: (key: string) => string }) {
   const games = block.games ?? 0;
   const minutes = block.minutes ?? 0;
   const shots = block.shots ?? 0;

@@ -3570,7 +3570,9 @@
     "coverUploadFailed": "Could not upload the image",
     "scoutPrivacyNote": "Other users will not see your photo or name — to them you are “Scout”.",
     "positionCover": "Position the cover",
-    "positionCoverHint": "Drag with one finger, pinch to zoom until the frame fits"
+    "positionCoverHint": "Drag with one finger, pinch to zoom until the frame fits",
+    "allTime": "All time",
+    "seasonsCount": "{count} seasons"
   },
   "register": {
     "title": "Registration",
