@@ -304,7 +304,9 @@ function hs_send_notificore_sms(string $phone, string $code): bool
         CURLOPT_POST => true,
         CURLOPT_HTTPHEADER => [
             'Content-Type: application/json',
-            'Authorization: Bearer ' . $apiKey,
+            'Accept: application/json',
+            // Notificore SMS API expects X-API-KEY (Bearer returns "Invalid API key")
+            'X-API-KEY: ' . $apiKey,
         ],
         CURLOPT_POSTFIELDS => json_encode($payload),
         CURLOPT_RETURNTRANSFER => true,
