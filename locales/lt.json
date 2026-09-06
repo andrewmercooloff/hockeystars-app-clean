@@ -30,7 +30,8 @@
     "left": "kairė",
     "right": "dešinė",
     "offline": "Nėra ryšio",
-    "and": "ir"
+    "and": "ir",
+    "info": "Informacija"
   },
   "winger": "Krašto puolėjas",
   "center": "Centro į priekį",
@@ -220,7 +221,9 @@
       "saveError": "Nepavyko pažymėti pratimo kaip atlikto",
       "generalError": "Išsaugant įvyko klaida",
       "times": "vieną kartą",
-      "timesPlural": "kartų"
+      "timesPlural": "kartų",
+      "loginRequired": "Prisijunkite, kad atliktumėte pratimus",
+      "title": "Pratimas"
     },
     "difficulty": {
       "Начинающий": "Pradžia",
@@ -3105,7 +3108,8 @@
         "difficulty": "Начинающий",
         "duration": "10 мин"
       }
-    }
+    },
+    "timesPlural": "kartus"
   },
   "items": {
     "autograph": "autografas",
@@ -3199,7 +3203,9 @@
     "errorProcessFriendRequest": "Nepavyko apdoroti jūsų užklausos draugauti.",
     "errorProcessRequest": "Nepavyko apdoroti jūsų užklausos",
     "errorSendMessage": "Nepavyko išsiųsti pranešimo",
-    "phoneOrEmailPlaceholderShort": "+370… arba el. paštas"
+    "phoneOrEmailPlaceholderShort": "+370… arba el. paštas",
+    "email": "El. paštas",
+    "errorSwitchingToEmail": "Nepavyko perjungti į prisijungimą el. paštu"
   },
   "profile": {
     "addFriend": "Pridėti kaip draugą",
@@ -3494,7 +3500,22 @@
     "city": "Miestas",
     "addAddress": "Pridėti adresą",
     "addressesHint": "Galite nurodyti kelis adresus",
-    "previousSeason": "Previous season"
+    "previousSeason": "Previous season",
+    "cover": "Viršelis",
+    "changeCover": "Keisti viršelį",
+    "removeCover": "Pašalinti viršelį",
+    "teamLogo": "Komandos logotipas",
+    "uploadTeamLogo": "Įkelti logotipą",
+    "coverUpdated": "Viršelis atnaujintas",
+    "teamLogoUpdated": "Komandos logotipas atnaujintas",
+    "coverUploadFailed": "Nepavyko įkelti vaizdo",
+    "scoutPrivacyNote": "Kiti naudotojai nematys jūsų nuotraukos ir vardo – jiems esate „Skautas“.",
+    "positionCover": "Nustatykite viršelį",
+    "positionCoverHint": "Vilkite vienu pirštu, priartinkite dviem, kol kadras tilps",
+    "allTime": "Iš viso",
+    "seasonsCount": "{count} sez.",
+    "currentSeasonHint": "Dabartinis sezonas",
+    "fullScreen": "Visas ekranas"
   },
   "register": {
     "title": "Registracija",
@@ -3545,7 +3566,10 @@
     "fillRequiredFields": "Prašome užpildyti visus privalomus laukus",
     "fillAllFields": "Prašome užpildyti visus laukus",
     "phoneFormatError": "Prašome įvesti galiojantį telefono numerį su šalies kodu (pvz., +1234567890)",
-    "parentEmailFormatError": "Prašome įvesti galiojantį tėvo el. pašto adresą"
+    "parentEmailFormatError": "Prašome įvesti galiojantį tėvo el. pašto adresą",
+    "scoutPrivacyNote": "Kiti nemato skauto nuotraukos ir vardo – rodomi kaip „Skautas“.",
+    "emailFormatError": "Įveskite teisingą el. pašto adresą",
+    "registrationFailed": "Registracija nepavyko"
   },
   "navigation": {
     "home": "Pradžia",
@@ -3603,7 +3627,8 @@
     "errorCreatingUser": "Nepavyko sukurti vartotojo",
     "fillRequiredFields": "Užpildykite visus privalomus laukus.",
     "enterValidPhone": "Įveskite galiojantį telefono numerį su šalies kodu.",
-    "requiredForPlayers": "Žaidėjams ir žvaigždėms privaloma nurodyti gimimo datą ir poziciją"
+    "requiredForPlayers": "Žaidėjams ir žvaigždėms privaloma nurodyti gimimo datą ir poziciją",
+    "adminPanel": "Administratoriaus skydelis"
   },
   "adminGifts": {
     "sendGift": "Siųsti dovaną",
@@ -3817,7 +3842,8 @@
     "shareRatingFooter": "hockeystars.com",
     "ratingPointsLabel": "taškų",
     "allCountries": "Visos šalys",
-    "allYears": "Visi metai"
+    "allYears": "Visi metai",
+    "filters": "Filtrai"
   },
   "messages": {
     "title": "Žinutės",
@@ -3832,7 +3858,8 @@
     "massSend": "Masinis siuntimas",
     "recipients": "Gavėjai",
     "typeMessage": "Įveskite žinutę...",
-    "send": "Siųsti"
+    "send": "Siųsti",
+    "searchHistoryLoading": "Ieškoma žinučių istorijoje…"
   },
   "notifications": {
     "title": "Pranešimai",
@@ -4091,7 +4118,8 @@
     "oneVideo": "naują vaizdo įrašą",
     "multipleVideos": "{count} naujų vaizdo įrašų",
     "video": "vaizdo įrašas",
-    "videos": "vaizdo įrašai"
+    "videos": "vaizdo įrašai",
+    "fullScreen": "Visas ekranas"
   },
   "avatarNotification": {
     "changed": "pakeitė avatarą"

@@ -28,7 +28,8 @@
     "left": "Gauche",
     "right": "Droite",
     "offline": "Pas de connexion",
-    "and": "et"
+    "and": "et",
+    "info": "Info"
   },
   "winger": "Ailier",
   "center": "Avant-centre",
@@ -201,7 +202,9 @@
       "saveError": "Impossible de marquer l'exercice comme terminé",
       "generalError": "Une erreur s'est produite lors de l'enregistrement",
       "times": "une fois",
-      "timesPlural": "fois"
+      "timesPlural": "fois",
+      "loginRequired": "Connectez-vous pour faire les exercices",
+      "title": "Exercice"
     },
     "difficulty": {
       "Начинающий": "Début",
@@ -3092,7 +3095,8 @@
       "Intermediate": "Intermédiaire",
       "Advanced": "Avancé",
       "Easy": "Facile"
-    }
+    },
+    "timesPlural": "fois"
   },
   "items": {
     "autograph": "autographe",
@@ -3186,7 +3190,9 @@
     "errorProcessFriendRequest": "Impossible de traiter votre demande d'ami.",
     "errorProcessRequest": "Échec du traitement de votre demande",
     "errorSendMessage": "Échec de l'envoi du message",
-    "phoneOrEmailPlaceholderShort": "+33… ou e-mail"
+    "phoneOrEmailPlaceholderShort": "+33… ou e-mail",
+    "email": "E-mail",
+    "errorSwitchingToEmail": "Impossible de passer à la connexion par e-mail"
   },
   "profile": {
     "addFriend": "Ajouter comme ami",
@@ -3480,7 +3486,22 @@
     "city": "Ville",
     "addAddress": "Ajouter une adresse",
     "addressesHint": "Vous pouvez indiquer plusieurs adresses",
-    "previousSeason": "Previous season"
+    "previousSeason": "Previous season",
+    "cover": "Couverture",
+    "changeCover": "Changer la couverture",
+    "removeCover": "Supprimer la couverture",
+    "teamLogo": "Logo de l’équipe",
+    "uploadTeamLogo": "Charger le logo",
+    "coverUpdated": "Couverture mise à jour",
+    "teamLogoUpdated": "Logo de l’équipe mis à jour",
+    "coverUploadFailed": "Échec du chargement de l’image",
+    "scoutPrivacyNote": "Les autres utilisateurs ne verront ni votre photo ni votre nom — pour eux vous êtes « Scout ».",
+    "positionCover": "Positionner la couverture",
+    "positionCoverHint": "Déplacez avec un doigt, pincez pour zoomer jusqu’à ce que le cadre convienne",
+    "allTime": "Toutes saisons",
+    "seasonsCount": "{count} saisons",
+    "currentSeasonHint": "Saison en cours",
+    "fullScreen": "Plein écran"
   },
   "register": {
     "title": "Inscription",
@@ -3531,7 +3552,10 @@
     "fillRequiredFields": "Veuillez remplir tous les champs obligatoires",
     "fillAllFields": "Veuillez remplir tous les champs",
     "phoneFormatError": "Veuillez entrer un numéro de téléphone valide avec l'indicatif du pays (ex. +1234567890)",
-    "parentEmailFormatError": "Veuillez entrer un email parent valide"
+    "parentEmailFormatError": "Veuillez entrer un email parent valide",
+    "scoutPrivacyNote": "La photo et le nom d’un recruteur ne sont pas visibles — vous apparaissez comme « Scout ».",
+    "emailFormatError": "Veuillez saisir une adresse e-mail valide",
+    "registrationFailed": "Échec de l’inscription"
   },
   "navigation": {
     "home": "Maison",
@@ -3588,7 +3612,8 @@
     "errorCreatingUser": "Échec de la création de l'utilisateur",
     "fillRequiredFields": "Veuillez remplir tous les champs obligatoires.",
     "enterValidPhone": "Veuillez entrer un numéro de téléphone valide avec l'indicatif du pays.",
-    "requiredForPlayers": "Pour les joueurs et les stars, il est obligatoire d'indiquer la date de naissance et le poste"
+    "requiredForPlayers": "Pour les joueurs et les stars, il est obligatoire d'indiquer la date de naissance et le poste",
+    "adminPanel": "Panneau d’administration"
   },
   "museum": {
     "title": "Musée",
@@ -3795,7 +3820,8 @@
     "shareRatingFooter": "hockeystars.com",
     "ratingPointsLabel": "points",
     "allCountries": "Tous les pays",
-    "allYears": "Toutes les années"
+    "allYears": "Toutes les années",
+    "filters": "Filtres"
   },
   "messages": {
     "title": "Messages",
@@ -3810,7 +3836,8 @@
     "massSend": "Envoi de masse",
     "recipients": "Destinataires",
     "typeMessage": "Tapez un message...",
-    "send": "Envoyer"
+    "send": "Envoyer",
+    "searchHistoryLoading": "Recherche dans l’historique…"
   },
   "notifications": {
     "title": "Notifications",
@@ -4289,5 +4316,8 @@
     "scanQr": "Scannez avec votre téléphone — App Store ou Google Play s'ouvre",
     "appStoreCta": "Télécharger sur l'App Store",
     "playStoreCta": "Télécharger sur Google Play"
+  },
+  "videoNotification": {
+    "fullScreen": "Plein écran"
   }
 }

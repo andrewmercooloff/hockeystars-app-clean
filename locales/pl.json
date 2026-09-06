@@ -30,7 +30,8 @@
     "left": "Lewy",
     "right": "Prawidłowy",
     "offline": "Brak połączenia",
-    "and": "i"
+    "and": "i",
+    "info": "Informacja"
   },
   "winger": "Skrzydłowy",
   "center": "Środkowy napastnik",
@@ -211,7 +212,9 @@
       "saveError": "Nie można oznaczyć ćwiczenia jako ukończonego",
       "generalError": "Wystąpił błąd podczas zapisywania",
       "times": "raz",
-      "timesPlural": "czasy"
+      "timesPlural": "czasy",
+      "loginRequired": "Zaloguj się, aby wykonywać ćwiczenia",
+      "title": "Ćwiczenie"
     },
     "difficulty": {
       "Начинающий": "Początek",
@@ -2877,7 +2880,8 @@
       "Начинающий": "Początkujący",
       "Средний": "Średni",
       "Продвинутый": "Zaawansowany"
-    }
+    },
+    "timesPlural": "razy"
   },
   "items": {
     "autograph": "autograf",
@@ -2971,7 +2975,9 @@
     "errorProcessFriendRequest": "Nie można przetworzyć prośby o dodanie do znajomych.",
     "errorProcessRequest": "Nie udało się przetworzyć Twojego żądania",
     "errorSendMessage": "Nie udało się wysłać wiadomości",
-    "phoneOrEmailPlaceholderShort": "+48… lub email"
+    "phoneOrEmailPlaceholderShort": "+48… lub email",
+    "email": "E-mail",
+    "errorSwitchingToEmail": "Nie udało się przełączyć na logowanie e-mailem"
   },
   "profile": {
     "addFriend": "Dodaj jako znajomego",
@@ -3274,7 +3280,22 @@
     "city": "Miasto",
     "addAddress": "Dodaj adres",
     "addressesHint": "Możesz podać kilka adresów",
-    "previousSeason": "Previous season"
+    "previousSeason": "Previous season",
+    "cover": "Okładka",
+    "changeCover": "Zmień okładkę",
+    "removeCover": "Usuń okładkę",
+    "teamLogo": "Logo drużyny",
+    "uploadTeamLogo": "Wgraj logo",
+    "coverUpdated": "Okładka zaktualizowana",
+    "teamLogoUpdated": "Logo drużyny zaktualizowane",
+    "coverUploadFailed": "Nie udało się wgrać obrazu",
+    "scoutPrivacyNote": "Inni użytkownicy nie zobaczą Twojego zdjęcia ani imienia — dla nich jesteś „Skautem”.",
+    "positionCover": "Ustaw okładkę",
+    "positionCoverHint": "Przesuwaj jednym palcem, powiększaj dwoma, aż kadr będzie pasować",
+    "allTime": "Łącznie",
+    "seasonsCount": "{count} sez.",
+    "currentSeasonHint": "Bieżący sezon",
+    "fullScreen": "Pełny ekran"
   },
   "register": {
     "title": "Rejestracja",
@@ -3325,7 +3346,10 @@
     "fillRequiredFields": "Proszę wypełnić wszystkie wymagane pola",
     "fillAllFields": "Proszę wypełnić wszystkie pola",
     "phoneFormatError": "Proszę wprowadzić prawidłowy numer telefonu z kodem kraju (np. +1234567890)",
-    "parentEmailFormatError": "Proszę wprowadzić prawidłowy email rodzica"
+    "parentEmailFormatError": "Proszę wprowadzić prawidłowy email rodzica",
+    "scoutPrivacyNote": "Zdjęcie i imię skauta nie są widoczne dla innych — wyświetlasz się jako „Skaut”.",
+    "emailFormatError": "Podaj poprawny adres e-mail",
+    "registrationFailed": "Rejestracja nie powiodła się"
   },
   "navigation": {
     "home": "Dom",
@@ -3384,7 +3408,8 @@
     "errorCreatingUser": "Nie udało się utworzyć użytkownika",
     "fillRequiredFields": "Proszę wypełnić wszystkie wymagane pola.",
     "enterValidPhone": "Proszę podać prawidłowy numer telefonu wraz z kodem kraju.",
-    "requiredForPlayers": "W przypadku zawodników i gwiazd obowiązkowe jest podanie daty urodzenia i stanowiska"
+    "requiredForPlayers": "W przypadku zawodników i gwiazd obowiązkowe jest podanie daty urodzenia i stanowiska",
+    "adminPanel": "Panel administratora"
   },
   "museum": {
     "title": "Muzeum",
@@ -3593,7 +3618,8 @@
     "shareRatingFooter": "hockeystars.com",
     "ratingPointsLabel": "punktów",
     "allCountries": "Wszystkie kraje",
-    "allYears": "Wszystkie lata"
+    "allYears": "Wszystkie lata",
+    "filters": "Filtry"
   },
   "messages": {
     "title": "Wiadomości",
@@ -3608,7 +3634,8 @@
     "massSend": "Wysyłanie masowe",
     "recipients": "Odbiorcy",
     "typeMessage": "Wpisz wiadomość...",
-    "send": "Wyślij"
+    "send": "Wyślij",
+    "searchHistoryLoading": "Szukamy w historii wiadomości…"
   },
   "notifications": {
     "title": "Powiadomienia",
@@ -4081,7 +4108,8 @@
     "oneVideo": "nowe wideo",
     "multipleVideos": "{count} nowych wideo",
     "video": "wideo",
-    "videos": "wideo"
+    "videos": "wideo",
+    "fullScreen": "Pełny ekran"
   },
   "avatarNotification": {
     "changed": "zmienił awatar"
