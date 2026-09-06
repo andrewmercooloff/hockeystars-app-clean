@@ -4,7 +4,7 @@ import { Image } from 'expo-image';
 import { Platform, StyleSheet, View, ViewStyle, LayoutChangeEvent } from 'react-native';
 import { colors } from '../theme/colors';
 import { ICE_BACKGROUND, ICE_RECYCLING_KEY } from '../utils/iceBackground';
-import HockeyPattern from './HockeyPattern';
+import { IceLighting, RinkAccent } from './ArenaLayers';
 
 interface CachedBackgroundProps {
   source?: number | { uri: string };
@@ -13,10 +13,12 @@ interface CachedBackgroundProps {
   resizeMode?: 'cover' | 'contain' | 'stretch' | 'center';
   onLayout?: (event: LayoutChangeEvent) => void;
   /**
-   * true (по умолчанию) — контентный экран: чистый графит без текстуры льда.
-   * false — сцена со льдом (главное поле, игры, авторизация).
+   * true (по умолчанию) — контентный экран: ночная арена (графит + разметка).
+   * false — сцена со светлым льдом (главное поле, игры, авторизация).
    */
   vignette?: boolean;
+  /** Отключить световые слои поверх льда (например, для игровых сцен с плотной графикой). */
+  lighting?: boolean;
 }
 
 const CachedBackground: React.FC<CachedBackgroundProps> = React.memo(({
@@ -26,17 +28,18 @@ const CachedBackground: React.FC<CachedBackgroundProps> = React.memo(({
   resizeMode = 'cover',
   onLayout,
   vignette = true,
+  lighting = true,
 }) => {
   if (vignette) {
     return (
       <View style={[styles.container, styles.plain, style]} onLayout={onLayout}>
         <LinearGradient
           pointerEvents="none"
-          colors={['#16161b', colors.background, colors.scene]}
-          locations={[0, 0.5, 1]}
+          colors={['#1b1d24', colors.background, colors.scene]}
+          locations={[0, 0.45, 1]}
           style={StyleSheet.absoluteFill}
         />
-        <HockeyPattern />
+        <RinkAccent />
         {children}
       </View>
     );
@@ -52,6 +55,7 @@ const CachedBackground: React.FC<CachedBackgroundProps> = React.memo(({
         cachePolicy="memory-disk"
         recyclingKey={ICE_RECYCLING_KEY}
       />
+      {lighting ? <IceLighting /> : null}
       {children}
     </View>
   );
