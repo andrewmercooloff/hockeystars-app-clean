@@ -46,6 +46,8 @@ interface PlayerData {
   minutes?: number;
   shots?: number;
   saves?: number;
+  /** Archived seasons: { "25/26": { goals, assists, games, minutes, shots, saves } } */
+  season_stats?: string | Record<string, Record<string, unknown>> | null;
   hockey_start_date?: string;
   city?: string;
   number?: string;
@@ -267,29 +269,64 @@ function buildTextPrompt(
     lines.push(`\nCurrent team: ${player.team}`);
   }
 
-  // Season stats — use Number() to avoid string concatenation
-  const goals = Number(player.goals ?? 0);
-  const assists = Number(player.assists ?? 0);
-  const games = Number(player.games ?? 0);
-  const shots = Number(player.shots ?? 0);
-  const saves = Number(player.saves ?? 0);
-  const minutes = Number(player.minutes ?? 0);
-
-  lines.push("\nSeason statistics:");
-  if (isGoalie) {
-    if (games) lines.push(`- Games: ${games}`);
-    if (minutes) lines.push(`- Minutes: ${minutes}`);
-    if (shots) lines.push(`- Shots against: ${shots}`);
-    if (saves) lines.push(`- Saves: ${saves}`);
-    if (shots && saves) {
-      lines.push(`- Save%: ${((saves / shots) * 100).toFixed(1)}%`);
+  // Statistics: current season (player columns) + every archived season + career totals.
+  // The app ranks players by career totals, so the report must reason about them too.
+  type Block = { goals: number; assists: number; games: number; minutes: number; shots: number; saves: number };
+  const toBlock = (src: Record<string, unknown> | null | undefined): Block => ({
+    goals: Number(src?.goals ?? 0) || 0,
+    assists: Number(src?.assists ?? 0) || 0,
+    games: Number(src?.games ?? 0) || 0,
+    minutes: Number(src?.minutes ?? 0) || 0,
+    shots: Number(src?.shots ?? 0) || 0,
+    saves: Number(src?.saves ?? 0) || 0,
+  });
+  const hasData = (b: Block) => Object.values(b).some((v) => v > 0);
+  const CURRENT_SEASON = "26/27";
+  const current = toBlock(player as unknown as Record<string, unknown>);
+  let archived: Record<string, Block> = {};
+  try {
+    const raw = typeof player.season_stats === "string" ? JSON.parse(player.season_stats) : player.season_stats;
+    if (raw && typeof raw === "object") {
+      for (const [key, block] of Object.entries(raw as Record<string, Record<string, unknown>>)) {
+        if (key === CURRENT_SEASON) continue;
+        const b = toBlock(block);
+        if (hasData(b)) archived[key] = b;
+      }
     }
-  } else {
-    if (games) lines.push(`- Games: ${games}`);
-    lines.push(`- Goals: ${goals}`);
-    lines.push(`- Assists: ${assists}`);
-    lines.push(`- Points: ${goals + assists}`);
-    if (games) lines.push(`- Goals/game: ${(goals / games).toFixed(2)}`);
+  } catch { archived = {}; }
+  const seasonKeys = Object.keys(archived).sort();
+  const total: Block = [current, ...seasonKeys.map((k) => archived[k])].reduce(
+    (acc, b) => ({
+      goals: acc.goals + b.goals, assists: acc.assists + b.assists, games: acc.games + b.games,
+      minutes: acc.minutes + b.minutes, shots: acc.shots + b.shots, saves: acc.saves + b.saves,
+    }),
+    toBlock(null),
+  );
+  const describe = (b: Block): string[] => {
+    const out: string[] = [];
+    if (isGoalie) {
+      if (b.games) out.push(`games ${b.games}`);
+      if (b.minutes) out.push(`minutes ${b.minutes}`);
+      if (b.shots) out.push(`shots against ${b.shots}`);
+      if (b.saves) out.push(`saves ${b.saves}`);
+      if (b.shots && b.saves) out.push(`SV% ${((b.saves / b.shots) * 100).toFixed(1)}%`);
+      if (b.minutes && b.shots) out.push(`GAA ${(((b.shots - b.saves) * 60) / b.minutes).toFixed(2)}`);
+    } else {
+      if (b.games) out.push(`games ${b.games}`);
+      out.push(`goals ${b.goals}`, `assists ${b.assists}`, `points ${b.goals + b.assists}`);
+      if (b.games) out.push(`points/game ${((b.goals + b.assists) / b.games).toFixed(2)}`);
+    }
+    return out;
+  };
+
+  lines.push("\nStatistics by season:");
+  lines.push(`- Current season ${CURRENT_SEASON}: ${hasData(current) ? describe(current).join(", ") : "no data yet (season just started)"}`);
+  for (const key of seasonKeys) {
+    lines.push(`- Season ${key}: ${describe(archived[key]).join(", ")}`);
+  }
+  if (seasonKeys.length > 0) {
+    lines.push(`- CAREER TOTAL (${seasonKeys.length + (hasData(current) ? 1 : 0)} seasons): ${describe(total).join(", ")}`);
+    lines.push("Base the assessment on the career totals and the trend between seasons; do not treat an empty current season as a lack of experience.");
   }
 
   // Achievements
