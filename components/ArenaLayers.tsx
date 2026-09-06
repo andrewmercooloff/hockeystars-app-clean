@@ -177,9 +177,9 @@ export const RinkAccent = React.memo(function RinkAccent() {
         <Defs>
           {/* Brand-side tint: violet-graphite (between our red and the scout purple), not arena blue */}
           <RadialGradient id="arenaLight" cx="50%" cy="0%" r="85%" gradientUnits="objectBoundingBox">
-            <Stop offset="0%" stopColor="#7b5ea8" stopOpacity="0.15" />
-            <Stop offset="60%" stopColor="#7b5ea8" stopOpacity="0.03" />
-            <Stop offset="100%" stopColor="#7b5ea8" stopOpacity="0" />
+            <Stop offset="0%" stopColor="#6e3a55" stopOpacity="0.15" />
+            <Stop offset="60%" stopColor="#6e3a55" stopOpacity="0.03" />
+            <Stop offset="100%" stopColor="#6e3a55" stopOpacity="0" />
           </RadialGradient>
           <RadialGradient id="arenaWarm" cx="8%" cy="100%" r="60%" gradientUnits="objectBoundingBox">
             <Stop offset="0%" stopColor="#fa2f40" stopOpacity="0.07" />
@@ -187,7 +187,7 @@ export const RinkAccent = React.memo(function RinkAccent() {
           </RadialGradient>
           <LinearGradient id="beam" x1="0" y1="0" x2="1" y2="0">
             <Stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
-            <Stop offset="50%" stopColor="#ffffff" stopOpacity="0.035" />
+            <Stop offset="50%" stopColor="#ffffff" stopOpacity="0.02" />
             <Stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
           </LinearGradient>
         </Defs>
@@ -199,7 +199,7 @@ export const RinkAccent = React.memo(function RinkAccent() {
           d={star}
           fill="none"
           stroke="#fa2f40"
-          strokeOpacity={0.085}
+          strokeOpacity={0.055}
           strokeWidth={r * 0.085}
           strokeLinejoin="round"
           strokeLinecap="round"
@@ -241,9 +241,9 @@ const DriftingGlow = React.memo(function DriftingGlow({ width, height }: { width
       <Svg width={size} height={size}>
         <Defs>
           <RadialGradient id="driftGlow" cx="50%" cy="50%" r="50%" gradientUnits="objectBoundingBox">
-            <Stop offset="0%" stopColor="#8d7cc7" stopOpacity="0.16" />
-            <Stop offset="45%" stopColor="#8d7cc7" stopOpacity="0.06" />
-            <Stop offset="100%" stopColor="#8d7cc7" stopOpacity="0" />
+            <Stop offset="0%" stopColor="#a04a62" stopOpacity="0.16" />
+            <Stop offset="45%" stopColor="#a04a62" stopOpacity="0.06" />
+            <Stop offset="100%" stopColor="#a04a62" stopOpacity="0" />
           </RadialGradient>
         </Defs>
         <Rect x="0" y="0" width={size} height={size} fill="url(#driftGlow)" />
