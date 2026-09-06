@@ -48,6 +48,7 @@ import {
 import { dataCache, CACHE_KEYS } from '../utils/DataCache';
 import { safeHideSplashScreen } from '../utils/splashScreenUtils';
 import { useOtaUpdates } from '../hooks/useOtaUpdates';
+import AnimatedSplash from '../components/AnimatedSplash';
 
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
@@ -1727,7 +1728,7 @@ export default function RootLayout() {
                 ...(Platform.OS === 'android' ? { backgroundColor: colors.scene } : {}),
               }}
             >
-              <CachedBackground style={{ flex: 1 }} vignette={false}>
+              <CachedBackground style={{ flex: 1 }} vignette={false} lighting={false}>
                 <StatusBar 
                   barStyle="light-content" 
                   backgroundColor="#050008" 
@@ -2050,14 +2051,7 @@ export default function RootLayout() {
               elevation: 9999,
               opacity: splashOpacity,
             }}>
-              <Image 
-                source={require('../assets/images/splash-icon.png')} 
-                style={{ 
-                  width: 200, // Оптимизированный размер для лучшего соответствия нативному splash
-                  height: 200
-                }}
-                resizeMode="contain"
-              />
+              <AnimatedSplash opacity={splashOpacity} />
             </Animated.View>
           )}
           
