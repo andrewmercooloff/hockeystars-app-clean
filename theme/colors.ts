@@ -7,6 +7,10 @@ export type AppColors = {
   brand: string;
   brandDark: string;
   brandMuted: string;
+  /** Очень лёгкий красный wash для фонов — не заливка, а тепло. */
+  brandWash: string;
+  /** Тонкая фирменная линия (хедер, таббар, сайдбар). */
+  borderAccent: string;
   text: string;
   textSecondary: string;
   textMuted: string;
@@ -25,26 +29,28 @@ export type AppColors = {
 };
 
 export const darkColors: AppColors = {
-  // Dark Mode 2.0: чистый графит без текстур, карточки контрастнее фона
-  background: '#101013',
-  surface: '#1c1c21',
-  surfaceOverlay: 'rgba(28, 28, 33, 0.96)',
+  // Dark Mode 2.0: графит + точечный фирменный красный (не заливка)
+  background: '#121014',
+  surface: '#1e1c20',
+  surfaceOverlay: 'rgba(30, 28, 32, 0.96)',
   brand: '#fa2f40',
   brandDark: '#c92635',
-  brandMuted: 'rgba(250, 47, 64, 0.15)',
+  brandMuted: 'rgba(250, 47, 64, 0.22)',
+  brandWash: 'rgba(250, 47, 64, 0.10)',
+  borderAccent: 'rgba(250, 47, 64, 0.32)',
   text: '#ffffff',
   textSecondary: '#d4d4d8',
   textMuted: '#a1a1aa',
   border: 'rgba(255, 255, 255, 0.08)',
-  scene: '#0b0b0e',
+  scene: '#0e0b0d',
   iceFallback: '#d8e4ea',
   success: '#4CAF50',
   warning: '#FF9800',
-  card: '#1c1c21',
-  sidebar: '#0d0d10',
+  card: '#1e1c20',
+  sidebar: '#100c0e',
   input: 'rgba(255,255,255,0.07)',
   screenOverlay: 'transparent',
-  headerBar: '#101013',
+  headerBar: '#121014',
 };
 
 /** Cool ice / arena light — not cream or purple */
@@ -54,7 +60,9 @@ export const lightColors: AppColors = {
   surfaceOverlay: 'rgba(247, 250, 252, 0.9)',
   brand: '#d9182c',
   brandDark: '#a91222',
-  brandMuted: 'rgba(217, 24, 44, 0.1)',
+  brandMuted: 'rgba(217, 24, 44, 0.12)',
+  brandWash: 'rgba(217, 24, 44, 0.06)',
+  borderAccent: 'rgba(217, 24, 44, 0.28)',
   text: '#0f1720',
   textSecondary: '#334155',
   textMuted: '#64748b',

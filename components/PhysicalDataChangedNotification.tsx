@@ -105,15 +105,17 @@ export default PhysicalDataChangedNotification;
 
 const styles = StyleSheet.create({
     containerBlur: {
-    marginHorizontal: 0,
-    marginVertical: 0,
+    borderRadius: 16,
+    marginHorizontal: 16,
+    marginVertical: 6,
+    overflow: 'hidden',
   },
   container: {
-    backgroundColor: 'transparent',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: '#1c1c21',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    borderRadius: 16,
+    padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
   },

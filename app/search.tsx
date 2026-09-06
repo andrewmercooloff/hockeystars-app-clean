@@ -504,6 +504,8 @@ export default function SearchScreen() {
   const { currentUser, isUserLoading } = useUser();
   const isDesktop = useIsDesktopLayout();
   const playersListRef = useRef<FlatList<ScoutListRow>>(null);
+  /** Динамический отступ под абсолютный блок поиска/фильтров — иначе «Новички» залезают под кнопку сброса. */
+  const [listTopInset, setListTopInset] = useState(220);
 
   // Функция для форматирования даты в формат DD.MM.YYYY
   const formatBirthDate = (dateString: string): string => {
@@ -1593,6 +1595,11 @@ export default function SearchScreen() {
             intensity={20}
             tint="dark"
             style={styles.searchSectionBlur}
+            onLayout={(e) => {
+              const { y, height } = e.nativeEvent.layout;
+              const next = Math.ceil(y + height) + 10;
+              setListTopInset((prev) => (Math.abs(prev - next) > 1 ? next : prev));
+            }}
           >
             <View style={styles.searchSection}>
               {/* Полупрозрачный оверлей */}
@@ -1837,7 +1844,11 @@ export default function SearchScreen() {
             renderItem={renderPlayerItem}
             keyExtractor={keyExtractor}
             ListEmptyComponent={ListEmptyComponent}
-            contentContainerStyle={[styles.playersList, isDesktop && styles.playersListDesktop]}
+            contentContainerStyle={[
+              styles.playersList,
+              { paddingTop: listTopInset },
+              isDesktop && styles.playersListDesktop,
+            ]}
             removeClippedSubviews={Platform.OS === 'android'}
             maxToRenderPerBatch={8}
             updateCellsBatchingPeriod={80}
@@ -2093,7 +2104,6 @@ const styles = StyleSheet.create({
     paddingBottom: 96,
     zIndex: 1,
     elevation: 1,
-    marginTop: 210
   },
   playersListDesktop: {
     paddingHorizontal: 8,

@@ -30,10 +30,31 @@ const CachedBackground: React.FC<CachedBackgroundProps> = React.memo(({
   if (vignette) {
     return (
       <View style={[styles.container, styles.plain, style]} onLayout={onLayout}>
+        {/* Нестандартный фон: диагональный графит + боковые bloom'ы, не плоский linear. */}
         <LinearGradient
           pointerEvents="none"
-          colors={['#16161b', colors.background, colors.scene]}
-          locations={[0, 0.5, 1]}
+          colors={['#22161c', '#141014', '#0c0a0e', '#161018']}
+          locations={[0, 0.32, 0.68, 1]}
+          start={{ x: 0.05, y: 0 }}
+          end={{ x: 0.95, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
+        {/* Фирменный bloom слева-сверху */}
+        <LinearGradient
+          pointerEvents="none"
+          colors={['rgba(250,47,64,0.20)', 'rgba(250,47,64,0.06)', 'transparent']}
+          locations={[0, 0.38, 0.78]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0.85, y: 0.55 }}
+          style={StyleSheet.absoluteFill}
+        />
+        {/* Холодный подъём справа-снизу */}
+        <LinearGradient
+          pointerEvents="none"
+          colors={['transparent', 'rgba(70,85,120,0.10)', 'rgba(18,14,22,0.55)']}
+          locations={[0.35, 0.72, 1]}
+          start={{ x: 0.15, y: 0.25 }}
+          end={{ x: 1, y: 1 }}
           style={StyleSheet.absoluteFill}
         />
         <HockeyPattern />
