@@ -6795,8 +6795,10 @@ export default function PlayerProfile() {
             {/* Фотографии - не показываем для звезд и администраторов, для магазинов и заточки коньков доступны всем */}
             {player.status !== 'star' && player.status !== 'admin' && (() => {
               const isShopOrSkateSharpening = player.status === 'shop' || player.status === 'skateSharpening';
+              // Scouts evaluate players — full profile access without friendship
               const canSeePhotos = (currentUser && currentUser.id === player.id) || 
                                    (currentUser?.status === 'admin') ||
+                                   (currentUser?.status === 'scout') ||
                                    friendshipStatus === 'friends' ||
                                    isShopOrSkateSharpening;
               const isEditingPhotos = isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id);
@@ -7151,6 +7153,7 @@ export default function PlayerProfile() {
               (currentUser && currentUser.id === player.id) || 
               (currentUser?.status === 'admin') ||
               (currentUser?.status === 'star') ||
+              (currentUser?.status === 'scout') ||
               friendshipStatus === 'friends' ? (
                 // Показываем контейнер музея если:
                 // 1. Это владелец профиля, админ или звезда - всегда показываем
