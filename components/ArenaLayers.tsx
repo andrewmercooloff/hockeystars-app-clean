@@ -2,7 +2,6 @@ import React from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import Svg, {
   Defs,
-  Line,
   LinearGradient,
   Polygon,
   RadialGradient,
@@ -64,12 +63,15 @@ export const IceLighting = React.memo(function IceLighting() {
  */
 export const RinkAccent = React.memo(function RinkAccent() {
   const { width, height } = useWindowDimensions();
-  const r = Math.max(width, 360) * 0.78;
-  const cx = width * 1.02;
-  const cy = -r * 0.12;
-  const blueY = height * 0.78;
+  // Whole star readable in the lower-right quadrant, one ray leaving the frame
+  const r = Math.max(width, 360) * 0.5;
+  const cx = width * 0.74;
+  const cy = height * 0.66;
   const outer = starPoints(cx, cy, r, -14);
-  const inner = starPoints(cx, cy, r * 0.9, -14);
+  const inner = starPoints(cx, cy, r * 0.82, -14);
+  const core = starPoints(cx, cy, r * 0.3, -14);
+  // Arena light beam: a soft diagonal band from the top-left rig
+  const beam = `${-width * 0.1},${-height * 0.05} ${width * 0.42},${-height * 0.05} ${width * 1.05},${height * 0.62} ${width * 0.55},${height * 0.62}`;
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
@@ -85,18 +87,23 @@ export const RinkAccent = React.memo(function RinkAccent() {
             <Stop offset="0%" stopColor="#fa2f40" stopOpacity="0.07" />
             <Stop offset="100%" stopColor="#fa2f40" stopOpacity="0" />
           </RadialGradient>
-          <LinearGradient id="accentLine" x1="0" y1="0" x2="1" y2="0">
-            <Stop offset="0%" stopColor="#a78bfa" stopOpacity="0" />
-            <Stop offset="25%" stopColor="#a78bfa" stopOpacity="0.13" />
-            <Stop offset="75%" stopColor="#a78bfa" stopOpacity="0.13" />
-            <Stop offset="100%" stopColor="#a78bfa" stopOpacity="0" />
+          <LinearGradient id="beam" x1="0" y1="0" x2="1" y2="0">
+            <Stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
+            <Stop offset="50%" stopColor="#ffffff" stopOpacity="0.035" />
+            <Stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
           </LinearGradient>
+          <RadialGradient id="starFill" cx="50%" cy="50%" r="50%" gradientUnits="objectBoundingBox">
+            <Stop offset="0%" stopColor="#fa2f40" stopOpacity="0.16" />
+            <Stop offset="55%" stopColor="#fa2f40" stopOpacity="0.06" />
+            <Stop offset="100%" stopColor="#fa2f40" stopOpacity="0.02" />
+          </RadialGradient>
         </Defs>
         <Rect x="0" y="0" width={width} height={height} fill="url(#arenaLight)" />
         <Rect x="0" y="0" width={width} height={height} fill="url(#arenaWarm)" />
-        <Polygon points={outer} fill="#fa2f40" fillOpacity={0.028} stroke="#fa2f40" strokeOpacity={0.11} strokeWidth={2.5} strokeLinejoin="round" />
-        <Polygon points={inner} fill="none" stroke="#fa2f40" strokeOpacity={0.035} strokeWidth={1} strokeLinejoin="round" />
-        <Line x1={0} y1={blueY} x2={width} y2={blueY} stroke="url(#accentLine)" strokeWidth={3} />
+        <Polygon points={beam} fill="url(#beam)" />
+        <Polygon points={outer} fill="url(#starFill)" stroke="#fa2f40" strokeOpacity={0.22} strokeWidth={2} strokeLinejoin="round" />
+        <Polygon points={inner} fill="none" stroke="#ffffff" strokeOpacity={0.05} strokeWidth={1} strokeLinejoin="round" />
+        <Polygon points={core} fill="#fa2f40" fillOpacity={0.1} />
       </Svg>
     </View>
   );
