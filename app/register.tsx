@@ -592,33 +592,37 @@ export default function RegisterScreen() {
         return;
       }
 
-      // Для США/Канады отправляем email, для остальных - SMS через Twilio Verify
+      // Для США/Канады отправляем email, для остальных - SMS через сервер
       if (isUSOrCanada) {
         // Email: генерируем код, сохраняем в БД, отправляем
-      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-      await saveVerificationCode(contactValue, verificationCode);
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+        await saveVerificationCode(contactValue, verificationCode);
         console.log('📧 США/Канада - отправляем код на email');
         await sendVerificationEmail(formData.email, verificationCode);
       } else {
-        console.log('📱 Отправляем код через сервер HockeyStars');
-        const smsOk = await sendVerificationSMS(formData.phone);
-        if (!smsOk) {
-          showAlert(
-            t('common.error'),
-            t('auth.errorSendingCodeMessage') || 'Не удалось отправить SMS. Полностью закройте приложение и откройте снова.',
-            'error'
-          );
-          return;
-        }
+        // SMS: сразу показываем экран кода — ответ сервера может прийти позже SMS
+        console.log('📱 Отправляем код через сервер HockeyStars (фон)');
+        setStep('verification');
+        setResendTimer(60);
+        setCanResend(false);
+        Keyboard.dismiss();
+
+        void sendVerificationSMS(formData.phone).then((smsOk) => {
+          if (!smsOk) {
+            showAlert(
+              t('common.error'),
+              t('auth.errorSendingCodeMessage') ||
+                'Не удалось подтвердить отправку SMS. Если код не пришёл — нажмите «Отправить снова».',
+              'warning'
+            );
+          }
+        });
+        return;
       }
-      
+
       setStep('verification');
-      
-      // Запускаем таймер для повторной отправки (60 секунд)
       setResendTimer(60);
       setCanResend(false);
-      
-      // Скрываем клавиатуру и показываем уведомление с задержкой
       Keyboard.dismiss();
       
     } catch (error) {
@@ -645,8 +649,11 @@ export default function RegisterScreen() {
         await saveVerificationCode(formData.email, verificationCode);
         await sendVerificationEmail(formData.email, verificationCode);
       } else {
-        // SMS: Twilio Verify сам генерирует и управляет кодами!
-        await sendVerificationSMS(formData.phone);
+        const smsOk = await sendVerificationSMS(formData.phone);
+        if (!smsOk) {
+          showAlert(t('common.error'), t('auth.errorResendingCodeMessage') || 'Не удалось отправить SMS', 'error');
+          return;
+        }
       }
       
       // Запускаем таймер снова

@@ -348,35 +348,34 @@ export default function LoginScreen() {
         console.log('📧 Автоопределение: отправляем код на email');
         await sendVerificationEmail(cleanedContact, verificationCode);
       } else {
-        // SMS через сервер hockey-stars.com (Notificore ключ на VPS)
-        console.log('📱 Отправляем код через сервер HockeyStars');
-        const smsOk = await sendVerificationSMS(cleanedContact);
-        if (!smsOk) {
-          setAlert({
-            visible: true,
-            title: t('common.error'),
-            message:
-              t('auth.errorSendingCodeMessage') ||
-              'Не удалось отправить SMS. Закройте приложение полностью и откройте снова (нужно обновление), затем повторите.',
-            type: 'error',
-          });
-          return;
-        }
+        // SMS: сразу показываем экран кода — ответ сервера может прийти позже SMS
+        console.log('📱 Отправляем код через сервер HockeyStars (фон)');
+        setStep('code');
+        setResendTimer(60);
+        setCanResend(false);
+        Keyboard.dismiss();
+        setTimeout(() => codeRef.current?.focus(), 100);
+
+        void sendVerificationSMS(cleanedContact).then((smsOk) => {
+          if (!smsOk) {
+            setAlert({
+              visible: true,
+              title: t('common.error'),
+              message:
+                t('auth.errorSendingCodeMessage') ||
+                'Не удалось подтвердить отправку SMS. Если код не пришёл — нажмите «Отправить снова».',
+              type: 'warning',
+            });
+          }
+        });
+        return;
       }
 
-      
       setStep('code');
-      
-      // Запускаем таймер на 60 секунд
       setResendTimer(60);
       setCanResend(false);
-      
-      // Скрываем клавиатуру и показываем уведомление с задержкой
       Keyboard.dismiss();
-      
-      setTimeout(() => {
-        codeRef.current?.focus();
-      }, 100);
+      setTimeout(() => codeRef.current?.focus(), 100);
       
     } catch (error) {
       console.error('❌ Ошибка отправки кода:', error);
