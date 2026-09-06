@@ -3,7 +3,17 @@ import { View, StyleSheet, Dimensions, Image as RNImage, TouchableOpacity, Platf
 import { Image as ExpoImage } from 'expo-image';
 import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useIsFocused } from '@react-navigation/native';
-import Animated, { useAnimatedStyle, useSharedValue, withTiming, runOnJS } from 'react-native-reanimated';
+import Animated, { Keyframe, useAnimatedStyle, useSharedValue, withTiming, runOnJS } from 'react-native-reanimated';
+
+/**
+ * Pucks settle onto the ice instead of popping in. Also hides the one-frame
+ * Android artifact where an elevated black view paints as a rectangle before
+ * its borderRadius is applied (seen as "black stripes" when the tab remounts).
+ */
+const PUCK_ENTER = new Keyframe({
+  0: { opacity: 0, transform: [{ scale: 0.88 }] },
+  100: { opacity: 1, transform: [{ scale: 1 }] },
+}).duration(280);
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Puck, { PUCK_SCOUT_LOGO } from '../components/Puck';
@@ -1873,6 +1883,7 @@ const OriginalPuckAnimator = React.memo(({
 
   return (
     <Animated.View 
+      entering={PUCK_ENTER}
       style={[styles.puckContainer, animatedStyle]}
       onTouchStart={enableDrag ? handleTouchStart : undefined}
       onTouchMove={enableDrag ? handleTouchMove : undefined}
