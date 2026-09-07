@@ -508,7 +508,7 @@
             try {
                 // Важно: для работы нужен столбец invited_by (создается SQL-скриптом)
                 var response = await fetch(
-                    SUPABASE_URL + '/rest/v1/players?select=id,name,avatar,status,invited_by&status=neq.admin',
+                    SUPABASE_URL + '/rest/v1/players?select=id,name,avatar,status,invited_by&status=neq.admin&status=neq.pending_verification&is_hidden=eq.false',
                     {
                         headers: {
                             'apikey': SUPABASE_ANON_KEY,

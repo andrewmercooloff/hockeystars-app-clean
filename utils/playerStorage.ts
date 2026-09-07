@@ -537,8 +537,9 @@ const convertSupabaseToPlayer = (supabasePlayer: SupabasePlayer): Player => {
     // Онлайн статус
     isOnline: supabasePlayer.is_online ?? false,
     lastSeen: supabasePlayer.last_seen || undefined,
-  // Скрытие профиля
-  is_hidden: supabasePlayer.is_hidden ?? false,
+  // Скрытие профиля. Детский аккаунт до согласия родителя всегда скрыт,
+  // даже если флаг в БД по какой-то причине не выставлен.
+  is_hidden: (supabasePlayer.is_hidden ?? false) || supabasePlayer.status === 'pending_verification',
   // YouTube game videos for AI analysis
   gameVideos: (() => {
     if (!supabasePlayer.game_videos) return undefined;
