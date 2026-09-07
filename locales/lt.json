@@ -3579,7 +3579,11 @@
       "code": "2 žingsnis · Patvirtinimas",
       "profile": "3 žingsnis · Profilis",
       "details": "4 žingsnis · Žaidėjo duomenys"
-    }
+    },
+    "currentTeam": "Dabartinė komanda",
+    "currentTeamHint": "Per komandą susiejami komandos draugai, viršelis ir komandos puslapis. Pradėkite rašyti, kad rastumėte esamą.",
+    "teamPlaceholder": "pvz., Dinamo Minsk 2012",
+    "teamWillBeCreated": "Tokios komandos dar nėra — sukursime ją jums."
   },
   "navigation": {
     "home": "Pradžia",

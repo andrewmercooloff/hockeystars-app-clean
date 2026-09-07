@@ -3565,7 +3565,11 @@
       "code": "Steg 2 · Bekräftelse",
       "profile": "Steg 3 · Profil",
       "details": "Steg 4 · Spelaruppgifter"
-    }
+    },
+    "currentTeam": "Nuvarande lag",
+    "currentTeamHint": "Lagkamrater, omslag och lagsida kopplas via laget. Börja skriva för att hitta ett befintligt lag.",
+    "teamPlaceholder": "t.ex. Dinamo Minsk 2012",
+    "teamWillBeCreated": "Laget finns inte ännu — vi skapar det åt dig."
   },
   "navigation": {
     "home": "Hem",

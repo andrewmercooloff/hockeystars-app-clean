@@ -3557,7 +3557,11 @@
       "code": "Vaihe 2 · Vahvistus",
       "profile": "Vaihe 3 · Profiili",
       "details": "Vaihe 4 · Pelaajan tiedot"
-    }
+    },
+    "currentTeam": "Nykyinen joukkue",
+    "currentTeamHint": "Joukkueen kautta löytyvät joukkuekaverit, kansikuva ja joukkuesivu. Ala kirjoittaa löytääksesi olemassa olevan.",
+    "teamPlaceholder": "esim. Dinamo Minsk 2012",
+    "teamWillBeCreated": "Tätä joukkuetta ei vielä ole — luomme sen sinulle."
   },
   "navigation": {
     "home": "Kotiin",

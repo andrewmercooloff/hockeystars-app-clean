@@ -3359,7 +3359,11 @@
       "code": "Krok 2 · Potwierdzenie",
       "profile": "Krok 3 · Profil",
       "details": "Krok 4 · Dane zawodnika"
-    }
+    },
+    "currentTeam": "Obecna drużyna",
+    "currentTeamHint": "Przez drużynę łączą się koledzy z zespołu, zdjęcie w tle i strona drużyny. Zacznij pisać, aby znaleźć istniejącą.",
+    "teamPlaceholder": "np. Dinamo Mińsk 2012",
+    "teamWillBeCreated": "Takiej drużyny jeszcze nie ma — utworzymy ją dla Ciebie."
   },
   "navigation": {
     "home": "Dom",

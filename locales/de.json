@@ -3565,7 +3565,11 @@
       "code": "Schritt 2 · Bestätigung",
       "profile": "Schritt 3 · Profil",
       "details": "Schritt 4 · Spielerdaten"
-    }
+    },
+    "currentTeam": "Aktuelles Team",
+    "currentTeamHint": "Darüber werden Mitspieler, Cover und Teamseite verknüpft. Tippe, um ein bestehendes Team zu finden.",
+    "teamPlaceholder": "z. B. Dinamo Minsk 2012",
+    "teamWillBeCreated": "Dieses Team gibt es noch nicht — wir legen es für dich an."
   },
   "navigation": {
     "home": "Heim",

@@ -3557,7 +3557,11 @@
       "code": "Krok 2 · Potvrdenie",
       "profile": "Krok 3 · Profil",
       "details": "Krok 4 · Údaje hráča"
-    }
+    },
+    "currentTeam": "Súčasný tím",
+    "currentTeamHint": "Cez tím sa prepájajú spoluhráči, titulná fotka a stránka tímu. Začnite písať a nájdeme existujúci.",
+    "teamPlaceholder": "napr. Dinamo Minsk 2012",
+    "teamWillBeCreated": "Taký tím ešte nie je — vytvoríme ho za vás."
   },
   "navigation": {
     "home": "Domov",

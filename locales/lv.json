@@ -3579,7 +3579,11 @@
       "code": "2. solis · Apstiprinājums",
       "profile": "3. solis · Profils",
       "details": "4. solis · Spēlētāja dati"
-    }
+    },
+    "currentTeam": "Pašreizējā komanda",
+    "currentTeamHint": "Caur komandu tiek saistīti komandas biedri, vāks un komandas lapa. Sāciet rakstīt, lai atrastu esošu.",
+    "teamPlaceholder": "piem., Dinamo Minsk 2012",
+    "teamWillBeCreated": "Šādas komandas vēl nav — mēs to izveidosim jums."
   },
   "navigation": {
     "home": "Sākums",

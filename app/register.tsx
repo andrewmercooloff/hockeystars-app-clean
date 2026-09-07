@@ -25,7 +25,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import CustomAlert from '../components/CustomAlert';
 import CachedBackground from '../components/CachedBackground';
-import { addPlayer, saveCurrentUser, Team, createPlayer, getPlayerByPhone, setInvitedBy } from '../utils/playerStorage';
+import { addPlayer, saveCurrentUser, Team, createPlayer, getPlayerByPhone, setInvitedBy, createTeam, addPlayerTeam } from '../utils/playerStorage';
+import RegisterTeamPicker, { RegisterTeamValue } from '../components/RegisterTeamPicker';
 import { requiresParentalConsent, registerChildWithParentalConsent, calculateAge } from '../utils/parentalConsentService';
 import { uploadImageToStorage } from '../utils/uploadImage';
 import { sendVerificationSMS, verifyCode, verifySMSCode, saveVerificationCode, sendVerificationEmail } from '../utils/emailService';
@@ -159,6 +160,7 @@ export default function RegisterScreen() {
   const [resendTimer, setResendTimer] = useState(0);
   const [canResend, setCanResend] = useState(false);
   const [selectedTeams, setSelectedTeams] = useState<Team[]>([]);
+  const [currentTeam, setCurrentTeam] = useState<RegisterTeamValue>({ team: null, name: '' });
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date(2008, 0, 1)); // 1 января 2008
   const [showCountryPicker, setShowCountryPicker] = useState(false);
@@ -997,7 +999,7 @@ export default function RegisterScreen() {
         status: formData.status || 'player', // Убеждаемся, что статус есть
         birthDate: formData.birthDate || '',
         country: formData.country,
-        team: formData.team || '',
+        team: currentTeam.name.trim() || formData.team || '',
         position: formData.position || '',
         grip: formData.grip || '',
         height: formData.height || '',
@@ -1054,6 +1056,23 @@ export default function RegisterScreen() {
           avatar: newPlayer.avatar ? (newPlayer.avatar.substring(0, 50) + '...') : 'нет'
         });
       
+        // Текущая команда: находим/создаём и привязываем как основную
+        const teamName = currentTeam.name.trim();
+        if (teamName && (formData.status === 'player' || formData.status === 'star' || formData.status === 'coach')) {
+          try {
+            const team = currentTeam.team || await createTeam({
+              name: teamName,
+              type: 'club',
+              country: formData.country || undefined,
+            });
+            if (team) {
+              await addPlayerTeam(newPlayer.id, team.id, true, new Date().getFullYear());
+            }
+          } catch (teamError) {
+            console.warn('⚠️ Не удалось привязать команду при регистрации:', teamError);
+          }
+        }
+
         // 🎟️ Referral: если регистрация была после открытия профиля по ссылке/QR,
         // сохраняем invited_by (и очищаем ключ, чтобы не применилось повторно).
         try {
@@ -1668,6 +1687,14 @@ export default function RegisterScreen() {
             </View>
           )}
 
+          {formData.status === 'coach' && (
+            <RegisterTeamPicker
+              value={currentTeam}
+              onChange={setCurrentTeam}
+              label={t('register.currentTeam')}
+            />
+          )}
+
           {/* Годы тренировки - только для тренеров */}
           {formData.status === 'coach' && (
             <View style={styles.inputContainer}>
@@ -1912,6 +1939,12 @@ export default function RegisterScreen() {
           {step === 'details' && (
           <>
           <Text style={styles.stepHint}>{t('register.detailsHint')}</Text>
+          <RegisterTeamPicker
+            value={currentTeam}
+            onChange={setCurrentTeam}
+            label={t('register.currentTeam')}
+            hint={t('register.currentTeamHint')}
+          />
           {/* Номер - только для игроков */}
           {formData.status === 'player' && (
             <View style={styles.inputContainer}>
