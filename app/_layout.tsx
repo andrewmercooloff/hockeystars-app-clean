@@ -48,6 +48,7 @@ import {
 import { dataCache, CACHE_KEYS } from '../utils/DataCache';
 import { safeHideSplashScreen } from '../utils/splashScreenUtils';
 import { useOtaUpdates } from '../hooks/useOtaUpdates';
+import { emitInboxRefresh, isMessagePushType } from '../utils/inboxEvents';
 import AnimatedSplash from '../components/AnimatedSplash';
 import OtaResurfaceOverlay from '../components/OtaResurfaceOverlay';
 
@@ -1354,6 +1355,14 @@ export default function RootLayout() {
             ? `/player/${data.player_id}?scrollToAnalysis=true`
             : `/player/${data.player_id}`;
       }
+      // Пуши о сообщениях без deepLink (массовая рассылка, старые версии) — сразу в чат с отправителем
+      if (!deepLink && isMessagePushType(data?.type)) {
+        deepLink =
+          typeof data?.senderId === 'string' && data.senderId ? `/chat/${data.senderId}` : '/messages';
+      }
+      if (isMessagePushType(data?.type)) {
+        emitInboxRefresh('push', typeof data?.senderId === 'string' ? data.senderId : undefined);
+      }
       
       if (deepLink) {
         console.log('🔗 Deep link из уведомления:', deepLink);
@@ -1628,8 +1637,10 @@ export default function RootLayout() {
       
       // ВАЖНО: Сообщения (type: 'message') НЕ должны обновлять счетчик уведомлений
       // Счетчик уведомлений обновляется только для типов: stats_change, photo_added, gift_received, friend_request и т.д.
-      if (notificationType === 'message') {
-        console.log('🔔 Push: Это сообщение, не обновляем счетчик уведомлений');
+      if (isMessagePushType(notificationType)) {
+        // Realtime мог пропустить INSERT (сокет в фоне) — просим инбокс и открытый чат перечитать данные
+        const data = notification.request.content.data as Record<string, unknown> | undefined;
+        emitInboxRefresh('push', typeof data?.senderId === 'string' ? data.senderId : undefined);
         return; // Не обновляем счетчик уведомлений для сообщений
       }
       

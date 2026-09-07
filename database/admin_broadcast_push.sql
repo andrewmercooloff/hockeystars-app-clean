@@ -66,7 +66,7 @@ begin
       'sound', 'default',
       'priority', 'high',
       'channelId', 'default',
-      'data', jsonb_build_object('type', 'new_message', 'screen', 'messages', 'tab', 'messages', 'senderId', v_admin)
+      'data', jsonb_build_object('type', 'message', 'action', 'open_chat', 'screen', 'messages', 'tab', 'messages', 'senderId', v_admin, 'deepLink', '/chat/' || v_admin::text)
     );
     v_n := v_n + 1;
     v_tokens := v_tokens + 1;

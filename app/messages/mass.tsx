@@ -138,10 +138,12 @@ export default function MassMessageScreen() {
             `💬 ${currentUser.name}`,
             message.length > 50 ? message.substring(0, 50) + '...' : message,
             {
-              type: 'new_message',
+              type: 'message',
               screen: 'messages',
               tab: 'messages',
-              senderId: currentUser.id
+              senderId: currentUser.id,
+              action: 'open_chat',
+              deepLink: `/chat/${currentUser.id}`,
             }
           );
         } catch (error) {
