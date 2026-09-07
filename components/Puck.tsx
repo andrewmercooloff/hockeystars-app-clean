@@ -6,6 +6,7 @@ import Animated from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import CachedAvatar from './CachedAvatar';
 import LeaderShine from './LeaderShine';
+import Svg, { Circle } from 'react-native-svg';
 import { LEADER_BORDER_COLORS, LEADER_MEDAL_BORDER_WIDTH, type LeaderRank } from '../utils/leaderDisplay';
 
 export const PUCK_SCOUT_LOGO = require('../assets/images/scout.png');
@@ -137,9 +138,18 @@ const Puck: React.FC<PuckProps> = ({
         animatedStyle,
       ]}
     >
-      {/* Едва заметная тень на льду отдельным View (без CALayer/elevation — без артефактов) */}
-      <View pointerEvents="none" style={[styles.iceContact, { width: size, height: size, borderRadius: dimensions.borderRadius }]} />
-      <View pointerEvents="none" style={[styles.puckFace, { width: size, height: size, borderRadius: dimensions.borderRadius }]} />
+      {/* Диск и тень — SVG-круги: View с backgroundColor+borderRadius на Fabric первый кадр
+          рисуется квадратом («чёрные прямоугольники» при возврате на главную). */}
+      <Svg
+        pointerEvents="none"
+        style={styles.puckDisc}
+        width={size + 2}
+        height={size + 4}
+        viewBox={`0 0 ${size + 2} ${size + 4}`}
+      >
+        <Circle cx={size / 2 + 2} cy={size / 2 + 4} r={size / 2} fill="rgba(0,0,0,0.20)" />
+        <Circle cx={size / 2 + 1} cy={size / 2 + 1} r={size / 2 - 0.75} fill="#000000" stroke="#26262b" strokeWidth={1.5} />
+      </Svg>
       {/* Дополнительная тень на льду - отключена для производительности */}
       {/* <Animated.View style={[
         styles.iceShadow,
@@ -326,13 +336,10 @@ const styles = StyleSheet.create({
   },
   // Лицевая сторона диска: чёрная резина, кромка почти чёрная (непрозрачный цвет —
   // Fabric рисует рамку через CoreAnimation, без кадра "квадрат без скругления").
-  puckFace: {
+  puckDisc: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    backgroundColor: '#000000',
-    borderWidth: 1.5,
-    borderColor: '#26262b',
+    top: -1,
+    left: -1,
   },
   puckTouchable: {
     width: '100%',
@@ -384,12 +391,6 @@ const styles = StyleSheet.create({
   },
   // Лёгкая тень на льду (не используется в рендере, но оставлена для совместимости)
   // Лёгкая тень на льду: чуть вниз, без объёма
-  iceContact: {
-    position: 'absolute',
-    top: 3,
-    left: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.20)',
-  },
   iceShadow: {
     position: 'absolute',
     bottom: -8,
