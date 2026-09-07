@@ -19,9 +19,9 @@ ${cardCss(size)}
 /* corner ornaments: torn diagonal bands */
 .orn{position:absolute;pointer-events:none;}
 .orn.tl{left:-50mm;top:-48mm;width:170mm;height:60mm;transform:rotate(-24deg);
-  background:linear-gradient(180deg,var(--secondary) 0 30%,transparent 30% 42%,var(--primary) 42% 60%,transparent 60% 68%,rgba(11,42,91,.15) 68% 78%,transparent 78%);}
+  background:linear-gradient(180deg,var(--secondary) 0 30%,transparent 30% 42%,var(--primary) 42% 60%,transparent 60% 68%,color-mix(in srgb,var(--primary) 15%,transparent) 68% 78%,transparent 78%);}
 .orn.br{right:-40mm;bottom:-30mm;width:190mm;height:70mm;transform:rotate(-24deg);
-  background:linear-gradient(0deg,var(--primary) 0 34%,transparent 34% 44%,var(--secondary) 44% 62%,transparent 62% 70%,rgba(200,16,46,.15) 70% 80%,transparent 80%);}
+  background:linear-gradient(0deg,var(--primary) 0 34%,transparent 34% 44%,var(--secondary) 44% 62%,transparent 62% 70%,color-mix(in srgb,var(--secondary) 15%,transparent) 70% 80%,transparent 80%);}
 .orn.tr{right:-70mm;top:-32mm;width:170mm;height:50mm;transform:rotate(-24deg);
   background:linear-gradient(180deg,var(--secondary) 0 28%,transparent 28% 40%,var(--primary) 40% 58%,transparent 58%);}
 
@@ -50,7 +50,7 @@ ${cardCss(size)}
 .cover .season b{color:var(--accent);margin:0 1.5mm;}
 .cover .logo{position:absolute;right:${bleed + 12}mm;top:${bleed + 12}mm;width:62mm;height:62mm;display:flex;align-items:center;justify-content:center;}
 .cover .logo img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 1.5mm 3mm rgba(0,0,0,.45));}
-.cover .logo .badge{width:58mm;height:58mm;border-radius:50%;background:radial-gradient(circle at 50% 35%,#1d4a95,var(--primary) 70%);border:1.6mm solid #fff;
+.cover .logo .badge{width:58mm;height:58mm;border-radius:50%;background:radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--primary) 70%,#fff),var(--primary) 70%);border:1.6mm solid #fff;
   box-shadow:0 0 0 1.2mm var(--secondary),0 2mm 5mm rgba(0,0,0,.4);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;}
 .cover .logo .badge .star{font-size:12mm;line-height:1;color:var(--secondary);text-shadow:0 0 1mm #fff,0 0 1mm #fff;}
 .cover .logo .badge .txt{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:9mm;line-height:.95;margin-top:1mm;padding:0 3mm;}
@@ -95,17 +95,17 @@ ${cardCss(size)}
 .team .hdr .sub{font-family:'Oswald';font-weight:600;text-transform:uppercase;font-size:3.6mm;letter-spacing:.14em;color:var(--secondary);text-align:right;margin-top:2mm;}
 .team .grid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 36}mm;display:grid;
   grid-template-columns:repeat(3,${size.w}mm);justify-content:space-between;row-gap:6mm;}
-.slot{position:relative;width:${size.w}mm;height:${size.h}mm;border:.35mm dashed rgba(11,42,91,.55);border-radius:1mm;overflow:hidden;background:#fff;}
+.slot{position:relative;width:${size.w}mm;height:${size.h}mm;border:.35mm dashed color-mix(in srgb,var(--primary) 55%,transparent);border-radius:1mm;overflow:hidden;background:#fff;}
 .slot .ghost{position:absolute;left:${-size.bleed}mm;top:${-size.bleed}mm;filter:grayscale(1) contrast(.9);opacity:.28;}
 .slot .tag{position:absolute;left:50%;top:0;transform:translateX(-50%);background:var(--secondary);color:#fff;font-family:'Oswald';font-weight:600;
   font-size:3mm;line-height:1;padding:1mm 2.6mm 1.1mm;border-radius:0 0 1.5mm 1.5mm;letter-spacing:.06em;}
-.slot .lbl{position:absolute;left:0;right:0;bottom:0;padding:1.6mm 2mm 1.8mm;text-align:center;background:rgba(255,255,255,.88);border-top:.3mm solid rgba(11,42,91,.25);}
+.slot .lbl{position:absolute;left:0;right:0;bottom:0;padding:1.6mm 2mm 1.8mm;text-align:center;background:rgba(255,255,255,.88);border-top:.3mm solid color-mix(in srgb,var(--primary) 25%,transparent);}
 .slot .lbl .n{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:3.9mm;line-height:1.05;color:var(--dark);}
 .slot .lbl .n span{color:var(--secondary);margin-right:1.2mm;}
 .slot .lbl .p{font-family:'Roboto';font-weight:500;text-transform:uppercase;letter-spacing:.12em;font-size:2.4mm;color:#4a5a70;margin-top:.7mm;}
 .slot.outline .ghost{display:none;}
 .slot.outline{background:linear-gradient(160deg,#fff,var(--ice));}
-.slot.outline .bignum{position:absolute;left:0;right:0;top:34%;text-align:center;font-family:'Oswald';font-weight:700;font-size:20mm;line-height:1;color:rgba(11,42,91,.12);}
+.slot.outline .bignum{position:absolute;left:0;right:0;top:34%;text-align:center;font-family:'Oswald';font-weight:700;font-size:20mm;line-height:1;color:color-mix(in srgb,var(--primary) 12%,transparent);}
 
 /* ---------- HISTORY ---------- */
 .history .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
@@ -122,7 +122,7 @@ ${cardCss(size)}
 .history .item h4{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:5.4mm;line-height:1.05;color:var(--dark);margin-bottom:1.2mm;}
 .history .item p{font-size:3.7mm;line-height:1.35;color:#1b2940;white-space:pre-line;}
 .history .facts{position:absolute;right:${bleed + 10}mm;top:${bleed + 44}mm;width:44mm;background:#fff;border:.5mm solid var(--primary);border-radius:2mm;padding:4mm 3mm;
-  box-shadow:0 1.5mm 4mm rgba(11,42,91,.12);}
+  box-shadow:0 1.5mm 4mm color-mix(in srgb,var(--primary) 12%,transparent);}
 .history .facts h5{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:4.6mm;color:var(--dark);text-align:center;line-height:1.05;margin-bottom:3mm;
   padding-bottom:2mm;border-bottom:.5mm solid var(--secondary);}
 .history .fact{text-align:center;margin-bottom:4.5mm;}
@@ -136,7 +136,7 @@ ${cardCss(size)}
 .stats .note{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 40}mm;font-size:3.8mm;color:#1b2940;line-height:1.35;}
 .stats table{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 56}mm;width:calc(100% - ${(bleed + 10) * 2}mm);border-collapse:collapse;font-size:3.6mm;}
 .stats th{font-family:'Oswald';font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:3.4mm;color:#fff;background:var(--primary);padding:2.4mm 2mm;text-align:left;}
-.stats td{border-bottom:.3mm solid rgba(11,42,91,.25);height:9.6mm;padding:0 2mm;color:#7b8798;}
+.stats td{border-bottom:.3mm solid color-mix(in srgb,var(--primary) 25%,transparent);height:9.6mm;padding:0 2mm;color:#7b8798;}
 .stats td.i{width:9mm;text-align:center;font-family:'Oswald';font-weight:600;color:var(--secondary);}
 .stats tr:nth-child(even) td{background:rgba(238,243,249,.7);}
 
