@@ -2978,7 +2978,11 @@
     "errorSendMessage": "Nie udało się wysłać wiadomości",
     "phoneOrEmailPlaceholderShort": "+48… lub email",
     "email": "E-mail",
-    "errorSwitchingToEmail": "Nie udało się przełączyć na logowanie e-mailem"
+    "errorSwitchingToEmail": "Nie udało się przełączyć na logowanie e-mailem",
+    "smsRateLimited": "Kod na ten numer został wysłany mniej niż minutę temu. Wpisz go lub poproś o nowy po zakończeniu odliczania.",
+    "smsServerUnreachable": "Brak połączenia z serwerem HockeyStars. Sprawdź internet (VPN może blokować) i naciśnij „Wyślij ponownie”.",
+    "smsEmailOnly": "Dla USA i Kanady logowanie przez e-mail.",
+    "smsProviderFailed": "Operator nie przyjął SMS-a. Sprawdź numer lub spróbuj za minutę."
   },
   "profile": {
     "addFriend": "Dodaj jako znajomego",

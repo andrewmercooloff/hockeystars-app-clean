@@ -3193,7 +3193,11 @@
     "errorSendMessage": "Impossibile inviare il messaggio",
     "phoneOrEmailPlaceholderShort": "+39… o email",
     "email": "Email",
-    "errorSwitchingToEmail": "Impossibile passare all’accesso via email"
+    "errorSwitchingToEmail": "Impossibile passare all’accesso via email",
+    "smsRateLimited": "Un codice è già stato inviato a questo numero meno di un minuto fa. Inseriscilo o richiedine uno nuovo al termine del timer.",
+    "smsServerUnreachable": "Server HockeyStars non raggiungibile. Controlla la connessione (una VPN può bloccare) e tocca «Invia di nuovo».",
+    "smsEmailOnly": "Per USA e Canada accedi con l'e-mail.",
+    "smsProviderFailed": "L'operatore non ha accettato l'SMS. Controlla il numero o riprova tra un minuto."
   },
   "profile": {
     "addFriend": "Aggiungi come amico",

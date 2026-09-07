@@ -3193,7 +3193,11 @@
     "errorSendMessage": "Échec de l'envoi du message",
     "phoneOrEmailPlaceholderShort": "+33… ou e-mail",
     "email": "E-mail",
-    "errorSwitchingToEmail": "Impossible de passer à la connexion par e-mail"
+    "errorSwitchingToEmail": "Impossible de passer à la connexion par e-mail",
+    "smsRateLimited": "Un code a déjà été envoyé à ce numéro il y a moins d'une minute. Saisissez-le ou demandez-en un nouveau à la fin du délai.",
+    "smsServerUnreachable": "Serveur HockeyStars injoignable. Vérifiez la connexion (un VPN peut bloquer) et appuyez sur « Renvoyer ».",
+    "smsEmailOnly": "Pour les États-Unis et le Canada, connectez-vous par e-mail.",
+    "smsProviderFailed": "L'opérateur n'a pas accepté le SMS. Vérifiez le numéro ou réessayez dans une minute."
   },
   "profile": {
     "addFriend": "Ajouter comme ami",

@@ -3252,7 +3252,11 @@
     "errorSendMessage": "Failed to send message",
     "phoneOrEmailPlaceholderShort": "+48… or email",
     "email": "Email",
-    "errorSwitchingToEmail": "Could not switch to email sign-in"
+    "errorSwitchingToEmail": "Could not switch to email sign-in",
+    "smsRateLimited": "A code was already sent to this number less than a minute ago. Enter it, or request a new one when the timer ends.",
+    "smsServerUnreachable": "Couldn't reach the HockeyStars server. Check your connection (a VPN may block it) and tap “Send again”.",
+    "smsEmailOnly": "For the US and Canada, sign in with your email.",
+    "smsProviderFailed": "The SMS carrier didn't accept the message. Check the number or try again in a minute."
   },
   "profile": {
     "title": "Profile",

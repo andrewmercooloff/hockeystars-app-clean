@@ -3193,7 +3193,11 @@
     "errorSendMessage": "Odoslanie správy zlyhalo",
     "phoneOrEmailPlaceholderShort": "+421… alebo email",
     "email": "E-mail",
-    "errorSwitchingToEmail": "Nepodarilo sa prepnúť na prihlásenie e-mailom"
+    "errorSwitchingToEmail": "Nepodarilo sa prepnúť na prihlásenie e-mailom",
+    "smsRateLimited": "Kód bol na toto číslo odoslaný menej ako minútu dozadu. Zadajte ho alebo po skončení odpočtu požiadajte o nový.",
+    "smsServerUnreachable": "Server HockeyStars nie je dostupný. Skontrolujte pripojenie (VPN môže blokovať) a klepnite na „Odoslať znova“.",
+    "smsEmailOnly": "Pre USA a Kanadu sa prihláste e-mailom.",
+    "smsProviderFailed": "Operátor SMS neprijal. Skontrolujte číslo alebo to skúste o minútu."
   },
   "profile": {
     "addFriend": "Pridať ako priateľa",

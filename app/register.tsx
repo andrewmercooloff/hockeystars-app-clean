@@ -30,7 +30,7 @@ import { addPlayer, saveCurrentUser, Team, createPlayer, getPlayerByPhone, getPl
 import RegisterTeamPicker, { RegisterTeamValue } from '../components/RegisterTeamPicker';
 import { requiresParentalConsent, registerChildWithParentalConsent, calculateAge } from '../utils/parentalConsentService';
 import { uploadImageToStorage } from '../utils/uploadImage';
-import { sendVerificationSMS, verifyCode, verifySMSCode, saveVerificationCode, sendVerificationEmail } from '../utils/emailService';
+import { sendVerificationSMSDetailed, verifyCode, verifySMSCode, saveVerificationCode, sendVerificationEmail, SmsSendResult } from '../utils/emailService';
 import { ICE_BACKGROUND } from '../utils/iceBackground';
 import { formatPickerDate } from '../utils/birthDate';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -605,6 +605,28 @@ export default function RegisterScreen() {
   };
 
   // Отправка кода подтверждения
+  /** Понятное сообщение по коду ошибки сервера SMS */
+  const reportSmsFailure = (res: SmsSendResult) => {
+    if (res.error === 'rate') {
+      // Код уже отправлен меньше минуты назад — остаёмся на экране кода
+      showAlert(t('auth.codeSent'), t('auth.smsRateLimited'), 'info');
+      return;
+    }
+    if (res.error === 'network') {
+      showAlert(t('common.error'), t('auth.smsServerUnreachable'), 'warning');
+      return;
+    }
+    if (res.error === 'phone_format') {
+      showAlert(t('common.error'), t('register.phoneFormatError'), 'error');
+      return;
+    }
+    if (res.error === 'email_only') {
+      showAlert(t('common.error'), t('auth.smsEmailOnly'), 'error');
+      return;
+    }
+    showAlert(t('common.error'), t('auth.smsProviderFailed'), 'error');
+  };
+
   const handleSendCode = async () => {
     // Определяем, США/Канада или нет (используем в нескольких местах)
     const isUSOrCanada = formData.country === 'США' || formData.country === 'Канада';
@@ -689,15 +711,8 @@ export default function RegisterScreen() {
         setCanResend(false);
         Keyboard.dismiss();
 
-        void sendVerificationSMS(formData.phone).then((smsOk) => {
-          if (!smsOk) {
-            showAlert(
-              t('common.error'),
-              t('auth.errorSendingCodeMessage') ||
-                'Не удалось подтвердить отправку SMS. Если код не пришёл — нажмите «Отправить снова».',
-              'warning'
-            );
-          }
+        void sendVerificationSMSDetailed(formData.phone).then((res) => {
+          if (!res.ok) reportSmsFailure(res);
         });
         return;
       }
@@ -836,9 +851,9 @@ export default function RegisterScreen() {
         await saveVerificationCode(formData.email, verificationCode);
         await sendVerificationEmail(formData.email, verificationCode);
       } else {
-        const smsOk = await sendVerificationSMS(formData.phone);
-        if (!smsOk) {
-          showAlert(t('common.error'), t('auth.errorResendingCodeMessage') || 'Не удалось отправить SMS', 'error');
+        const res = await sendVerificationSMSDetailed(formData.phone);
+        if (!res.ok) {
+          reportSmsFailure(res);
           return;
         }
       }

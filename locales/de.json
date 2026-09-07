@@ -3193,7 +3193,11 @@
     "errorSendMessage": "Senden der Nachricht fehlgeschlagen",
     "phoneOrEmailPlaceholderShort": "+49… oder E-Mail",
     "email": "E-Mail",
-    "errorSwitchingToEmail": "Wechsel zur E-Mail-Anmeldung fehlgeschlagen"
+    "errorSwitchingToEmail": "Wechsel zur E-Mail-Anmeldung fehlgeschlagen",
+    "smsRateLimited": "An diese Nummer wurde vor weniger als einer Minute bereits ein Code gesendet. Gib ihn ein oder fordere nach dem Timer einen neuen an.",
+    "smsServerUnreachable": "HockeyStars-Server nicht erreichbar. Prüfe die Verbindung (VPN kann blockieren) und tippe „Erneut senden“.",
+    "smsEmailOnly": "Für USA und Kanada per E-Mail anmelden.",
+    "smsProviderFailed": "Der Mobilfunkanbieter hat die SMS nicht angenommen. Prüfe die Nummer oder versuche es in einer Minute erneut."
   },
   "profile": {
     "addFriend": "Als Freund hinzufügen",

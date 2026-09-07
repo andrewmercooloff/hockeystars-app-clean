@@ -3193,7 +3193,11 @@
     "errorSendMessage": "Viestin lähettäminen epäonnistui",
     "phoneOrEmailPlaceholderShort": "+358… tai sähköposti",
     "email": "Sähköposti",
-    "errorSwitchingToEmail": "Sähköpostikirjautumiseen vaihtaminen epäonnistui"
+    "errorSwitchingToEmail": "Sähköpostikirjautumiseen vaihtaminen epäonnistui",
+    "smsRateLimited": "Tähän numeroon lähetettiin koodi alle minuutti sitten. Syötä se tai pyydä uusi ajastimen päätyttyä.",
+    "smsServerUnreachable": "HockeyStars-palvelimeen ei saada yhteyttä. Tarkista yhteys (VPN voi estää) ja napauta ”Lähetä uudelleen”.",
+    "smsEmailOnly": "USA:ssa ja Kanadassa kirjaudutaan sähköpostilla.",
+    "smsProviderFailed": "Operaattori ei hyväksynyt tekstiviestiä. Tarkista numero tai yritä minuutin kuluttua."
   },
   "profile": {
     "addFriend": "Lisää kaveriksi",

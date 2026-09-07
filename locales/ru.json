@@ -3022,7 +3022,11 @@
     "errorSendMessage": "Не удалось отправить сообщение",
     "phoneOrEmailPlaceholderShort": "+48… или email",
     "email": "Email",
-    "errorSwitchingToEmail": "Не удалось переключиться на вход по email"
+    "errorSwitchingToEmail": "Не удалось переключиться на вход по email",
+    "smsRateLimited": "Код на этот номер уже отправлен меньше минуты назад. Введите его или запросите новый, когда закончится таймер.",
+    "smsServerUnreachable": "Нет связи с сервером HockeyStars. Проверьте интернет (VPN может блокировать) и нажмите «Отправить снова».",
+    "smsEmailOnly": "Для США и Канады вход по email.",
+    "smsProviderFailed": "Оператор не принял SMS. Проверьте номер или попробуйте через минуту."
   },
   "profile": {
     "addFriend": "Добавить в друзья",

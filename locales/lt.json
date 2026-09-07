@@ -3206,7 +3206,11 @@
     "errorSendMessage": "Nepavyko išsiųsti pranešimo",
     "phoneOrEmailPlaceholderShort": "+370… arba el. paštas",
     "email": "El. paštas",
-    "errorSwitchingToEmail": "Nepavyko perjungti į prisijungimą el. paštu"
+    "errorSwitchingToEmail": "Nepavyko perjungti į prisijungimą el. paštu",
+    "smsRateLimited": "Kodas šiuo numeriu išsiųstas mažiau nei prieš minutę. Įveskite jį arba paprašykite naujo, kai baigsis laikmatis.",
+    "smsServerUnreachable": "Nepavyksta pasiekti HockeyStars serverio. Patikrinkite ryšį (VPN gali blokuoti) ir spauskite „Siųsti dar kartą“.",
+    "smsEmailOnly": "JAV ir Kanadai — prisijungimas el. paštu.",
+    "smsProviderFailed": "Operatorius nepriėmė SMS. Patikrinkite numerį arba bandykite po minutės."
   },
   "profile": {
     "addFriend": "Pridėti kaip draugą",

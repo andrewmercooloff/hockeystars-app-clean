@@ -3206,7 +3206,11 @@
     "errorSendMessage": "Neizdevās nosūtīt ziņojumu",
     "phoneOrEmailPlaceholderShort": "+371… vai e-pasts",
     "email": "E-pasts",
-    "errorSwitchingToEmail": "Neizdevās pārslēgties uz pieteikšanos ar e-pastu"
+    "errorSwitchingToEmail": "Neizdevās pārslēgties uz pieteikšanos ar e-pastu",
+    "smsRateLimited": "Kods uz šo numuru nosūtīts mazāk nekā minūti atpakaļ. Ievadiet to vai pieprasiet jaunu, kad beigsies taimeris.",
+    "smsServerUnreachable": "Nevar sasniegt HockeyStars serveri. Pārbaudiet savienojumu (VPN var bloķēt) un pieskarieties “Sūtīt vēlreiz”.",
+    "smsEmailOnly": "ASV un Kanādai — pieslēgšanās ar e-pastu.",
+    "smsProviderFailed": "Operators nepieņēma SMS. Pārbaudiet numuru vai mēģiniet pēc minūtes."
   },
   "profile": {
     "addFriend": "Pievienot kā draugu",

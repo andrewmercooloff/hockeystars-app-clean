@@ -3193,7 +3193,11 @@
     "errorSendMessage": "Det gick inte att skicka meddelandet",
     "phoneOrEmailPlaceholderShort": "+46… eller e-post",
     "email": "E-post",
-    "errorSwitchingToEmail": "Kunde inte byta till e-postinloggning"
+    "errorSwitchingToEmail": "Kunde inte byta till e-postinloggning",
+    "smsRateLimited": "En kod skickades till det här numret för mindre än en minut sedan. Ange den eller begär en ny när timern är slut.",
+    "smsServerUnreachable": "Kan inte nå HockeyStars-servern. Kontrollera anslutningen (VPN kan blockera) och tryck på ”Skicka igen”.",
+    "smsEmailOnly": "För USA och Kanada, logga in med e-post.",
+    "smsProviderFailed": "Operatören tog inte emot SMS:et. Kontrollera numret eller försök igen om en minut."
   },
   "profile": {
     "addFriend": "Lägg till som vän",

@@ -337,7 +337,15 @@ const withTimeout = async <T,>(promise: Promise<T>, ms: number, label: string): 
   }
 };
 
-const sendVerificationSmsViaServer = async (phoneNumber: string): Promise<boolean> => {
+export type SmsSendResult = {
+  ok: boolean;
+  /** 'rate' — код уже отправлен недавно; 'network' — сервер недоступен; иначе код ошибки сервера */
+  error?: 'rate' | 'network' | 'sms' | 'phone_format' | 'email_only' | string;
+  message?: string;
+  status?: number;
+};
+
+const sendVerificationSmsViaServer = async (phoneNumber: string): Promise<SmsSendResult> => {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), APP_SMS_TIMEOUT_MS);
@@ -354,38 +362,55 @@ const sendVerificationSmsViaServer = async (phoneNumber: string): Promise<boolea
     const data = await response.json().catch(() => null);
     if (response.ok && data?.success) {
       console.log('✅ SMS отправлен через сервер HockeyStars:', data.channel || 'ok');
-      return true;
+      return { ok: true };
     }
     console.warn('⚠️ Сервер SMS не принял запрос:', response.status, data?.error || data?.message);
-    return false;
+    return {
+      ok: false,
+      error: data?.error || (response.status === 429 ? 'rate' : 'sms'),
+      message: data?.message,
+      status: response.status,
+    };
   } catch (error) {
     const aborted =
       error instanceof Error &&
       (error.name === 'AbortError' || error.message.includes('aborted'));
-    console.warn(
-      aborted ? '⚠️ Сервер SMS: таймаут' : '⚠️ Сервер SMS недоступен:',
-      error
-    );
-    return false;
+    console.warn(aborted ? '⚠️ Сервер SMS: таймаут' : '⚠️ Сервер SMS недоступен:', error);
+    return { ok: false, error: 'network' };
   }
 };
 
-export const sendVerificationSMS = async (phoneNumber: string, _code?: string): Promise<boolean> => {
+/**
+ * Отправка кода с подробным результатом. Сетевая ошибка повторяется один раз;
+ * ответ «rate» означает, что код уже ушёл менее 45 с назад — это не провал.
+ */
+export const sendVerificationSMSDetailed = async (phoneNumber: string): Promise<SmsSendResult> => {
   console.log('📱 Отправляем код подтверждения на:', phoneNumber);
-
-  // Server-only: embedded Notificore keys in old builds are revoked — do not fall back.
-  const ok = await withTimeout(
+  let result = await withTimeout(
     sendVerificationSmsViaServer(phoneNumber),
     APP_SMS_TIMEOUT_MS + 2000,
     'server_sms'
-  ).catch(() => false);
+  ).catch((): SmsSendResult => ({ ok: false, error: 'network' }));
 
-  if (ok) {
-    return true;
+  if (!result.ok && result.error === 'network') {
+    await new Promise((r) => setTimeout(r, 1500));
+    result = await withTimeout(
+      sendVerificationSmsViaServer(phoneNumber),
+      APP_SMS_TIMEOUT_MS + 2000,
+      'server_sms_retry'
+    ).catch((): SmsSendResult => ({ ok: false, error: 'network' }));
   }
 
-  console.error('❌ Не удалось отправить SMS через сервер HockeyStars');
-  return false;
+  if (!result.ok) {
+    console.error('❌ Не удалось отправить SMS через сервер HockeyStars:', result.error, result.message);
+  }
+  return result;
+};
+
+export const sendVerificationSMS = async (phoneNumber: string, _code?: string): Promise<boolean> => {
+  const result = await sendVerificationSMSDetailed(phoneNumber);
+  // Код уже отправлен недавно — пользователь может ввести его
+  return result.ok || result.error === 'rate';
 };
 
 // Проверка SMS кода через БД (Twilio Verify отключен)
