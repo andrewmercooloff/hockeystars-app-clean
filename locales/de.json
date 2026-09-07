@@ -3580,7 +3580,9 @@
     "entryTitle": "Aufs Eis",
     "entrySubtitle": "Gib deine Telefonnummer ein. Wir melden dich an oder erstellen ein Konto.",
     "codeSubtitle": "Gib den Code aus der Nachricht ein",
-    "whoAreYou": "Wer bist du?"
+    "whoAreYou": "Wer bist du?",
+    "useEmailInstead": "Stattdessen E-Mail verwenden",
+    "usePhoneInstead": "Stattdessen Telefonnummer verwenden"
   },
   "navigation": {
     "home": "Heim",

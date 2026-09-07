@@ -3572,7 +3572,9 @@
     "entryTitle": "Na ľad",
     "entrySubtitle": "Zadajte telefónne číslo. Prihlásime vás alebo vytvoríme účet.",
     "codeSubtitle": "Zadajte kód zo správy",
-    "whoAreYou": "Kto ste?"
+    "whoAreYou": "Kto ste?",
+    "useEmailInstead": "Použiť e-mail",
+    "usePhoneInstead": "Použiť telefónne číslo"
   },
   "navigation": {
     "home": "Domov",

@@ -3683,7 +3683,9 @@
     "entryTitle": "Welcome to the ice",
     "entrySubtitle": "Enter your phone number. We'll sign you in or create an account.",
     "codeSubtitle": "Enter the code from the message",
-    "whoAreYou": "Who are you?"
+    "whoAreYou": "Who are you?",
+    "useEmailInstead": "Use email instead",
+    "usePhoneInstead": "Use phone number instead"
   },
   "navigation": {
     "home": "Home",

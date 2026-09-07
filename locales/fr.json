@@ -3580,7 +3580,9 @@
     "entryTitle": "Entrée sur la glace",
     "entrySubtitle": "Saisissez votre numéro. Nous vous connectons ou créons un compte.",
     "codeSubtitle": "Saisissez le code reçu",
-    "whoAreYou": "Qui êtes-vous ?"
+    "whoAreYou": "Qui êtes-vous ?",
+    "useEmailInstead": "Utiliser l'e-mail",
+    "usePhoneInstead": "Utiliser le numéro de téléphone"
   },
   "navigation": {
     "home": "Maison",

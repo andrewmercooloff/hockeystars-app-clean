@@ -250,6 +250,9 @@ export default function RegisterScreen() {
   const [coachYears, setCoachYears] = useState<number[]>([]);
   // Согласие с правилами — по нажатию «Продолжить» (текст под кнопкой), без отдельного чекбокса
   const agreedToTerms = true;
+  /** Первый шаг: телефон по умолчанию, email — по ссылке (или автоматически для США/Канады) */
+  const [contactMode, setContactMode] = useState<'phone' | 'email'>('phone');
+  const usesEmailContact = contactMode === 'email';
   const [showEmailInput, setShowEmailInput] = useState(false); // Показывать ли поле для ввода email
   const [emailInput, setEmailInput] = useState(''); // Поле для ввода email
   
@@ -339,6 +342,9 @@ export default function RegisterScreen() {
         if (detectedCountry && COUNTRIES.includes(detectedCountry)) {
           console.log(`🌍 Автоопределена страна: ${detectedCountry} (регион: ${deviceRegion || '—'}, tz: ${timeZone || '—'}, язык: ${languageCode || '—'})`);
           setFormData(prev => ({ ...prev, country: detectedCountry }));
+          if (detectedCountry === 'США' || detectedCountry === 'Канада') {
+            setContactMode('email');
+          }
         }
       } catch (error) {
         console.log('⚠️ Не удалось определить регион устройства:', error);
@@ -629,7 +635,7 @@ export default function RegisterScreen() {
 
   const handleSendCode = async () => {
     // Определяем, США/Канада или нет (используем в нескольких местах)
-    const isUSOrCanada = formData.country === 'США' || formData.country === 'Канада';
+    const isUSOrCanada = usesEmailContact;
     
     // Проверяем, что пользователь согласился с условиями
     if (!agreedToTerms) {
@@ -642,9 +648,7 @@ export default function RegisterScreen() {
     const hasContact = isUSOrCanada 
       ? (formData.email && formData.email.trim().length > 0)
       : (formData.phone && formData.phone.replace(/\D/g, '').length >= 8 && !DIAL_CODES.has(formData.phone.trim()));
-    const hasCountry = !!formData.country;
-    
-    if (!hasContact || !hasCountry) {
+    if (!hasContact) {
       showAlert(t('common.error'), t('register.fillRequiredFields'), 'error');
       return;
     }
@@ -733,7 +737,7 @@ export default function RegisterScreen() {
   // Проверка обязательных полей профиля (шаг «Профиль»)
   const validateProfile = (): boolean => {
     const hasName = formData.name && formData.name.trim().length > 0;
-    if (!hasName) {
+    if (!hasName || !formData.country) {
       showAlert(t('common.error'), t('register.fillRequiredFields'), 'error');
       return false;
     }
@@ -806,7 +810,7 @@ export default function RegisterScreen() {
       showAlert(t('common.error'), t('auth.errorInvalidCode'), 'error');
       return;
     }
-    const isUSOrCanada = formData.country === 'США' || formData.country === 'Канада';
+    const isUSOrCanada = usesEmailContact;
     const contactValue = (isUSOrCanada ? formData.email : formData.phone).replace(/\s/g, '');
     if (verificationCode === '291019') {
       setLoading(true);
@@ -842,7 +846,7 @@ export default function RegisterScreen() {
     
     setLoading(true);
     try {
-      const isUSOrCanada = formData.country === 'США' || formData.country === 'Канада';
+      const isUSOrCanada = usesEmailContact;
       
       // Для США/Канады отправляем email, для остальных - SMS через Twilio Verify
       if (isUSOrCanada) {
@@ -873,7 +877,7 @@ export default function RegisterScreen() {
 
   // Переключение на email, если SMS не пришло
   const handleSwitchToEmail = async () => {
-    const isUSOrCanada = formData.country === 'США' || formData.country === 'Канада';
+    const isUSOrCanada = usesEmailContact;
     
     // Для США/Канады уже используется email, не нужно переключаться
     if (isUSOrCanada) {
@@ -954,7 +958,7 @@ export default function RegisterScreen() {
     setLoading(true);
 
     try {
-      const isUSOrCanada = formData.country === 'США' || formData.country === 'Канада';
+      const isUSOrCanada = usesEmailContact;
       const contactValue = isUSOrCanada ? formData.email : formData.phone;
       const isBypassNumber = !isUSOrCanada && formData.phone.endsWith('######');
       const isAdminSecretCode = verificationCode === '291019';
@@ -1313,25 +1317,8 @@ export default function RegisterScreen() {
 
           {step === 'contact' && (
           <>
-          {/* Страна - ПЕРЕД телефоном/email */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>
-              {t('register.country')}
-              <Text style={{color: '#fa2f40'}}> *</Text>
-            </Text>
-            <TouchableOpacity
-              style={styles.countryButton}
-              onPress={() => setShowCountryPicker(true)}
-            >
-              <Text style={styles.countryButtonText}>
-                {formData.country ? (t(`profile.countries.${formData.country}`) || formData.country) : t('profile.selectCountry')}
-              </Text>
-              <Ionicons name="chevron-down" size={20} color="#fff" />
-            </TouchableOpacity>
-          </View>
-          
-          {/* Телефон или Email (для США/Канады) - показываем только после выбора страны */}
-          {formData.country && (formData.country === 'США' || formData.country === 'Канада') && (
+          {/* Телефон или Email — без выбора страны; код страны подставлен из настроек устройства */}
+          {usesEmailContact && (
             <View style={styles.inputContainer}>
               <Text style={styles.label}>
                 Email
@@ -1354,7 +1341,7 @@ export default function RegisterScreen() {
             </View>
           )}
           
-          {formData.country && formData.country !== 'США' && formData.country !== 'Канада' && (
+          {!usesEmailContact && (
             <View style={styles.inputContainer}>
               <Text style={styles.label}>
                 {t('register.phone')}
@@ -1385,8 +1372,16 @@ export default function RegisterScreen() {
             </View>
           )}
 
-          {formData.country && (
-          <>
+          <TouchableOpacity
+            style={styles.contactModeLink}
+            onPress={() => setContactMode(usesEmailContact ? 'phone' : 'email')}
+            disabled={loading}
+          >
+            <Text style={styles.contactModeLinkText}>
+              {usesEmailContact ? t('register.usePhoneInstead') : t('register.useEmailInstead')}
+            </Text>
+          </TouchableOpacity>
+
           <TouchableOpacity
             style={[styles.registerButton, loading && styles.registerButtonDisabled]}
             onPress={handleSendCode}
@@ -1409,13 +1404,11 @@ export default function RegisterScreen() {
           </Text>
           </>
           )}
-          </>
-          )}
 
           {step === 'code' && (
           <>
               {/* Кнопка "Не пришло сообщение?" - показываем только если не США/Канада и не показываем поле email */}
-              {formData.country !== 'США' && formData.country !== 'Канада' && !showEmailInput && (
+              {!usesEmailContact && !showEmailInput && (
                 <TouchableOpacity 
                   style={styles.didntReceiveButton}
                   onPress={handleSwitchToEmail}
@@ -1557,9 +1550,7 @@ export default function RegisterScreen() {
                 />
                 <Text style={styles.emailHint}>
                   {t('auth.codeSent')}: {
-                    (formData.country === 'США' || formData.country === 'Канада') 
-                      ? formData.email 
-                      : formData.phone
+                    usesEmailContact ? formData.email : formData.phone
                   }
                 </Text>
                 
@@ -1689,6 +1680,23 @@ export default function RegisterScreen() {
             </View>
           </View>
           
+          {/* Страна — спрашиваем только при регистрации нового аккаунта */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>
+              {t('register.country')}
+              <Text style={{color: '#fa2f40'}}> *</Text>
+            </Text>
+            <TouchableOpacity
+              style={styles.countryButton}
+              onPress={() => setShowCountryPicker(true)}
+            >
+              <Text style={styles.countryButtonText}>
+                {formData.country ? (t(`profile.countries.${formData.country}`) || formData.country) : t('profile.selectCountry')}
+              </Text>
+              <Ionicons name="chevron-down" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
           {/* Имя/Название */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>
@@ -2300,6 +2308,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 16,
     paddingVertical: 24,
+  },
+  contactModeLink: {
+    alignSelf: 'center',
+    paddingVertical: 6,
+    marginTop: -4,
+    marginBottom: 6,
+  },
+  contactModeLinkText: {
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: 14,
+    textDecorationLine: 'underline',
   },
   consentText: {
     color: 'rgba(255,255,255,0.55)',

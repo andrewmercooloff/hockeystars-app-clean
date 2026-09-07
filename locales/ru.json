@@ -3428,7 +3428,9 @@
     "entryTitle": "Выход на лёд",
     "entrySubtitle": "Введите номер телефона — войдём в аккаунт или создадим новый.",
     "codeSubtitle": "Введите код из сообщения",
-    "whoAreYou": "Кто вы?"
+    "whoAreYou": "Кто вы?",
+    "useEmailInstead": "Войти по email",
+    "usePhoneInstead": "Войти по номеру телефона"
   },
   "navigation": {
     "home": "Главная",

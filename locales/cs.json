@@ -3572,7 +3572,9 @@
     "entryTitle": "Na led",
     "entrySubtitle": "Zadejte telefonní číslo. Přihlásíme vás nebo vytvoříme účet.",
     "codeSubtitle": "Zadejte kód ze zprávy",
-    "whoAreYou": "Kdo jste?"
+    "whoAreYou": "Kdo jste?",
+    "useEmailInstead": "Použít e-mail",
+    "usePhoneInstead": "Použít telefonní číslo"
   },
   "navigation": {
     "home": "Domov",

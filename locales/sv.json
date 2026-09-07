@@ -3580,7 +3580,9 @@
     "entryTitle": "Ut på isen",
     "entrySubtitle": "Ange ditt telefonnummer. Vi loggar in dig eller skapar ett konto.",
     "codeSubtitle": "Ange koden från meddelandet",
-    "whoAreYou": "Vem är du?"
+    "whoAreYou": "Vem är du?",
+    "useEmailInstead": "Använd e-post i stället",
+    "usePhoneInstead": "Använd telefonnummer i stället"
   },
   "navigation": {
     "home": "Hem",

@@ -3572,7 +3572,9 @@
     "entryTitle": "Jäälle",
     "entrySubtitle": "Syötä puhelinnumerosi. Kirjaamme sinut sisään tai luomme tilin.",
     "codeSubtitle": "Syötä viestin koodi",
-    "whoAreYou": "Kuka olet?"
+    "whoAreYou": "Kuka olet?",
+    "useEmailInstead": "Käytä sähköpostia",
+    "usePhoneInstead": "Käytä puhelinnumeroa"
   },
   "navigation": {
     "home": "Kotiin",

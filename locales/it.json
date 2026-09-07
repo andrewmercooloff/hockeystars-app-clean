@@ -3580,7 +3580,9 @@
     "entryTitle": "Sul ghiaccio",
     "entrySubtitle": "Inserisci il numero di telefono. Ti faremo accedere o creeremo un account.",
     "codeSubtitle": "Inserisci il codice ricevuto",
-    "whoAreYou": "Chi sei?"
+    "whoAreYou": "Chi sei?",
+    "useEmailInstead": "Usa l'email",
+    "usePhoneInstead": "Usa il numero di telefono"
   },
   "navigation": {
     "home": "Casa",
