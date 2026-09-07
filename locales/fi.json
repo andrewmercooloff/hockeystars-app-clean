@@ -29,7 +29,8 @@
     "right": "Oikein",
     "offline": "Ei yhteyttä",
     "and": "ja",
-    "info": "Tiedote"
+    "info": "Tiedote",
+    "continue": "Jatka"
   },
   "winger": "Laituri",
   "center": "Keskushyökkääjä",
@@ -3547,7 +3548,16 @@
     "parentEmailFormatError": "Syötä kelvollinen vanhemman sähköpostiosoite",
     "scoutPrivacyNote": "Muut eivät näe kykyjenetsijän kuvaa tai nimeä – näyt nimellä ”Kykyjenetsijä”.",
     "emailFormatError": "Syötä kelvollinen sähköpostiosoite",
-    "registrationFailed": "Rekisteröinti epäonnistui"
+    "registrationFailed": "Rekisteröinti epäonnistui",
+    "detailsHint": "Valinnainen: numero, ote, pituus ja paino auttavat kykyjenetsijöitä ja kavereita löytämään sinut. Voit täyttää ne myöhemmin profiilissa.",
+    "skipForNow": "Ohita",
+    "parentEmailSendFailed": "Sähköpostin lähetys vanhemmalle epäonnistui. Tarkista osoite ja yritä myöhemmin.",
+    "step": {
+      "contact": "Vaihe 1 · Yhteystiedot",
+      "code": "Vaihe 2 · Vahvistus",
+      "profile": "Vaihe 3 · Profiili",
+      "details": "Vaihe 4 · Pelaajan tiedot"
+    }
   },
   "navigation": {
     "home": "Kotiin",

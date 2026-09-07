@@ -31,7 +31,8 @@
     "right": "Pareizi",
     "offline": "Nav savienojuma",
     "and": "un",
-    "info": "Informācija"
+    "info": "Informācija",
+    "continue": "Turpināt"
   },
   "winger": "Malējais uzbrucējs",
   "center": "Centra uzbrucējs",
@@ -3569,7 +3570,16 @@
     "parentEmailFormatError": "Lūdzu, ievadiet derīgu vecāka e-pasta adresi",
     "scoutPrivacyNote": "Citi neredz skauta fotoattēlu un vārdu — jūs tiekat rādīts kā “Skauts”.",
     "emailFormatError": "Ievadiet derīgu e-pasta adresi",
-    "registrationFailed": "Reģistrācija neizdevās"
+    "registrationFailed": "Reģistrācija neizdevās",
+    "detailsHint": "Neobligāti: numurs, tvēriens, augums un svars palīdz skautiem un draugiem jūs atrast. Varēsiet aizpildīt vēlāk profilā.",
+    "skipForNow": "Izlaist",
+    "parentEmailSendFailed": "Neizdevās nosūtīt e-pastu vecākiem. Pārbaudiet adresi un mēģiniet vēlāk.",
+    "step": {
+      "contact": "1. solis · Kontakti",
+      "code": "2. solis · Apstiprinājums",
+      "profile": "3. solis · Profils",
+      "details": "4. solis · Spēlētāja dati"
+    }
   },
   "navigation": {
     "home": "Sākums",

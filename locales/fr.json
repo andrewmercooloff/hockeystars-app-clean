@@ -29,7 +29,8 @@
     "right": "Droite",
     "offline": "Pas de connexion",
     "and": "et",
-    "info": "Info"
+    "info": "Info",
+    "continue": "Continuer"
   },
   "winger": "Ailier",
   "center": "Avant-centre",
@@ -3555,7 +3556,16 @@
     "parentEmailFormatError": "Veuillez entrer un email parent valide",
     "scoutPrivacyNote": "La photo et le nom d’un recruteur ne sont pas visibles — vous apparaissez comme « Scout ».",
     "emailFormatError": "Veuillez saisir une adresse e-mail valide",
-    "registrationFailed": "Échec de l’inscription"
+    "registrationFailed": "Échec de l’inscription",
+    "detailsHint": "Facultatif : numéro, prise, taille et poids aident les recruteurs et amis à vous trouver. Vous pourrez les remplir plus tard dans le profil.",
+    "skipForNow": "Passer",
+    "parentEmailSendFailed": "Impossible d'envoyer l'e-mail au parent. Vérifiez l'adresse et réessayez plus tard.",
+    "step": {
+      "contact": "Étape 1 · Contact",
+      "code": "Étape 2 · Confirmation",
+      "profile": "Étape 3 · Profil",
+      "details": "Étape 4 · Données du joueur"
+    }
   },
   "navigation": {
     "home": "Maison",

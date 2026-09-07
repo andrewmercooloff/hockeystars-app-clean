@@ -29,7 +29,8 @@
     "right": "Giusto",
     "offline": "Nessuna connessione",
     "and": "e",
-    "info": "Info"
+    "info": "Info",
+    "continue": "Continua"
   },
   "winger": "Ala",
   "center": "Centravanti",
@@ -3555,7 +3556,16 @@
     "parentEmailFormatError": "Si prega di inserire un'email genitore valida",
     "scoutPrivacyNote": "Foto e nome dello scout non sono visibili agli altri: appari come “Scout”.",
     "emailFormatError": "Inserisci un indirizzo email valido",
-    "registrationFailed": "Registrazione non riuscita"
+    "registrationFailed": "Registrazione non riuscita",
+    "detailsHint": "Facoltativo: numero, impugnatura, altezza e peso aiutano scout e amici a trovarti. Puoi compilarli più tardi nel profilo.",
+    "skipForNow": "Salta per ora",
+    "parentEmailSendFailed": "Impossibile inviare l'e-mail al genitore. Controlla l'indirizzo e riprova più tardi.",
+    "step": {
+      "contact": "Passo 1 · Contatto",
+      "code": "Passo 2 · Conferma",
+      "profile": "Passo 3 · Profilo",
+      "details": "Passo 4 · Dati giocatore"
+    }
   },
   "navigation": {
     "home": "Casa",

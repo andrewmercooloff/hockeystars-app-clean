@@ -29,7 +29,8 @@
     "right": "Právo",
     "offline": "Bez připojení",
     "and": "a",
-    "info": "Informace"
+    "info": "Informace",
+    "continue": "Pokračovat"
   },
   "winger": "Křídelník",
   "center": "Střed dopředu",
@@ -3547,7 +3548,16 @@
     "parentEmailFormatError": "Prosím zadejte platný email rodiče",
     "scoutPrivacyNote": "Fotku a jméno skauta ostatní nevidí – zobrazujete se jako „Skaut“.",
     "emailFormatError": "Zadejte platnou e-mailovou adresu",
-    "registrationFailed": "Registrace se nezdařila"
+    "registrationFailed": "Registrace se nezdařila",
+    "detailsHint": "Nepovinné: číslo, držení hole, výška a váha pomáhají skautům a přátelům vás najít. Můžete je doplnit později v profilu.",
+    "skipForNow": "Přeskočit",
+    "parentEmailSendFailed": "E-mail rodiči se nepodařilo odeslat. Zkontrolujte adresu a zkuste to později.",
+    "step": {
+      "contact": "Krok 1 · Kontakt",
+      "code": "Krok 2 · Potvrzení",
+      "profile": "Krok 3 · Profil",
+      "details": "Krok 4 · Údaje hráče"
+    }
   },
   "navigation": {
     "home": "Domov",

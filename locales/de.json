@@ -29,7 +29,8 @@
     "right": "Rechts",
     "offline": "Keine Verbindung",
     "and": "und",
-    "info": "Info"
+    "info": "Info",
+    "continue": "Weiter"
   },
   "winger": "Flügelspieler",
   "center": "Mittelstürmer",
@@ -3555,7 +3556,16 @@
     "parentEmailFormatError": "Bitte geben Sie eine gültige E-Mail-Adresse des Elternteils ein",
     "scoutPrivacyNote": "Foto und Name eines Scouts sind für andere nicht sichtbar – du erscheinst als „Scout“.",
     "emailFormatError": "Bitte gib eine gültige E-Mail-Adresse ein",
-    "registrationFailed": "Registrierung fehlgeschlagen"
+    "registrationFailed": "Registrierung fehlgeschlagen",
+    "detailsHint": "Optional: Nummer, Griff, Größe und Gewicht helfen Scouts und Freunden, dich zu finden. Du kannst sie später im Profil ergänzen.",
+    "skipForNow": "Später",
+    "parentEmailSendFailed": "Die E-Mail an die Eltern konnte nicht gesendet werden. Bitte Adresse prüfen und später erneut versuchen.",
+    "step": {
+      "contact": "Schritt 1 · Kontakt",
+      "code": "Schritt 2 · Bestätigung",
+      "profile": "Schritt 3 · Profil",
+      "details": "Schritt 4 · Spielerdaten"
+    }
   },
   "navigation": {
     "home": "Heim",

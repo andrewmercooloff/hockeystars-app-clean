@@ -31,7 +31,8 @@
     "left": "Left",
     "right": "Right",
     "offline": "No connection",
-    "info": "Info"
+    "info": "Info",
+    "continue": "Continue"
   },
   "winger": "Winger",
   "center": "Center",
@@ -3658,7 +3659,16 @@
     "_cache_clear": "2024-01-16-9",
     "scoutPrivacyNote": "Other users will not see a scout’s photo or name — you appear as “Scout”.",
     "emailFormatError": "Please enter a valid email address",
-    "registrationFailed": "Registration failed"
+    "registrationFailed": "Registration failed",
+    "detailsHint": "Optional: number, grip, height and weight help scouts and friends find you. You can fill them in later in your profile.",
+    "skipForNow": "Skip for now",
+    "parentEmailSendFailed": "We couldn't send the email to the parent. Please check the address and try again later.",
+    "step": {
+      "contact": "Step 1 · Contact",
+      "code": "Step 2 · Confirmation",
+      "profile": "Step 3 · Profile",
+      "details": "Step 4 · Player details"
+    }
   },
   "navigation": {
     "home": "Home",

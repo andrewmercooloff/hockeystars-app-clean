@@ -31,7 +31,8 @@
     "right": "Prawidłowy",
     "offline": "Brak połączenia",
     "and": "i",
-    "info": "Informacja"
+    "info": "Informacja",
+    "continue": "Dalej"
   },
   "winger": "Skrzydłowy",
   "center": "Środkowy napastnik",
@@ -3349,7 +3350,16 @@
     "parentEmailFormatError": "Proszę wprowadzić prawidłowy email rodzica",
     "scoutPrivacyNote": "Zdjęcie i imię skauta nie są widoczne dla innych — wyświetlasz się jako „Skaut”.",
     "emailFormatError": "Podaj poprawny adres e-mail",
-    "registrationFailed": "Rejestracja nie powiodła się"
+    "registrationFailed": "Rejestracja nie powiodła się",
+    "detailsHint": "Opcjonalnie: numer, chwyt, wzrost i waga pomagają skautom i znajomym Cię znaleźć. Możesz je uzupełnić później w profilu.",
+    "skipForNow": "Pomiń",
+    "parentEmailSendFailed": "Nie udało się wysłać e-maila do rodzica. Sprawdź adres i spróbuj później.",
+    "step": {
+      "contact": "Krok 1 · Kontakt",
+      "code": "Krok 2 · Potwierdzenie",
+      "profile": "Krok 3 · Profil",
+      "details": "Krok 4 · Dane zawodnika"
+    }
   },
   "navigation": {
     "home": "Dom",

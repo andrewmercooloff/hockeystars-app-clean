@@ -369,7 +369,7 @@ serve(async (req) => {
     // Для США/Канады проверяем по email, для остальных - по phone
     let existingPlayerQuery = supabase
       .from('players')
-      .select('id, status')
+      .select('id, status, consent_token_expires_at')
     
     if (isEmailAsContact) {
       // Для США/Канады ищем по email (который передан в поле phone)
@@ -390,11 +390,18 @@ serve(async (req) => {
     }
 
     if (existingPlayer) {
-      const errorCode = isEmailAsContact ? 'EMAIL_ALREADY_EXISTS' : 'PHONE_ALREADY_EXISTS'
-      return new Response(
-        JSON.stringify({ error: errorCode, code: errorCode }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+      // Незавершённая детская регистрация (родитель не подтвердил) не должна блокировать номер:
+      // удаляем черновик и создаём новый запрос согласия.
+      if (existingPlayer.status === 'pending_verification') {
+        console.log('♻️ Удаляем незавершённую регистрацию:', existingPlayer.id)
+        await supabase.from('players').delete().eq('id', existingPlayer.id)
+      } else {
+        const errorCode = isEmailAsContact ? 'EMAIL_ALREADY_EXISTS' : 'PHONE_ALREADY_EXISTS'
+        return new Response(
+          JSON.stringify({ error: errorCode, code: errorCode }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
     }
 
     // Генерируем токен согласия
@@ -522,15 +529,16 @@ serve(async (req) => {
 
     if (!emailResult.success) {
       console.error('❌ Email не отправлен:', emailResult.error)
-      console.error('❌ Проверьте настройки RESEND_API_KEY в секретах Supabase')
-      // Возвращаем ошибку, чтобы пользователь знал, что письмо не отправлено
+      console.error('❌ Проверьте настройки RESEND_API_KEY и верификацию домена в Resend')
+      // Откатываем черновик, иначе повторная попытка упрётся в "номер уже зарегистрирован"
+      await supabase.from('players').delete().eq('id', tempId)
       return new Response(
-        JSON.stringify({ 
-          error: 'Не удалось отправить письмо родителю', 
-          details: emailResult.error,
-          playerId: tempId // Возвращаем ID для возможности повторной отправки
+        JSON.stringify({
+          error: 'PARENT_EMAIL_SEND_FAILED',
+          code: 'PARENT_EMAIL_SEND_FAILED',
+          details: emailResult.error
         }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
     

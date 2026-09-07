@@ -31,7 +31,8 @@
     "right": "dešinė",
     "offline": "Nėra ryšio",
     "and": "ir",
-    "info": "Informacija"
+    "info": "Informacija",
+    "continue": "Tęsti"
   },
   "winger": "Krašto puolėjas",
   "center": "Centro į priekį",
@@ -3569,7 +3570,16 @@
     "parentEmailFormatError": "Prašome įvesti galiojantį tėvo el. pašto adresą",
     "scoutPrivacyNote": "Kiti nemato skauto nuotraukos ir vardo – rodomi kaip „Skautas“.",
     "emailFormatError": "Įveskite teisingą el. pašto adresą",
-    "registrationFailed": "Registracija nepavyko"
+    "registrationFailed": "Registracija nepavyko",
+    "detailsHint": "Neprivaloma: numeris, laikymas, ūgis ir svoris padeda skautams ir draugams jus rasti. Galėsite užpildyti vėliau profilyje.",
+    "skipForNow": "Praleisti",
+    "parentEmailSendFailed": "Nepavyko išsiųsti el. laiško tėvams. Patikrinkite adresą ir bandykite vėliau.",
+    "step": {
+      "contact": "1 žingsnis · Kontaktai",
+      "code": "2 žingsnis · Patvirtinimas",
+      "profile": "3 žingsnis · Profilis",
+      "details": "4 žingsnis · Žaidėjo duomenys"
+    }
   },
   "navigation": {
     "home": "Pradžia",

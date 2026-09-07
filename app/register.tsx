@@ -97,6 +97,26 @@ const REGION_TO_COUNTRY: { [key: string]: string } = {
   'MX': 'Мексика',
 };
 
+function StepIndicator({ current, total, label }: { current: number; total: number; label: string }) {
+  return (
+    <View style={styles.stepIndicator}>
+      <View style={styles.stepDots}>
+        {Array.from({ length: total }).map((_, i) => (
+          <View
+            key={i}
+            style={[
+              styles.stepDot,
+              i < current && styles.stepDotDone,
+              i === current - 1 && styles.stepDotActive,
+            ]}
+          />
+        ))}
+      </View>
+      <Text style={styles.stepLabel}>{label}</Text>
+    </View>
+  );
+}
+
 export default function RegisterScreen() {
   const router = useRouter();
   const { t, language } = useLanguage();
@@ -126,7 +146,14 @@ export default function RegisterScreen() {
     // Поле для родительского согласия (для детей < 13 лет)
     parentEmail: ''
   });
-  const [step, setStep] = useState<'form' | 'verification'>('form');
+  type RegisterStep = 'contact' | 'code' | 'profile' | 'details';
+  const [step, setStep] = useState<RegisterStep>('contact');
+  const [contactVerified, setContactVerified] = useState(false);
+  const isBypassPhone = () =>
+    formData.country !== 'США' && formData.country !== 'Канада' && formData.phone.endsWith('######');
+  const totalSteps = formData.status === 'player' ? 4 : 3;
+  const stepIndex = step === 'contact' ? 1 : step === 'code' ? 2 : step === 'profile' ? 3 : 4;
+  const stepLabel = t(`register.step.${step}`);
   const [verificationCode, setVerificationCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
@@ -146,17 +173,23 @@ export default function RegisterScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
   const codeInputRef = useRef<TextInput>(null);
   const emailInputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    scrollViewRef.current?.scrollTo({ y: 0, animated: false });
+  }, [step]);
   
   // Глобальный слушатель клавиатуры для прокрутки к полю ввода кода
   useEffect(() => {
-    if (step !== 'verification') return;
+    if (step !== 'code') return;
     
     const keyboardWillShowListener = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
       (e) => {
         const keyboardHeight = e.endCoordinates?.height || 0;
         setTimeout(() => {
-          if (codeInputRef.current && scrollViewRef.current) {
+          // Прокручиваем только к тому полю, которое реально в фокусе,
+          // иначе редактирование телефона "уезжало" к полю кода
+          if (codeInputRef.current && scrollViewRef.current && codeInputRef.current.isFocused()) {
             // Используем measureLayout для получения позиции относительно ScrollView
             codeInputRef.current.measureLayout(
               scrollViewRef.current as any,
@@ -288,8 +321,8 @@ export default function RegisterScreen() {
   }, [resendTimer]);
 
   useEffect(() => {
-    if (verificationCode.length === 6) {
-      handleVerifyAndRegister();
+    if (verificationCode.length === 6 && step === 'code' && !loading) {
+      void handleVerifyCode();
     }
   }, [verificationCode]);
 
@@ -486,21 +519,12 @@ export default function RegisterScreen() {
     const hasContact = isUSOrCanada 
       ? (formData.email && formData.email.trim().length > 0)
       : (formData.phone && formData.phone.trim().length > 0);
-    const hasName = formData.name && formData.name.trim().length > 0;
     const hasStatus = !!formData.status;
     const hasCountry = !!formData.country;
     
-    if (!hasContact || !hasName || !hasStatus || !hasCountry) {
+    if (!hasContact || !hasStatus || !hasCountry) {
       showAlert(t('common.error'), t('register.fillRequiredFields'), 'error');
       return;
-    }
-
-    // Валидация имени для игроков, звезд, тренеров и скаутов
-    if (formData.status !== 'shop' && formData.status !== 'skateSharpening') {
-      if (!validateName(formData.name)) {
-        showAlert(t('common.error'), t('register.nameError'), 'error');
-        return;
-      }
     }
 
     // Для США/Канады проверяем email, для остальных - телефон
@@ -522,51 +546,6 @@ export default function RegisterScreen() {
       }
     }
 
-    // Дополнительные проверки в зависимости от статуса
-    if (formData.status === 'player' && (!formData.birthDate || !formData.position)) {
-      showAlert(t('common.error'), t('register.fillAllFields'), 'error');
-      return;
-    }
-
-    if (formData.status === 'star' && (!formData.birthDate || !formData.position)) {
-      showAlert(t('common.error'), t('register.fillAllFields'), 'error');
-      return;
-    }
-
-    // Проверка для тренера - обязательно выбрать хотя бы один год
-    if (formData.status === 'coach' && coachYears.length === 0) {
-      showAlert(t('common.error'), t('register.coachYearsRequired'), 'error');
-      return;
-    }
-
-    // Проверка аватара - обязателен для всех кроме скаута
-    if (formData.status !== 'scout' && !formData.avatar) {
-      showAlert(t('common.error'), t('register.photoRequired'), 'error');
-      return;
-    }
-
-    // Проверка возраста и родительского согласия для детей < 13 лет
-    // ВАЖНО: проверяем для игроков И звёзд (не только player, но и star)
-    if (formData.birthDate && (formData.status === 'player' || formData.status === 'star')) {
-      const age = calculateAge(formData.birthDate);
-      if (age < 13) {
-        if (!formData.parentEmail || !formData.parentEmail.trim()) {
-          showAlert(
-            t('register.parentalConsentRequired'),
-            t('register.parentalConsentMessage'),
-            'warning'
-          );
-          return;
-        }
-        // Проверяем формат email родителя
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(formData.parentEmail.trim())) {
-          showAlert(t('common.error'), t('register.parentEmailFormatError'), 'error');
-          return;
-        }
-      }
-    }
-
     setLoading(true);
 
     try {
@@ -577,18 +556,9 @@ export default function RegisterScreen() {
       const isBypassNumber = !isUSOrCanada && formData.phone.endsWith('######');
       
       if (isBypassNumber) {
-        // Для номеров с суффиксом ###### пропускаем SMS и сразу переходим к регистрации
         console.log('🔓 Обнаружен bypass номер, пропускаем SMS подтверждение');
-        showAlert(
-          'Режим разработчика', 
-          'Номер заканчивается на ######, SMS подтверждение пропущено', 
-          'success',
-          () => {
-            // Имитируем успешную верификацию и переходим к регистрации
-            setVerificationCode('123456');
-            setTimeout(() => handleVerifyAndRegister(), 100);
-          }
-        );
+        setContactVerified(true);
+        setStep('profile');
         return;
       }
 
@@ -602,7 +572,7 @@ export default function RegisterScreen() {
       } else {
         // SMS: сразу показываем экран кода — ответ сервера может прийти позже SMS
         console.log('📱 Отправляем код через сервер HockeyStars (фон)');
-        setStep('verification');
+        setStep('code');
         setResendTimer(60);
         setCanResend(false);
         Keyboard.dismiss();
@@ -620,7 +590,7 @@ export default function RegisterScreen() {
         return;
       }
 
-      setStep('verification');
+      setStep('code');
       setResendTimer(60);
       setCanResend(false);
       Keyboard.dismiss();
@@ -633,7 +603,109 @@ export default function RegisterScreen() {
     }
   };
 
-  // Подтверждение кода и регистрация
+  // Проверка обязательных полей профиля (шаг «Профиль»)
+  const validateProfile = (): boolean => {
+    const hasName = formData.name && formData.name.trim().length > 0;
+    if (!hasName) {
+      showAlert(t('common.error'), t('register.fillRequiredFields'), 'error');
+      return false;
+    }
+    if (formData.status !== 'shop' && formData.status !== 'skateSharpening') {
+      if (!validateName(formData.name)) {
+        showAlert(t('common.error'), t('register.nameError'), 'error');
+        return false;
+      }
+    }
+    // Дополнительные проверки в зависимости от статуса
+    if (formData.status === 'player' && (!formData.birthDate || !formData.position)) {
+      showAlert(t('common.error'), t('register.fillAllFields'), 'error');
+      return false;
+    }
+
+    if (formData.status === 'star' && (!formData.birthDate || !formData.position)) {
+      showAlert(t('common.error'), t('register.fillAllFields'), 'error');
+      return false;
+    }
+
+    // Проверка для тренера - обязательно выбрать хотя бы один год
+    if (formData.status === 'coach' && coachYears.length === 0) {
+      showAlert(t('common.error'), t('register.coachYearsRequired'), 'error');
+      return false;
+    }
+
+    // Проверка аватара - обязателен для всех кроме скаута
+    if (formData.status !== 'scout' && !formData.avatar) {
+      showAlert(t('common.error'), t('register.photoRequired'), 'error');
+      return false;
+    }
+
+    // Проверка возраста и родительского согласия для детей < 13 лет
+    // ВАЖНО: проверяем для игроков И звёзд (не только player, но и star)
+    if (formData.birthDate && (formData.status === 'player' || formData.status === 'star')) {
+      const age = calculateAge(formData.birthDate);
+      if (age < 13) {
+        if (!formData.parentEmail || !formData.parentEmail.trim()) {
+          showAlert(
+            t('register.parentalConsentRequired'),
+            t('register.parentalConsentMessage'),
+            'warning'
+          );
+          return false;
+        }
+        // Проверяем формат email родителя
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.parentEmail.trim())) {
+          showAlert(t('common.error'), t('register.parentEmailFormatError'), 'error');
+          return false;
+        }
+      }
+    }
+
+    return true;
+  };
+
+  const handleProfileNext = () => {
+    if (!validateProfile()) return;
+    if (formData.status === 'player') {
+      setStep('details');
+    } else {
+      void handleRegister();
+    }
+  };
+
+  // Шаг «Код»: только проверяем код, регистрация — после заполнения профиля
+  const handleVerifyCode = async () => {
+    if (!verificationCode || verificationCode.length !== 6) {
+      showAlert(t('common.error'), t('auth.errorInvalidCode'), 'error');
+      return;
+    }
+    if (verificationCode === '291019') {
+      setContactVerified(true);
+      setStep('profile');
+      return;
+    }
+    setLoading(true);
+    try {
+      const isUSOrCanada = formData.country === 'США' || formData.country === 'Канада';
+      const contactValue = isUSOrCanada ? formData.email : formData.phone;
+      const result = contactValue.includes('@')
+        ? await verifyCode(contactValue, verificationCode)
+        : await verifySMSCode(contactValue, verificationCode);
+      if (!result.success) {
+        const msg = result.translationKey ? t(result.translationKey) : (result.message || t('auth.errorVerifyingCodeMessage'));
+        showAlert(t('common.error'), msg, 'error');
+        return;
+      }
+      setContactVerified(true);
+      setStep('profile');
+    } catch (e) {
+      console.error('❌ Ошибка проверки кода:', e);
+      showAlert(t('common.error'), t('auth.errorVerifyingCodeMessage'), 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Повторная отправка кода
   const handleResendCode = async () => {
     if (!canResend) return;
@@ -742,11 +814,12 @@ export default function RegisterScreen() {
     }
   };
 
-  const handleVerifyAndRegister = async () => {
-    if (!verificationCode || verificationCode.length !== 6) {
+  const handleRegister = async () => {
+    if (!contactVerified && (!verificationCode || verificationCode.length !== 6)) {
       showAlert(t('common.error'), t('auth.errorInvalidCode'), 'error');
       return;
     }
+    if (!validateProfile()) return;
 
     setLoading(true);
 
@@ -759,7 +832,7 @@ export default function RegisterScreen() {
       // Определяем, это email или телефон (для выбора метода проверки)
       const isEmailContact = contactValue.includes('@');
       
-      if (!isBypassNumber && !isAdminSecretCode) {
+      if (!contactVerified && !isBypassNumber && !isAdminSecretCode) {
         // Для обычных проверяем код
         // Email через БД, SMS через Twilio Verify
         const verificationResult = isEmailContact 
@@ -831,6 +904,9 @@ export default function RegisterScreen() {
           switch (consentResult.error) {
             case 'PHONE_ALREADY_EXISTS':
               errorMessage = t('auth.phoneAlreadyRegistered');
+              break;
+            case 'PARENT_EMAIL_SEND_FAILED':
+              errorMessage = t('register.parentEmailSendFailed');
               break;
             case 'PARENTAL_CONSENT_ERROR':
             case 'CONSENT_REQUEST_FAILED':
@@ -1077,7 +1153,11 @@ export default function RegisterScreen() {
 
           
           <Text style={styles.title}>{t('register.title')}</Text>
-          
+
+          <StepIndicator current={stepIndex} total={totalSteps} label={stepLabel} />
+
+          {step === 'contact' && (
+          <>
           {/* Статус */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>
@@ -1244,8 +1324,231 @@ export default function RegisterScreen() {
             </View>
           )}
 
-          {/* Остальные поля - показываем только после выбора страны */}
+          {/* Чекбокс принятия условий - показываем только после выбора страны */}
           {formData.country && (
+            <View style={styles.termsContainer}>
+              <TouchableOpacity 
+                style={styles.checkbox}
+                onPress={() => setAgreedToTerms(!agreedToTerms)}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.checkboxSquare, agreedToTerms && styles.checkboxSquareChecked]}>
+                  {agreedToTerms && <Ionicons name="checkmark" size={16} color="#fff" />}
+                </View>
+              </TouchableOpacity>
+              <Text style={styles.termsText}>
+                {t('register.agreeToTerms')}
+              </Text>
+            </View>
+          )}
+          {formData.country && (
+            <TouchableOpacity 
+              style={styles.termsLink}
+              onPress={() => {
+                const langParam = language === 'ru' ? '?lang=ru' : '?lang=en';
+                Linking.openURL(`https://hockey-stars.com/rules.html${langParam}`);
+              }}
+            >
+              <Ionicons name="document-text-outline" size={16} color="#fa2f40" />
+              <Text style={styles.termsLinkText}>{t('register.termsLink')}</Text>
+            </TouchableOpacity>
+          )}
+          
+          {formData.country && (
+          <TouchableOpacity
+            style={[styles.registerButton, (loading || !agreedToTerms) && styles.registerButtonDisabled]}
+            onPress={handleSendCode}
+            disabled={(loading || !agreedToTerms)}
+          >
+            <Ionicons name={loading ? "hourglass" : "arrow-forward"} size={20} color="#fff" />
+            <Text style={styles.registerButtonText}>{loading ? t('common.loading') : t('common.continue')}</Text>
+          </TouchableOpacity>
+          )}
+          </>
+          )}
+
+          {step === 'code' && (
+          <>
+              {/* Кнопка "Не пришло сообщение?" - показываем только если не США/Канада и не показываем поле email */}
+              {formData.country !== 'США' && formData.country !== 'Канада' && !showEmailInput && (
+                <TouchableOpacity 
+                  style={styles.didntReceiveButton}
+                  onPress={handleSwitchToEmail}
+                  disabled={loading}
+                >
+                  <Text style={styles.didntReceiveButtonText}>
+                    {t('auth.didntReceiveCode')}
+                  </Text>
+                </TouchableOpacity>
+              )}
+              
+              {/* Поле для ввода email, если переключились на email - показываем ПЕРЕД полем кода */}
+              {showEmailInput && (
+                <View style={styles.inputContainer}>
+                  <Text style={styles.label}>{t('auth.enterEmail')}</Text>
+                  <TextInput
+                    ref={emailInputRef}
+                    style={styles.input}
+                    value={emailInput}
+                    onChangeText={setEmailInput}
+                    placeholder={t('auth.emailPlaceholder')}
+                    placeholderTextColor="#888"
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    textContentType="emailAddress"
+                    keyboardType="email-address"
+                    autoCorrect={false}
+                    returnKeyType="done"
+                    blurOnSubmit={false}
+                    enablesReturnKeyAutomatically={true}
+                    onSubmitEditing={handleSendCodeToEmail}
+                    editable={!loading}
+                    selectTextOnFocus={false}
+                    autoFocus={true}
+                    onFocus={() => {
+                      // Прокрутка к полю email при фокусе
+                      setTimeout(() => {
+                        if (emailInputRef.current && scrollViewRef.current) {
+                          emailInputRef.current.measureLayout(
+                            scrollViewRef.current as any,
+                            (x, y, width, height) => {
+                              const screenHeight = Dimensions.get('window').height;
+                              const keyboardHeight = 300; // Примерная высота клавиатуры
+                              const visibleArea = screenHeight - keyboardHeight;
+                              const inputBottom = y + height;
+                              const targetY = inputBottom - visibleArea + 130;
+                              
+                              if (targetY > 0) {
+                                scrollViewRef.current?.scrollTo({ 
+                                  y: targetY, 
+                                  animated: true 
+                                });
+                              }
+                            },
+                            () => {
+                              // Fallback: используем measure если measureLayout не работает
+                              emailInputRef.current?.measure((x, y, width, height, pageX, pageY) => {
+                                const screenHeight = Dimensions.get('window').height;
+                                const keyboardHeight = 300;
+                                const visibleArea = screenHeight - keyboardHeight;
+                                const inputBottom = pageY + height;
+                                const scrollOffset = inputBottom - visibleArea + 130;
+                                
+                                if (scrollOffset > 0) {
+                                  scrollViewRef.current?.scrollTo({ 
+                                    y: scrollOffset, 
+                                    animated: true 
+                                  });
+                                }
+                              });
+                            }
+                          );
+                        }
+                      }, 300);
+                    }}
+                  />
+                  <TouchableOpacity 
+                    style={[styles.registerButton, styles.sendEmailButton, loading && styles.registerButtonDisabled]} 
+                    onPress={handleSendCodeToEmail}
+                    disabled={loading || !emailInput.trim()}
+                  >
+                    <Ionicons 
+                      name={loading ? "hourglass" : "mail"} 
+                      size={20} 
+                      color="#fff" 
+                    />
+                    <Text style={styles.registerButtonText}>
+                      {loading ? t('common.loading') : t('auth.sendToEmail')}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              
+              {/* Поле для ввода кода */}
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>{t('auth.code')}</Text>
+                <TextInput
+                  ref={codeInputRef}
+                  style={[styles.input, styles.codeInput]}
+                  value={verificationCode}
+                  onChangeText={(text) => {
+                    // Удаляем все нецифровые символы (включая буквы и спецсимволы) и ограничиваем до 6 цифр
+                    const cleaned = text.replace(/[^0-9]/g, '').slice(0, 6);
+                    setVerificationCode(cleaned);
+                  }}
+                  placeholder={t('auth.codePlaceholder')}
+                  placeholderTextColor="#888"
+                  keyboardType="number-pad"
+                  maxLength={6}
+                  autoComplete="one-time-code"
+                  textContentType="oneTimeCode"
+                  selectTextOnFocus={true}
+                  autoFocus={false}
+                  onFocus={() => {
+                    // Дополнительная прокрутка при фокусе
+                    setTimeout(() => {
+                      if (codeInputRef.current && scrollViewRef.current) {
+                        codeInputRef.current.measureLayout(
+                          scrollViewRef.current as any,
+                          (x, y, width, height) => {
+                            const screenHeight = Dimensions.get('window').height;
+                            const keyboardHeight = 300; // Примерная высота клавиатуры
+                            const visibleArea = screenHeight - keyboardHeight;
+                            const inputBottom = y + height;
+                            const targetY = inputBottom - visibleArea + 130;
+                            
+                            if (targetY > 0) {
+                              scrollViewRef.current?.scrollTo({ 
+                                y: targetY, 
+                                animated: true 
+                              });
+                            }
+                          },
+                          () => {}
+                        );
+                      }
+                    }, 300);
+                  }}
+                />
+                <Text style={styles.emailHint}>
+                  {t('auth.codeSent')}: {
+                    (formData.country === 'США' || formData.country === 'Канада') 
+                      ? formData.email 
+                      : formData.phone
+                  }
+                </Text>
+                
+                {/* Кнопка повторной отправки */}
+                <TouchableOpacity 
+                  style={[styles.resendButton, (!canResend || loading || showEmailInput) && styles.resendButtonDisabled]} 
+                  onPress={handleResendCode}
+                  disabled={!canResend || loading || showEmailInput}
+                >
+                  <Text style={[styles.resendButtonText, (!canResend || loading || showEmailInput) && styles.resendButtonTextDisabled]}>
+                    {resendTimer > 0 ? `${t('auth.resendCode')} ${resendTimer}с` : t('auth.sendCode')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+          <TouchableOpacity
+            style={[styles.registerButton, loading && styles.registerButtonDisabled]}
+            onPress={handleVerifyCode}
+            disabled={loading}
+          >
+            <Ionicons name={loading ? "hourglass" : "checkmark-circle"} size={20} color="#fff" />
+            <Text style={styles.registerButtonText}>{loading ? t('common.loading') : t('common.continue')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.registerButton, styles.backButton]}
+            onPress={() => { setStep('contact'); setVerificationCode(''); }}
+            disabled={loading}
+          >
+            <Ionicons name="arrow-back" size={20} color="#fa2f40" />
+            <Text style={[styles.registerButtonText, styles.backButtonText]}>{t('common.back')}</Text>
+          </TouchableOpacity>
+          </>
+          )}
+
+          {step === 'profile' && (
           <>
           {/* Имя/Название */}
           <View style={styles.inputContainer}>
@@ -1435,81 +1738,6 @@ export default function RegisterScreen() {
             </View>
           )}
 
-          {/* Номер - только для игроков */}
-          {formData.status === 'player' && (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>{t('register.number')}</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.number}
-                onChangeText={(text) => setFormData({...formData, number: text})}
-                placeholder={t('register.number')}
-                placeholderTextColor="#888"
-                keyboardType="numeric"
-                maxLength={2}
-              />
-            </View>
-          )}
-
-          {/* Хват - только для игроков */}
-          {formData.status === 'player' && (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>{t('register.grip')}</Text>
-              <View style={styles.pickerContainer}>
-                {[
-                  { key: 'Левый', translation: t('common.left') },
-                  { key: 'Правый', translation: t('common.right') }
-                ].map((grip) => (
-                  <TouchableOpacity
-                    key={grip.key}
-                    style={[
-                      styles.pickerOption,
-                      formData.grip === grip.key && styles.pickerOptionSelected
-                    ]}
-                    onPress={() => setFormData({...formData, grip: grip.key})}
-                  >
-                    <Text style={[
-                      styles.pickerOptionText,
-                      formData.grip === grip.key && styles.pickerOptionTextSelected
-                    ]}>
-                      {grip.translation}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-          )}
-
-          {/* Рост - только для игроков */}
-          {formData.status === 'player' && (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>{t('register.height')}</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.height}
-                onChangeText={(text) => setFormData({...formData, height: text})}
-                placeholder={t('register.height')}
-                placeholderTextColor="#888"
-                keyboardType="numeric"
-              />
-            </View>
-          )}
-
-          {/* Вес - только для игроков */}
-          {formData.status === 'player' && (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>{t('register.weight')}</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.weight}
-                onChangeText={(text) => setFormData({...formData, weight: text})}
-                placeholder={t('register.weight')}
-                placeholderTextColor="#888"
-                keyboardType="numeric"
-              />
-            </View>
-          )}
-
           {/* Поля для магазина */}
           {formData.status === 'shop' && (
             <>
@@ -1662,252 +1890,123 @@ export default function RegisterScreen() {
               </View>
             </>
           )}
+          <TouchableOpacity
+            style={[styles.registerButton, loading && styles.registerButtonDisabled]}
+            onPress={handleProfileNext}
+            disabled={loading}
+          >
+            <Ionicons name={loading ? "hourglass" : "formData.status === 'player' ? 'arrow-forward' : 'checkmark-circle'"} size={20} color="#fff" />
+            <Text style={styles.registerButtonText}>{loading ? t('common.loading') : formData.status === 'player' ? t('common.continue') : t('register.register')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.registerButton, styles.backButton]}
+            onPress={() => setStep(contactVerified && !isBypassPhone() ? 'code' : 'contact')}
+            disabled={loading}
+          >
+            <Ionicons name="arrow-back" size={20} color="#fa2f40" />
+            <Text style={[styles.registerButtonText, styles.backButtonText]}>{t('common.back')}</Text>
+          </TouchableOpacity>
+          </>
+          )}
 
-          {/* Чекбокс принятия условий - показываем только после выбора страны */}
-          {formData.country && step === 'form' && (
-            <View style={styles.termsContainer}>
-              <TouchableOpacity 
-                style={styles.checkbox}
-                onPress={() => setAgreedToTerms(!agreedToTerms)}
-                activeOpacity={0.7}
-              >
-                <View style={[styles.checkboxSquare, agreedToTerms && styles.checkboxSquareChecked]}>
-                  {agreedToTerms && <Ionicons name="checkmark" size={16} color="#fff" />}
-                </View>
-              </TouchableOpacity>
-              <Text style={styles.termsText}>
-                {t('register.agreeToTerms')}
-              </Text>
+          {step === 'details' && (
+          <>
+          <Text style={styles.stepHint}>{t('register.detailsHint')}</Text>
+          {/* Номер - только для игроков */}
+          {formData.status === 'player' && (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t('register.number')}</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.number}
+                onChangeText={(text) => setFormData({...formData, number: text})}
+                placeholder={t('register.number')}
+                placeholderTextColor="#888"
+                keyboardType="numeric"
+                maxLength={2}
+              />
             </View>
           )}
-          {formData.country && step === 'form' && (
-            <TouchableOpacity 
-              style={styles.termsLink}
-              onPress={() => {
-                const langParam = language === 'ru' ? '?lang=ru' : '?lang=en';
-                Linking.openURL(`https://hockey-stars.com/rules.html${langParam}`);
-              }}
-            >
-              <Ionicons name="document-text-outline" size={16} color="#fa2f40" />
-              <Text style={styles.termsLinkText}>{t('register.termsLink')}</Text>
-            </TouchableOpacity>
-          )}
-          
-          {/* Кнопки - показываем только после выбора страны */}
-          {formData.country && step === 'form' && (
-            <TouchableOpacity 
-              style={[styles.registerButton, (loading || !agreedToTerms) && styles.registerButtonDisabled]} 
-              onPress={handleSendCode}
-              disabled={loading || !agreedToTerms}
-            >
-              <Ionicons 
-                name={loading ? "hourglass" : "mail"} 
-                size={20} 
-                color="#fff" 
-              />
-              <Text style={styles.registerButtonText}>
-                {loading ? t('common.loading') : t('auth.sendCode')}
-              </Text>
-            </TouchableOpacity>
-          )}
-          
-          {/* Форма верификации */}
-          {step === 'verification' && (
-            <>
-              {/* Кнопка "Не пришло сообщение?" - показываем только если не США/Канада и не показываем поле email */}
-              {formData.country !== 'США' && formData.country !== 'Канада' && !showEmailInput && (
-                <TouchableOpacity 
-                  style={styles.didntReceiveButton}
-                  onPress={handleSwitchToEmail}
-                  disabled={loading}
-                >
-                  <Text style={styles.didntReceiveButtonText}>
-                    {t('auth.didntReceiveCode')}
-                  </Text>
-                </TouchableOpacity>
-              )}
-              
-              {/* Поле для ввода email, если переключились на email - показываем ПЕРЕД полем кода */}
-              {showEmailInput && (
-                <View style={styles.inputContainer}>
-                  <Text style={styles.label}>{t('auth.enterEmail')}</Text>
-                  <TextInput
-                    ref={emailInputRef}
-                    style={styles.input}
-                    value={emailInput}
-                    onChangeText={setEmailInput}
-                    placeholder={t('auth.emailPlaceholder')}
-                    placeholderTextColor="#888"
-                    autoCapitalize="none"
-                    autoComplete="email"
-                    textContentType="emailAddress"
-                    keyboardType="email-address"
-                    autoCorrect={false}
-                    returnKeyType="done"
-                    blurOnSubmit={false}
-                    enablesReturnKeyAutomatically={true}
-                    onSubmitEditing={handleSendCodeToEmail}
-                    editable={!loading}
-                    selectTextOnFocus={false}
-                    autoFocus={true}
-                    onFocus={() => {
-                      // Прокрутка к полю email при фокусе
-                      setTimeout(() => {
-                        if (emailInputRef.current && scrollViewRef.current) {
-                          emailInputRef.current.measureLayout(
-                            scrollViewRef.current as any,
-                            (x, y, width, height) => {
-                              const screenHeight = Dimensions.get('window').height;
-                              const keyboardHeight = 300; // Примерная высота клавиатуры
-                              const visibleArea = screenHeight - keyboardHeight;
-                              const inputBottom = y + height;
-                              const targetY = inputBottom - visibleArea + 130;
-                              
-                              if (targetY > 0) {
-                                scrollViewRef.current?.scrollTo({ 
-                                  y: targetY, 
-                                  animated: true 
-                                });
-                              }
-                            },
-                            () => {
-                              // Fallback: используем measure если measureLayout не работает
-                              emailInputRef.current?.measure((x, y, width, height, pageX, pageY) => {
-                                const screenHeight = Dimensions.get('window').height;
-                                const keyboardHeight = 300;
-                                const visibleArea = screenHeight - keyboardHeight;
-                                const inputBottom = pageY + height;
-                                const scrollOffset = inputBottom - visibleArea + 130;
-                                
-                                if (scrollOffset > 0) {
-                                  scrollViewRef.current?.scrollTo({ 
-                                    y: scrollOffset, 
-                                    animated: true 
-                                  });
-                                }
-                              });
-                            }
-                          );
-                        }
-                      }, 300);
-                    }}
-                  />
-                  <TouchableOpacity 
-                    style={[styles.registerButton, styles.sendEmailButton, loading && styles.registerButtonDisabled]} 
-                    onPress={handleSendCodeToEmail}
-                    disabled={loading || !emailInput.trim()}
+
+          {/* Хват - только для игроков */}
+          {formData.status === 'player' && (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t('register.grip')}</Text>
+              <View style={styles.pickerContainer}>
+                {[
+                  { key: 'Левый', translation: t('common.left') },
+                  { key: 'Правый', translation: t('common.right') }
+                ].map((grip) => (
+                  <TouchableOpacity
+                    key={grip.key}
+                    style={[
+                      styles.pickerOption,
+                      formData.grip === grip.key && styles.pickerOptionSelected
+                    ]}
+                    onPress={() => setFormData({...formData, grip: grip.key})}
                   >
-                    <Ionicons 
-                      name={loading ? "hourglass" : "mail"} 
-                      size={20} 
-                      color="#fff" 
-                    />
-                    <Text style={styles.registerButtonText}>
-                      {loading ? t('common.loading') : t('auth.sendToEmail')}
+                    <Text style={[
+                      styles.pickerOptionText,
+                      formData.grip === grip.key && styles.pickerOptionTextSelected
+                    ]}>
+                      {grip.translation}
                     </Text>
                   </TouchableOpacity>
-                </View>
-              )}
-              
-              {/* Поле для ввода кода */}
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>{t('auth.code')}</Text>
-                <TextInput
-                  ref={codeInputRef}
-                  style={[styles.input, styles.codeInput]}
-                  value={verificationCode}
-                  onChangeText={(text) => {
-                    // Удаляем все нецифровые символы (включая буквы и спецсимволы) и ограничиваем до 6 цифр
-                    const cleaned = text.replace(/[^0-9]/g, '').slice(0, 6);
-                    setVerificationCode(cleaned);
-                  }}
-                  placeholder={t('auth.codePlaceholder')}
-                  placeholderTextColor="#888"
-                  keyboardType="number-pad"
-                  maxLength={6}
-                  autoComplete="one-time-code"
-                  textContentType="oneTimeCode"
-                  selectTextOnFocus={true}
-                  autoFocus={false}
-                  onFocus={() => {
-                    // Дополнительная прокрутка при фокусе
-                    setTimeout(() => {
-                      if (codeInputRef.current && scrollViewRef.current) {
-                        codeInputRef.current.measureLayout(
-                          scrollViewRef.current as any,
-                          (x, y, width, height) => {
-                            const screenHeight = Dimensions.get('window').height;
-                            const keyboardHeight = 300; // Примерная высота клавиатуры
-                            const visibleArea = screenHeight - keyboardHeight;
-                            const inputBottom = y + height;
-                            const targetY = inputBottom - visibleArea + 130;
-                            
-                            if (targetY > 0) {
-                              scrollViewRef.current?.scrollTo({ 
-                                y: targetY, 
-                                animated: true 
-                              });
-                            }
-                          },
-                          () => {}
-                        );
-                      }
-                    }, 300);
-                  }}
-                />
-                <Text style={styles.emailHint}>
-                  {t('auth.codeSent')}: {
-                    (formData.country === 'США' || formData.country === 'Канада') 
-                      ? formData.email 
-                      : formData.phone
-                  }
-                </Text>
-                
-                {/* Кнопка повторной отправки */}
-                <TouchableOpacity 
-                  style={[styles.resendButton, (!canResend || loading || showEmailInput) && styles.resendButtonDisabled]} 
-                  onPress={handleResendCode}
-                  disabled={!canResend || loading || showEmailInput}
-                >
-                  <Text style={[styles.resendButtonText, (!canResend || loading || showEmailInput) && styles.resendButtonTextDisabled]}>
-                    {resendTimer > 0 ? `${t('auth.resendCode')} ${resendTimer}с` : t('auth.sendCode')}
-                  </Text>
-                </TouchableOpacity>
+                ))}
               </View>
-
-              {/* Кнопка подтверждения */}
-              <TouchableOpacity 
-                style={[styles.registerButton, loading && styles.registerButtonDisabled]} 
-                onPress={handleVerifyAndRegister}
-                disabled={loading}
-              >
-                <Ionicons 
-                  name={loading ? "hourglass" : "checkmark-circle"} 
-                  size={20} 
-                  color="#fff" 
-                />
-                <Text style={styles.registerButtonText}>
-                  {loading ? t('common.loading') : t('register.register')}
-                </Text>
-              </TouchableOpacity>
-
-              {/* Кнопка "Назад" */}
-              <TouchableOpacity 
-                style={[styles.registerButton, styles.backButton]} 
-                onPress={() => {
-                  setStep('form');
-                  setVerificationCode('');
-                }}
-                disabled={loading}
-              >
-                <Ionicons name="arrow-back" size={20} color="#fa2f40" />
-                <Text style={[styles.registerButtonText, styles.backButtonText]}>
-                  {t('common.back')}
-                </Text>
-              </TouchableOpacity>
-            </>
+            </View>
           )}
-            </>
+
+          {/* Рост - только для игроков */}
+          {formData.status === 'player' && (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t('register.height')}</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.height}
+                onChangeText={(text) => setFormData({...formData, height: text})}
+                placeholder={t('register.height')}
+                placeholderTextColor="#888"
+                keyboardType="numeric"
+              />
+            </View>
+          )}
+
+          {/* Вес - только для игроков */}
+          {formData.status === 'player' && (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t('register.weight')}</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.weight}
+                onChangeText={(text) => setFormData({...formData, weight: text})}
+                placeholder={t('register.weight')}
+                placeholderTextColor="#888"
+                keyboardType="numeric"
+              />
+            </View>
+          )}
+
+          <TouchableOpacity
+            style={[styles.registerButton, loading && styles.registerButtonDisabled]}
+            onPress={() => handleRegister()}
+            disabled={loading}
+          >
+            <Ionicons name={loading ? "hourglass" : "checkmark-circle"} size={20} color="#fff" />
+            <Text style={styles.registerButtonText}>{loading ? t('common.loading') : t('register.register')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.skipButton} onPress={() => handleRegister()} disabled={loading}>
+            <Text style={styles.skipButtonText}>{t('register.skipForNow')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.registerButton, styles.backButton]}
+            onPress={() => setStep('profile')}
+            disabled={loading}
+          >
+            <Ionicons name="arrow-back" size={20} color="#fa2f40" />
+            <Text style={[styles.registerButtonText, styles.backButtonText]}>{t('common.back')}</Text>
+          </TouchableOpacity>
+          </>
           )}
 
 
@@ -2042,6 +2141,15 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
+  stepIndicator: { alignItems: 'center', marginBottom: 22, gap: 10 },
+  stepDots: { flexDirection: 'row', gap: 6 },
+  stepDot: { width: 28, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.14)' },
+  stepDotDone: { backgroundColor: 'rgba(250,47,64,0.55)' },
+  stepDotActive: { backgroundColor: '#fa2f40' },
+  stepLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 13, fontFamily: 'Gilroy-Regular' },
+  stepHint: { color: 'rgba(255,255,255,0.6)', fontSize: 13, fontFamily: 'Gilroy-Regular', marginBottom: 16, lineHeight: 18 },
+  skipButton: { alignSelf: 'center', paddingVertical: 12, paddingHorizontal: 20 },
+  skipButtonText: { color: 'rgba(255,255,255,0.6)', fontSize: 14, fontFamily: 'Gilroy-Regular', textDecorationLine: 'underline' },
   container: {
     flex: 1,
     backgroundColor: '#050008',

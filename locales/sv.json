@@ -29,7 +29,8 @@
     "right": "Rätt",
     "offline": "Ingen anslutning",
     "and": "och",
-    "info": "Info"
+    "info": "Info",
+    "continue": "Fortsätt"
   },
   "winger": "Ytter",
   "center": "Center framåt",
@@ -3555,7 +3556,16 @@
     "parentEmailFormatError": "Vänligen ange en giltig förälders e-postadress",
     "scoutPrivacyNote": "Andra ser inte en scouts foto eller namn – du visas som ”Scout”.",
     "emailFormatError": "Ange en giltig e-postadress",
-    "registrationFailed": "Registreringen misslyckades"
+    "registrationFailed": "Registreringen misslyckades",
+    "detailsHint": "Valfritt: nummer, fattning, längd och vikt hjälper scouter och vänner att hitta dig. Du kan fylla i dem senare i profilen.",
+    "skipForNow": "Hoppa över",
+    "parentEmailSendFailed": "Det gick inte att skicka e-post till föräldern. Kontrollera adressen och försök igen senare.",
+    "step": {
+      "contact": "Steg 1 · Kontakt",
+      "code": "Steg 2 · Bekräftelse",
+      "profile": "Steg 3 · Profil",
+      "details": "Steg 4 · Spelaruppgifter"
+    }
   },
   "navigation": {
     "home": "Hem",

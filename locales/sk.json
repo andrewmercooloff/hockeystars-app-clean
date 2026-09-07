@@ -29,7 +29,8 @@
     "right": "Správne",
     "offline": "Bez pripojenia",
     "and": "a",
-    "info": "Informácia"
+    "info": "Informácia",
+    "continue": "Pokračovať"
   },
   "winger": "Krídelník",
   "center": "Stred dopredu",
@@ -3547,7 +3548,16 @@
     "parentEmailFormatError": "Prosím zadajte platný email rodiča",
     "scoutPrivacyNote": "Fotku a meno skauta ostatní nevidia – zobrazujete sa ako „Skaut“.",
     "emailFormatError": "Zadajte platnú e-mailovú adresu",
-    "registrationFailed": "Registrácia sa nepodarila"
+    "registrationFailed": "Registrácia sa nepodarila",
+    "detailsHint": "Nepovinné: číslo, držanie hokejky, výška a váha pomáhajú skautom a priateľom vás nájsť. Môžete ich doplniť neskôr v profile.",
+    "skipForNow": "Preskočiť",
+    "parentEmailSendFailed": "E-mail rodičovi sa nepodarilo odoslať. Skontrolujte adresu a skúste to neskôr.",
+    "step": {
+      "contact": "Krok 1 · Kontakt",
+      "code": "Krok 2 · Potvrdenie",
+      "profile": "Krok 3 · Profil",
+      "details": "Krok 4 · Údaje hráča"
+    }
   },
   "navigation": {
     "home": "Domov",
