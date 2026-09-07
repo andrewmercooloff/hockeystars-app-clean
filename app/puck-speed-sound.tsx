@@ -233,6 +233,21 @@ export default function PuckSpeedSoundScreen() {
       uncertaintyKmh,
     };
   }, [distanceMeters]);
+
+  /**
+   * Раньше какого интервала второй удар физически невозможен (лимит 120 км/ч + запас).
+   * Всё, что «слышно» раньше — это реверберация/хвост первого удара, а не второй звук.
+   * Без этого при опросе каждые 16 мс хвост первого удара принимался за второй,
+   * получалась «скорость» 400–600 км/ч, результат молча отбрасывался и радар «не видел» броски.
+   */
+  const minSecondSoundGapMs = useCallback((): number => {
+    const maxKmh = 130;
+    const minFlightMs = (distanceMeters / (maxKmh / 3.6)) * 1000;
+    const acousticMs = (distanceMeters / SPEED_OF_SOUND_MS) * 1000;
+    const pos = micPositionRef.current;
+    const measured = pos === 'shooter' ? minFlightMs + acousticMs : pos === 'target' ? minFlightMs - acousticMs : minFlightMs;
+    return Math.max(METERING_POLL_MS * 3, measured);
+  }, [distanceMeters]);
   const DEBOUNCE_MS = 200; // Debounce для предотвращения ложных срабатываний (увеличено до 200мс)
   
   // Ref для отслеживания времени последней детекции звука
@@ -540,6 +555,7 @@ export default function PuckSpeedSoundScreen() {
     if (window.length > Math.max(2, Math.round(100 / METERING_POLL_MS))) window.shift();
     const currentVolumeThreshold = volumeThresholdRef.current;
     const currentPeakThreshold = peakDetectionThresholdRef.current;
+    const minGapMs = minSecondSoundGapMs();
     
     // Определяем направление изменения амплитуды
     const isRising = averageAmplitude > lastAmplitudeRef.current;
@@ -577,7 +593,7 @@ export default function PuckSpeedSoundScreen() {
         // КРИТИЧНО: Для быстрых скоростей второй звук может начаться ДО затухания первого
         // Проверяем, прошло ли достаточно времени с начала первого звука (минимум 30мс)
         const timeSinceFirstStartRising = nowMs - firstSoundStartTimeRef.current;
-        const canStartSecondSoundRising = timeSinceFirstStartRising > 20; // Минимум 20мс для очень быстрых скоростей (до ~900 км/ч)
+        const canStartSecondSoundRising = timeSinceFirstStartRising >= minGapMs;
         
         // Если прошло достаточно времени И амплитуда снова поднялась (второй звук), начинаем второй звук
         // Это позволяет фиксировать очень быстрые скорости, когда второй звук начинается сразу после пика первого
@@ -642,7 +658,7 @@ export default function PuckSpeedSoundScreen() {
         // Первый звук затухает - но для быстрых скоростей второй звук может начаться ДО завершения первого
         // Проверяем, прошло ли достаточно времени с начала первого звука (минимум 50мс для очень быстрых скоростей)
         const timeSinceFirstStart = nowMs - firstSoundStartTimeRef.current;
-        const canStartSecondSound = timeSinceFirstStart > 20; // Минимум 20мс для очень быстрых скоростей (до ~900 км/ч)
+        const canStartSecondSound = timeSinceFirstStart >= minGapMs;
         
         // Если прошло достаточно времени И амплитуда снова поднялась (второй звук), начинаем второй звук
         // Для быстрых скоростей второй звук может начаться во время затухания первого
@@ -734,7 +750,7 @@ export default function PuckSpeedSoundScreen() {
               ? currentVolumeThreshold * 0.52  // 52% для очень быстрых скоростей
               : currentVolumeThreshold * 0.7; // 70% для обычных скоростей
         
-        if (isRising && 
+        if (timeSinceFirstStartComplete >= minGapMs && isRising && 
             amplitudeJump > secondSoundPeakThresholdComplete && 
             averageAmplitude > secondSoundVolumeThresholdComplete &&
             amplitudeJump > secondSoundJumpThresholdComplete) {
@@ -812,7 +828,7 @@ export default function PuckSpeedSoundScreen() {
         soundStateRef.current = 'idle';
         break;
     }
-  }, [distanceMeters, computeSpeed, handleSoundDetected, t]);
+  }, [distanceMeters, computeSpeed, minSecondSoundGapMs, handleSoundDetected, t]);
 
   // Обработка обнаруженного звука (автоматически для веб, вручную для мобильного)
   const handleSoundDetected = useCallback((timestamp: number, amplitude: number) => {
