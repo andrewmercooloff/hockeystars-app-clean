@@ -11,19 +11,24 @@ declare
     'ru', 'Как игры на выходных? 🔥',
     'en', 'How were the weekend games? 🔥',
     'fi', 'Miten viikonlopun pelit menivät? 🔥',
-    'lt', 'Kaip sekėsi savaitgalio rungtynės? 🔥'
+    'lt', 'Kaip sekėsi savaitgalio rungtynės? 🔥',
+    'pl', 'Jak poszły weekendowe mecze? 🔥'
   );
   v_push_body jsonb := jsonb_build_object(
     'ru', 'Новый сезон — статистика обнулилась. Заполняй её после каждой игры и попадай в рейтинг. Подробности в сообщении 👉',
     'en', 'New season — your stats were reset. Log them after every game and climb the rating. Details in your messages 👉',
     'fi', 'Uusi kausi — tilastosi nollattiin. Kirjaa ne jokaisen pelin jälkeen ja nouse rankingiin. Lisätiedot viesteissä 👉',
     'lt', 'Naujas sezonas — statistika nunulinta. Pildyk ją po kiekvienų rungtynių ir kilk reitinge. Daugiau — žinutėje 👉'
+,
+    'pl', 'Nowy sezon — statystyki zostały wyzerowane. Uzupełniaj je po każdym meczu i wchodź do rankingu. Szczegóły w wiadomości 👉'
   );
   v_msg jsonb := jsonb_build_object(
     'ru', E'Как игры на выходных? 🔥\n\nТвоя статистика в Hockeystars обнулилась с новым сезоном 🤷🏻‍♂️. Заполняй новую статистику после каждой игры, попадай в рейтинг Hockeystars и соревнуйся с друзьями!\n\nЗакрой пару раз приложение и открой снова. Мы перезалили лёд, теперь всё по-другому!\n\nДобавь своему профилю обложку с командой, заливай свои видео-хайлайты и жди продвижение тебя от нас в тикток и инстаграм!',
     'en', E'How were the weekend games? 🔥\n\nYour Hockeystars stats were reset for the new season 🤷🏻‍♂️. Log your new stats after every game, climb the Hockeystars rating and compete with friends!\n\nClose the app a couple of times and open it again. We resurfaced the ice — everything looks different now!\n\nAdd a team cover to your profile, upload your video highlights and get promoted by us on TikTok and Instagram!',
     'fi', E'Miten viikonlopun pelit menivät? 🔥\n\nHockeystars-tilastosi nollattiin uuden kauden alkaessa 🤷🏻‍♂️. Kirjaa uudet tilastot jokaisen pelin jälkeen, nouse Hockeystars-rankingiin ja kilpaile kavereiden kanssa!\n\nSulje sovellus pari kertaa ja avaa uudelleen. Jäädytimme kentän uudestaan — kaikki näyttää nyt erilaiselta!\n\nLisää profiiliisi joukkueen kansikuva, lataa video-kohokohtasi ja saat meiltä nostoa TikTokissa ja Instagramissa!',
     'lt', E'Kaip sekėsi savaitgalio rungtynės? 🔥\n\nTavo Hockeystars statistika buvo nunulinta prasidėjus naujam sezonui 🤷🏻‍♂️. Pildyk naują statistiką po kiekvienų rungtynių, kilk Hockeystars reitinge ir varžykis su draugais!\n\nPorą kartų uždaryk programėlę ir atidaryk iš naujo. Mes perliejome ledą — dabar viskas atrodo kitaip!\n\nPridėk profiliui viršelį su komanda, kelk savo vaizdo akimirkas ir lauk mūsų reklamos TikTok ir Instagram!'
+,
+    'pl', E'Jak poszły weekendowe mecze? 🔥\n\nTwoje statystyki w Hockeystars zostały wyzerowane wraz z nowym sezonem 🤷🏻‍♂️. Uzupełniaj nowe statystyki po każdym meczu, wchodź do rankingu Hockeystars i rywalizuj ze znajomymi!\n\nZamknij aplikację kilka razy i otwórz ponownie. Odnowiliśmy lód — teraz wszystko wygląda inaczej!\n\nDodaj do profilu okładkę z drużyną, wrzucaj swoje wideo-highlighty i czekaj na promocję od nas na TikToku i Instagramie!'
   );
   v_chunk jsonb := '[]'::jsonb;
   v_n int := 0;
