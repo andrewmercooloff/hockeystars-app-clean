@@ -19,24 +19,31 @@ function cardCss(size) {
   return `
 .card{position:relative;width:${W}mm;height:${H}mm;overflow:hidden;background:#fff;color:#fff;}
 /* ---- FRONT ---- */
-.card.front .photo{position:absolute;left:${inset};top:${inset};right:${inset};bottom:${inset};overflow:hidden;background:#dfe6ee;border-radius:1mm;}
+.card.front{background:#fff;}
+.card.front .accents{position:absolute;inset:0;width:100%;height:100%;display:block;}
+.card.front .photo{position:absolute;left:${inset};top:${inset};right:${inset};bottom:${inset};overflow:hidden;background:#dfe6ee;
+  clip-path:polygon(${mm(13)} 0,100% 0,100% calc(100% - ${mm(13)}),calc(100% - ${mm(13)}) 100%,0 100%,0 ${mm(13)});}
 .card.front .photo img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;}
-.card.front .inner-frame{position:absolute;left:${inset};top:${inset};right:${inset};bottom:${inset};border:.5mm solid var(--primary);border-radius:1mm;}
-.card.front .band{position:absolute;pointer-events:none;}
-.card.front .band.tl{left:${mm(-10)};top:${mm(2)};width:${mm(38)};height:${mm(5)};transform:rotate(-38deg);background:linear-gradient(90deg,var(--secondary) 0 55%,var(--primary) 55% 100%);}
-.card.front .band.tl2{left:${mm(-9)};top:${mm(8.5)};width:${mm(30)};height:${mm(1.8)};transform:rotate(-38deg);background:var(--primary);}
-.card.front .band.br{right:${mm(-10)};bottom:${mm(4)};width:${mm(38)};height:${mm(5)};transform:rotate(-38deg);background:linear-gradient(90deg,var(--primary) 0 45%,var(--secondary) 45% 100%);}
-.card.front .band.br2{right:${mm(-9)};bottom:${mm(11)};width:${mm(30)};height:${mm(1.8)};transform:rotate(-38deg);background:var(--secondary);}
-.card.front .num{position:absolute;right:${(B + 3.6 * s).toFixed(2)}mm;top:${(B + 2.2 * s).toFixed(2)}mm;font-family:'Oswald';font-weight:700;font-size:${mm(13)};line-height:1;color:#fff;
-  text-shadow:0 0 1mm var(--primary),0 0 1mm var(--primary),0 .6mm 1.6mm rgba(0,0,0,.55);}
-.card.front .logo{position:absolute;left:${pad}mm;top:${pad}mm;width:${mm(11)};height:${mm(11)};}
+.card.front.team .photo img{object-position:center center;}
+.card.front .photo::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 .45mm var(--primary);
+  clip-path:polygon(${mm(13)} 0,100% 0,100% calc(100% - ${mm(13)}),calc(100% - ${mm(13)}) 100%,0 100%,0 ${mm(13)});}
+.card.front .num{position:absolute;right:${(B + 3.4 * s).toFixed(2)}mm;top:${(B + 2.4 * s).toFixed(2)}mm;font-family:'Oswald';font-weight:700;font-size:${mm(13.5)};line-height:1;color:#fff;
+  -webkit-text-stroke:${mm(0.55)} var(--primary);paint-order:stroke fill;filter:drop-shadow(0 .5mm 1mm rgba(0,0,0,.35));}
+.card.front .logo{position:absolute;left:${(B + 3.2 * s).toFixed(2)}mm;bottom:${(B + 3.2 * s).toFixed(2)}mm;width:${mm(10)};height:${mm(10)};z-index:2;}
 .card.front .logo img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 .4mm .8mm rgba(0,0,0,.5));}
-.card.front .plate{position:absolute;left:${inset};right:${inset};bottom:${inset};padding:${mm(9)} ${mm(3)} ${mm(3)};
-  background:linear-gradient(180deg,rgba(6,20,45,0) 0%,rgba(6,20,45,.72) 45%,rgba(6,20,45,.9) 100%);border-radius:0 0 1mm 1mm;}
-.card.front .plate .nm{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:${mm(4.6)};line-height:1.05;text-shadow:0 .3mm .6mm rgba(0,0,0,.6);word-break:break-word;}
-.card.front .plate .nm small{display:block;font-weight:600;font-size:${mm(3.6)};opacity:.95;}
-.card.front .plate .pos{margin-top:${mm(1)};font-family:'Roboto';font-weight:500;font-size:${mm(2.6)};letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.92);}
+.card.front .plate{position:absolute;left:${inset};right:${inset};bottom:${inset};padding:${mm(10)} ${mm(3)} ${mm(3.2)} ${mm(3)};
+  background:linear-gradient(180deg,rgba(8,10,16,0) 0%,rgba(8,10,16,.55) 35%,rgba(8,10,16,.92) 100%);
+  clip-path:polygon(0 0,100% 0,100% calc(100% - ${mm(13)}),calc(100% - ${mm(13)}) 100%,0 100%);}
+.card.front.haslogo .plate{padding-left:${mm(14.5)};}
+.card.front .plate .nm{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:${mm(4.8)};line-height:1.02;text-shadow:0 .3mm .6mm rgba(0,0,0,.6);word-break:break-word;}
+.card.front .plate .nm small{display:block;font-weight:500;font-size:${mm(3.5)};opacity:.95;margin-top:.3mm;}
+.card.front .plate .pos{margin-top:${mm(1.2)};font-family:'Roboto';font-weight:500;font-size:${mm(2.5)};letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.92);}
 .card.front .plate .pos::before{content:"";display:inline-block;width:${mm(5)};height:.6mm;background:var(--secondary);vertical-align:middle;margin-right:1.5mm;}
+.card.front.coach .plate .pos::before{background:var(--accent);}
+.card.front.coach .plate .pos{color:var(--accent);}
+.card.front .ribbon{position:absolute;left:${(B + 3.2 * s).toFixed(2)}mm;top:${(B + 3.2 * s).toFixed(2)}mm;background:var(--accent);color:var(--dark);font-family:'Oswald';font-weight:700;
+  text-transform:uppercase;font-size:${mm(2.6)};letter-spacing:.1em;padding:${mm(0.8)} ${mm(2)};transform:skewX(-10deg);box-shadow:0 .4mm .8mm rgba(0,0,0,.35);}
+.card.front .ribbon span{display:inline-block;transform:skewX(10deg);}
 /* ---- BACK ---- */
 .card.back{background:var(--primary);}
 .card.back .bg{position:absolute;inset:0;background:
@@ -66,6 +73,28 @@ function cardCss(size) {
 `;
 }
 
+// Corner accents drawn as SVG in card millimetres so they land exactly under the cut photo corners.
+// A band is the strip between the lines x+y=a and x+y=b; the upper-right half is recoloured with the primary colour.
+function accentSvg(size, colors) {
+  const { w, h, bleed: B } = size;
+  const W = w + B * 2;
+  const H = h + B * 2;
+  const s = w / 63.5;
+  const inset = B + 2.6 * s;
+  const cut = 13 * s;
+  const d = 2 * inset + cut; // the diagonal cut line x + y = d (top-left corner)
+  const band = (a, b, c1, c2, k) => {
+    const main = `<polygon points="${a},0 ${b},0 0,${b} 0,${a}" fill="${c1}"/>`;
+    const split = `<polygon points="${(a + k) / 2},${(a - k) / 2} ${(b + k) / 2},${(b - k) / 2} ${b},0 ${a},0" fill="${c2}"/>`;
+    return main + split;
+  };
+  const tl = band(d - 6.2 * s, d - 0.6 * s, colors.secondary, colors.primary, 3 * s) + band(d - 9.6 * s, d - 7.6 * s, colors.primary, colors.primary, 0);
+  return `<svg class="accents" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <g>${tl}</g>
+    <g transform="translate(${W} ${H}) rotate(180)">${band(d - 6.2 * s, d - 0.6 * s, colors.primary, colors.secondary, -3 * s) + band(d - 9.6 * s, d - 7.6 * s, colors.secondary, colors.secondary, 0)}</g>
+  </svg>`;
+}
+
 function nameHtml(card) {
   const surname = esc(card.surname).toUpperCase();
   const name = esc(card.name).toUpperCase();
@@ -75,12 +104,12 @@ function nameHtml(card) {
 function cardFront(card, data) {
   const logo = data.assets.logo ? `<div class="logo"><img src="${data.assets.logo}"></div>` : '';
   const num = card.number ? `<div class="num">${esc(card.number)}</div>` : '';
-  return `<div class="card front">
+  const ribbon = card.ribbon ? `<div class="ribbon"><span>${esc(card.ribbon)}</span></div>` : '';
+  const cls = ['card', 'front', card.type, data.assets.logo ? 'haslogo' : ''].filter(Boolean).join(' ');
+  return `<div class="${cls}">
+    ${accentSvg(data.cardSize, data.colors)}
     <div class="photo"><img src="${card.photo}"></div>
-    <div class="band tl"></div><div class="band tl2"></div>
-    <div class="band br"></div><div class="band br2"></div>
-    <div class="inner-frame"></div>
-    ${logo}${num}
+    ${ribbon}${logo}${num}
     <div class="plate">
       <div class="nm">${nameHtml(card)}</div>
       <div class="pos">${esc(card.position)}</div>

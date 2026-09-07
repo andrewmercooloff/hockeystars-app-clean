@@ -20,7 +20,7 @@ const POSITIONS = {
   coach: 'Тренер',
 };
 
-const IMAGE_EXT = ['.jpg', '.jpeg', '.png', '.webp'];
+const IMAGE_EXT = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif'];
 
 function parseCsv(text) {
   text = text.replace(/^\uFEFF/, '');
@@ -106,12 +106,30 @@ function placeholderPhoto(number, color) {
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
 }
 
-function findAsset(assetsDir, names) {
-  for (const name of names) {
-    const p = path.join(assetsDir, name);
-    if (fs.existsSync(p)) return p;
+const ASSET_EXT = ['.png', '.svg', '.pdf', '.jpg', '.jpeg', '.webp', '.heic', '.heif'];
+
+// Assets are looked up by base name with any supported extension: logo.png / logo.pdf / logo.svg …
+function findAsset(assetsDir, baseNames) {
+  if (!fs.existsSync(assetsDir)) return null;
+  const files = fs.readdirSync(assetsDir);
+  for (const base of baseNames) {
+    for (const ext of ASSET_EXT) {
+      const hit = files.find((f) => f.toLowerCase() === (base + ext).toLowerCase());
+      if (hit) return path.join(assetsDir, hit);
+    }
   }
   return null;
+}
+
+// Optional folder with lifestyle photos for the "Жизнь команды" collage page.
+function listGallery(assetsDir) {
+  const dir = path.join(assetsDir, 'gallery');
+  if (!fs.existsSync(dir)) return [];
+  return fs
+    .readdirSync(dir)
+    .filter((f) => IMAGE_EXT.includes(path.extname(f).toLowerCase()))
+    .sort((a, b) => a.localeCompare(b, 'ru', { numeric: true }))
+    .map((f) => path.join(dir, f));
 }
 
 async function loadTeam(teamDir, cacheDir) {
@@ -147,6 +165,7 @@ async function loadTeam(teamDir, cacheDir) {
       weight: row.weight || row['вес'] || '',
       grip: row.grip || row['хват'] || '',
       birthdate: row.birthdate || row['дата рождения'] || row['дата_рождения'] || '',
+      ribbon: row.ribbon || row['метка'] || (type === 'coach' ? 'Тренерский штаб' : type === 'team' ? 'Команда' : type === 'legend' ? 'Легенда' : ''),
       photo: photoPath ? await prepareImage(photoPath, photoCache, 1600) : placeholderPhoto(number, colors.primary),
       // low-res copy for the faded "paste here" ghosts in the album
       photoSmall: photoPath ? await prepareImage(photoPath, photoCache, 500) : placeholderPhoto(number, colors.primary),
@@ -159,13 +178,15 @@ async function loadTeam(teamDir, cacheDir) {
     return p ? prepareImage(p, path.join(cacheDir, 'assets'), maxPx) : null;
   };
   const assets = {
-    logo: await asset(['logo.png', 'logo.svg', 'logo.jpg'], 1500),
-    cover: await asset(['cover.jpg', 'cover.png', 'team.jpg', 'team.png'], 3200),
-    teamPhoto: await asset(['team.jpg', 'team.png', 'cover.jpg', 'cover.png'], 3200),
-    back: await asset(['back.jpg', 'back.png'], 3200),
-    qr: await asset(['qr.png', 'qr.svg', 'qr.jpg'], 1200),
-    history: await asset(['history.jpg', 'history.png'], 1600),
+    logo: await asset(['logo'], 1500),
+    cover: await asset(['cover', 'team'], 3200),
+    teamPhoto: await asset(['team', 'cover'], 3200),
+    back: await asset(['back', 'arena'], 3200),
+    qr: await asset(['qr'], 1200),
+    history: await asset(['history'], 1600),
+    gallery: [],
   };
+  for (const p of listGallery(assetsDir)) assets.gallery.push(await prepareImage(p, path.join(cacheDir, 'gallery'), 1800));
 
   const brand = {
     hockeystarsWhite: fileUrl(path.join(__dirname, 'brand', 'hockeystars-white.png')),

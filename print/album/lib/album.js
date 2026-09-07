@@ -140,6 +140,33 @@ ${cardCss(size)}
 .stats td.i{width:9mm;text-align:center;font-family:'Oswald';font-weight:600;color:var(--secondary);}
 .stats tr:nth-child(even) td{background:rgba(238,243,249,.7);}
 
+/* ---------- NOTES ---------- */
+.notes .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
+.notes .lines{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 46}mm;}
+.notes .line{height:10.5mm;border-bottom:.3mm solid color-mix(in srgb,var(--primary) 28%,transparent);}
+
+/* ---------- AUTOGRAPHS ---------- */
+.autographs .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
+.autographs .note{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 40}mm;font-size:3.8mm;color:#1b2940;line-height:1.35;}
+.autographs .grid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 54}mm;display:grid;grid-template-columns:repeat(3,1fr);gap:5mm 6mm;}
+.autographs .box{height:33mm;border:.35mm solid color-mix(in srgb,var(--primary) 30%,transparent);border-radius:1.5mm;position:relative;background:rgba(255,255,255,.75);}
+.autographs .box .n{position:absolute;left:3mm;right:3mm;bottom:2.4mm;font-family:'Oswald';font-weight:600;font-size:3.3mm;text-transform:uppercase;color:var(--dark);
+  border-top:.3mm solid var(--secondary);padding-top:1.2mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.autographs .box .n span{color:var(--secondary);margin-right:1mm;}
+
+/* ---------- GALLERY ---------- */
+.gallery .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
+.gallery .grid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 40}mm;bottom:${bleed + 14}mm;display:grid;gap:4mm;
+  grid-template-columns:repeat(6,1fr);grid-auto-rows:1fr;grid-auto-flow:dense;}
+.gallery .ph{position:relative;overflow:hidden;border-radius:1.5mm;background:#c9d5e3;box-shadow:0 1mm 3mm rgba(0,0,0,.18);}
+.gallery .ph img{width:100%;height:100%;object-fit:cover;display:block;}
+.gallery .ph.big{grid-column:span 4;grid-row:span 2;}
+.gallery .ph.wide{grid-column:span 3;}
+.gallery .ph.tall{grid-column:span 2;grid-row:span 2;}
+.gallery .ph.sm{grid-column:span 2;}
+.gallery .ph .cap{position:absolute;left:0;right:0;bottom:0;padding:1.5mm 2.5mm;font-family:'Oswald';font-weight:600;font-size:3mm;text-transform:uppercase;letter-spacing:.06em;color:#fff;
+  background:linear-gradient(180deg,transparent,rgba(0,0,0,.6));}
+
 /* ---------- BACK COVER ---------- */
 .backcover{background:var(--dark);color:#fff;}
 .backcover .photo{position:absolute;inset:0;}
@@ -170,7 +197,7 @@ ${cardCss(size)}
 `;
 }
 
-const arrow = `<svg viewBox="0 0 60 44" fill="none" stroke="${'#c8102e'}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+const arrow = (color) => `<svg viewBox="0 0 60 44" fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
   <path d="M6 8 C 22 6, 40 10, 52 30"/><path d="M40 30 L 52 32 L 55 20"/></svg>`;
 
 function coverPage(data) {
@@ -216,7 +243,7 @@ function introPage(data, pageNo) {
     <div class="lead">${intro.replace(/\n/g, '<br>')}</div>
     <div class="sample">${sample ? cardFront(sample, data) : ''}</div>
     <div class="how"><h3>Как это работает:</h3>
-      ${steps.map((s) => `<div class="step">${arrow}<div>${s}</div></div>`).join('')}
+      ${steps.map((s) => `<div class="step">${arrow(data.colors.secondary)}<div>${s}</div></div>`).join('')}
     </div>
     <div class="bottom">
       <div class="bigname" style="font-size:${bigSize.toFixed(1)}mm">${esc(bigName)}</div>
@@ -288,6 +315,46 @@ function statsPage(data, pageNo) {
   </section>`;
 }
 
+function notesPage(data, pageNo) {
+  const lines = Array.from({ length: 22 }, () => '<div class="line"></div>').join('');
+  return `<section class="page notes ice">
+    <div class="orn br" style="opacity:.9"></div>
+    <div class="hdr"><div class="title">Мои заметки</div></div>
+    <div class="lines">${lines}</div>
+    <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
+  </section>`;
+}
+
+function autographsPage(data, pageNo, cards) {
+  const boxes = cards
+    .slice(0, 18)
+    .map((c) => `<div class="box"><div class="n">${c.number ? `<span>#${esc(c.number)}</span>` : ''}${esc(c.surname)} ${esc(c.name)}</div></div>`)
+    .join('');
+  return `<section class="page autographs ice">
+    <div class="orn br" style="opacity:.9"></div>
+    <div class="hdr"><div class="title">Автографы</div></div>
+    <div class="note">Собери подписи всей команды: попроси каждого игрока и тренера расписаться в своей ячейке.</div>
+    <div class="grid">${boxes}</div>
+    <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
+  </section>`;
+}
+
+// Lifestyle photos from assets/gallery/. Layout pattern for up to 12 photos per page: one hero,
+// then a mix of tall / wide / small tiles so the page reads as a magazine spread, not a grid.
+const GALLERY_PATTERN = ['big', 'tall', 'sm', 'sm', 'wide', 'wide', 'sm', 'sm', 'sm', 'tall', 'wide', 'sm'];
+function galleryPage(data, pageNo, photos, title) {
+  const tiles = photos
+    .slice(0, GALLERY_PATTERN.length)
+    .map((src, i) => `<div class="ph ${GALLERY_PATTERN[i]}"><img src="${src}"></div>`)
+    .join('');
+  return `<section class="page gallery ice">
+    <div class="orn br" style="opacity:.9"></div>
+    <div class="hdr"><div class="title">${esc(title || 'Жизнь команды')}</div></div>
+    <div class="grid">${tiles}</div>
+    <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
+  </section>`;
+}
+
 function backCoverPage(data) {
   const t = data.team;
   const texts = t.texts || {};
@@ -315,9 +382,47 @@ function albumHtml(data) {
   if (chunks.length) inner.push((n) => teamPage(data, chunks[0], n));
   inner.push((n) => historyPage(data, n));
   chunks.slice(1).forEach((chunk) => inner.push((n) => teamPage(data, chunk, n)));
-  const extra = (data.team.album && data.team.album.extraPages) || [];
-  extra.forEach((kind) => inner.push((n) => (kind === 'stats' ? statsPage(data, n) : '')));
-  while ((inner.length + 2) % 4 !== 0) inner.push((n) => statsPage(data, n));
+  // Extra pages: "stats" (match log), "gallery" (assets/gallery/*), "gallery:Заголовок".
+  // With no explicit list, gallery photos (if any) get their own page automatically.
+  const albumCfg = data.team.album || {};
+  const extra = albumCfg.extraPages?.length ? albumCfg.extraPages : data.assets.gallery.length ? ['gallery'] : [];
+  let galleryOffset = 0;
+  const people = data.cards.filter((c) => c.type !== 'team');
+  let autographOffset = 0;
+  const nextAutographs = () => {
+    const chunk = people.slice(autographOffset, autographOffset + 18);
+    autographOffset += chunk.length;
+    return chunk;
+  };
+  for (const kind of extra) {
+    if (kind === 'stats') inner.push((n) => statsPage(data, n));
+    else if (kind === 'autographs') {
+      const chunk = nextAutographs();
+      if (chunk.length) inner.push((n) => autographsPage(data, n, chunk));
+    } else if (kind.startsWith('gallery')) {
+      const photos = data.assets.gallery.slice(galleryOffset, galleryOffset + GALLERY_PATTERN.length);
+      galleryOffset += photos.length;
+      const title = kind.includes(':') ? kind.slice(kind.indexOf(':') + 1) : albumCfg.galleryTitle;
+      if (photos.length) inner.push((n) => galleryPage(data, n, photos, title));
+    }
+  }
+  // Saddle-stitched booklet: pad to a multiple of 4 pages — leftover gallery photos, then autographs, then the match log.
+  let statsUsed = extra.includes('stats');
+  while ((inner.length + 2) % 4 !== 0) {
+    const photos = data.assets.gallery.slice(galleryOffset, galleryOffset + GALLERY_PATTERN.length);
+    if (photos.length >= 4) {
+      galleryOffset += photos.length;
+      inner.push((n) => galleryPage(data, n, photos, albumCfg.galleryTitle));
+    } else if (autographOffset < people.length) {
+      const autographs = nextAutographs();
+      inner.push((n) => autographsPage(data, n, autographs));
+    } else if (!statsUsed) {
+      statsUsed = true;
+      inner.push((n) => statsPage(data, n));
+    } else {
+      inner.push((n) => notesPage(data, n));
+    }
+  }
 
   const pages = [coverPage(data), ...inner.map((fn, i) => fn(i + 2)), backCoverPage(data)];
   return `<!doctype html><html lang="ru"><head><meta charset="utf-8"><style>${albumCss(data)}</style></head><body>${pages.join('\n')}</body></html>`;
