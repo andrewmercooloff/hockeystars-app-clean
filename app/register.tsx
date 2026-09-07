@@ -71,6 +71,31 @@ const COUNTRY_DIAL_CODE: { [country: string]: string } = {
 };
 const DIAL_CODES = new Set(Object.values(COUNTRY_DIAL_CODE));
 
+// Часовой пояс устройства → страна (когда в локали нет региона, например просто "ru")
+const TIMEZONE_TO_COUNTRY: { [tz: string]: string } = {
+  'Europe/Minsk': 'Беларусь', 'Europe/Moscow': 'Россия', 'Europe/Kaliningrad': 'Россия', 'Europe/Samara': 'Россия',
+  'Asia/Yekaterinburg': 'Россия', 'Asia/Novosibirsk': 'Россия', 'Asia/Krasnoyarsk': 'Россия', 'Asia/Omsk': 'Россия',
+  'Asia/Irkutsk': 'Россия', 'Asia/Yakutsk': 'Россия', 'Asia/Vladivostok': 'Россия', 'Asia/Magadan': 'Россия',
+  'Europe/Kiev': 'Украина', 'Europe/Kyiv': 'Украина', 'Asia/Almaty': 'Казахстан', 'Asia/Aqtobe': 'Казахстан',
+  'Asia/Tashkent': 'Узбекистан', 'Europe/Warsaw': 'Польша', 'Europe/Vilnius': 'Литва', 'Europe/Riga': 'Латвия',
+  'Europe/Tallinn': 'Эстония', 'Europe/Prague': 'Чехия', 'Europe/Bratislava': 'Словакия', 'Europe/Helsinki': 'Финляндия',
+  'Europe/Stockholm': 'Швеция', 'Europe/Oslo': 'Норвегия', 'Europe/Copenhagen': 'Дания', 'Europe/Berlin': 'Германия',
+  'Europe/Vienna': 'Австрия', 'Europe/Zurich': 'Швейцария', 'Europe/Paris': 'Франция', 'Europe/Rome': 'Италия',
+  'Europe/Madrid': 'Испания', 'Europe/London': 'Великобритания', 'Europe/Amsterdam': 'Нидерланды',
+  'Europe/Brussels': 'Бельгия', 'Europe/Budapest': 'Венгрия', 'Europe/Ljubljana': 'Словения', 'Europe/Zagreb': 'Хорватия',
+  'Europe/Istanbul': 'Турция', 'Asia/Jerusalem': 'Израиль', 'Asia/Dubai': 'Объединенные Арабские Эмираты',
+  'Asia/Tokyo': 'Япония', 'Asia/Seoul': 'Южная Корея', 'Asia/Shanghai': 'Китай', 'Australia/Sydney': 'Австралия',
+  'Pacific/Auckland': 'Новая Зеландия',
+};
+
+// Язык интерфейса устройства → наиболее вероятная страна (последний, самый грубый сигнал)
+const LANGUAGE_TO_COUNTRY: { [lang: string]: string } = {
+  be: 'Беларусь', uk: 'Украина', kk: 'Казахстан', pl: 'Польша', cs: 'Чехия', sk: 'Словакия', lt: 'Литва', lv: 'Латвия',
+  et: 'Эстония', fi: 'Финляндия', sv: 'Швеция', nb: 'Норвегия', no: 'Норвегия', da: 'Дания', de: 'Германия',
+  fr: 'Франция', it: 'Италия', es: 'Испания', nl: 'Нидерланды', hu: 'Венгрия', sl: 'Словения', hr: 'Хорватия',
+  tr: 'Турция', he: 'Израиль', ja: 'Япония', ko: 'Южная Корея', zh: 'Китай', en: 'США',
+};
+
 const REGION_TO_COUNTRY: { [key: string]: string } = {
   'BY': 'Беларусь',
   'RU': 'Россия',
@@ -97,17 +122,17 @@ const REGION_TO_COUNTRY: { [key: string]: string } = {
   'NL': 'Нидерланды',
   'BE': 'Бельгия',
   'ES': 'Испания',
-  'PT': 'Португалия',
-  'GR': 'Греция',
   'TR': 'Турция',
   'IL': 'Израиль',
-  'AE': 'ОАЭ',
+  'AE': 'Объединенные Арабские Эмираты',
+  'SI': 'Словения', 'HR': 'Хорватия', 'HU': 'Венгрия', 'RO': 'Румыния', 'BG': 'Болгария', 'RS': 'Сербия',
+  'IS': 'Исландия', 'LU': 'Люксембург', 'UZ': 'Узбекистан', 'SG': 'Сингапур', 'HK': 'Гонконг', 'TW': 'Тайвань',
+  'IN': 'Индия', 'TH': 'Таиланд', 'MY': 'Малайзия', 'ZA': 'ЮАР',
   'CN': 'Китай',
   'JP': 'Япония',
   'KR': 'Южная Корея',
   'AU': 'Австралия',
   'NZ': 'Новая Зеландия',
-  'BR': 'Бразилия',
   'AR': 'Аргентина',
   'MX': 'Мексика',
 };
@@ -254,12 +279,18 @@ export default function RegisterScreen() {
   useEffect(() => {
     if (!formData.country) {
       try {
-        // Получаем регион устройства (например, 'BY', 'RU', 'US')
-        const deviceRegion = Localization.getLocales()[0]?.regionCode || '';
-        const detectedCountry = REGION_TO_COUNTRY[deviceRegion];
+        // Только настройки устройства, без геолокации: регион локали → часовой пояс → язык
+        const locale = Localization.getLocales()[0];
+        const deviceRegion = (locale?.regionCode || '').toUpperCase();
+        const timeZone = Localization.getCalendars()[0]?.timeZone || '';
+        const languageCode = (locale?.languageCode || '').toLowerCase();
+        const detectedCountry =
+          REGION_TO_COUNTRY[deviceRegion] ||
+          TIMEZONE_TO_COUNTRY[timeZone] ||
+          LANGUAGE_TO_COUNTRY[languageCode];
         
         if (detectedCountry && COUNTRIES.includes(detectedCountry)) {
-          console.log(`🌍 Автоопределена страна: ${detectedCountry} (регион: ${deviceRegion})`);
+          console.log(`🌍 Автоопределена страна: ${detectedCountry} (регион: ${deviceRegion || '—'}, tz: ${timeZone || '—'}, язык: ${languageCode || '—'})`);
           setFormData(prev => ({ ...prev, country: detectedCountry }));
         }
       } catch (error) {
