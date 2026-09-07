@@ -4318,5 +4318,9 @@
   },
   "videoNotification": {
     "fullScreen": "Schermo intero"
+  },
+  "coverNotification": {
+    "title": "Nuova copertina",
+    "changed": "ha aggiornato la copertina del profilo"
   }
 }

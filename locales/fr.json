@@ -4319,5 +4319,9 @@
   },
   "videoNotification": {
     "fullScreen": "Plein écran"
+  },
+  "coverNotification": {
+    "title": "Nouvelle couverture",
+    "changed": "a mis à jour la couverture du profil"
   }
 }

@@ -4114,6 +4114,10 @@
   "avatarNotification": {
     "changed": "zmienił awatar"
   },
+  "coverNotification": {
+    "title": "Nowe zdjęcie w tle",
+    "changed": "zaktualizował zdjęcie w tle profilu"
+  },
   "puckSpeedNotification": {
     "title": "Nowy rekord prędkości",
     "message": "{playerName} ustanowił nowy rekord prędkości: {speed} km/h"

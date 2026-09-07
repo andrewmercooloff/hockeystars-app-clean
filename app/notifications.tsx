@@ -38,6 +38,7 @@ import GiftAcceptedNotification from '../components/GiftAcceptedNotification';
 import VideoAddedNotification from '../components/VideoAddedNotification';
 import { sortVideoUrlsNewestFirst } from '../utils/videoUrls';
 import AvatarChangedNotification from '../components/AvatarChangedNotification';
+import CoverChangedNotification from '../components/CoverChangedNotification';
 import AchievementAddedNotification from '../components/AchievementAddedNotification';
 import PuckSpeedChangedNotification from '../components/PuckSpeedChangedNotification';
 import PhysicalDataChangedNotification from '../components/PhysicalDataChangedNotification';
@@ -309,6 +310,19 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               onHeaderPress={handlePress}
               onScrubActiveChange={onVideoScrubActiveChange}
             />
+        ) : notification.type === 'cover_changed' ? (
+          <PressableScale
+            onPress={handlePress}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <CoverChangedNotification
+              playerName={notification.data?.changedPlayerName || 'Игрок'}
+              playerId={notification.data?.changedPlayerId}
+              playerAvatar={notification.playerAvatar}
+              coverUrl={notification.data?.coverUrl}
+              timestamp={notification.data?.timestamp || new Date(notification.timestamp).toISOString()}
+            />
+          </PressableScale>
         ) : notification.type === 'avatar_changed' ? (
           <PressableScale
             onPress={handlePress}
@@ -532,7 +546,7 @@ const getItemTypeName = (type: string) => {
 
 interface NotificationItem {
   id: string;
-  type: 'friend_request' | 'friend_accepted' | 'autograph_request' | 'stick_request' | 'gift_request' | 'gift_accepted' | 'system' | 'achievement' | 'team_invite' | 'stats_change' | 'photo_added' | 'new_friendship' | 'exercise_completed' | 'gift_received' | 'friend_gift_received' | 'video_added' | 'avatar_changed' | 'achievement_added' | 'physical_data_changed' | 'puck_speed_changed';
+  type: 'friend_request' | 'friend_accepted' | 'autograph_request' | 'stick_request' | 'gift_request' | 'gift_accepted' | 'system' | 'achievement' | 'team_invite' | 'stats_change' | 'photo_added' | 'new_friendship' | 'exercise_completed' | 'gift_received' | 'friend_gift_received' | 'video_added' | 'avatar_changed' | 'cover_changed' | 'achievement_added' | 'physical_data_changed' | 'puck_speed_changed';
   title: string;
   message: string;
   timestamp: number;
@@ -771,7 +785,7 @@ export default function NotificationsScreen() {
   // UX: "медиа" (видео+фото) вторым после "все", как основной сценарий просмотра.
   const FILTER_TYPES: Record<string, string[]> = {
     all: [],
-    media: ['video_added', 'video_liked', 'photo_added', 'photo_liked', 'avatar_changed'],
+    media: ['video_added', 'video_liked', 'photo_added', 'photo_liked', 'avatar_changed', 'cover_changed'],
     friends: ['friend_request', 'friend_accepted', 'new_friendship'],
     gifts: ['gift_received', 'friend_gift_received', 'gift_accepted', 'gift_request', 'autograph_request', 'stick_request'],
     stats: ['stats_change', 'normative_changed', 'physical_data_changed', 'puck_speed_changed', 'achievement_added', 'achievement', 'scout_report'],
@@ -867,6 +881,7 @@ export default function NotificationsScreen() {
             notification.type === 'friend_gift_received' ||
             notification.type === 'video_added' ||
             notification.type === 'avatar_changed' ||
+            notification.type === 'cover_changed' ||
             notification.type === 'achievement_added' ||
             notification.type === 'physical_data_changed' ||
             notification.type === 'puck_speed_changed' ||
@@ -1642,6 +1657,11 @@ export default function NotificationsScreen() {
         // Для уведомлений о добавленных видео показываем видео игрока
         if (notification.data && notification.data.changedPlayerId) {
           navigateToPlayerProfile(router, { playerId: notification.data.changedPlayerId, returnTo: 'notifications', scrollToVideos: 'true' });
+        }
+      } else if (notification.type === 'cover_changed') {
+        const changedPlayerId = notification.data?.changedPlayerId;
+        if (changedPlayerId) {
+          navigateToPlayerProfile(router, { playerId: changedPlayerId, returnTo: 'notifications' });
         }
       } else if (notification.type === 'avatar_changed') {
         const changedPlayerId = notification.data?.changedPlayerId;

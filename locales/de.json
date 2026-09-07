@@ -4337,5 +4337,9 @@
   },
   "videoNotification": {
     "fullScreen": "Vollbild"
+  },
+  "coverNotification": {
+    "title": "Neues Titelbild",
+    "changed": "hat das Profil-Titelbild aktualisiert"
   }
 }

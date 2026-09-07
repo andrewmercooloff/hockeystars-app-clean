@@ -4314,5 +4314,9 @@
   },
   "videoNotification": {
     "fullScreen": "Celá obrazovka"
+  },
+  "coverNotification": {
+    "title": "Nová titulná fotka",
+    "changed": "aktualizoval titulnú fotku profilu"
   }
 }

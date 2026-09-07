@@ -6288,6 +6288,82 @@ export const notifyFriendsAboutAvatarChange = async (
   }
 };
 
+const recentCoverNotifyByPlayer = new Map<string, number>();
+const COVER_NOTIFY_COOLDOWN_MS = 2 * 60 * 1000;
+
+/**
+ * Игрок сменил обложку профиля: друзьям — карточка в ленте (раздел «Медиа»)
+ * и push на их языке с переходом в профиль.
+ */
+export const notifyFriendsAboutCover = async (
+  playerId: string,
+  playerName: string,
+  coverUrl: string,
+): Promise<void> => {
+  try {
+    const now = Date.now();
+    const last = recentCoverNotifyByPlayer.get(playerId);
+    if (last != null && now - last < COVER_NOTIFY_COOLDOWN_MS) return;
+    recentCoverNotifyByPlayer.set(playerId, now);
+
+    const friends = await getFriends(playerId);
+    if (friends.length === 0) return;
+
+    const { getUserLanguages, loadTranslations } = await import('./languageHelper');
+    const { sendNotificationToUser } = await import('./notificationService');
+    const friendLanguages = await getUserLanguages(friends.map((f) => f.id));
+    const en = loadTranslations('en');
+    const timestamp = new Date().toISOString();
+
+    const rows = friends.map((friend) => {
+      const lang = friendLanguages.get(friend.id) || 'en';
+      const tr = loadTranslations(lang);
+      const title = tr?.coverNotification?.title || en?.coverNotification?.title || 'New cover';
+      const changed = tr?.coverNotification?.changed || en?.coverNotification?.changed || 'updated the profile cover';
+      return {
+        user_id: friend.id,
+        type: 'cover_changed',
+        title,
+        message: `${playerName} ${changed}`,
+        data: {
+          changedPlayerId: playerId,
+          changedPlayerName: playerName,
+          coverUrl,
+          timestamp,
+        },
+        created_at: timestamp,
+        is_read: false,
+      };
+    });
+
+    const { error } = await supabase.from('notifications').insert(rows);
+    if (error) {
+      console.error('❌ Ошибка сохранения уведомлений об обложке:', error);
+      return;
+    }
+
+    for (const row of rows) {
+      try {
+        await sendNotificationToUser(row.user_id, '🖼️ ' + row.title, row.message, {
+          type: 'cover_changed',
+          player_id: playerId,
+          action: 'open_player',
+          deepLink: `/player/${playerId}`,
+        });
+      } catch (e) {
+        console.error('⚠️ Ошибка push/cover_changed:', e);
+      }
+      try {
+        await supabase.rpc('increment_unread_notifications', { user_id: row.user_id });
+      } catch {
+        // счётчик не критичен
+      }
+    }
+  } catch (error) {
+    console.error('❌ Ошибка уведомлений об обложке:', error);
+  }
+};
+
 export const notifyFriendsAboutPuckSpeed = async (
   playerId: string,
   playerName: string,

@@ -4320,5 +4320,9 @@
   },
   "videoNotification": {
     "fullScreen": "Helskärm"
+  },
+  "coverNotification": {
+    "title": "Ny omslagsbild",
+    "changed": "uppdaterade profilens omslagsbild"
   }
 }

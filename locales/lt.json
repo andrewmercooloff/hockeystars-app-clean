@@ -4124,6 +4124,10 @@
   "avatarNotification": {
     "changed": "pakeitė avatarą"
   },
+  "coverNotification": {
+    "title": "Naujas viršelis",
+    "changed": "atnaujino profilio viršelį"
+  },
   "puckSpeedNotification": {
     "title": "Naujas greičio rekordas",
     "message": "{playerName} nustatė naują greičio rekordą: {speed} km/h"

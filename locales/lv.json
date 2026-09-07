@@ -4329,6 +4329,10 @@
   "avatarNotification": {
     "changed": "mainīja avataru"
   },
+  "coverNotification": {
+    "title": "Jauns vāka attēls",
+    "changed": "atjaunināja profila vāka attēlu"
+  },
   "puckSpeedNotification": {
     "title": "Jauns ātruma rekords",
     "message": "{playerName} noteica jaunu ātruma rekordu: {speed} km/h"

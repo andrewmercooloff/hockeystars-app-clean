@@ -4312,5 +4312,9 @@
   },
   "videoNotification": {
     "fullScreen": "Koko näyttö"
+  },
+  "coverNotification": {
+    "title": "Uusi kansikuva",
+    "changed": "päivitti profiilin kansikuvan"
   }
 }

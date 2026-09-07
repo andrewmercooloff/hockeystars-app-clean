@@ -79,6 +79,10 @@
     "title": "Новый аватар",
     "changed": "изменил свой аватар"
   },
+  "coverNotification": {
+    "title": "Новая обложка",
+    "changed": "обновил обложку профиля"
+  },
   "puckSpeedNotification": {
     "title": "Новый рекорд скорости",
     "message": "{playerName} установил новый рекорд скорости: {speed} км/ч"

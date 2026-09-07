@@ -79,6 +79,10 @@
     "title": "New Avatar",
     "changed": "changed avatar"
   },
+  "coverNotification": {
+    "title": "New cover",
+    "changed": "updated the profile cover"
+  },
   "puckSpeedNotification": {
     "title": "New speed record",
     "message": "{playerName} set a new speed record: {speed} km/h"
