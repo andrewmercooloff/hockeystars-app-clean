@@ -71,6 +71,7 @@ import StarGiftModal from '../../components/StarGiftModal';
 import AdminGiftModal from '../../components/AdminGiftModal';
 import CachedAvatar from '../../components/CachedAvatar';
 import LoadingCenter from '../../components/LoadingCenter';
+import { birthDateToLocalDate } from '../../utils/birthDate';
 import { ICE_BACKGROUND } from '../../utils/iceBackground';
 import { useAvatarCache } from '../../utils/AvatarCache';
 import AIAnalysisCard, { AIAnalysis } from '../../components/AIAnalysisCard';
@@ -2641,20 +2642,8 @@ export default function PlayerProfile() {
 
   const showBirthDatePickerModal = () => {
     // Устанавливаем текущую дату рождения или сегодняшнюю дату
-    if (editData.birthDate || player?.birthDate) {
-      const dateStr = editData.birthDate || player?.birthDate || '';
-      const parts = dateStr.split('.');
-      if (parts.length === 3) {
-        const day = parseInt(parts[0]);
-        const month = parseInt(parts[1]) - 1; // Месяцы в JS начинаются с 0
-        const year = parseInt(parts[2]);
-        setSelectedBirthDate(new Date(year, month, day));
-      } else {
-        setSelectedBirthDate(new Date());
-      }
-    } else {
-      setSelectedBirthDate(new Date());
-    }
+    // Поддерживаем оба формата: DD.MM.YYYY (форма) и YYYY-MM-DD (из БД)
+    setSelectedBirthDate(birthDateToLocalDate(editData.birthDate || player?.birthDate));
     setShowBirthDatePicker(true);
   };
 

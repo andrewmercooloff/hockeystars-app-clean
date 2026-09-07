@@ -8,6 +8,7 @@ import {
 import { type Player } from '../utils/playerStorage';
 import { getAllTimeGoalieBlock, getAllTimePoints, getSeasonSavePercentage } from '../utils/seasonStats';
 import { getRatingShareCardWidth } from '../utils/ratingShareExport';
+import { birthYearOf } from '../utils/birthDate';
 
 export type SearchRatingShareEntry = {
   player: Player;
@@ -56,7 +57,7 @@ function getPlayerMeta(player: Player, t: (key: string) => string): string {
         : player.country
       : null,
     player.birthDate
-      ? String(new Date(player.birthDate).getFullYear())
+      ? String(birthYearOf(player.birthDate) ?? '')
       : player.age
         ? String(new Date().getFullYear() - player.age)
         : null,

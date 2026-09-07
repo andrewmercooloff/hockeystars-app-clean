@@ -32,6 +32,7 @@ import { requiresParentalConsent, registerChildWithParentalConsent, calculateAge
 import { uploadImageToStorage } from '../utils/uploadImage';
 import { sendVerificationSMS, verifyCode, verifySMSCode, saveVerificationCode, sendVerificationEmail } from '../utils/emailService';
 import { ICE_BACKGROUND } from '../utils/iceBackground';
+import { formatPickerDate } from '../utils/birthDate';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Функция для генерации UUID v4
@@ -499,14 +500,9 @@ export default function RegisterScreen() {
     if (Platform.OS === 'ios') {
       // На iOS календарь не закрывается автоматически
       if (date) {
-        // На iOS DateTimePicker может возвращать дату с проблемами часового пояса
-        // Создаем нормализованную дату сразу, используя UTC методы для чтения
-        // Это гарантирует правильные значения независимо от часового пояса
-        const year = date.getUTCFullYear();
-        const month = date.getUTCMonth();
-        const day = date.getUTCDate();
-        const normalizedDate = new Date(year, month, day, 12, 0, 0, 0);
-        setSelectedDate(normalizedDate);
+        // Пикер отдаёт локальную дату; читать её нужно локальными методами,
+        // иначе в поясах восточнее UTC 01.01.2019 превращается в 31.12.2018
+        setSelectedDate(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0, 0));
       }
     } else {
       // На Android календарь закрывается только при полном выборе
@@ -2087,23 +2083,7 @@ export default function RegisterScreen() {
                 <TouchableOpacity 
                   style={[styles.datePickerButton, styles.confirmButton]} 
                   onPress={() => {
-                    // На iOS DateTimePicker может возвращать дату с проблемами часового пояса
-                    // Используем более надежный способ - форматируем напрямую из selectedDate
-                    // но используем UTC методы для чтения, чтобы избежать смещения
-                    const year = selectedDate.getUTCFullYear();
-                    const month = selectedDate.getUTCMonth();
-                    const day = selectedDate.getUTCDate();
-                    
-                    // Форматируем дату напрямую из UTC компонентов
-                    const dayStr = day.toString().padStart(2, '0');
-                    const monthStr = (month + 1).toString().padStart(2, '0');
-                    const yearStr = year.toString();
-                    const formattedDate = `${dayStr}.${monthStr}.${yearStr}`;
-                    
-                    // Также обновляем selectedDate для корректного отображения
-                    const normalizedDate = new Date(year, month, day, 12, 0, 0, 0);
-                    setSelectedDate(normalizedDate);
-                    
+                    const formattedDate = formatPickerDate(selectedDate);
                     setFormData({...formData, birthDate: formattedDate});
                     setShowDatePicker(false);
                   }}

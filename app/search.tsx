@@ -66,6 +66,7 @@ import {
 import { getAllTimeBlock } from '../utils/seasonStats';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
+import { birthYearOf } from '../utils/birthDate';
 
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
@@ -190,8 +191,8 @@ function buildSearchPlayerSubtitle(
   }
 
   if (item.birthDate) {
-    const birthYear = new Date(item.birthDate).getFullYear();
-    if (!isNaN(birthYear)) {
+    const birthYear = birthYearOf(item.birthDate);
+    if (birthYear) {
       parts.push(birthYear.toString());
     }
   } else if (item.age) {
