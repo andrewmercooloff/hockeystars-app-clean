@@ -2930,7 +2930,7 @@ export default function HomeScreen() {
         hasLoadedBlockedInitiallyRef.current = true;
       }
       return () => {
-        setCurrentScreen(null);
+        setCurrentScreen(null, 'home');
       };
     }, [setCurrentScreen, currentUser?.id, loadBlockedUsers, params.refresh, loadAllPlayers, resetPucksMotion])
   );

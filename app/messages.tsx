@@ -1251,7 +1251,7 @@ export default function MessagesScreen() {
 
       return () => {
         cancelled = true;
-        setCurrentScreen(null);
+        setCurrentScreen(null, 'messages');
       };
     }, [
       silentLoadChats,

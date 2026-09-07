@@ -79,7 +79,7 @@ export default function ExercisesScreen() {
     useCallback(() => {
       setCurrentScreen('exercises');
       return () => {
-        setCurrentScreen(null);
+        setCurrentScreen(null, 'exercises');
       };
     }, [setCurrentScreen])
   );

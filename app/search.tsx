@@ -691,12 +691,12 @@ export default function SearchScreen() {
       setCurrentScreen('search');
       if (!currentUser) {
         return () => {
-          setCurrentScreen(null);
+          setCurrentScreen(null, 'search');
         };
       }
       if (players.length > 0) {
         return () => {
-          setCurrentScreen(null);
+          setCurrentScreen(null, 'search');
         };
       }
       const refreshData = async () => {
@@ -743,7 +743,7 @@ export default function SearchScreen() {
         };
         refreshData();
       return () => {
-        setCurrentScreen(null);
+        setCurrentScreen(null, 'search');
       };
     }, [setCurrentScreen, currentUser, players.length])
   );

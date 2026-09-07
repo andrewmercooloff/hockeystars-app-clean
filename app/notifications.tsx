@@ -1337,7 +1337,7 @@ export default function NotificationsScreen() {
         if (!markReadDone && currentUser) {
           void updateNotificationCount(currentUser);
         }
-        setCurrentScreen(null);
+        setCurrentScreen(null, 'notifications');
       };
     }, [
       currentUser,

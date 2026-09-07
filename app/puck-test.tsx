@@ -582,7 +582,7 @@ export default function PuckTestScreen() {
     useCallback(() => {
       setCurrentScreen('puck-test');
       return () => {
-        setCurrentScreen(null);
+        setCurrentScreen(null, 'puck-test');
       };
     }, [setCurrentScreen])
   );

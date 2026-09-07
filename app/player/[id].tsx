@@ -1832,7 +1832,7 @@ export default function PlayerProfile() {
       }
 
       return () => {
-        setCurrentScreen(null);
+        setCurrentScreen(null, 'player');
         setSelectedVideo(null);
       };
     }, [id])
@@ -4426,7 +4426,7 @@ export default function PlayerProfile() {
               t('common.success') || t('success'), 
               t('profile.userDeleted', { name: player.name }),
               'success',
-              () => router.push({ pathname: '/', params: { refresh: String(Date.now()) } })
+              () => router.replace({ pathname: '/', params: { refresh: String(Date.now()) } })
             );
         } else {
           showCustomAlert(
