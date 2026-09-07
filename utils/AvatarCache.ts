@@ -63,12 +63,10 @@ class AvatarCache {
       // Если в кеше уже есть URL и новый URL содержит тот же файл
     // НЕ обновляем кеш - игнорируем дублирующие аватары из уведомлений
     if (oldUrl && avatarUrl) {
-      // Извлекаем имя файла из URL (последняя часть после последнего /)
+      // Имя файла ВМЕСТЕ с параметрами: ?v=<time> означает новый файл под старым именем
       const getFilename = (url: string) => {
         const parts = url.split('/');
-        const lastPart = parts[parts.length - 1];
-        // Удаляем параметры запроса, если есть
-        return lastPart.split('?')[0];
+        return parts[parts.length - 1];
       };
       
       const oldFilename = getFilename(oldUrl);

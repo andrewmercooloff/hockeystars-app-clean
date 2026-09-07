@@ -20,9 +20,17 @@ interface CachedAvatarProps {
   imagePriority?: 'low' | 'normal' | 'high';
 }
 
-/** URL без query — для сравнения «тот же файл или нет». */
+/**
+ * Идентичность файла: путь + параметры версии, без хоста (direct ↔ proxy — тот же файл).
+ * ?v=/_v= входят в идентичность: перезаписанный под тем же именем файл — уже другой аватар.
+ */
 function avatarUriBase(url: string | null | undefined): string {
   if (!url) return '';
+  return url.replace(/^https?:\/\/[^/]+/, '');
+}
+
+/** URL без параметров — последний шанс взять файл из дискового кеша. */
+function stripQuery(url: string): string {
   return url.split('?')[0];
 }
 
@@ -155,7 +163,7 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
       return;
     }
     const current = overrideUrl || url;
-    const bare = avatarUriBase(current);
+    const bare = current ? stripQuery(current) : '';
     if (current && isRemote && current !== bare && overrideUrl !== bare) {
       // Версионный URL (_v=/r=) не пришёл — пробуем тот же файл без параметров: его
       // показывают другие экраны, и он почти наверняка есть в дисковом кеше.
@@ -244,7 +252,7 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
   return (
     <View style={[imageStyle, { backgroundColor: 'rgba(255, 255, 255, 0.12)', overflow: 'hidden' }]}>
       <Image
-        source={{ uri: sourceUri }}
+        source={{ uri: sourceUri ?? undefined }}
         style={imageStyle}
         contentFit="cover"
         onError={handleError}

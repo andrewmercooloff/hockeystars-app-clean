@@ -3700,13 +3700,14 @@ export default function PlayerProfile() {
         const { uploadImageToStorage } = await import('../../utils/uploadImage');
         const uploadedUrl = await uploadImageToStorage(avatarUrl, `avatar_${player.id}.jpg`);
         if (uploadedUrl) {
-          avatarUrl = uploadedUrl;
+          // Файл перезаписывается под тем же именем, поэтому в БД кладём URL с версией:
+          // иначе у других пользователей (и у CDN) навсегда остаётся старая картинка —
+          // realtime не видит изменения, а дисковый кеш expo-image ключуется по URL.
+          avatarUrl = `${uploadedUrl.split('?')[0]}?v=${Date.now()}`;
           avatarWasUpdated = true;
           
-          // КРИТИЧНО: Обновляем аватар ГЛОБАЛЬНО во всех компонентах
-          // forceNotify=true гарантирует перезагрузку даже если URL тот же (файл перезаписан)
           const { updateAvatarGlobally } = await import('../../utils/AvatarCache');
-          await updateAvatarGlobally(player.id, uploadedUrl);
+          await updateAvatarGlobally(player.id, avatarUrl);
           console.log('✅ Аватар обновлён глобально через updateAvatarGlobally');
         } else {
           console.error('❌ Не удалось загрузить аватар в Storage');
