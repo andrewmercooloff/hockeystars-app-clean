@@ -321,6 +321,11 @@ const dispatchVerificationSms = async (
 
 /** OTA-safe path: SMS secrets live on hockey-stars.com, not in the binary. */
 const APP_SMS_OTP_URL = 'https://hockey-stars.com/api/app-send-code.php';
+/**
+ * Тот же PHP-скрипт на api-домене: у части операторов запросы к apex-домену не доходят
+ * (в логах nginx телефон ходит на api.hockey-stars.com, но не на hockey-stars.com).
+ */
+const APP_SMS_OTP_FALLBACK_URL = 'https://api.hockey-stars.com/otp/app-send-code.php';
 const APP_SMS_TIMEOUT_MS = 12000;
 
 const withTimeout = async <T,>(promise: Promise<T>, ms: number, label: string): Promise<T> => {
@@ -345,11 +350,14 @@ export type SmsSendResult = {
   status?: number;
 };
 
-const sendVerificationSmsViaServer = async (phoneNumber: string): Promise<SmsSendResult> => {
+const sendVerificationSmsViaServer = async (
+  phoneNumber: string,
+  url: string = APP_SMS_OTP_URL
+): Promise<SmsSendResult> => {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), APP_SMS_TIMEOUT_MS);
-    const response = await fetch(APP_SMS_OTP_URL, {
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -375,30 +383,34 @@ const sendVerificationSmsViaServer = async (phoneNumber: string): Promise<SmsSen
     const aborted =
       error instanceof Error &&
       (error.name === 'AbortError' || error.message.includes('aborted'));
-    console.warn(aborted ? '⚠️ Сервер SMS: таймаут' : '⚠️ Сервер SMS недоступен:', error);
+    console.warn(aborted ? '⚠️ Сервер SMS: таймаут' : '⚠️ Сервер SMS недоступен:', url, error);
     return { ok: false, error: 'network' };
   }
 };
 
 /**
- * Отправка кода с подробным результатом. Сетевая ошибка повторяется один раз;
- * ответ «rate» означает, что код уже ушёл менее 45 с назад — это не провал.
+ * Отправка кода с подробным результатом. При сетевой ошибке — повтор через api-домен,
+ * затем ещё одна попытка на основной; ответ «rate» означает, что код уже ушёл
+ * менее 45 с назад — это не провал.
  */
 export const sendVerificationSMSDetailed = async (phoneNumber: string): Promise<SmsSendResult> => {
   console.log('📱 Отправляем код подтверждения на:', phoneNumber);
-  let result = await withTimeout(
-    sendVerificationSmsViaServer(phoneNumber),
-    APP_SMS_TIMEOUT_MS + 2000,
-    'server_sms'
-  ).catch((): SmsSendResult => ({ ok: false, error: 'network' }));
+  const attempts: Array<{ url: string; label: string; delayMs: number }> = [
+    { url: APP_SMS_OTP_URL, label: 'server_sms', delayMs: 0 },
+    { url: APP_SMS_OTP_FALLBACK_URL, label: 'server_sms_fallback', delayMs: 0 },
+    { url: APP_SMS_OTP_URL, label: 'server_sms_retry', delayMs: 1500 },
+  ];
 
-  if (!result.ok && result.error === 'network') {
-    await new Promise((r) => setTimeout(r, 1500));
+  let result: SmsSendResult = { ok: false, error: 'network' };
+  for (const attempt of attempts) {
+    if (attempt.delayMs) await new Promise((r) => setTimeout(r, attempt.delayMs));
     result = await withTimeout(
-      sendVerificationSmsViaServer(phoneNumber),
+      sendVerificationSmsViaServer(phoneNumber, attempt.url),
       APP_SMS_TIMEOUT_MS + 2000,
-      'server_sms_retry'
+      attempt.label
     ).catch((): SmsSendResult => ({ ok: false, error: 'network' }));
+    // Любой ответ сервера (в т.ч. rate/phone_format) — окончательный, повторяем только сетевые сбои
+    if (result.ok || result.error !== 'network') break;
   }
 
   if (!result.ok) {
