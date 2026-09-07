@@ -515,6 +515,10 @@ export default function PlayerProfile() {
   // --- AI Analysis state (must be before resolvedAiAnalysis) ---
   const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
   const [aiUsageCount, setAiUsageCount] = useState<number>(0);
+  // Лимит отчётов в месяц: 1 + 1 (заполненный профиль) + 1 за каждого приглашённого друга
+  const [aiUsageLimit, setAiUsageLimit] = useState<number>(1);
+  const [aiInvitedFriends, setAiInvitedFriends] = useState<number | undefined>(undefined);
+  const aiUsageFetchedForRef = useRef<string | null>(null);
   const [isGeneratingAnalysis, setIsGeneratingAnalysis] = useState(false);
   const [gameVideoLinks, setGameVideoLinks] = useState<string[]>(['']);
   const isOwner = currentUser && player && currentUser.id === player.id;
@@ -2494,6 +2498,34 @@ export default function PlayerProfile() {
     return { complete: missing.length === 0, missing };
   };
 
+  // Актуальный счётчик и лимит отчётов для владельца профиля
+  useEffect(() => {
+    if (!player || !currentUser || currentUser.id !== player.id) return;
+    if (aiUsageFetchedForRef.current === player.id) return;
+    aiUsageFetchedForRef.current = player.id;
+    (async () => {
+      try {
+        const response = await supabaseFetch(getSupabaseFunctionUrl('generate-ai-analysis'), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${supabaseAnonKey}`,
+            apikey: supabaseAnonKey,
+          },
+          body: JSON.stringify({ player_id: player.id, action: 'get_usage' }),
+        });
+        const data = await response.json();
+        if (response.ok && typeof data?.count === 'number') {
+          setAiUsageCount(data.count);
+          if (typeof data.limit === 'number') setAiUsageLimit(data.limit);
+          if (typeof data.invited_friends === 'number') setAiInvitedFriends(data.invited_friends);
+        }
+      } catch {
+        /* сеть недоступна — оставляем значения по умолчанию */
+      }
+    })();
+  }, [player?.id, currentUser?.id]);
+
   const handleGenerateAnalysis = async () => {
     if (!player || !currentUser || currentUser.id !== player.id) return;
     if (isGeneratingAnalysis) return;
@@ -2520,7 +2552,9 @@ export default function PlayerProfile() {
       const data = await response.json();
 
       if (response.status === 429) {
-        showCustomAlert('Limit Reached', data.message || 'You have used all 5 analyses for this month.', 'info');
+        if (typeof data.limit === 'number') setAiUsageLimit(data.limit);
+        if (typeof data.count === 'number') setAiUsageCount(data.count);
+        showCustomAlert(t('common.info') || 'Info', data.message || 'You have used all analyses for this month.', 'info');
         return;
       }
 
@@ -2539,6 +2573,8 @@ export default function PlayerProfile() {
       };
       setAiAnalysis(newAnalysis);
       setAiUsageCount(data.count || aiUsageCount + 1);
+      if (typeof data.limit === 'number') setAiUsageLimit(data.limit);
+      if (typeof data.invited_friends === 'number') setAiInvitedFriends(data.invited_friends);
 
       const vids = gameVideoLinks.filter(v => v.trim() !== '');
       if (vids.length > 0) {
@@ -6721,7 +6757,9 @@ export default function PlayerProfile() {
                       profileUrl={buildInviteLink(player.id, player.name)}
                       isOwner={!!isOwner}
                       usageCount={aiUsageCount}
-                      maxUsage={5}
+                      maxUsage={aiUsageLimit}
+                      invitedFriends={aiInvitedFriends}
+                      onInvite={shareProfile}
                       onGenerate={handleGenerateAnalysis}
                       onTogglePublic={handleToggleAnalysisPublic}
                       onTranslate={handleTranslateAnalysis}

@@ -69,6 +69,9 @@ const i18n: Record<string, Record<string, string>> = {
   generate:         { en: 'Create Scout Report', ru: 'Создать скаутский отчет', de: 'Scout-Bericht erstellen', fr: 'Créer rapport scout', it: 'Crea rapporto scout', pl: 'Utwórz raport skauta', sv: 'Skapa scoutrapport', cs: 'Vytvořit skautskou zprávu', sk: 'Vytvoriť skautskú správu', fi: 'Luo tiedusteluraportti', lv: 'Izveidot skauta ziņojumu', lt: 'Sukurti skauto ataskaitą' },
   regenerate:       { en: 'Update Report', ru: 'Обновить отчет', de: 'Scout-Bericht aktualisieren', fr: 'Mettre à jour le rapport', it: 'Aggiorna rapporto', pl: 'Zaktualizuj raport', sv: 'Uppdatera rapport', cs: 'Aktualizovat zprávu', sk: 'Aktualizovať správu', fi: 'Päivitä raportti', lv: 'Atjaunināt ziņojumu', lt: 'Atnaujinti ataskaitą' },
   generating:       { en: 'Generating... (~15 sec)', ru: 'Генерируем скаутский отчет...', de: 'Wird generiert...', fr: 'Génération...', it: 'Generazione...', pl: 'Generowanie...', sv: 'Genererar...', cs: 'Generování...', sk: 'Generovanie...', fi: 'Luodaan...', lv: 'Ģenerē...', lt: 'Generuojama...' },
+  allowanceRule:    { en: 'Per month: 1 report + 1 for a complete profile + 1 for every invited friend who registers', ru: 'В месяц: 1 отчёт + 1 за заполненный профиль + 1 за каждого приглашённого друга, который зарегистрировался', de: 'Pro Monat: 1 Bericht + 1 für ein vollständiges Profil + 1 für jeden eingeladenen Freund, der sich registriert', fr: 'Par mois : 1 rapport + 1 pour un profil complet + 1 pour chaque ami invité qui s\'inscrit', it: 'Al mese: 1 report + 1 per il profilo completo + 1 per ogni amico invitato che si registra', pl: 'Miesięcznie: 1 raport + 1 za pełny profil + 1 za każdego zaproszonego znajomego, który się zarejestruje', sv: 'Per månad: 1 rapport + 1 för komplett profil + 1 för varje inbjuden vän som registrerar sig', cs: 'Měsíčně: 1 report + 1 za úplný profil + 1 za každého pozvaného kamaráda, který se zaregistruje', sk: 'Mesačne: 1 report + 1 za úplný profil + 1 za každého pozvaného kamaráta, ktorý sa zaregistruje', fi: 'Kuukaudessa: 1 raportti + 1 täydestä profiilista + 1 jokaisesta kutsutusta kaverista, joka rekisteröityy', lv: 'Mēnesī: 1 atskaite + 1 par pilnu profilu + 1 par katru uzaicinātu draugu, kurš reģistrējas', lt: 'Per mėnesį: 1 ataskaita + 1 už užpildytą profilį + 1 už kiekvieną pakviestą draugą, kuris užsiregistruoja' },
+  inviteForMore:    { en: 'Invite a friend → +1 report every month', ru: 'Пригласи друга → +1 отчёт каждый месяц', de: 'Freund einladen → +1 Bericht jeden Monat', fr: 'Invitez un ami → +1 rapport chaque mois', it: 'Invita un amico → +1 report ogni mese', pl: 'Zaproś znajomego → +1 raport co miesiąc', sv: 'Bjud in en vän → +1 rapport varje månad', cs: 'Pozvi kamaráda → +1 report každý měsíc', sk: 'Pozvi kamaráta → +1 report každý mesiac', fi: 'Kutsu kaveri → +1 raportti joka kuukausi', lv: 'Uzaicini draugu → +1 atskaite katru mēnesi', lt: 'Pakviesk draugą → +1 ataskaita kas mėnesį' },
+  invitedCount:     { en: 'Invited friends: {n}', ru: 'Приглашено друзей: {n}', de: 'Eingeladene Freunde: {n}', fr: 'Amis invités : {n}', it: 'Amici invitati: {n}', pl: 'Zaproszeni znajomi: {n}', sv: 'Inbjudna vänner: {n}', cs: 'Pozvaní kamarádi: {n}', sk: 'Pozvaní kamaráti: {n}', fi: 'Kutsutut kaverit: {n}', lv: 'Uzaicināti draugi: {n}', lt: 'Pakviesti draugai: {n}' },
   limitReached:     { en: 'Limit reached (resets next month)', ru: 'Лимит исчерпан (обновится в след. месяце)', de: 'Limit erreicht (nächsten Monat zurückgesetzt)', fr: 'Limite atteinte (réinitialisée le mois prochain)', it: 'Limite raggiunto (si resetta il mese prossimo)', pl: 'Limit osiągnięty (reset w przyszłym miesiącu)', sv: 'Gräns nådd (återställs nästa månad)', cs: 'Limit dosažen (resetuje se příští měsíc)', sk: 'Limit dosiahnutý (resetuje sa budúci mesiac)', fi: 'Raja saavutettu (nollautuu ensi kuussa)', lv: 'Limits sasniegts (atjauno nākamajā mēnesī)', lt: 'Limitas pasiektas (atsinaujins kitą mėnesį)' },
   completeProfile:  { en: 'Complete profile to unlock', ru: 'Заполните профиль для разблокировки', de: 'Profil vervollständigen zum Entsperren', fr: 'Compléter le profil pour déverrouiller', it: 'Completa il profilo per sbloccare', pl: 'Uzupełnij profil, aby odblokować', sv: 'Slutför profilen för att låsa upp', cs: 'Dokončete profil pro odemknutí', sk: 'Dokončite profil na odomknutie', fi: 'Täydennä profiili avataksesi', lv: 'Aizpildiet profilu, lai atbloķētu', lt: 'Užpildykite profilį norėdami atrakinti' },
   translate:        { en: 'Translate', ru: 'Перевести', de: 'Übersetzen', fr: 'Traduire', it: 'Traduci', pl: 'Przetłumacz', sv: 'Översätt', cs: 'Přeložit', sk: 'Preložiť', fi: 'Käännä', lv: 'Tulkot', lt: 'Versti' },
@@ -118,6 +121,10 @@ interface Props {
   isOwner: boolean;
   usageCount: number;
   maxUsage?: number;
+  /** Сколько друзей приглашено (даёт +1 отчёт в месяц за каждого) */
+  invitedFriends?: number;
+  /** Открыть шаринг ссылки-приглашения */
+  onInvite?: () => void;
   onGenerate: () => void;
   onTogglePublic: (isPublic: boolean) => void;
   onTranslate: (lang: string, forceRetranslate?: boolean) => Promise<string>;
@@ -189,6 +196,8 @@ export default function AIAnalysisCard({
   isOwner,
   usageCount,
   maxUsage = 5,
+  invitedFriends,
+  onInvite,
   onGenerate,
   onTogglePublic,
   onTranslate,
@@ -718,6 +727,21 @@ export default function AIAnalysisCard({
         <Text style={styles.limitNote}>{tr('limitReached')}</Text>
       )}
 
+      {isOwner && (
+        <View style={styles.allowanceBox}>
+          <Text style={styles.allowanceRule}>{tr('allowanceRule')}</Text>
+          {typeof invitedFriends === 'number' && (
+            <Text style={styles.allowanceRule}>{tr('invitedCount').replace('{n}', String(invitedFriends))}</Text>
+          )}
+          {onInvite && (
+            <TouchableOpacity style={styles.inviteBtn} onPress={onInvite} activeOpacity={0.85}>
+              <Ionicons name="person-add-outline" size={15} color="#fff" />
+              <Text style={styles.inviteBtnText}>{tr('inviteForMore')}</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
+
       {missingModal}
       {offScreenCards}
     </View>
@@ -874,6 +898,38 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center',
     marginTop: 10,
+  },
+  allowanceBox: {
+    marginTop: 12,
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
+    gap: 6,
+  },
+  allowanceRule: {
+    fontFamily: 'Gilroy-Regular',
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 12,
+    lineHeight: 16,
+    textAlign: 'center',
+  },
+  inviteBtn: {
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 999,
+    backgroundColor: 'rgba(250, 47, 64, 0.85)',
+  },
+  inviteBtnText: {
+    fontFamily: 'Gilroy-Bold',
+    color: '#fff',
+    fontSize: 13,
   },
   deleteReportRow: {
     flexDirection: 'row',

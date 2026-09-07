@@ -3,7 +3,7 @@
 // Features:
 //   - NHL Scout scouting report: stats, height/weight, teams, achievements, videos
 //   - Google Search grounding for real external info
-//   - Rate limit: 5 times per player per calendar month
+//   - Rate limit per calendar month: 1 + 1 (complete profile) + 1 per invited registered friend
 //   - Translation caching
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -17,7 +17,49 @@ const corsHeaders = {
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const MAX_MONTHLY_USES = 5;
+// Monthly allowance: 1 base + 1 for a complete profile + 1 per invited friend who registered.
+const BASE_MONTHLY_USES = 1;
+
+interface Allowance {
+  limit: number;
+  profileComplete: boolean;
+  invitedFriends: number;
+}
+
+async function computeAllowance(supabase: any, playerId: string): Promise<Allowance> {
+  const [{ data: p }, { count: teamsCount }, { count: invited }] = await Promise.all([
+    supabase
+      .from("players")
+      .select("avatar, position, country, birth_date, height, weight, grip, goals, assists, games, minutes, shots")
+      .eq("id", playerId)
+      .maybeSingle(),
+    supabase.from("player_teams").select("id", { count: "exact", head: true }).eq("player_id", playerId),
+    supabase
+      .from("players")
+      .select("id", { count: "exact", head: true })
+      .eq("invited_by", playerId)
+      .neq("status", "pending_verification"),
+  ]);
+
+  let profileComplete = false;
+  if (p) {
+    const num = (v: unknown) => Number(v) || 0;
+    const isGoalie = p.position === "goalie";
+    const hasStats = isGoalie
+      ? num(p.games) > 0 || num(p.minutes) > 0 || num(p.shots) > 0
+      : num(p.goals) > 0 || num(p.assists) > 0 || num(p.games) > 0;
+    profileComplete =
+      !!p.avatar && !!p.position && !!p.country && !!p.birth_date &&
+      num(p.height) > 0 && num(p.weight) > 0 && !!p.grip &&
+      (teamsCount || 0) > 0 && hasStats;
+  }
+  const invitedFriends = invited || 0;
+  return {
+    limit: BASE_MONTHLY_USES + (profileComplete ? 1 : 0) + invitedFriends,
+    profileComplete,
+    invitedFriends,
+  };
+}
 // Comma-separated player IDs that bypass the monthly limit (for testing/admin)
 const BYPASS_LIMIT_IDS = (Deno.env.get("BYPASS_LIMIT_PLAYER_IDS") || "").split(",").map(s => s.trim()).filter(Boolean);
 // gemini-2.5-flash: stable quota, supports Video + Search Grounding
@@ -541,11 +583,18 @@ serve(async (req) => {
       .maybeSingle();
 
     const currentCount = usageRow?.count || 0;
+    const allowance = await computeAllowance(supabase, player_id);
+    const MAX_MONTHLY_USES = allowance.limit;
+    const allowanceInfo = {
+      limit: allowance.limit,
+      profile_complete: allowance.profileComplete,
+      invited_friends: allowance.invitedFriends,
+    };
 
     // ACTION: get_usage
     if (action === "get_usage") {
       return new Response(
-        JSON.stringify({ count: currentCount, remaining: MAX_MONTHLY_USES - currentCount }),
+        JSON.stringify({ count: currentCount, remaining: Math.max(0, MAX_MONTHLY_USES - currentCount), ...allowanceInfo }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -607,7 +656,8 @@ serve(async (req) => {
           error: "LIMIT_REACHED",
           count: currentCount,
           remaining: 0,
-          message: `You have used all ${MAX_MONTHLY_USES} analyses for this month. Resets on the 1st of next month.`,
+          ...allowanceInfo,
+          message: `You have used all ${MAX_MONTHLY_USES} analyses for this month. Invite a friend for +1 per month; resets on the 1st.`,
           // legacy compat
         }),
         { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -700,7 +750,8 @@ serve(async (req) => {
       JSON.stringify({
         analysis: analysisText,
         count: currentCount + 1,
-        remaining: MAX_MONTHLY_USES - currentCount - 1,
+        remaining: Math.max(0, MAX_MONTHLY_USES - currentCount - 1),
+        ...allowanceInfo,
         has_video_analysis: validVideos.length > 0,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
