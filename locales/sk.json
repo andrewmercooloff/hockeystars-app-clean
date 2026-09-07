@@ -30,7 +30,8 @@
     "offline": "Bez pripojenia",
     "and": "a",
     "info": "Informácia",
-    "continue": "Pokračovať"
+    "continue": "Pokračovať",
+    "retry": "Skúsiť znova"
   },
   "winger": "Krídelník",
   "center": "Stred dopredu",
@@ -58,7 +59,9 @@
   },
   "achievementNotification": {
     "added": "pridané",
-    "oneAchievement": "nový úspech"
+    "oneAchievement": "nový úspech",
+    "multipleAchievements": "{count} nových úspechov",
+    "received": "získal"
   },
   "friendshipNotification": {
     "title": "Nové priateľstvo",
@@ -3498,7 +3501,17 @@
     "allTime": "Celkovo",
     "seasonsCount": "{count} sez.",
     "currentSeasonHint": "Aktuálna sezóna",
-    "fullScreen": "Celá obrazovka"
+    "fullScreen": "Celá obrazovka",
+    "heightWithUnit": "Výška (cm)",
+    "individualTraining": "Individuálne tréningy",
+    "noPermission": "Bez prístupu ku galérii",
+    "playerNumber": "Číslo hráča",
+    "playerNumberPlaceholder": "Číslo na drese",
+    "savedToGallery": "Uložené do galérie",
+    "selectBirthDate": "Vyberte dátum narodenia",
+    "shareError": "Chyba pri vytváraní obrázka",
+    "skateServices": "Služby",
+    "weightWithUnit": "Váha (kg)"
   },
   "register": {
     "title": "Registrácia",
@@ -3634,7 +3647,11 @@
     "fillRequiredFields": "Vyplňte všetky povinné polia.",
     "enterValidPhone": "Zadajte platné telefónne číslo s kódom krajiny.",
     "requiredForPlayers": "Pre hráčov a hviezdy je povinné uviesť dátum narodenia a pozíciu",
-    "adminPanel": "Panel správcu"
+    "adminPanel": "Panel správcu",
+    "login": "Prihlásiť",
+    "loginAsUserConfirm": "Naozaj sa chcete prihlásiť ako {name}?",
+    "loginAsUserError": "Prihlásenie ako používateľ zlyhalo",
+    "loginAsUserSuccess": "Ste prihlásení ako {name}"
   },
   "museum": {
     "title": "múzeum",
@@ -3815,7 +3832,8 @@
   "settings": {
     "title": "Nastavenia",
     "language": "Jazyk",
-    "selectLanguage": "Vyberte jazyk"
+    "selectLanguage": "Vyberte jazyk",
+    "autoLanguage": "Auto"
   },
   "search": {
     "title": "Hľadať",
@@ -3975,7 +3993,9 @@
     "noFriendsToForward": "Žiadni priatelia na preposlanie",
     "messageForwarded": "Správa preposlaná",
     "forwardedTo": "Preposlané",
-    "forwardError": "Preposlanie zlyhalo"
+    "forwardError": "Preposlanie zlyhalo",
+    "user": "Používateľ",
+    "you": "Vy"
   },
   "createUser": {
     "title": "Vytvorenie používateľa",
@@ -4122,7 +4142,24 @@
     "seconds": "sek",
     "times": "raz",
     "sprint": "Beh na 100 metrov",
-    "_cache_clear": "2024-01-16-9"
+    "_cache_clear": "2024-01-16-9",
+    "customGift": "Požiadať o darček",
+    "deleteGiftConfirm": "Naozaj chcete tento darček odstrániť?",
+    "errorGiftAlreadyExists": "Hráč {playerName} už tento darček má.\n\nVyberte iný darček alebo vytvorte nový.",
+    "errorGiftNotDeleted": "Darček nebol odstránený",
+    "errorGiftNotFound": "Darček sa nenašiel",
+    "errorPermissionDenied": "Nemáte oprávnenie odstrániť tento darček",
+    "errorSelectOrCreate": "Vyberte darček alebo vytvorte nový",
+    "errorSendingGift": "Darček sa nepodarilo odoslať",
+    "fromAdmin": "Admin",
+    "fromStar": "od {starName}",
+    "giftReceived": "Darček prijatý!",
+    "giftReceivedFromAdmin": "Dostali ste darček od administrátora: {giftName}",
+    "giftReceivedFromAdminPush": "Dostali ste darček od administrátora: {giftName}",
+    "giftReceivedFromStar": "Dostali ste darček od {starName}: {giftName}",
+    "giftReceivedFromStarPush": "Dostali ste darček od {starName}: {giftName}",
+    "giftReceivedPush": "🎁 Darček prijatý!",
+    "successGiftSent": "Darček odoslaný hráčovi {playerName}!"
   },
   "TEMP_DELETE_ME": {
     "title": "Normy",
@@ -4346,7 +4383,10 @@
     "playStoreCta": "Stiahnuť z Google Play"
   },
   "videoNotification": {
-    "fullScreen": "Celá obrazovka"
+    "fullScreen": "Celá obrazovka",
+    "added": "pridal",
+    "multipleVideos": "{count} nových videí",
+    "oneVideo": "nové video"
   },
   "coverNotification": {
     "title": "Nová titulná fotka",
@@ -4356,5 +4396,21 @@
     "resurfacing": "Upravujeme ľad…",
     "updating": "Inštalujeme aktualizáciu",
     "updated": "Čerstvý ľad — aplikácia aktualizovaná"
-  }
+  },
+  "avatarNotification": {
+    "changed": "zmenil avatar"
+  },
+  "cm": "cm",
+  "height": "výška",
+  "kg": "kg",
+  "referral": {
+    "leaderboard": "Najlepší pozývajúci",
+    "noInvites": "Zatiaľ nikto nepozval priateľov",
+    "points": "bodov"
+  },
+  "statsNotification": {
+    "physicalData": "fyzické údaje",
+    "updated": "aktualizoval"
+  },
+  "weight": "váha"
 }

@@ -30,7 +30,8 @@
     "offline": "Pas de connexion",
     "and": "et",
     "info": "Info",
-    "continue": "Continuer"
+    "continue": "Continuer",
+    "retry": "Réessayer"
   },
   "winger": "Ailier",
   "center": "Avant-centre",
@@ -58,7 +59,9 @@
   },
   "achievementNotification": {
     "added": "ajouté",
-    "oneAchievement": "nouvelle réussite"
+    "oneAchievement": "nouvelle réussite",
+    "multipleAchievements": "{count} nouveaux succès",
+    "received": "a reçu"
   },
   "friendshipNotification": {
     "title": "Nouvelle amitié",
@@ -3506,7 +3509,16 @@
     "allTime": "Toutes saisons",
     "seasonsCount": "{count} saisons",
     "currentSeasonHint": "Saison en cours",
-    "fullScreen": "Plein écran"
+    "fullScreen": "Plein écran",
+    "heightWithUnit": "Taille (cm)",
+    "noPermission": "Pas d'accès à la galerie",
+    "playerNumber": "Numéro du joueur",
+    "playerNumberPlaceholder": "Numéro sur le maillot",
+    "savedToGallery": "Enregistré dans la galerie",
+    "selectBirthDate": "Choisir la date de naissance",
+    "shareError": "Erreur lors de la création de l'image",
+    "skateServices": "Services",
+    "weightWithUnit": "Poids (kg)"
   },
   "register": {
     "title": "Inscription",
@@ -3640,7 +3652,13 @@
     "fillRequiredFields": "Veuillez remplir tous les champs obligatoires.",
     "enterValidPhone": "Veuillez entrer un numéro de téléphone valide avec l'indicatif du pays.",
     "requiredForPlayers": "Pour les joueurs et les stars, il est obligatoire d'indiquer la date de naissance et le poste",
-    "adminPanel": "Panneau d’administration"
+    "adminPanel": "Panneau d’administration",
+    "login": "Se connecter",
+    "loginAsUser": "Se connecter en tant qu'utilisateur",
+    "loginAsUserConfirm": "Voulez-vous vraiment vous connecter en tant que {name} ?",
+    "loginAsUserError": "Échec de la connexion en tant qu'utilisateur",
+    "loginAsUserSuccess": "Vous êtes connecté en tant que {name}",
+    "sendGift": "Envoyer un cadeau"
   },
   "museum": {
     "title": "Musée",
@@ -3821,7 +3839,8 @@
   "settings": {
     "title": "Paramètres",
     "language": "Langue",
-    "selectLanguage": "Sélectionner la langue"
+    "selectLanguage": "Sélectionner la langue",
+    "autoLanguage": "Auto"
   },
   "search": {
     "title": "Recherche",
@@ -3980,7 +3999,9 @@
     "noFriendsToForward": "Pas d'amis à qui transférer",
     "messageForwarded": "Message transféré",
     "forwardedTo": "Transféré",
-    "forwardError": "Échec du transfert"
+    "forwardError": "Échec du transfert",
+    "user": "Utilisateur",
+    "you": "Vous"
   },
   "createUser": {
     "title": "Créer un utilisateur",
@@ -4127,7 +4148,24 @@
     "seconds": "seconde",
     "times": "une fois",
     "sprint": "Course de 100 mètres",
-    "_cache_clear": "2024-01-16-9"
+    "_cache_clear": "2024-01-16-9",
+    "customGift": "Demander un cadeau",
+    "deleteGiftConfirm": "Voulez-vous vraiment supprimer ce cadeau ?",
+    "errorGiftAlreadyExists": "Le joueur {playerName} a déjà ce cadeau.\n\nChoisissez un autre cadeau ou créez-en un nouveau.",
+    "errorGiftNotDeleted": "Le cadeau n'a pas été supprimé",
+    "errorGiftNotFound": "Cadeau introuvable",
+    "errorPermissionDenied": "Vous n'êtes pas autorisé à supprimer ce cadeau",
+    "errorSelectOrCreate": "Choisissez un cadeau ou créez-en un nouveau",
+    "errorSendingGift": "Impossible d'envoyer le cadeau",
+    "fromAdmin": "Admin",
+    "fromStar": "de {starName}",
+    "giftReceived": "Cadeau reçu !",
+    "giftReceivedFromAdmin": "Vous avez reçu un cadeau de l'admin : {giftName}",
+    "giftReceivedFromAdminPush": "Vous avez reçu un cadeau de l'admin : {giftName}",
+    "giftReceivedFromStar": "Vous avez reçu un cadeau de {starName} : {giftName}",
+    "giftReceivedFromStarPush": "Vous avez reçu un cadeau de {starName} : {giftName}",
+    "giftReceivedPush": "🎁 Cadeau reçu !",
+    "successGiftSent": "Cadeau envoyé à {playerName} !"
   },
   "TEMP_DELETE_ME": {
     "title": "Normes",
@@ -4351,7 +4389,10 @@
     "playStoreCta": "Télécharger sur Google Play"
   },
   "videoNotification": {
-    "fullScreen": "Plein écran"
+    "fullScreen": "Plein écran",
+    "added": "a ajouté",
+    "multipleVideos": "{count} nouvelles vidéos",
+    "oneVideo": "nouvelle vidéo"
   },
   "coverNotification": {
     "title": "Nouvelle couverture",
@@ -4361,5 +4402,21 @@
     "resurfacing": "Resurfaçage de la glace…",
     "updating": "Installation de la mise à jour",
     "updated": "Glace neuve — application mise à jour"
-  }
+  },
+  "avatarNotification": {
+    "changed": "a changé sa photo de profil"
+  },
+  "cm": "cm",
+  "height": "taille",
+  "kg": "kg",
+  "referral": {
+    "leaderboard": "Meilleurs parrains",
+    "noInvites": "Personne n'a encore invité d'amis",
+    "points": "points"
+  },
+  "statsNotification": {
+    "physicalData": "données physiques",
+    "updated": "a mis à jour"
+  },
+  "weight": "poids"
 }

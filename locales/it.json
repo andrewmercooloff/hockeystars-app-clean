@@ -30,7 +30,8 @@
     "offline": "Nessuna connessione",
     "and": "e",
     "info": "Info",
-    "continue": "Continua"
+    "continue": "Continua",
+    "retry": "Riprova"
   },
   "winger": "Ala",
   "center": "Centravanti",
@@ -58,7 +59,9 @@
   },
   "achievementNotification": {
     "added": "aggiunto",
-    "oneAchievement": "nuovo risultato"
+    "oneAchievement": "nuovo risultato",
+    "multipleAchievements": "{count} nuovi traguardi",
+    "received": "ha ricevuto"
   },
   "friendshipNotification": {
     "title": "Nuova amicizia",
@@ -3506,7 +3509,16 @@
     "allTime": "Totale carriera",
     "seasonsCount": "{count} stagioni",
     "currentSeasonHint": "Stagione corrente",
-    "fullScreen": "Schermo intero"
+    "fullScreen": "Schermo intero",
+    "heightWithUnit": "Altezza (cm)",
+    "noPermission": "Nessun accesso alla galleria",
+    "playerNumber": "Numero del giocatore",
+    "playerNumberPlaceholder": "Numero sulla maglia",
+    "savedToGallery": "Salvato nella galleria",
+    "selectBirthDate": "Scegli la data di nascita",
+    "shareError": "Errore nella creazione dell'immagine",
+    "skateServices": "Servizi",
+    "weightWithUnit": "Peso (kg)"
   },
   "register": {
     "title": "Registrazione",
@@ -3640,7 +3652,13 @@
     "fillRequiredFields": "Si prega di compilare tutti i campi obbligatori.",
     "enterValidPhone": "Inserisci un numero di telefono valido con prefisso internazionale.",
     "requiredForPlayers": "Per i giocatori e le stelle è obbligatorio indicare la data di nascita e la posizione",
-    "adminPanel": "Pannello admin"
+    "adminPanel": "Pannello admin",
+    "login": "Accedi",
+    "loginAsUser": "Accedi come utente",
+    "loginAsUserConfirm": "Vuoi davvero accedere come {name}?",
+    "loginAsUserError": "Accesso come utente non riuscito",
+    "loginAsUserSuccess": "Ora sei connesso come {name}",
+    "sendGift": "Invia regalo"
   },
   "museum": {
     "title": "Museo",
@@ -3821,7 +3839,8 @@
   "settings": {
     "title": "Impostazioni",
     "language": "Lingua",
-    "selectLanguage": "Seleziona la lingua"
+    "selectLanguage": "Seleziona la lingua",
+    "autoLanguage": "Auto"
   },
   "search": {
     "title": "Ricerca",
@@ -3979,7 +3998,9 @@
     "noFriendsToForward": "Nessun amico a cui inoltrare",
     "messageForwarded": "Messaggio inoltrato",
     "forwardedTo": "Inoltrato",
-    "forwardError": "Inoltro fallito"
+    "forwardError": "Inoltro fallito",
+    "user": "Utente",
+    "you": "Tu"
   },
   "createUser": {
     "title": "Creazione di un utente",
@@ -4126,7 +4147,24 @@
     "seconds": "secondo",
     "times": "una volta",
     "sprint": "100 metri piani",
-    "_cache_clear": "2024-01-16-9"
+    "_cache_clear": "2024-01-16-9",
+    "customGift": "Chiedi un regalo",
+    "deleteGiftConfirm": "Vuoi davvero eliminare questo regalo?",
+    "errorGiftAlreadyExists": "Il giocatore {playerName} ha già questo regalo.\n\nScegli un altro regalo o creane uno nuovo.",
+    "errorGiftNotDeleted": "Il regalo non è stato eliminato",
+    "errorGiftNotFound": "Regalo non trovato",
+    "errorPermissionDenied": "Non hai i permessi per eliminare questo regalo",
+    "errorSelectOrCreate": "Scegli un regalo o creane uno nuovo",
+    "errorSendingGift": "Impossibile inviare il regalo",
+    "fromAdmin": "Admin",
+    "fromStar": "da {starName}",
+    "giftReceived": "Regalo ricevuto!",
+    "giftReceivedFromAdmin": "Hai ricevuto un regalo dall'admin: {giftName}",
+    "giftReceivedFromAdminPush": "Hai ricevuto un regalo dall'admin: {giftName}",
+    "giftReceivedFromStar": "Hai ricevuto un regalo da {starName}: {giftName}",
+    "giftReceivedFromStarPush": "Hai ricevuto un regalo da {starName}: {giftName}",
+    "giftReceivedPush": "🎁 Regalo ricevuto!",
+    "successGiftSent": "Regalo inviato a {playerName}!"
   },
   "TEMP_DELETE_ME": {
     "title": "Standard",
@@ -4350,7 +4388,10 @@
     "playStoreCta": "Scarica da Google Play"
   },
   "videoNotification": {
-    "fullScreen": "Schermo intero"
+    "fullScreen": "Schermo intero",
+    "added": "ha aggiunto",
+    "multipleVideos": "{count} nuovi video",
+    "oneVideo": "nuovo video"
   },
   "coverNotification": {
     "title": "Nuova copertina",
@@ -4360,5 +4401,21 @@
     "resurfacing": "Rifacimento del ghiaccio…",
     "updating": "Installazione dell'aggiornamento",
     "updated": "Ghiaccio nuovo — app aggiornata"
-  }
+  },
+  "avatarNotification": {
+    "changed": "ha cambiato l'avatar"
+  },
+  "cm": "cm",
+  "height": "altezza",
+  "kg": "kg",
+  "referral": {
+    "leaderboard": "Migliori invitanti",
+    "noInvites": "Nessuno ha ancora invitato amici",
+    "points": "punti"
+  },
+  "statsNotification": {
+    "physicalData": "dati fisici",
+    "updated": "ha aggiornato"
+  },
+  "weight": "peso"
 }

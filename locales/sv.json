@@ -30,7 +30,8 @@
     "offline": "Ingen anslutning",
     "and": "och",
     "info": "Info",
-    "continue": "Fortsätt"
+    "continue": "Fortsätt",
+    "retry": "Försök igen"
   },
   "winger": "Ytter",
   "center": "Center framåt",
@@ -58,7 +59,9 @@
   },
   "achievementNotification": {
     "added": "lagt till",
-    "oneAchievement": "ny prestation"
+    "oneAchievement": "ny prestation",
+    "multipleAchievements": "{count} nya prestationer",
+    "received": "fick"
   },
   "friendshipNotification": {
     "title": "Ny vänskap",
@@ -3506,7 +3509,16 @@
     "allTime": "Totalt",
     "seasonsCount": "{count} säsonger",
     "currentSeasonHint": "Aktuell säsong",
-    "fullScreen": "Helskärm"
+    "fullScreen": "Helskärm",
+    "heightWithUnit": "Längd (cm)",
+    "noPermission": "Ingen åtkomst till galleriet",
+    "playerNumber": "Spelarnummer",
+    "playerNumberPlaceholder": "Nummer på tröjan",
+    "savedToGallery": "Sparad i galleriet",
+    "selectBirthDate": "Välj födelsedatum",
+    "shareError": "Fel vid skapande av bild",
+    "skateServices": "Tjänster",
+    "weightWithUnit": "Vikt (kg)"
   },
   "register": {
     "title": "Registrering",
@@ -3642,7 +3654,11 @@
     "fillRequiredFields": "Vänligen fyll i alla obligatoriska fält.",
     "enterValidPhone": "Ange ett giltigt telefonnummer med landskod.",
     "requiredForPlayers": "För spelare och stjärnor är det obligatoriskt att ange födelsedatum och position",
-    "adminPanel": "Adminpanel"
+    "adminPanel": "Adminpanel",
+    "login": "Logga in",
+    "loginAsUserConfirm": "Vill du verkligen logga in som {name}?",
+    "loginAsUserError": "Kunde inte logga in som användare",
+    "loginAsUserSuccess": "Du är nu inloggad som {name}"
   },
   "museum": {
     "title": "Museum",
@@ -3823,7 +3839,8 @@
   "settings": {
     "title": "Inställningar",
     "language": "Språk",
-    "selectLanguage": "Välj språk"
+    "selectLanguage": "Välj språk",
+    "autoLanguage": "Auto"
   },
   "search": {
     "title": "Söka",
@@ -3981,7 +3998,9 @@
     "noFriendsToForward": "Inga vänner att vidarebefordra till",
     "messageForwarded": "Meddelande vidarebefordrat",
     "forwardedTo": "Vidarebefordrat",
-    "forwardError": "Vidarebefordran misslyckades"
+    "forwardError": "Vidarebefordran misslyckades",
+    "user": "Användare",
+    "you": "Du"
   },
   "createUser": {
     "title": "Skapa en användare",
@@ -4128,7 +4147,24 @@
     "seconds": "sek",
     "times": "en gång",
     "sprint": "100 meter streck",
-    "_cache_clear": "2024-01-16-9"
+    "_cache_clear": "2024-01-16-9",
+    "customGift": "Be om present",
+    "deleteGiftConfirm": "Vill du verkligen ta bort den här presenten?",
+    "errorGiftAlreadyExists": "Spelaren {playerName} har redan den här presenten.\n\nVälj en annan present eller skapa en ny.",
+    "errorGiftNotDeleted": "Presenten togs inte bort",
+    "errorGiftNotFound": "Presenten hittades inte",
+    "errorPermissionDenied": "Du har inte behörighet att ta bort den här presenten",
+    "errorSelectOrCreate": "Välj en present eller skapa en ny",
+    "errorSendingGift": "Kunde inte skicka presenten",
+    "fromAdmin": "Admin",
+    "fromStar": "från {starName}",
+    "giftReceived": "Present mottagen!",
+    "giftReceivedFromAdmin": "Du fick en present från admin: {giftName}",
+    "giftReceivedFromAdminPush": "Du fick en present från admin: {giftName}",
+    "giftReceivedFromStar": "Du fick en present från {starName}: {giftName}",
+    "giftReceivedFromStarPush": "Du fick en present från {starName}: {giftName}",
+    "giftReceivedPush": "🎁 Present mottagen!",
+    "successGiftSent": "Present skickad till {playerName}!"
   },
   "TEMP_DELETE_ME": {
     "title": "Standarder",
@@ -4352,7 +4388,10 @@
     "playStoreCta": "Ladda ner från Google Play"
   },
   "videoNotification": {
-    "fullScreen": "Helskärm"
+    "fullScreen": "Helskärm",
+    "added": "lade till",
+    "multipleVideos": "{count} nya videor",
+    "oneVideo": "ny video"
   },
   "coverNotification": {
     "title": "Ny omslagsbild",
@@ -4362,5 +4401,21 @@
     "resurfacing": "Isen spolas…",
     "updating": "Installerar uppdateringen",
     "updated": "Ny is — appen är uppdaterad"
-  }
+  },
+  "avatarNotification": {
+    "changed": "bytte profilbild"
+  },
+  "cm": "cm",
+  "height": "längd",
+  "kg": "kg",
+  "referral": {
+    "leaderboard": "Bästa inbjudare",
+    "noInvites": "Ingen har bjudit in vänner än",
+    "points": "poäng"
+  },
+  "statsNotification": {
+    "physicalData": "fysiska data",
+    "updated": "uppdaterade"
+  },
+  "weight": "vikt"
 }

@@ -30,7 +30,8 @@
     "offline": "Ei yhteyttä",
     "and": "ja",
     "info": "Tiedote",
-    "continue": "Jatka"
+    "continue": "Jatka",
+    "retry": "Yritä uudelleen"
   },
   "winger": "Laituri",
   "center": "Keskushyökkääjä",
@@ -58,7 +59,9 @@
   },
   "achievementNotification": {
     "added": "lisätty",
-    "oneAchievement": "uusi saavutus"
+    "oneAchievement": "uusi saavutus",
+    "multipleAchievements": "{count} uutta saavutusta",
+    "received": "sai"
   },
   "friendshipNotification": {
     "title": "Uusi ystävyys",
@@ -3498,7 +3501,17 @@
     "allTime": "Kaikki ajat",
     "seasonsCount": "{count} kautta",
     "currentSeasonHint": "Nykyinen kausi",
-    "fullScreen": "Koko näyttö"
+    "fullScreen": "Koko näyttö",
+    "heightWithUnit": "Pituus (cm)",
+    "individualTraining": "Yksilöharjoittelu",
+    "noPermission": "Ei pääsyä galleriaan",
+    "playerNumber": "Pelaajan numero",
+    "playerNumberPlaceholder": "Numero pelipaidassa",
+    "savedToGallery": "Tallennettu galleriaan",
+    "selectBirthDate": "Valitse syntymäaika",
+    "shareError": "Virhe kuvan luonnissa",
+    "skateServices": "Palvelut",
+    "weightWithUnit": "Paino (kg)"
   },
   "register": {
     "title": "Rekisteröinti",
@@ -3634,7 +3647,11 @@
     "fillRequiredFields": "Täytä kaikki pakolliset kentät.",
     "enterValidPhone": "Anna kelvollinen puhelinnumero ja maakoodi.",
     "requiredForPlayers": "Pelaajille ja tähdille on pakollista ilmoittaa syntymäaika ja paikka",
-    "adminPanel": "Hallintapaneeli"
+    "adminPanel": "Hallintapaneeli",
+    "login": "Kirjaudu",
+    "loginAsUserConfirm": "Haluatko varmasti kirjautua käyttäjänä {name}?",
+    "loginAsUserError": "Kirjautuminen käyttäjänä epäonnistui",
+    "loginAsUserSuccess": "Olet nyt kirjautunut käyttäjänä {name}"
   },
   "museum": {
     "title": "Museo",
@@ -3815,7 +3832,8 @@
   "settings": {
     "title": "Asetukset",
     "language": "Kieli",
-    "selectLanguage": "Valitse kieli"
+    "selectLanguage": "Valitse kieli",
+    "autoLanguage": "Auto"
   },
   "search": {
     "title": "Haku",
@@ -3973,7 +3991,9 @@
     "noFriendsToForward": "Ei kavereita välitettäväksi",
     "messageForwarded": "Viesti välitetty",
     "forwardedTo": "Välitetty",
-    "forwardError": "Välitys epäonnistui"
+    "forwardError": "Välitys epäonnistui",
+    "user": "Käyttäjä",
+    "you": "Sinä"
   },
   "createUser": {
     "title": "Käyttäjän luominen",
@@ -4120,7 +4140,24 @@
     "seconds": "sek",
     "times": "kerran",
     "sprint": "100 metrin juoksu",
-    "_cache_clear": "2024-01-16-9"
+    "_cache_clear": "2024-01-16-9",
+    "customGift": "Pyydä lahjaa",
+    "deleteGiftConfirm": "Haluatko varmasti poistaa tämän lahjan?",
+    "errorGiftAlreadyExists": "Pelaajalla {playerName} on jo tämä lahja.\n\nValitse toinen lahja tai luo uusi.",
+    "errorGiftNotDeleted": "Lahjaa ei poistettu",
+    "errorGiftNotFound": "Lahjaa ei löydy",
+    "errorPermissionDenied": "Sinulla ei ole oikeutta poistaa tätä lahjaa",
+    "errorSelectOrCreate": "Valitse lahja tai luo uusi",
+    "errorSendingGift": "Lahjan lähetys epäonnistui",
+    "fromAdmin": "Admin",
+    "fromStar": "lähettäjä {starName}",
+    "giftReceived": "Lahja vastaanotettu!",
+    "giftReceivedFromAdmin": "Sait lahjan adminilta: {giftName}",
+    "giftReceivedFromAdminPush": "Sait lahjan adminilta: {giftName}",
+    "giftReceivedFromStar": "Sait lahjan käyttäjältä {starName}: {giftName}",
+    "giftReceivedFromStarPush": "Sait lahjan käyttäjältä {starName}: {giftName}",
+    "giftReceivedPush": "🎁 Lahja vastaanotettu!",
+    "successGiftSent": "Lahja lähetetty pelaajalle {playerName}!"
   },
   "TEMP_DELETE_ME": {
     "title": "Standardit",
@@ -4344,7 +4381,10 @@
     "playStoreCta": "Lataa Google Playsta"
   },
   "videoNotification": {
-    "fullScreen": "Koko näyttö"
+    "fullScreen": "Koko näyttö",
+    "added": "lisäsi",
+    "multipleVideos": "{count} uutta videota",
+    "oneVideo": "uusi video"
   },
   "coverNotification": {
     "title": "Uusi kansikuva",
@@ -4354,5 +4394,21 @@
     "resurfacing": "Jäätä kunnostetaan…",
     "updating": "Päivitystä asennetaan",
     "updated": "Uusi jää — sovellus päivitetty"
-  }
+  },
+  "avatarNotification": {
+    "changed": "vaihtoi profiilikuvan"
+  },
+  "cm": "cm",
+  "height": "pituus",
+  "kg": "kg",
+  "referral": {
+    "leaderboard": "Parhaat kutsujat",
+    "noInvites": "Kukaan ei ole vielä kutsunut kavereita",
+    "points": "pistettä"
+  },
+  "statsNotification": {
+    "physicalData": "fyysiset tiedot",
+    "updated": "päivitti"
+  },
+  "weight": "paino"
 }

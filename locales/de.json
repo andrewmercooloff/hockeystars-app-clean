@@ -30,7 +30,8 @@
     "offline": "Keine Verbindung",
     "and": "und",
     "info": "Info",
-    "continue": "Weiter"
+    "continue": "Weiter",
+    "retry": "Erneut versuchen"
   },
   "winger": "Flügelspieler",
   "center": "Mittelstürmer",
@@ -58,7 +59,9 @@
   },
   "achievementNotification": {
     "added": "hinzugefügt",
-    "oneAchievement": "neue Leistung"
+    "oneAchievement": "neue Leistung",
+    "multipleAchievements": "{count} neue Erfolge",
+    "received": "hat erhalten"
   },
   "friendshipNotification": {
     "title": "Neue Freundschaft",
@@ -3506,7 +3509,16 @@
     "allTime": "Gesamt",
     "seasonsCount": "{count} Saisons",
     "currentSeasonHint": "Aktuelle Saison",
-    "fullScreen": "Vollbild"
+    "fullScreen": "Vollbild",
+    "heightWithUnit": "Größe (cm)",
+    "noPermission": "Kein Zugriff auf die Galerie",
+    "playerNumber": "Spielernummer",
+    "playerNumberPlaceholder": "Nummer auf dem Trikot",
+    "savedToGallery": "In Galerie gespeichert",
+    "selectBirthDate": "Geburtsdatum wählen",
+    "shareError": "Fehler beim Erstellen des Bildes",
+    "skateServices": "Dienstleistungen",
+    "weightWithUnit": "Gewicht (kg)"
   },
   "register": {
     "title": "Anmeldung",
@@ -3640,7 +3652,13 @@
     "fillRequiredFields": "Bitte füllen Sie alle erforderlichen Felder aus.",
     "enterValidPhone": "Bitte geben Sie eine gültige Telefonnummer mit Landesvorwahl ein.",
     "requiredForPlayers": "Bei Spielern und Stars ist die Angabe des Geburtsdatums und der Position obligatorisch",
-    "adminPanel": "Admin-Bereich"
+    "adminPanel": "Admin-Bereich",
+    "login": "Anmelden",
+    "loginAsUser": "Als Nutzer anmelden",
+    "loginAsUserConfirm": "Möchten Sie sich wirklich als {name} anmelden?",
+    "loginAsUserError": "Anmeldung als Nutzer fehlgeschlagen",
+    "loginAsUserSuccess": "Sie sind jetzt als {name} angemeldet",
+    "sendGift": "Geschenk senden"
   },
   "adminGifts": {
     "title": "Geschenkverwaltung",
@@ -3840,7 +3858,8 @@
   "settings": {
     "title": "Einstellungen",
     "language": "Sprache",
-    "selectLanguage": "Sprache auswählen"
+    "selectLanguage": "Sprache auswählen",
+    "autoLanguage": "Auto"
   },
   "search": {
     "title": "Suchen",
@@ -3998,7 +4017,9 @@
     "noFriendsToForward": "Keine Freunde zum Weiterleiten",
     "messageForwarded": "Nachricht weitergeleitet",
     "forwardedTo": "Weitergeleitet",
-    "forwardError": "Weiterleitung fehlgeschlagen"
+    "forwardError": "Weiterleitung fehlgeschlagen",
+    "user": "Nutzer",
+    "you": "Sie"
   },
   "createUser": {
     "title": "Erstellen eines Benutzers",
@@ -4145,7 +4166,24 @@
     "seconds": "Sek.",
     "times": "einmal",
     "sprint": "100-Meter-Lauf",
-    "_cache_clear": "2024-01-16-9"
+    "_cache_clear": "2024-01-16-9",
+    "customGift": "Geschenk anfragen",
+    "deleteGiftConfirm": "Möchten Sie dieses Geschenk wirklich löschen?",
+    "errorGiftAlreadyExists": "Spieler {playerName} hat dieses Geschenk bereits.\n\nWählen Sie ein anderes Geschenk oder erstellen Sie ein neues.",
+    "errorGiftNotDeleted": "Geschenk wurde nicht gelöscht",
+    "errorGiftNotFound": "Geschenk nicht gefunden",
+    "errorPermissionDenied": "Sie dürfen dieses Geschenk nicht löschen",
+    "errorSelectOrCreate": "Wählen Sie ein Geschenk oder erstellen Sie ein neues",
+    "errorSendingGift": "Geschenk konnte nicht gesendet werden",
+    "fromAdmin": "Admin",
+    "fromStar": "von {starName}",
+    "giftReceived": "Geschenk erhalten!",
+    "giftReceivedFromAdmin": "Sie haben ein Geschenk vom Admin erhalten: {giftName}",
+    "giftReceivedFromAdminPush": "Sie haben ein Geschenk vom Admin erhalten: {giftName}",
+    "giftReceivedFromStar": "Sie haben ein Geschenk von {starName} erhalten: {giftName}",
+    "giftReceivedFromStarPush": "Sie haben ein Geschenk von {starName} erhalten: {giftName}",
+    "giftReceivedPush": "🎁 Geschenk erhalten!",
+    "successGiftSent": "Geschenk an {playerName} gesendet!"
   },
   "TEMP_DELETE_ME": {
     "title": "Normen",
@@ -4369,7 +4407,10 @@
     "playStoreCta": "Bei Google Play laden"
   },
   "videoNotification": {
-    "fullScreen": "Vollbild"
+    "fullScreen": "Vollbild",
+    "added": "hat hinzugefügt",
+    "multipleVideos": "{count} neue Videos",
+    "oneVideo": "neues Video"
   },
   "coverNotification": {
     "title": "Neues Titelbild",
@@ -4379,5 +4420,21 @@
     "resurfacing": "Eis wird aufbereitet…",
     "updating": "Update wird installiert",
     "updated": "Frisches Eis — App aktualisiert"
-  }
+  },
+  "avatarNotification": {
+    "changed": "hat das Profilbild geändert"
+  },
+  "cm": "cm",
+  "height": "Größe",
+  "kg": "kg",
+  "referral": {
+    "leaderboard": "Top-Einlader",
+    "noInvites": "Noch niemand hat Freunde eingeladen",
+    "points": "Punkte"
+  },
+  "statsNotification": {
+    "physicalData": "Körperdaten",
+    "updated": "hat aktualisiert"
+  },
+  "weight": "Gewicht"
 }

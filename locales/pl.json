@@ -3300,7 +3300,13 @@
     "allTime": "Łącznie",
     "seasonsCount": "{count} sez.",
     "currentSeasonHint": "Bieżący sezon",
-    "fullScreen": "Pełny ekran"
+    "fullScreen": "Pełny ekran",
+    "heightWithUnit": "Wzrost (cm)",
+    "playerNumber": "Numer gracza",
+    "playerNumberPlaceholder": "Numer na koszulce",
+    "selectBirthDate": "Wybierz datę urodzenia",
+    "skateServices": "Usługi",
+    "weightWithUnit": "Waga (kg)"
   },
   "register": {
     "title": "Rejestracja",
@@ -3436,7 +3442,11 @@
     "fillRequiredFields": "Proszę wypełnić wszystkie wymagane pola.",
     "enterValidPhone": "Proszę podać prawidłowy numer telefonu wraz z kodem kraju.",
     "requiredForPlayers": "W przypadku zawodników i gwiazd obowiązkowe jest podanie daty urodzenia i stanowiska",
-    "adminPanel": "Panel administratora"
+    "adminPanel": "Panel administratora",
+    "login": "Zaloguj",
+    "loginAsUserConfirm": "Czy na pewno chcesz zalogować się jako {name}?",
+    "loginAsUserError": "Nie udało się zalogować jako użytkownik",
+    "loginAsUserSuccess": "Jesteś zalogowany jako {name}"
   },
   "museum": {
     "title": "Muzeum",
@@ -3785,7 +3795,9 @@
     "noFriendsToForward": "Brak znajomych do przesłania",
     "messageForwarded": "Wiadomość przesłana",
     "forwardedTo": "Przesłano",
-    "forwardError": "Nie udało się przesłać"
+    "forwardError": "Nie udało się przesłać",
+    "user": "Użytkownik",
+    "you": "Ty"
   },
   "createUser": {
     "title": "Tworzenie użytkownika",
@@ -3949,7 +3961,8 @@
     "giftReceivedFromStar": "Otrzymałeś prezent od {starName}: {giftName}",
     "giftReceivedPush": "🎁 Otrzymano prezent!",
     "giftReceivedFromAdminPush": "Otrzymałeś prezent od administratora: {giftName}",
-    "giftReceivedFromStarPush": "Otrzymałeś prezent od {starName}: {giftName}"
+    "giftReceivedFromStarPush": "Otrzymałeś prezent od {starName}: {giftName}",
+    "customGift": "Poproś o prezent"
   },
   "TEMP_DELETE_ME": {
     "title": "Standardy",
@@ -4206,5 +4219,10 @@
     "resurfacing": "Odnawiamy lód…",
     "updating": "Instalujemy aktualizację",
     "updated": "Świeży lód — aplikacja zaktualizowana"
+  },
+  "referral": {
+    "leaderboard": "Najlepsi zapraszający",
+    "noInvites": "Nikt jeszcze nie zaprosił znajomych",
+    "points": "punktów"
   }
 }

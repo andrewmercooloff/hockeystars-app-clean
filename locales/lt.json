@@ -3520,7 +3520,14 @@
     "allTime": "Iš viso",
     "seasonsCount": "{count} sez.",
     "currentSeasonHint": "Dabartinis sezonas",
-    "fullScreen": "Visas ekranas"
+    "fullScreen": "Visas ekranas",
+    "heightWithUnit": "Ūgis (cm)",
+    "individualTraining": "Individualios treniruotės",
+    "playerNumber": "Žaidėjo numeris",
+    "playerNumberPlaceholder": "Numeris ant aprangos",
+    "selectBirthDate": "Pasirinkite gimimo datą",
+    "skateServices": "Paslaugos",
+    "weightWithUnit": "Svoris (kg)"
   },
   "register": {
     "title": "Registracija",
@@ -3655,7 +3662,12 @@
     "fillRequiredFields": "Užpildykite visus privalomus laukus.",
     "enterValidPhone": "Įveskite galiojantį telefono numerį su šalies kodu.",
     "requiredForPlayers": "Žaidėjams ir žvaigždėms privaloma nurodyti gimimo datą ir poziciją",
-    "adminPanel": "Administratoriaus skydelis"
+    "adminPanel": "Administratoriaus skydelis",
+    "login": "Prisijungti",
+    "loginAsUser": "Prisijungti kaip naudotojas",
+    "loginAsUserConfirm": "Tikrai norite prisijungti kaip {name}?",
+    "loginAsUserError": "Nepavyko prisijungti kaip naudotojas",
+    "loginAsUserSuccess": "Prisijungėte kaip {name}"
   },
   "adminGifts": {
     "sendGift": "Siųsti dovaną",
@@ -4005,7 +4017,9 @@
     "noFriendsToForward": "Nėra draugų persiųsti",
     "messageForwarded": "Žinutė persiųsta",
     "forwardedTo": "Persiųsta",
-    "forwardError": "Nepavyko persiųsti"
+    "forwardError": "Nepavyko persiųsti",
+    "user": "Naudotojas",
+    "you": "Jūs"
   },
   "createUser": {
     "title": "Vartotojo kūrimas",
@@ -4047,7 +4061,10 @@
     "error": "Klaida",
     "fillRequiredFields": "Užpildykite visus privalomus laukus.",
     "enterValidPhone": "Įveskite galiojantį telefono numerį su šalies kodu.",
-    "requiredForPlayers": "Žaidėjams ir žvaigždėms privaloma nurodyti gimimo datą ir poziciją"
+    "requiredForPlayers": "Žaidėjams ir žvaigždėms privaloma nurodyti gimimo datą ir poziciją",
+    "errorCreatingUser": "Nepavyko sukurti naudotojo",
+    "success": "Pavyko",
+    "userCreated": "Naudotojas {name} sukurtas"
   },
   "puckSpeed": {
     "title": "Ritulio greičio matavimas",
@@ -4144,7 +4161,26 @@
     "giftReceivedFromStar": "Gavote dovaną iš {starName}: {giftName}",
     "giftReceivedPush": "🎁 Gauta dovana!",
     "giftReceivedFromAdminPush": "Gavote dovaną iš administratoriaus: {giftName}",
-    "giftReceivedFromStarPush": "Gavote dovaną iš {starName}: {giftName}"
+    "giftReceivedFromStarPush": "Gavote dovaną iš {starName}: {giftName}",
+    "addGift": "Pridėti dovaną",
+    "characters": "simbolių",
+    "customGift": "Paprašyti dovanos",
+    "failedToSendRequest": "Nepavyko išsiųsti užklausos",
+    "invalidGift": "netinkama dovana",
+    "noImage": "be paveikslėlio",
+    "pleaseWriteMessage": "Parašykite žinutę prie užklausos",
+    "requestGift": "Paprašyti dovanos",
+    "requestInfo": "Išsiuntus užklausą žvaigždė gaus pranešimą ir galės ją priimti arba atmesti. Jei užklausa bus priimta, dovana atsiras jūsų Dovanų muziejuje.",
+    "requestItem": "Paprašyti: {itemType}",
+    "requestMessage": "Užklausos žinutė",
+    "requestMessageHelper": "Parašykite mandagią žinutę, kodėl norite gauti šią dovaną",
+    "requestMessagePlaceholder": "Pavyzdžiui: Sveiki! Esu didelis jūsų žaidimo gerbėjas ir norėčiau gauti autografą savo kolekcijai...",
+    "requestSent": "Užklausa išsiųsta!",
+    "requestSentMessage": "Jūsų užklausa ({itemType}) išsiųsta. Laukite atsakymo.",
+    "selectGiftType": "Pasirinkite dovanos tipą",
+    "selectGiftTypeMessage": "Kokio tipo dovaną norite sukurti?",
+    "sendRequest": "Siųsti užklausą",
+    "sending": "Siunčiama..."
   },
   "videoNotification": {
     "added": "pridėjo",
@@ -4224,5 +4260,24 @@
     "resurfacing": "Atnaujiname ledą…",
     "updating": "Diegiame atnaujinimą",
     "updated": "Šviežias ledas — programa atnaujinta"
+  },
+  "goalie": "Vartininkas",
+  "referral": {
+    "leaderboard": "Daugiausiai pakvietę",
+    "noInvites": "Kol kas niekas nepakvietė draugų",
+    "points": "taškų"
+  },
+  "socialLinks": {
+    "cannotOpenLink": "Nepavyksta atidaryti {platform} nuorodos",
+    "error": "Klaida",
+    "instagram": "Instagram",
+    "instagramPlaceholder": "@vardas arba nuoroda",
+    "openError": "Klaida atidarant nuorodą",
+    "tiktok": "TikTok",
+    "tiktokPlaceholder": "@vardas arba nuoroda",
+    "vk": "VK",
+    "vkPlaceholder": "@vardas arba nuoroda",
+    "website": "Svetainė arba nuoroda",
+    "websitePlaceholder": "example.com"
   }
 }

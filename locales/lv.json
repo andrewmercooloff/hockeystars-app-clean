@@ -3520,7 +3520,14 @@
     "allTime": "Kopā",
     "seasonsCount": "{count} sez.",
     "currentSeasonHint": "Pašreizējā sezona",
-    "fullScreen": "Pilnekrāns"
+    "fullScreen": "Pilnekrāns",
+    "heightWithUnit": "Augums (cm)",
+    "individualTraining": "Individuālie treniņi",
+    "playerNumber": "Spēlētāja numurs",
+    "playerNumberPlaceholder": "Numurs uz krekla",
+    "selectBirthDate": "Izvēlieties dzimšanas datumu",
+    "skateServices": "Pakalpojumi",
+    "weightWithUnit": "Svars (kg)"
   },
   "register": {
     "title": "Reģistrācija",
@@ -3656,7 +3663,11 @@
     "fillRequiredFields": "Lūdzu, aizpildiet visus obligātos laukus.",
     "enterValidPhone": "Lūdzu, ievadiet derīgu tālruņa numuru ar valsts kodu.",
     "requiredForPlayers": "Spēlētājiem un zvaigznēm obligāti jānorāda dzimšanas datums un pozīcija",
-    "adminPanel": "Administratora panelis"
+    "adminPanel": "Administratora panelis",
+    "login": "Pieslēgties",
+    "loginAsUserConfirm": "Vai tiešām vēlaties pieslēgties kā {name}?",
+    "loginAsUserError": "Neizdevās pieslēgties kā lietotājs",
+    "loginAsUserSuccess": "Jūs esat pieslēdzies kā {name}"
   },
   "museum": {
     "title": "Muzejs",
@@ -4000,7 +4011,9 @@
     "noFriendsToForward": "Nav draugu, kam pārsūtīt",
     "messageForwarded": "Ziņa pārsūtīta",
     "forwardedTo": "Pārsūtīts",
-    "forwardError": "Pārsūtīšana neizdevās"
+    "forwardError": "Pārsūtīšana neizdevās",
+    "user": "Lietotājs",
+    "you": "Jūs"
   },
   "createUser": {
     "title": "Lietotāja izveide",
@@ -4164,7 +4177,8 @@
     "giftReceivedFromStar": "Jūs saņēmāt dāvanu no {starName}: {giftName}",
     "giftReceivedPush": "🎁 Saņemta dāvana!",
     "giftReceivedFromAdminPush": "Jūs saņēmāt dāvanu no administratora: {giftName}",
-    "giftReceivedFromStarPush": "Jūs saņēmāt dāvanu no {starName}: {giftName}"
+    "giftReceivedFromStarPush": "Jūs saņēmāt dāvanu no {starName}: {giftName}",
+    "customGift": "Lūgt dāvanu"
   },
   "TEMP_DELETE_ME": {
     "title": "Standarti",
@@ -4421,5 +4435,11 @@
     "resurfacing": "Atjaunojam ledu…",
     "updating": "Instalējam atjauninājumu",
     "updated": "Svaigs ledus — lietotne atjaunināta"
+  },
+  "goalie": "Vārtsargs",
+  "referral": {
+    "leaderboard": "Labākie ielūdzēji",
+    "noInvites": "Neviens vēl nav uzaicinājis draugus",
+    "points": "punkti"
   }
 }

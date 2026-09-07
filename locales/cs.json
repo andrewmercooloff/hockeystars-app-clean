@@ -30,7 +30,8 @@
     "offline": "Bez připojení",
     "and": "a",
     "info": "Informace",
-    "continue": "Pokračovat"
+    "continue": "Pokračovat",
+    "retry": "Zkusit znovu"
   },
   "winger": "Křídelník",
   "center": "Střed dopředu",
@@ -58,7 +59,9 @@
   },
   "achievementNotification": {
     "added": "přidáno",
-    "oneAchievement": "nový úspěch"
+    "oneAchievement": "nový úspěch",
+    "multipleAchievements": "{count} nových úspěchů",
+    "received": "získal"
   },
   "friendshipNotification": {
     "title": "Nové přátelství",
@@ -3498,7 +3501,17 @@
     "allTime": "Celkem",
     "seasonsCount": "{count} sez.",
     "currentSeasonHint": "Aktuální sezóna",
-    "fullScreen": "Celá obrazovka"
+    "fullScreen": "Celá obrazovka",
+    "heightWithUnit": "Výška (cm)",
+    "individualTraining": "Individuální tréninky",
+    "noPermission": "Bez přístupu ke galerii",
+    "playerNumber": "Číslo hráče",
+    "playerNumberPlaceholder": "Číslo na dresu",
+    "savedToGallery": "Uloženo do galerie",
+    "selectBirthDate": "Vyberte datum narození",
+    "shareError": "Chyba při vytváření obrázku",
+    "skateServices": "Služby",
+    "weightWithUnit": "Váha (kg)"
   },
   "register": {
     "title": "Registrace",
@@ -3632,7 +3645,13 @@
     "fillRequiredFields": "Vyplňte prosím všechna povinná pole.",
     "enterValidPhone": "Zadejte prosím platné telefonní číslo s kódem země.",
     "requiredForPlayers": "U hráčů a hvězd je povinné uvést datum narození a pozici",
-    "adminPanel": "Panel správce"
+    "adminPanel": "Panel správce",
+    "login": "Přihlásit",
+    "loginAsUser": "Přihlásit jako uživatel",
+    "loginAsUserConfirm": "Opravdu se chcete přihlásit jako {name}?",
+    "loginAsUserError": "Přihlášení jako uživatel se nezdařilo",
+    "loginAsUserSuccess": "Jste přihlášeni jako {name}",
+    "sendGift": "Poslat dárek"
   },
   "museum": {
     "title": "Muzeum",
@@ -3813,7 +3832,8 @@
   "settings": {
     "title": "Nastavení",
     "language": "Jazyk",
-    "selectLanguage": "Vyberte jazyk"
+    "selectLanguage": "Vyberte jazyk",
+    "autoLanguage": "Auto"
   },
   "search": {
     "title": "Vyhledávání",
@@ -3973,7 +3993,9 @@
     "noFriendsToForward": "Žádní přátelé k přeposlání",
     "messageForwarded": "Zpráva přeposlána",
     "forwardedTo": "Přeposláno",
-    "forwardError": "Přeposlání se nezdařilo"
+    "forwardError": "Přeposlání se nezdařilo",
+    "user": "Uživatel",
+    "you": "Vy"
   },
   "createUser": {
     "title": "Vytvoření uživatele",
@@ -4120,7 +4142,24 @@
     "seconds": "sek",
     "times": "jednou",
     "sprint": "Běh na 100 metrů",
-    "_cache_clear": "2024-01-16-9"
+    "_cache_clear": "2024-01-16-9",
+    "customGift": "Požádat o dárek",
+    "deleteGiftConfirm": "Opravdu chcete tento dárek smazat?",
+    "errorGiftAlreadyExists": "Hráč {playerName} už tento dárek má.\n\nVyberte jiný dárek nebo vytvořte nový.",
+    "errorGiftNotDeleted": "Dárek nebyl smazán",
+    "errorGiftNotFound": "Dárek nenalezen",
+    "errorPermissionDenied": "Nemáte oprávnění tento dárek smazat",
+    "errorSelectOrCreate": "Vyberte dárek nebo vytvořte nový",
+    "errorSendingGift": "Dárek se nepodařilo odeslat",
+    "fromAdmin": "Admin",
+    "fromStar": "od {starName}",
+    "giftReceived": "Dárek přijat!",
+    "giftReceivedFromAdmin": "Dostali jste dárek od administrátora: {giftName}",
+    "giftReceivedFromAdminPush": "Dostali jste dárek od administrátora: {giftName}",
+    "giftReceivedFromStar": "Dostali jste dárek od {starName}: {giftName}",
+    "giftReceivedFromStarPush": "Dostali jste dárek od {starName}: {giftName}",
+    "giftReceivedPush": "🎁 Dárek přijat!",
+    "successGiftSent": "Dárek odeslán hráči {playerName}!"
   },
   "TEMP_DELETE_ME": {
     "title": "Normy",
@@ -4344,7 +4383,10 @@
     "playStoreCta": "Stáhnout z Google Play"
   },
   "videoNotification": {
-    "fullScreen": "Celá obrazovka"
+    "fullScreen": "Celá obrazovka",
+    "added": "přidal",
+    "multipleVideos": "{count} nových videí",
+    "oneVideo": "nové video"
   },
   "coverNotification": {
     "title": "Nová titulní fotka",
@@ -4354,5 +4396,21 @@
     "resurfacing": "Upravujeme led…",
     "updating": "Instalujeme aktualizaci",
     "updated": "Čerstvý led — aplikace aktualizována"
-  }
+  },
+  "avatarNotification": {
+    "changed": "změnil avatar"
+  },
+  "cm": "cm",
+  "height": "výška",
+  "kg": "kg",
+  "referral": {
+    "leaderboard": "Nejlepší zvoucí",
+    "noInvites": "Zatím nikdo nepozval přátele",
+    "points": "bodů"
+  },
+  "statsNotification": {
+    "physicalData": "fyzické údaje",
+    "updated": "aktualizoval"
+  },
+  "weight": "váha"
 }
