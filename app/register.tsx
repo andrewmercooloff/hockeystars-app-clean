@@ -2044,7 +2044,7 @@ export default function RegisterScreen() {
             onPress={handleProfileNext}
             disabled={loading}
           >
-            <Ionicons name={loading ? "hourglass" : "formData.status === 'player' ? 'arrow-forward' : 'checkmark-circle'"} size={20} color="#fff" />
+            <Ionicons name={loading ? 'hourglass' : formData.status === 'player' ? 'arrow-forward' : 'checkmark-circle'} size={20} color="#fff" />
             <Text style={styles.registerButtonText}>{loading ? t('common.loading') : formData.status === 'player' ? t('common.continue') : t('register.register')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
