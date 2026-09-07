@@ -279,14 +279,19 @@ export default function RegisterScreen() {
   useEffect(() => {
     if (!formData.country) {
       try {
-        // Только настройки устройства, без геолокации: регион локали → часовой пояс → язык
+        // Только настройки устройства, без геолокации.
+        // Часовой пояс — самый надёжный сигнал: локаль iOS отдаёт с учётом языка приложения
+        // (например en-US при русском регионе), а пояс всегда системный.
         const locale = Localization.getLocales()[0];
         const deviceRegion = (locale?.regionCode || '').toUpperCase();
-        const timeZone = Localization.getCalendars()[0]?.timeZone || '';
+        const timeZone =
+          Localization.getCalendars()[0]?.timeZone ||
+          Intl.DateTimeFormat().resolvedOptions().timeZone ||
+          '';
         const languageCode = (locale?.languageCode || '').toLowerCase();
         const detectedCountry =
-          REGION_TO_COUNTRY[deviceRegion] ||
           TIMEZONE_TO_COUNTRY[timeZone] ||
+          REGION_TO_COUNTRY[deviceRegion] ||
           LANGUAGE_TO_COUNTRY[languageCode];
         
         if (detectedCountry && COUNTRIES.includes(detectedCountry)) {
