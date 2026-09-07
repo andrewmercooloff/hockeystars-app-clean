@@ -4354,5 +4354,10 @@
   "coverNotification": {
     "title": "Nouvelle couverture",
     "changed": "a mis à jour la couverture du profil"
+  },
+  "ota": {
+    "resurfacing": "Resurfaçage de la glace…",
+    "updating": "Installation de la mise à jour",
+    "updated": "Glace neuve — application mise à jour"
   }
 }

@@ -4414,5 +4414,10 @@
     "scanQr": "Noskenējiet ar tālruni — atvērsies App Store vai Google Play",
     "appStoreCta": "Lejupielādēt App Store",
     "playStoreCta": "Lejupielādēt Google Play"
+  },
+  "ota": {
+    "resurfacing": "Atjaunojam ledu…",
+    "updating": "Instalējam atjauninājumu",
+    "updated": "Svaigs ledus — lietotne atjaunināta"
   }
 }

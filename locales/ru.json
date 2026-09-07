@@ -4313,5 +4313,10 @@
     "scanQr": "Наведите камеру телефона — откроется App Store или Google Play",
     "appStoreCta": "Скачать в App Store",
     "playStoreCta": "Скачать в Google Play"
+  },
+  "ota": {
+    "resurfacing": "Заливаем лёд…",
+    "updating": "Устанавливаем обновление",
+    "updated": "Лёд залит — приложение обновлено"
   }
 }

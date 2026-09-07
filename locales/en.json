@@ -4578,5 +4578,10 @@
     "scanQr": "Scan with your phone — App Store or Google Play opens automatically",
     "appStoreCta": "Get it on the App Store",
     "playStoreCta": "Get it on Google Play"
+  },
+  "ota": {
+    "resurfacing": "Resurfacing the ice…",
+    "updating": "Installing the update",
+    "updated": "Fresh ice — app updated"
   }
 }

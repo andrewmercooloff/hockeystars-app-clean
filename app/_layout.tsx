@@ -49,6 +49,7 @@ import { dataCache, CACHE_KEYS } from '../utils/DataCache';
 import { safeHideSplashScreen } from '../utils/splashScreenUtils';
 import { useOtaUpdates } from '../hooks/useOtaUpdates';
 import AnimatedSplash from '../components/AnimatedSplash';
+import OtaResurfaceOverlay from '../components/OtaResurfaceOverlay';
 
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
@@ -2043,6 +2044,8 @@ export default function RootLayout() {
                   );
                 })()}
           
+          <OtaResurfaceOverlay />
+
           {/* Splash screen поверх всего интерфейса */}
           {(!loaded || showSplash || !appReady) && (
             <Animated.View style={{ 

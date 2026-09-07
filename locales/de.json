@@ -4372,5 +4372,10 @@
   "coverNotification": {
     "title": "Neues Titelbild",
     "changed": "hat das Profil-Titelbild aktualisiert"
+  },
+  "ota": {
+    "resurfacing": "Eis wird aufbereitet…",
+    "updating": "Update wird installiert",
+    "updated": "Frisches Eis — App aktualisiert"
   }
 }

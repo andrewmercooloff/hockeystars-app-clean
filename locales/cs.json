@@ -4347,5 +4347,10 @@
   "coverNotification": {
     "title": "Nová titulní fotka",
     "changed": "aktualizoval titulní fotku profilu"
+  },
+  "ota": {
+    "resurfacing": "Upravujeme led…",
+    "updating": "Instalujeme aktualizaci",
+    "updated": "Čerstvý led — aplikace aktualizována"
   }
 }

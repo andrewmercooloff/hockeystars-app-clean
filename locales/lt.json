@@ -4217,5 +4217,10 @@
     "scanQr": "Nuskaitykite telefonu — atsidarys App Store arba Google Play",
     "appStoreCta": "Atsisiųsti iš App Store",
     "playStoreCta": "Atsisiųsti iš Google Play"
+  },
+  "ota": {
+    "resurfacing": "Atnaujiname ledą…",
+    "updating": "Diegiame atnaujinimą",
+    "updated": "Šviežias ledas — programa atnaujinta"
   }
 }

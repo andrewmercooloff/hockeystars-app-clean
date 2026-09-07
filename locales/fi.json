@@ -4347,5 +4347,10 @@
   "coverNotification": {
     "title": "Uusi kansikuva",
     "changed": "päivitti profiilin kansikuvan"
+  },
+  "ota": {
+    "resurfacing": "Jäätä kunnostetaan…",
+    "updating": "Päivitystä asennetaan",
+    "updated": "Uusi jää — sovellus päivitetty"
   }
 }

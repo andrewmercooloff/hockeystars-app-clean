@@ -3,6 +3,7 @@ import { AppState, type AppStateStatus, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { usePathname } from 'expo-router';
 import * as Updates from 'expo-updates';
+import { markOtaJustUpdated, presentOtaReload } from '../utils/otaReloadSignal';
 
 const CHECK_COOLDOWN_MS = 5 * 60_000;
 const FOREGROUND_POLL_MS = 30 * 60_000;
@@ -23,11 +24,24 @@ export async function applyOtaUpdateIfPending(): Promise<boolean> {
       return false;
     }
     await AsyncStorage.removeItem(PENDING_UPDATE_KEY);
-    await Updates.reloadAsync();
+    await reloadWithResurfacing(true);
     return true;
   } catch {
     return false;
   }
+}
+
+/**
+ * Reload into the downloaded bundle. When the user can see the screen we first
+ * play the "ice resurfacing" overlay so the restart doesn't feel like a crash;
+ * a flag makes the next launch show a short "updated" toast.
+ */
+async function reloadWithResurfacing(visible: boolean): Promise<void> {
+  await markOtaJustUpdated();
+  if (visible) {
+    await presentOtaReload();
+  }
+  await Updates.reloadAsync();
 }
 
 /**
@@ -57,12 +71,12 @@ export function useOtaUpdates(): void {
       pendingReloadRef.current = v === '1';
     });
 
-    const applyPendingReload = async () => {
+    const applyPendingReload = async (visible: boolean) => {
       if (!pendingReloadRef.current) return;
       pendingReloadRef.current = false;
       await AsyncStorage.removeItem(PENDING_UPDATE_KEY);
       try {
-        await Updates.reloadAsync();
+        await reloadWithResurfacing(visible);
       } catch {
         /* ignore */
       }
@@ -86,7 +100,7 @@ export function useOtaUpdates(): void {
           appStateRef.current !== 'active' || isAuthPath(pathnameRef.current);
 
         if (canReloadNow) {
-          await applyPendingReload();
+          await applyPendingReload(appStateRef.current === 'active');
         }
       } catch {
         /* OTA unavailable — ignore */
@@ -111,7 +125,7 @@ export function useOtaUpdates(): void {
         nextState === 'background' || nextState === 'inactive';
 
       if (wasActive && leavingActive && pendingReloadRef.current) {
-        void applyPendingReload();
+        void applyPendingReload(false);
       }
 
       if (

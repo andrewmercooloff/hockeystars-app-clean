@@ -4355,5 +4355,10 @@
   "coverNotification": {
     "title": "Ny omslagsbild",
     "changed": "uppdaterade profilens omslagsbild"
+  },
+  "ota": {
+    "resurfacing": "Isen spolas…",
+    "updating": "Installerar uppdateringen",
+    "updated": "Ny is — appen är uppdaterad"
   }
 }

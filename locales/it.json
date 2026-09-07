@@ -4353,5 +4353,10 @@
   "coverNotification": {
     "title": "Nuova copertina",
     "changed": "ha aggiornato la copertina del profilo"
+  },
+  "ota": {
+    "resurfacing": "Rifacimento del ghiaccio…",
+    "updating": "Installazione dell'aggiornamento",
+    "updated": "Ghiaccio nuovo — app aggiornata"
   }
 }

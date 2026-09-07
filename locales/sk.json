@@ -4349,5 +4349,10 @@
   "coverNotification": {
     "title": "Nová titulná fotka",
     "changed": "aktualizoval titulnú fotku profilu"
+  },
+  "ota": {
+    "resurfacing": "Upravujeme ľad…",
+    "updating": "Inštalujeme aktualizáciu",
+    "updated": "Čerstvý ľad — aplikácia aktualizovaná"
   }
 }

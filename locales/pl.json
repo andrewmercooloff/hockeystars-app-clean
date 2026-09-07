@@ -4199,5 +4199,10 @@
     "scanQr": "Zeskanuj telefonem — otworzy się App Store lub Google Play",
     "appStoreCta": "Pobierz z App Store",
     "playStoreCta": "Pobierz z Google Play"
+  },
+  "ota": {
+    "resurfacing": "Odnawiamy lód…",
+    "updating": "Instalujemy aktualizację",
+    "updated": "Świeży lód — aplikacja zaktualizowana"
   }
 }
