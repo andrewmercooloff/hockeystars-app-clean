@@ -3,7 +3,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as Localization from 'expo-localization';
 import { useRouter } from 'expo-router';
 import { COUNTRIES } from '../utils/constants';
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useUser } from '../contexts/UserContext';
 import ShopAddressesEditor from '../components/ShopAddressesEditor';
@@ -12,6 +12,7 @@ import {
     Dimensions,
     Image,
     Keyboard,
+    KeyboardAvoidingView,
     Linking,
     Platform,
     ScrollView,
@@ -265,60 +266,45 @@ export default function RegisterScreen() {
     scrollViewRef.current?.scrollTo({ y: 0, animated: false });
   }, [step]);
   
-  // Глобальный слушатель клавиатуры для прокрутки к полю ввода кода
+  // Любое поле в фокусе должно оказаться над клавиатурой: на каждом показе клавиатуры
+  // находим текущий фокусный TextInput и докручиваем ScrollView так, чтобы он был виден.
+  const keyboardHeightRef = useRef(0);
+  const scrollOffsetRef = useRef(0);
+  const scrollFocusedInputIntoView = useCallback(() => {
+    const focused = TextInput.State.currentlyFocusedInput?.();
+    const scroll = scrollViewRef.current;
+    if (!focused || !scroll) return;
+    const keyboardHeight = keyboardHeightRef.current;
+    if (!keyboardHeight) return;
+    (focused as any).measureInWindow?.((_x: number, y: number, _w: number, h: number) => {
+      const windowHeight = Dimensions.get('window').height;
+      const visibleBottom = windowHeight - keyboardHeight - 16;
+      const inputBottom = y + h;
+      if (inputBottom > visibleBottom) {
+        scroll.scrollTo({ y: scrollOffsetRef.current + (inputBottom - visibleBottom) + 24, animated: true });
+      }
+    });
+  }, []);
+
   useEffect(() => {
-    if (step !== 'code') return;
-    
-    const keyboardWillShowListener = Keyboard.addListener(
+    const show = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
       (e) => {
-        const keyboardHeight = e.endCoordinates?.height || 0;
-        setTimeout(() => {
-          // Прокручиваем только к тому полю, которое реально в фокусе,
-          // иначе редактирование телефона "уезжало" к полю кода
-          if (codeInputRef.current && scrollViewRef.current && codeInputRef.current.isFocused()) {
-            // Используем measureLayout для получения позиции относительно ScrollView
-            codeInputRef.current.measureLayout(
-              scrollViewRef.current as any,
-              (x, y, width, height) => {
-                const screenHeight = Dimensions.get('window').height;
-                const visibleArea = screenHeight - keyboardHeight;
-                const inputBottom = y + height;
-                const targetY = inputBottom - visibleArea + 130;
-                
-                if (targetY > 0) {
-                  scrollViewRef.current?.scrollTo({ 
-                    y: targetY, 
-                    animated: true 
-                  });
-                }
-              },
-              () => {
-                // Fallback: используем measure если measureLayout не работает
-                codeInputRef.current?.measure((x, y, width, height, pageX, pageY) => {
-                  const screenHeight = Dimensions.get('window').height;
-                  const visibleArea = screenHeight - keyboardHeight;
-                  const inputBottom = pageY + height;
-                  const scrollOffset = inputBottom - visibleArea + 130;
-                  
-                  if (scrollOffset > 0) {
-                    scrollViewRef.current?.scrollTo({ 
-                      y: scrollOffset, 
-                      animated: true 
-                    });
-                  }
-                });
-              }
-            );
-          }
-        }, Platform.OS === 'ios' ? 100 : 300);
+        keyboardHeightRef.current = e.endCoordinates?.height || 0;
+        setTimeout(scrollFocusedInputIntoView, Platform.OS === 'ios' ? 80 : 200);
       }
     );
-
+    const hide = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        keyboardHeightRef.current = 0;
+      }
+    );
     return () => {
-      keyboardWillShowListener.remove();
+      show.remove();
+      hide.remove();
     };
-  }, [step, showEmailInput]);
+  }, [scrollFocusedInputIntoView]);
   
   // Автоопределение страны по региону устройства при первой загрузке
   useEffect(() => {
@@ -1296,11 +1282,19 @@ export default function RegisterScreen() {
     <CachedBackground source={ICE_BACKGROUND} style={styles.container} resizeMode="cover" vignette={false}>
       <BlurView intensity={28} tint="dark" style={StyleSheet.absoluteFill} />
       <View style={styles.backdropTint} pointerEvents="none" />
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoider}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
       <ScrollView 
         ref={scrollViewRef}
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        onScroll={(e) => {
+          scrollOffsetRef.current = e.nativeEvent.contentOffset.y;
+        }}
+        scrollEventThrottle={32}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.formContainer}>
@@ -2174,6 +2168,7 @@ export default function RegisterScreen() {
           </View>
         </TouchableWithoutFeedback>
       </ScrollView>
+      </KeyboardAvoidingView>
       
       {/* DateTimePicker */}
       {showDatePicker && (
@@ -2302,6 +2297,9 @@ const styles = StyleSheet.create({
   backdropTint: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(8, 8, 12, 0.35)',
+  },
+  keyboardAvoider: {
+    flex: 1,
   },
   scrollContainer: {
     flexGrow: 1,
