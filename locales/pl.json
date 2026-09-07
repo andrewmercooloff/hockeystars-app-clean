@@ -4103,7 +4103,13 @@
     "deleteError": "Błąd",
     "deleteErrorMessage": "Nie udało się usunąć rekordu",
     "speedExceedsLimit": "Prędkość przekracza 120 km/h, pomiar nie jest liczony",
-    "needMicrophone": "Wymagany dostęp do mikrofonu"
+    "needMicrophone": "Wymagany dostęp do mikrofonu",
+    "micPosition": {
+      "label": "Gdzie leży telefon",
+      "shooter": "Przy strzelcu",
+      "middle": "Pośrodku",
+      "target": "Przy bandzie"
+    }
   },
   "logout": "Wyjście",
   "logoutConfirm": "Wyloguj się ze swojego profilu",

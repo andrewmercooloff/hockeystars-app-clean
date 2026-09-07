@@ -4299,7 +4299,13 @@
     "deleteError": "Fehler",
     "deleteErrorMessage": "Eintrag konnte nicht gelöscht werden",
     "speedExceedsLimit": "Geschwindigkeit überschreitet 120 km/h, Messung wird nicht gezählt",
-    "needMicrophone": "Mikrofonzugriff erforderlich"
+    "needMicrophone": "Mikrofonzugriff erforderlich",
+    "micPosition": {
+      "label": "Wo das Telefon liegt",
+      "shooter": "Beim Schützen",
+      "middle": "In der Mitte",
+      "target": "An der Bande"
+    }
   },
   "logout": "Ausfahrt",
   "logoutConfirm": "Melden Sie sich von Ihrem Profil ab",

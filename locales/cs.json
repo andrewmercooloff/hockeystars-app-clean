@@ -4274,7 +4274,13 @@
     "deleteError": "Chyba",
     "deleteErrorMessage": "Nepodařilo se smazat záznam",
     "speedExceedsLimit": "Rychlost přesahuje 120 km/h, měření se nepočítá",
-    "needMicrophone": "Vyžaduje se přístup k mikrofonu"
+    "needMicrophone": "Vyžaduje se přístup k mikrofonu",
+    "micPosition": {
+      "label": "Kde leží telefon",
+      "shooter": "U střelce",
+      "middle": "Uprostřed",
+      "target": "U mantinelu"
+    }
   },
   "logout": "Výstup",
   "logoutConfirm": "Odhlaste se ze svého profilu",

@@ -4274,7 +4274,13 @@
     "deleteError": "Virhe",
     "deleteErrorMessage": "Tietueen poistaminen epäonnistui",
     "speedExceedsLimit": "Nopeus ylittää 120 km/h, mittaus ei lasketa",
-    "needMicrophone": "Mikrofonin käyttöoikeus vaaditaan"
+    "needMicrophone": "Mikrofonin käyttöoikeus vaaditaan",
+    "micPosition": {
+      "label": "Missä puhelin on",
+      "shooter": "Laukojan vieressä",
+      "middle": "Keskellä",
+      "target": "Laidan vieressä"
+    }
   },
   "logout": "Poistu",
   "logoutConfirm": "Kirjaudu ulos profiilistasi",

@@ -55,7 +55,15 @@ interface SpeedResult {
   timeMs: number;       // время в миллисекундах
   distance: number;     // метры (фиксированное расстояние 5м)
   timestamp: number;    // время создания результата (мс)
+  uncertaintyKmh?: number; // ± погрешность из-за дискретности замера
 }
+
+/** Скорость звука в воздухе на катке (~+5°C), м/с */
+const SPEED_OF_SOUND_MS = 337;
+/** Период опроса микрофона, мс. Определяет разрешение по времени. */
+const METERING_POLL_MS = 16;
+/** Где лежит телефон относительно траектории: у игрока, посередине или у борта/сетки */
+type MicPosition = 'shooter' | 'middle' | 'target';
 
 // Типы для Web Audio API (только для веб)
 declare global {
@@ -116,6 +124,9 @@ export default function PuckSpeedSoundScreen() {
   const [currentStatus, setCurrentStatus] = useState<string>(initialStatus);
   const [isMeasuring, setIsMeasuring] = useState(false);
   const [currentAmplitude, setCurrentAmplitude] = useState(0);
+  const [micPosition, setMicPosition] = useState<MicPosition>('shooter');
+  const micPositionRef = useRef<MicPosition>('shooter');
+  useEffect(() => { micPositionRef.current = micPosition; }, [micPosition]);
   const [distanceCm, setDistanceCm] = useState<string>('500'); // Расстояние в см (по умолчанию 5м = 500см)
   const [showInstructions, setShowInstructions] = useState(false); // Показывать ли инструкцию
   const [sensitivity, setSensitivity] = useState(50); // Чувствительность (0-100, по умолчанию 50)
@@ -197,6 +208,31 @@ export default function PuckSpeedSoundScreen() {
   const MIN_TIME_BETWEEN_SOUNDS_MS = 100; // Минимальное время между звуками (100мс)
   // Расстояние конвертируем из см в метры
   const distanceMeters = parseFloat(distanceCm) / 100 || 5; // По умолчанию 5м если не указано
+
+  /**
+   * Микрофон слышит удар клюшки и удар о борт с разной задержкой: звук от дальнего
+   * события идёт дольше. Если телефон у игрока, второй звук приходит на D/c позже,
+   * и без поправки скорость занижается (на 5 м и 100 км/ч — примерно на 8%).
+   */
+  const computeSpeed = useCallback((measuredMs: number): SpeedResult | null => {
+    const acousticMs = (distanceMeters / SPEED_OF_SOUND_MS) * 1000;
+    const pos = micPositionRef.current;
+    const flightMs = pos === 'shooter' ? measuredMs - acousticMs : pos === 'target' ? measuredMs + acousticMs : measuredMs;
+    if (flightMs <= 0) return null;
+    const speedMs = distanceMeters / (flightMs / 1000);
+    const speedKmh = speedMs * 3.6;
+    // Каждая метка времени известна с точностью до периода опроса
+    const uncertaintyKmh = speedKmh * (METERING_POLL_MS / flightMs);
+    return {
+      speedMs,
+      speedKmh,
+      speedMph: speedKmh / 1.60934,
+      timeMs: flightMs,
+      distance: distanceMeters,
+      timestamp: Date.now(),
+      uncertaintyKmh,
+    };
+  }, [distanceMeters]);
   const DEBOUNCE_MS = 200; // Debounce для предотвращения ложных срабатываний (увеличено до 200мс)
   
   // Ref для отслеживания времени последней детекции звука
@@ -492,9 +528,16 @@ export default function PuckSpeedSoundScreen() {
   }, [isMeasuring]);
 
   // НОВАЯ ФУНКЦИЯ: Обработка амплитуды с отслеживанием полных циклов звука (подъем -> падение)
+  // Пороги «скачка» откалиброваны под шаг ~100 мс. При опросе каждые 16 мс сравниваем
+  // не с предыдущим сэмплом, а с минимумом за последние ~100 мс — семантика сохраняется.
+  const recentAmplitudesRef = useRef<number[]>([]);
   const processAmplitudeWithCycleDetection = useCallback((averageAmplitude: number, nowMs: number) => {
     const currentState = soundStateRef.current;
-    const amplitudeJump = averageAmplitude - previousAmplitudeRef.current;
+    const window = recentAmplitudesRef.current;
+    const windowMin = window.length ? Math.min(...window) : previousAmplitudeRef.current;
+    const amplitudeJump = averageAmplitude - Math.min(windowMin, previousAmplitudeRef.current);
+    window.push(averageAmplitude);
+    if (window.length > Math.max(2, Math.round(100 / METERING_POLL_MS))) window.shift();
     const currentVolumeThreshold = volumeThresholdRef.current;
     const currentPeakThreshold = peakDetectionThresholdRef.current;
     
@@ -739,27 +782,14 @@ export default function PuckSpeedSoundScreen() {
           
           // Рассчитываем скорость на основе времени между началами звуков
           const timeBetweenStarts = secondSoundStartTimeRef.current - firstSoundStartTimeRef.current;
-          if (timeBetweenStarts > 0) {
-            const speedMs = distanceMeters / (timeBetweenStarts / 1000);
-            const speedKmh = speedMs * 3.6;
-            console.log(`⏱️ Время между началами звуков: ${timeBetweenStarts}мс (${(timeBetweenStarts / 1000).toFixed(3)}с)`);
-            console.log(`⚡ Скорость рассчитана: ${speedKmh.toFixed(2)} км/ч`);
-            
-            // Проверка: если скорость больше 120 км/ч, не сохраняем результат
+          const computed = timeBetweenStarts > 0 ? computeSpeed(timeBetweenStarts) : null;
+          if (computed) {
+            const { speedKmh } = computed;
+            console.log(`⏱️ Между началами звуков: ${timeBetweenStarts}мс, полёт: ${computed.timeMs.toFixed(0)}мс, скорость: ${speedKmh.toFixed(1)} км/ч`);
             if (speedKmh > 120) {
               console.log(`⚠️ Скорость ${speedKmh.toFixed(2)} км/ч превышает лимит 120 км/ч, результат не сохранен`);
             } else {
-              // Сохраняем результат
-              const speedMph = speedKmh / 1.60934;
-              const result: SpeedResult = {
-                speedMs,
-                speedKmh,
-                speedMph,
-                timeMs: timeBetweenStarts,
-                timestamp: Date.now(),
-                distance: distanceMeters
-              };
-              setSpeedResults(prev => [...prev, result]);
+              setSpeedResults(prev => [...prev, computed]);
               setCurrentStatus(`${t('puckSpeed.speedCalculated') || '⚡ Скорость:'} ${speedKmh.toFixed(1)} ${t('puckSpeed.kmh') || 'км/ч'}`);
               lastSpeedCalculationTimeRef.current = Date.now();
             }
@@ -782,7 +812,7 @@ export default function PuckSpeedSoundScreen() {
         soundStateRef.current = 'idle';
         break;
     }
-  }, [distanceMeters, handleSoundDetected, t]);
+  }, [distanceMeters, computeSpeed, handleSoundDetected, t]);
 
   // Обработка обнаруженного звука (автоматически для веб, вручную для мобильного)
   const handleSoundDetected = useCallback((timestamp: number, amplitude: number) => {
@@ -823,39 +853,24 @@ export default function PuckSpeedSoundScreen() {
 
         console.log(`⏱️ Время между звуками: ${timeDiffMs.toFixed(0)}мс (${timeDiffSeconds.toFixed(3)}с)`);
 
-        if (timeDiffSeconds > 0) {
-          const speedMs = distanceMeters / timeDiffSeconds;
-          const speedKmh = speedMs * 3.6;
+        const result = timeDiffSeconds > 0 ? computeSpeed(timeDiffMs) : null;
+        if (result) {
+          const { speedKmh } = result;
           
           // Проверка: если скорость больше 120 км/ч, не сохраняем результат
           if (speedKmh > 120) {
             console.log(`⚠️ Скорость ${speedKmh.toFixed(2)} км/ч превышает лимит 120 км/ч, результат не сохранен`);
             setCurrentStatus(t('puckSpeed.speedExceedsLimit') || '⚠️ Скорость превышает 120 км/ч, измерение не засчитано');
             
-            // Очищаем таймаут
             if (soundTimeoutRef.current) {
               clearTimeout(soundTimeoutRef.current);
               soundTimeoutRef.current = null;
             }
-            
-            // Сбрасываем события для следующего измерения
             return [];
           }
-          
-          const speedMph = speedKmh / 1.60934; // Конвертация в мили/час
 
-          console.log(`⚡ Скорость рассчитана: ${speedKmh.toFixed(2)} км/ч`);
+          console.log(`⚡ Скорость рассчитана: ${speedKmh.toFixed(2)} км/ч (полёт ${result.timeMs.toFixed(0)}мс)`);
 
-          const result: SpeedResult = {
-            speedMs,
-            speedKmh,
-            speedMph,
-            timeMs: timeDiffMs,
-            distance: distanceMeters,
-            timestamp: Date.now(), // Время создания результата
-          };
-
-          // Очищаем таймаут, так как второй звук уже получен
           if (soundTimeoutRef.current) {
             clearTimeout(soundTimeoutRef.current);
             soundTimeoutRef.current = null;
@@ -864,14 +879,10 @@ export default function PuckSpeedSoundScreen() {
           setSpeedResults(prevResults => [...prevResults, result]);
           setCurrentStatus(`${t('puckSpeed.speedCalculated') || '⚡ Скорость:'} ${speedKmh.toFixed(1)} ${t('puckSpeed.kmh') || 'км/ч'}`);
 
-          // ВАЖНО: Фиксируем время расчета скорости для периода покоя
           lastSpeedCalculationTimeRef.current = Date.now();
-
-          // Сбрасываем события для следующего измерения
-          // ВАЖНО: также сбрасываем ref синхронно
           soundEventsRef.current = [];
-          previousAmplitudeRef.current = 0; // Сбрасываем предыдущую амплитуду для следующего измерения
-          lastSoundDetectionTimeRef.current = 0; // Сбрасываем время последней детекции
+          previousAmplitudeRef.current = 0;
+          lastSoundDetectionTimeRef.current = 0;
           return [];
         } else {
           console.warn('⚠️ Время между звуками <= 0, пропускаем расчет');
@@ -880,7 +891,7 @@ export default function PuckSpeedSoundScreen() {
 
       return updatedEvents;
     });
-  }, [distanceMeters]);
+  }, [distanceMeters, computeSpeed]);
 
   // Цикл анализа для веб-версии (Web Audio API)
   useEffect(() => {
@@ -1011,6 +1022,7 @@ export default function PuckSpeedSoundScreen() {
       previousAmplitudeRef.current = 0; // ВАЖНО: сбрасываем предыдущую амплитуду при старте
       soundStateRef.current = 'idle'; // Сбрасываем состояние звука
       lastAmplitudeRef.current = 0; // Сбрасываем последнюю амплитуду
+      recentAmplitudesRef.current = [];
 
     // Fallback функция для использования expo-av вместо AudioRecorderPlayer
     const startExpoAVRecording = async () => {
@@ -1047,7 +1059,7 @@ export default function PuckSpeedSoundScreen() {
             isMeteringEnabled: true, // ВАЖНО: включаем метеринг для получения данных об амплитуде
           },
           undefined, // onRecordingStatusUpdate - не используем, будем опрашивать вручную
-          100 // updateInterval - минимальный интервал
+          METERING_POLL_MS
         );
         
         expoAVRecordingRef.current = recording;
@@ -1057,10 +1069,13 @@ export default function PuckSpeedSoundScreen() {
         
         // Запускаем опрос метеринга через интервал
         let meteringCallCount = 0;
+        let pollInFlight = false;
         expoAVMeteringIntervalRef.current = setInterval(async () => {
           if (!isAnalyzingRef.current || !isMeasuringRef.current || !expoAVRecordingRef.current) {
             return;
           }
+          if (pollInFlight) return; // не накапливаем параллельные запросы к нативному модулю
+          pollInFlight = true;
           
           try {
             const status = await expoAVRecordingRef.current.getStatusAsync();
@@ -1078,7 +1093,8 @@ export default function PuckSpeedSoundScreen() {
                 averageAmplitude = Math.max(0, Math.min(255, ((normalizedDb + 80) / 80) * 255));
               }
               
-              setCurrentAmplitude(averageAmplitude / 255);
+              // UI обновляем ~15 раз/с, детекцию — на каждом опросе
+              if (meteringCallCount % 4 === 0) setCurrentAmplitude(averageAmplitude / 255);
               
               // Логируем первые вызовы для диагностики
               const enableLogs = typeof process !== 'undefined' &&
@@ -1121,7 +1137,10 @@ export default function PuckSpeedSoundScreen() {
               console.error(`❌ [${platform}] Ошибка получения статуса expo-av:`, statusError);
             }
           }
-        }, 100); // Опрашиваем каждые 100ms
+          finally {
+            pollInFlight = false;
+          }
+        }, METERING_POLL_MS);
         
         console.log(`✅ [${platform}] Цикл опроса метеринга expo-av запущен`);
       } catch (error) {
@@ -1575,6 +1594,11 @@ export default function PuckSpeedSoundScreen() {
                     }
                   </Animated.Text>
                   <Text style={styles.speedUnit}>{t('puckSpeed.kmh') || 'км/ч'}</Text>
+                  {speedResults.length > 0 && speedResults[speedResults.length - 1].uncertaintyKmh != null && (
+                    <Text style={styles.speedUncertainty}>
+                      ±{Math.max(1, Math.round(speedResults[speedResults.length - 1].uncertaintyKmh!))}
+                    </Text>
+                  )}
                 </View>
               </View>
               
@@ -1867,6 +1891,20 @@ export default function PuckSpeedSoundScreen() {
                         </View>
                       </View>
                       <Text style={styles.distanceLabel}>{t('puckSpeed.distanceLabel') || 'Расстояние от шайбы до сетки'}</Text>
+                      <View style={styles.micPositionRow}>
+                        {(['shooter', 'middle', 'target'] as MicPosition[]).map((pos) => (
+                          <TouchableOpacity
+                            key={pos}
+                            style={[styles.micPositionChip, micPosition === pos && styles.micPositionChipActive]}
+                            onPress={() => setMicPosition(pos)}
+                          >
+                            <Text style={[styles.micPositionText, micPosition === pos && styles.micPositionTextActive]}>
+                              {t(`puckSpeed.micPosition.${pos}`)}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                      <Text style={styles.micPositionLabel}>{t('puckSpeed.micPosition.label')}</Text>
                     </View>
                   </View>
                   <View style={styles.buttonShadow}>
@@ -2464,6 +2502,31 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 0,
     textAlign: 'center',
+  },
+  micPositionRow: { flexDirection: 'row', justifyContent: 'center', gap: 8, marginTop: 14 },
+  micPositionChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.14)',
+  },
+  micPositionChipActive: { backgroundColor: 'rgba(250,47,64,0.9)', borderColor: '#fa2f40' },
+  micPositionText: { color: 'rgba(255,255,255,0.75)', fontSize: 13, fontFamily: 'Gilroy-Regular' },
+  micPositionTextActive: { color: '#fff', fontFamily: 'Gilroy-Bold' },
+  micPositionLabel: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 12,
+    fontFamily: 'Gilroy-Regular',
+    marginTop: 6,
+    textAlign: 'center',
+  },
+  speedUncertainty: {
+    color: 'rgba(255,255,255,0.55)',
+    fontSize: 12,
+    fontFamily: 'Gilroy-Regular',
+    marginTop: 2,
   },
   instructionHintContainer: {
     position: 'absolute',

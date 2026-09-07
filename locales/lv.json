@@ -4318,7 +4318,13 @@
     "deleteError": "Kļūda",
     "deleteErrorMessage": "Neizdevās dzēst ierakstu",
     "speedExceedsLimit": "Ātrums pārsniedz 120 km/h, mērījums netiek skaitīts",
-    "needMicrophone": "Nepieciešama piekļuve mikrofonam"
+    "needMicrophone": "Nepieciešama piekļuve mikrofonam",
+    "micPosition": {
+      "label": "Kur atrodas telefons",
+      "shooter": "Pie metēja",
+      "middle": "Vidū",
+      "target": "Pie apmales"
+    }
   },
   "logout": "Iziet",
   "logoutConfirm": "Iziet no sava profila",

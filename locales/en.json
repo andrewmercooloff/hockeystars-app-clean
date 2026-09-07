@@ -4518,7 +4518,13 @@
     "cameraNotAvailable": "Camera not available",
     "lastSpeed": "Last Speed",
     "invalidSpeed": "Speed out of range",
-    "invalidTime": "Object in frame too long. Throw faster!"
+    "invalidTime": "Object in frame too long. Throw faster!",
+    "micPosition": {
+      "label": "Where the phone is",
+      "shooter": "By the shooter",
+      "middle": "In the middle",
+      "target": "By the boards"
+    }
   },
   "referral": {
     "leaderboard": "Top Inviters",

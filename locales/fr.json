@@ -4281,7 +4281,13 @@
     "deleteError": "Erreur",
     "deleteErrorMessage": "Impossible de supprimer l'enregistrement",
     "speedExceedsLimit": "La vitesse dépasse 120 km/h, la mesure n'est pas comptée",
-    "needMicrophone": "Accès au microphone requis"
+    "needMicrophone": "Accès au microphone requis",
+    "micPosition": {
+      "label": "Position du téléphone",
+      "shooter": "Près du tireur",
+      "middle": "Au milieu",
+      "target": "Près de la bande"
+    }
   },
   "logout": "Sortie",
   "logoutConfirm": "Déconnectez-vous de votre profil",

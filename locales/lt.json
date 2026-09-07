@@ -4079,7 +4079,13 @@
     "deleteError": "Klaida",
     "deleteErrorMessage": "Nepavyko ištrinti įrašo",
     "speedExceedsLimit": "Greitis viršija 120 km/h, matavimas neįskaitomas",
-    "needMicrophone": "Reikalingas prieiga prie mikrofono"
+    "needMicrophone": "Reikalingas prieiga prie mikrofono",
+    "micPosition": {
+      "label": "Kur padėtas telefonas",
+      "shooter": "Prie metiko",
+      "middle": "Viduryje",
+      "target": "Prie borto"
+    }
   },
   "logout": "Atsijungti",
   "logoutConfirm": "Atsijungti nuo profilio",

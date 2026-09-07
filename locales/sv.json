@@ -4282,7 +4282,13 @@
     "deleteError": "Fel",
     "deleteErrorMessage": "Kunde inte radera posten",
     "speedExceedsLimit": "Hastigheten överstiger 120 km/h, mätningen räknas inte",
-    "needMicrophone": "Mikrofonåtkomst krävs"
+    "needMicrophone": "Mikrofonåtkomst krävs",
+    "micPosition": {
+      "label": "Var telefonen ligger",
+      "shooter": "Vid skytten",
+      "middle": "I mitten",
+      "target": "Vid sargen"
+    }
   },
   "logout": "Utgång",
   "logoutConfirm": "Logga ut från din profil",
