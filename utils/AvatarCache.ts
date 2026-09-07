@@ -84,16 +84,10 @@ class AvatarCache {
     
     
     try {
-      // При forceNotify очищаем кэш изображений, чтобы гарантировать загрузку нового файла
-      if (forceNotify) {
-        try {
-          // Очищаем кэш expo-image для принудительной перезагрузки
-          await Image.clearMemoryCache();
-        } catch (cacheError) {
-          console.warn('⚠️ Не удалось очистить кэш изображений:', cacheError);
-        }
-      }
-      
+      // Глобальный Image.clearMemoryCache() здесь был ошибкой: он выбрасывал из памяти
+      // аватары ВСЕХ игроков ради одного. Новый файл под тем же именем и так
+      // подхватывается через уникальный _v=timestamp ниже.
+
       // При forceNotify используем timestamp для гарантированной перезагрузки
       // Иначе инкрементируем версию
       const currentVersion = this.avatarVersions.get(playerId) || 0;
@@ -286,10 +280,21 @@ export const useAvatarCache = (playerId: string, fallbackUrl?: string) => {
   return avatarUrl;
 };
 
-// Функция для обновления аватара во всех местах
-// ВАЖНО: forceNotify = true гарантирует уведомление всех listeners при обновлении
+// Аватар РЕАЛЬНО изменился (новый файл загружен / пришло realtime‑событие смены):
+// ломаем кеш через _v=timestamp и уведомляем всех подписчиков.
+// НЕ вызывать при обычной загрузке профиля — иначе каждый вход = новый уникальный URL,
+// который никогда не берётся с диска и на плохой сети остаётся чёрным кругом.
 export const updateAvatarGlobally = async (playerId: string, newAvatarUrl: string): Promise<void> => {
   await avatarCache.setAvatar(playerId, newAvatarUrl, true);
+};
+
+/**
+ * Просто убедиться, что URL аватара известен кешу (после getCurrentUser, refresh и т.п.).
+ * Тот же файл → ничего не делает; другой файл → обычное обновление без timestamp.
+ */
+export const ensureAvatarCached = async (playerId: string, avatarUrl: string): Promise<void> => {
+  if (!playerId || !avatarUrl) return;
+  await avatarCache.setAvatar(playerId, avatarUrl, false);
 };
 
 // Функция для предзагрузки аватара

@@ -1049,8 +1049,8 @@ export default function PlayerProfile() {
       }
 
       if (forceRefreshProfile && finalPlayerData.avatar) {
-        const { updateAvatarGlobally } = await import('../../utils/AvatarCache');
-        await updateAvatarGlobally(finalPlayerData.id, finalPlayerData.avatar);
+        const { ensureAvatarCached } = await import('../../utils/AvatarCache');
+        await ensureAvatarCached(finalPlayerData.id, finalPlayerData.avatar);
       }
       
       // Сразу устанавливаем основные данные для быстрого отображения

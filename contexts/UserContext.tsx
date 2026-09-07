@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, ReactNode, useCallback, use
 import { Player, loadCurrentUser } from '../utils/playerStorage';
 import { dataCache, CACHE_KEYS } from '../utils/DataCache';
 import { router } from 'expo-router';
-import { avatarCache, updateAvatarGlobally } from '../utils/AvatarCache';
+import { avatarCache, ensureAvatarCached } from '../utils/AvatarCache';
 
 interface UserContextType {
   currentUser: Player | null;
@@ -138,7 +138,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       if (nextUser.avatar && nextUser.id) {
         const prevAvatar = prev?.avatar || globalUserCache?.avatar;
         if (!prevAvatar || prevAvatar !== nextUser.avatar) {
-          void updateAvatarGlobally(nextUser.id, nextUser.avatar);
+          void ensureAvatarCached(nextUser.id, nextUser.avatar);
         }
       }
 

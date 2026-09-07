@@ -5,7 +5,7 @@ import {
   throwIfSupabaseNetworkError,
   ensureSupabaseRouting,
 } from './supabase';
-import { avatarCache, updateAvatarGlobally, preloadPlayerAvatars, seedPlayerAvatarUrls } from './AvatarCache';
+import { avatarCache, updateAvatarGlobally, ensureAvatarCached, preloadPlayerAvatars, seedPlayerAvatarUrls } from './AvatarCache';
 import { dataCache, CACHE_KEYS } from './DataCache';
 import { addActivityPoints } from '../services/activityService';
 import {
@@ -2523,17 +2523,8 @@ export const updatePlayer = async (playerId: string, updateData: Partial<Player>
     
     // Проверяем изменение аватара и обновляем глобальный кеш
     if (oldPlayer && oldPlayer.avatar !== updatedPlayer.avatar) {
-      // Очищаем старый аватар из всех кешей
-      if (oldPlayer.avatar) {
-        try {
-          const { Image } = await import('expo-image');
-          // Инвалидируем кеш старого аватара
-          await Image.clearMemoryCache();
-          await Image.clearDiskCache();
-        } catch (error) {
-          console.error('❌ Ошибка очистки кеша изображений:', error);
-        }
-      }
+      // Не чистим общий кеш expo-image: это выбрасывало аватары всех игроков.
+      // Новый файл подхватится через _v=timestamp в updateAvatarGlobally.
       
       // Очищаем AvatarCache для этого игрока перед обновлением
       avatarCache.clearAvatar(playerId);
@@ -2805,7 +2796,7 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
             }
           }
           if (user?.avatar && user?.id) {
-            void updateAvatarGlobally(user.id, user.avatar);
+            void ensureAvatarCached(user.id, user.avatar);
           }
           return user as Player;
         }
@@ -2864,7 +2855,7 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
         if (nextAvatar && nextAvatar !== user.avatar) {
           user.avatar = nextAvatar;
           try {
-            await updateAvatarGlobally(user.id, nextAvatar);
+            await ensureAvatarCached(user.id, nextAvatar);
           } catch {
             // ignore
           }
@@ -2893,7 +2884,7 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
       user.avatar = storedAvatar;
     }
     if (user.avatar && user.id) {
-      void updateAvatarGlobally(user.id, user.avatar);
+      void ensureAvatarCached(user.id, user.avatar);
     }
     await AsyncStorage.setItem(cacheKey, JSON.stringify({
       user,
