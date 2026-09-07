@@ -1,0 +1,180 @@
+const fs = require('fs');
+const path = require('path');
+const { prepareImage, fileUrl } = require('./images');
+
+const POSITIONS = {
+  в: 'Вратарь',
+  вр: 'Вратарь',
+  вратарь: 'Вратарь',
+  g: 'Вратарь',
+  gk: 'Вратарь',
+  з: 'Защитник',
+  защ: 'Защитник',
+  защитник: 'Защитник',
+  d: 'Защитник',
+  н: 'Нападающий',
+  нап: 'Нападающий',
+  нападающий: 'Нападающий',
+  f: 'Нападающий',
+  тренер: 'Тренер',
+  coach: 'Тренер',
+};
+
+const IMAGE_EXT = ['.jpg', '.jpeg', '.png', '.webp'];
+
+function parseCsv(text) {
+  text = text.replace(/^\uFEFF/, '');
+  const firstLine = text.split(/\r?\n/)[0] || '';
+  const delimiter = (firstLine.match(/;/g) || []).length > (firstLine.match(/,/g) || []).length ? ';' : ',';
+  const rows = [];
+  let row = [];
+  let field = '';
+  let quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (quoted) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') {
+          field += '"';
+          i++;
+        } else {
+          quoted = false;
+        }
+      } else {
+        field += ch;
+      }
+    } else if (ch === '"') {
+      quoted = true;
+    } else if (ch === delimiter) {
+      row.push(field);
+      field = '';
+    } else if (ch === '\n' || ch === '\r') {
+      if (ch === '\r' && text[i + 1] === '\n') i++;
+      row.push(field);
+      rows.push(row);
+      row = [];
+      field = '';
+    } else {
+      field += ch;
+    }
+  }
+  if (field.length || row.length) {
+    row.push(field);
+    rows.push(row);
+  }
+  const header = rows.shift().map((h) => h.trim().toLowerCase());
+  return rows
+    .filter((r) => r.some((c) => c.trim() !== ''))
+    .map((r) => Object.fromEntries(header.map((h, i) => [h, (r[i] || '').trim()])));
+}
+
+function normalizePosition(raw) {
+  const key = (raw || '').trim().toLowerCase();
+  return POSITIONS[key] || (raw || '').trim();
+}
+
+// Photo lookup order: explicit `photo` column → jersey number (7, 07) → "Фамилия", "Фамилия Имя", "Фамилия_Имя".
+function findPhoto(photosDir, row) {
+  const candidates = [];
+  if (row.photo) candidates.push(row.photo);
+  if (row.number) candidates.push(row.number, String(row.number).padStart(2, '0'));
+  if (row.surname && row.name) candidates.push(`${row.surname} ${row.name}`, `${row.surname}_${row.name}`);
+  if (row.surname) candidates.push(row.surname);
+  for (const base of candidates) {
+    const direct = path.join(photosDir, base);
+    if (fs.existsSync(direct) && fs.statSync(direct).isFile()) return direct;
+    for (const ext of IMAGE_EXT) {
+      for (const variant of [base + ext, base + ext.toUpperCase()]) {
+        const p = path.join(photosDir, variant);
+        if (fs.existsSync(p)) return p;
+      }
+    }
+  }
+  return null;
+}
+
+function placeholderPhoto(number, color) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 420">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9eef5"/><stop offset="1" stop-color="#c9d3e0"/></linearGradient></defs>
+  <rect width="300" height="420" fill="url(#g)"/>
+  <g fill="${color}" opacity="0.28">
+    <circle cx="150" cy="150" r="62"/>
+    <path d="M40 420 C40 300 90 250 150 250 C210 250 260 300 260 420 Z"/>
+  </g>
+  <text x="150" y="395" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#5b6b80" opacity="0.7">ФОТО ${number ? '№' + number : ''}</text>
+</svg>`;
+  return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
+}
+
+function findAsset(assetsDir, names) {
+  for (const name of names) {
+    const p = path.join(assetsDir, name);
+    if (fs.existsSync(p)) return p;
+  }
+  return null;
+}
+
+async function loadTeam(teamDir, cacheDir) {
+  const team = JSON.parse(fs.readFileSync(path.join(teamDir, 'team.json'), 'utf8'));
+  const photosDir = path.join(teamDir, 'photos');
+  const assetsDir = path.join(teamDir, 'assets');
+  const rows = parseCsv(fs.readFileSync(path.join(teamDir, 'players.csv'), 'utf8'));
+
+  const colors = Object.assign(
+    { primary: '#0b2a5b', secondary: '#c8102e', accent: '#f2b632', dark: '#071a3a', ice: '#eef3f9' },
+    team.colors || {}
+  );
+
+  const photoCache = path.join(cacheDir, 'photos');
+  const missingPhotos = [];
+  const cards = [];
+  for (const [index, row] of rows.entries()) {
+    const number = (row.number || row['номер'] || '').replace(/^#/, '');
+    const surname = row.surname || row['фамилия'] || '';
+    const name = row.name || row['имя'] || '';
+    const type = (row.type || row['тип'] || 'player').toLowerCase();
+    const position = normalizePosition(row.position || row['амплуа'] || (type === 'coach' ? 'Тренер' : ''));
+    const photoPath = findPhoto(photosDir, { ...row, number, surname, name });
+    if (!photoPath) missingPhotos.push(`${number ? '#' + number + ' ' : ''}${surname} ${name}`.trim());
+    cards.push({
+      index: index + 1,
+      number,
+      surname,
+      name,
+      type,
+      position,
+      height: row.height || row['рост'] || '',
+      weight: row.weight || row['вес'] || '',
+      grip: row.grip || row['хват'] || '',
+      birthdate: row.birthdate || row['дата рождения'] || row['дата_рождения'] || '',
+      photo: photoPath ? await prepareImage(photoPath, photoCache, 1600) : placeholderPhoto(number, colors.primary),
+      // low-res copy for the faded "paste here" ghosts in the album
+      photoSmall: photoPath ? await prepareImage(photoPath, photoCache, 500) : placeholderPhoto(number, colors.primary),
+      hasPhoto: Boolean(photoPath),
+    });
+  }
+
+  const asset = async (names, maxPx) => {
+    const p = findAsset(assetsDir, names);
+    return p ? prepareImage(p, path.join(cacheDir, 'assets'), maxPx) : null;
+  };
+  const assets = {
+    logo: await asset(['logo.png', 'logo.svg', 'logo.jpg'], 1500),
+    cover: await asset(['cover.jpg', 'cover.png', 'team.jpg', 'team.png'], 3200),
+    teamPhoto: await asset(['team.jpg', 'team.png', 'cover.jpg', 'cover.png'], 3200),
+    back: await asset(['back.jpg', 'back.png'], 3200),
+    qr: await asset(['qr.png', 'qr.svg', 'qr.jpg'], 1200),
+    history: await asset(['history.jpg', 'history.png'], 1600),
+  };
+
+  const brand = {
+    hockeystarsWhite: fileUrl(path.join(__dirname, 'brand', 'hockeystars-white.png')),
+  };
+
+  const c = team.cards || {};
+  const cardSize = { w: Number(c.width) || 55, h: Number(c.height) || 77, bleed: Number(c.bleed ?? 2) };
+
+  return { team, colors, cards, assets, brand, missingPhotos, teamDir, cardSize };
+}
+
+module.exports = { loadTeam };
