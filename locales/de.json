@@ -3563,8 +3563,8 @@
     "step": {
       "contact": "Schritt 1 · Kontakt",
       "code": "Schritt 2 · Bestätigung",
-      "profile": "Schritt 3 · Profil",
-      "details": "Schritt 4 · Spielerdaten"
+      "profile": "Schritt 1 · Profil",
+      "details": "Schritt 2 · Spielerdaten"
     },
     "currentTeam": "Aktuelles Team",
     "currentTeamHint": "Darüber werden Mitspieler, Cover und Teamseite verknüpft. Tippe, um ein bestehendes Team zu finden.",
@@ -3572,7 +3572,11 @@
     "teamWillBeCreated": "Dieses Team gibt es noch nicht — wir legen es für dich an.",
     "consentByContinuing": "Mit „Weiter“ akzeptierst du die",
     "haveAccount": "Schon ein Konto?",
-    "signIn": "Anmelden"
+    "signIn": "Anmelden",
+    "entryTitle": "Aufs Eis",
+    "entrySubtitle": "Gib deine Telefonnummer ein. Wir melden dich an oder erstellen ein Konto.",
+    "codeSubtitle": "Gib den Code aus der Nachricht ein",
+    "whoAreYou": "Wer bist du?"
   },
   "navigation": {
     "home": "Heim",

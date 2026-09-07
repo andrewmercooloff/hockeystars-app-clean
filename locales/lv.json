@@ -3577,8 +3577,8 @@
     "step": {
       "contact": "1. solis · Kontakti",
       "code": "2. solis · Apstiprinājums",
-      "profile": "3. solis · Profils",
-      "details": "4. solis · Spēlētāja dati"
+      "profile": "1. solis · Profils",
+      "details": "2. solis · Spēlētāja dati"
     },
     "currentTeam": "Pašreizējā komanda",
     "currentTeamHint": "Caur komandu tiek saistīti komandas biedri, vāks un komandas lapa. Sāciet rakstīt, lai atrastu esošu.",
@@ -3586,7 +3586,11 @@
     "teamWillBeCreated": "Šādas komandas vēl nav — mēs to izveidosim jums.",
     "consentByContinuing": "Nospiežot “Turpināt”, jūs piekrītat",
     "haveAccount": "Jau ir konts?",
-    "signIn": "Pieslēgties"
+    "signIn": "Pieslēgties",
+    "entryTitle": "Uz ledu",
+    "entrySubtitle": "Ievadiet tālruņa numuru. Mēs jūs pieslēgsim vai izveidosim kontu.",
+    "codeSubtitle": "Ievadiet kodu no ziņas",
+    "whoAreYou": "Kas jūs esat?"
   },
   "navigation": {
     "home": "Sākums",

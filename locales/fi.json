@@ -3555,8 +3555,8 @@
     "step": {
       "contact": "Vaihe 1 · Yhteystiedot",
       "code": "Vaihe 2 · Vahvistus",
-      "profile": "Vaihe 3 · Profiili",
-      "details": "Vaihe 4 · Pelaajan tiedot"
+      "profile": "Vaihe 1 · Profiili",
+      "details": "Vaihe 2 · Pelaajan tiedot"
     },
     "currentTeam": "Nykyinen joukkue",
     "currentTeamHint": "Joukkueen kautta löytyvät joukkuekaverit, kansikuva ja joukkuesivu. Ala kirjoittaa löytääksesi olemassa olevan.",
@@ -3564,7 +3564,11 @@
     "teamWillBeCreated": "Tätä joukkuetta ei vielä ole — luomme sen sinulle.",
     "consentByContinuing": "Painamalla ”Jatka” hyväksyt",
     "haveAccount": "Onko sinulla jo tili?",
-    "signIn": "Kirjaudu"
+    "signIn": "Kirjaudu",
+    "entryTitle": "Jäälle",
+    "entrySubtitle": "Syötä puhelinnumerosi. Kirjaamme sinut sisään tai luomme tilin.",
+    "codeSubtitle": "Syötä viestin koodi",
+    "whoAreYou": "Kuka olet?"
   },
   "navigation": {
     "home": "Kotiin",

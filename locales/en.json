@@ -3666,8 +3666,8 @@
     "step": {
       "contact": "Step 1 · Contact",
       "code": "Step 2 · Confirmation",
-      "profile": "Step 3 · Profile",
-      "details": "Step 4 · Player details"
+      "profile": "Step 1 · Profile",
+      "details": "Step 2 · Player details"
     },
     "currentTeam": "Current team",
     "currentTeamHint": "Your team page, cover and teammates are linked through it. Start typing to find an existing team.",
@@ -3675,7 +3675,11 @@
     "teamWillBeCreated": "No such team yet — it will be created for you.",
     "consentByContinuing": "By tapping “Continue” you accept the",
     "haveAccount": "Already have an account?",
-    "signIn": "Sign in"
+    "signIn": "Sign in",
+    "entryTitle": "Welcome to the ice",
+    "entrySubtitle": "Enter your phone number. We'll sign you in or create an account.",
+    "codeSubtitle": "Enter the code from the message",
+    "whoAreYou": "Who are you?"
   },
   "navigation": {
     "home": "Home",

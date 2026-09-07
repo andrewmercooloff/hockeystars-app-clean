@@ -3563,8 +3563,8 @@
     "step": {
       "contact": "Steg 1 · Kontakt",
       "code": "Steg 2 · Bekräftelse",
-      "profile": "Steg 3 · Profil",
-      "details": "Steg 4 · Spelaruppgifter"
+      "profile": "Steg 1 · Profil",
+      "details": "Steg 2 · Spelaruppgifter"
     },
     "currentTeam": "Nuvarande lag",
     "currentTeamHint": "Lagkamrater, omslag och lagsida kopplas via laget. Börja skriva för att hitta ett befintligt lag.",
@@ -3572,7 +3572,11 @@
     "teamWillBeCreated": "Laget finns inte ännu — vi skapar det åt dig.",
     "consentByContinuing": "Genom att trycka på ”Fortsätt” godkänner du",
     "haveAccount": "Har du redan ett konto?",
-    "signIn": "Logga in"
+    "signIn": "Logga in",
+    "entryTitle": "Ut på isen",
+    "entrySubtitle": "Ange ditt telefonnummer. Vi loggar in dig eller skapar ett konto.",
+    "codeSubtitle": "Ange koden från meddelandet",
+    "whoAreYou": "Vem är du?"
   },
   "navigation": {
     "home": "Hem",

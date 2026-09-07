@@ -26,7 +26,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import CustomAlert from '../components/CustomAlert';
 import CachedBackground from '../components/CachedBackground';
-import { addPlayer, saveCurrentUser, Team, createPlayer, getPlayerByPhone, setInvitedBy, createTeam, addPlayerTeam } from '../utils/playerStorage';
+import { addPlayer, saveCurrentUser, Team, createPlayer, getPlayerByPhone, getPlayerByEmail, setInvitedBy, createTeam, addPlayerTeam, Player } from '../utils/playerStorage';
 import RegisterTeamPicker, { RegisterTeamValue } from '../components/RegisterTeamPicker';
 import { requiresParentalConsent, registerChildWithParentalConsent, calculateAge } from '../utils/parentalConsentService';
 import { uploadImageToStorage } from '../utils/uploadImage';
@@ -189,11 +189,53 @@ export default function RegisterScreen() {
   type RegisterStep = 'contact' | 'code' | 'profile' | 'details';
   const [step, setStep] = useState<RegisterStep>('contact');
   const [contactVerified, setContactVerified] = useState(false);
-  const isBypassPhone = () =>
-    formData.country !== 'США' && formData.country !== 'Канада' && formData.phone.endsWith('######');
-  const totalSteps = formData.status === 'player' ? 4 : 3;
-  const stepIndex = step === 'contact' ? 1 : step === 'code' ? 2 : step === 'profile' ? 3 : 4;
+  /** Найденный по контакту аккаунт: после кода — вход, а не регистрация */
+  const existingUserRef = useRef<Player | null | undefined>(undefined);
+
+  const lookupExistingUser = async (contact: string): Promise<Player | null> => {
+    const isEmail = contact.includes('@');
+    const lookup = isEmail ? getPlayerByEmail(contact) : getPlayerByPhone(contact);
+    const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 6000));
+    try {
+      return (await Promise.race([lookup, timeout])) ?? null;
+    } catch {
+      return null;
+    }
+  };
+
+  const signInExisting = async (user: Player) => {
+    if (user.status === 'pending_verification') {
+      showAlert(
+        t('register.parentalConsentSent'),
+        t('register.parentalConsentSentMessage', { email: user.parentEmail || '' }),
+        'warning'
+      );
+      return;
+    }
+    await saveCurrentUser(user);
+    refreshUser(true);
+    showAlert(t('auth.welcomeBack'), t('auth.welcomeBackMessage', { name: user.name }), 'success', () => {
+      setAlert(prev => ({ ...prev, visible: false }));
+      setTimeout(() => router.replace({ pathname: '/', params: { refresh: String(Date.now()) } }), 100);
+    });
+  };
+
+  /** После подтверждения контакта: существующий аккаунт — вход, новый — заполнение профиля */
+  const proceedAfterContactVerified = async (contact: string) => {
+    setContactVerified(true);
+    let user = existingUserRef.current;
+    if (user === undefined) user = await lookupExistingUser(contact);
+    existingUserRef.current = user;
+    if (user) {
+      await signInExisting(user);
+    } else {
+      setStep('profile');
+    }
+  };
+  const totalSteps = formData.status === 'player' ? 2 : 1;
+  const stepIndex = step === 'details' ? 2 : 1;
   const stepLabel = t(`register.step.${step}`);
+  const isRegistrationStep = step === 'profile' || step === 'details';
   const [verificationCode, setVerificationCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
@@ -578,10 +620,9 @@ export default function RegisterScreen() {
     const hasContact = isUSOrCanada 
       ? (formData.email && formData.email.trim().length > 0)
       : (formData.phone && formData.phone.replace(/\D/g, '').length >= 8 && !DIAL_CODES.has(formData.phone.trim()));
-    const hasStatus = !!formData.status;
     const hasCountry = !!formData.country;
     
-    if (!hasContact || !hasStatus || !hasCountry) {
+    if (!hasContact || !hasCountry) {
       showAlert(t('common.error'), t('register.fillRequiredFields'), 'error');
       return;
     }
@@ -616,10 +657,22 @@ export default function RegisterScreen() {
       
       if (isBypassNumber) {
         console.log('🔓 Обнаружен bypass номер, пропускаем SMS подтверждение');
-        setContactVerified(true);
-        setStep('profile');
+        const bypassUser = await getPlayerByPhone(formData.phone.replace('######', ''), true);
+        existingUserRef.current = bypassUser ?? null;
+        if (bypassUser) {
+          await signInExisting(bypassUser);
+        } else {
+          setContactVerified(true);
+          setStep('profile');
+        }
         return;
       }
+
+      // Заранее узнаём, есть ли аккаунт: результат применим только после подтверждения кода
+      existingUserRef.current = undefined;
+      void lookupExistingUser(contactValue.replace(/\s/g, '')).then((u) => {
+        existingUserRef.current = u;
+      });
 
       // Для США/Канады отправляем email, для остальных - SMS через сервер
       if (isUSOrCanada) {
@@ -738,15 +791,19 @@ export default function RegisterScreen() {
       showAlert(t('common.error'), t('auth.errorInvalidCode'), 'error');
       return;
     }
+    const isUSOrCanada = formData.country === 'США' || formData.country === 'Канада';
+    const contactValue = (isUSOrCanada ? formData.email : formData.phone).replace(/\s/g, '');
     if (verificationCode === '291019') {
-      setContactVerified(true);
-      setStep('profile');
+      setLoading(true);
+      try {
+        await proceedAfterContactVerified(contactValue);
+      } finally {
+        setLoading(false);
+      }
       return;
     }
     setLoading(true);
     try {
-      const isUSOrCanada = formData.country === 'США' || formData.country === 'Канада';
-      const contactValue = isUSOrCanada ? formData.email : formData.phone;
       const result = contactValue.includes('@')
         ? await verifyCode(contactValue, verificationCode)
         : await verifySMSCode(contactValue, verificationCode);
@@ -755,8 +812,7 @@ export default function RegisterScreen() {
         showAlert(t('common.error'), msg, 'error');
         return;
       }
-      setContactVerified(true);
-      setStep('profile');
+      await proceedAfterContactVerified(contactValue);
     } catch (e) {
       console.error('❌ Ошибка проверки кода:', e);
       showAlert(t('common.error'), t('auth.errorVerifyingCodeMessage'), 'error');
@@ -1231,106 +1287,17 @@ export default function RegisterScreen() {
           <View style={styles.formContainer}>
 
           
-          <Text style={styles.title}>{t('register.title')}</Text>
-
-          <StepIndicator current={stepIndex} total={totalSteps} label={stepLabel} />
+          <Text style={styles.title}>{isRegistrationStep ? t('register.title') : t('register.entryTitle')}</Text>
+          {isRegistrationStep ? (
+            <StepIndicator current={stepIndex} total={totalSteps} label={stepLabel} />
+          ) : (
+            <Text style={styles.entrySubtitle}>
+              {step === 'contact' ? t('register.entrySubtitle') : t('register.codeSubtitle')}
+            </Text>
+          )}
 
           {step === 'contact' && (
           <>
-          {/* Статус */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>
-              {t('register.status')}
-              <Text style={{color: '#fa2f40'}}> *</Text>
-            </Text>
-            <View style={styles.pickerContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.pickerOption,
-                  formData.status === 'player' && styles.pickerOptionSelected
-                ]}
-                onPress={() => setFormData({...formData, status: 'player'})}
-              >
-                <Text style={[
-                  styles.pickerOptionText,
-                  formData.status === 'player' && styles.pickerOptionTextSelected
-                ]}>
-                  {t('register.player')}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.pickerOption,
-                  formData.status === 'coach' && styles.pickerOptionSelected
-                ]}
-                onPress={() => setFormData({...formData, status: 'coach'})}
-              >
-                <Text style={[
-                  styles.pickerOptionText,
-                  formData.status === 'coach' && styles.pickerOptionTextSelected
-                ]}>
-                  {t('register.coach')}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.pickerOption,
-                  formData.status === 'scout' && styles.pickerOptionSelected
-                ]}
-                onPress={() => setFormData({...formData, status: 'scout'})}
-              >
-                <Text style={[
-                  styles.pickerOptionText,
-                  formData.status === 'scout' && styles.pickerOptionTextSelected
-                ]}>
-                  {t('register.scout')}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.pickerOption,
-                  formData.status === 'star' && styles.pickerOptionSelected
-                ]}
-                onPress={() => setFormData({...formData, status: 'star'})}
-              >
-                <Text style={[
-                  styles.pickerOptionText,
-                  formData.status === 'star' && styles.pickerOptionTextSelected
-                ]}>
-                  {t('register.star')}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.pickerOption,
-                  formData.status === 'shop' && styles.pickerOptionSelected
-                ]}
-                onPress={() => setFormData({...formData, status: 'shop'})}
-              >
-                <Text style={[
-                  styles.pickerOptionText,
-                  formData.status === 'shop' && styles.pickerOptionTextSelected
-                ]}>
-                  {t('register.shop')}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.pickerOption,
-                  formData.status === 'skateSharpening' && styles.pickerOptionSelected
-                ]}
-                onPress={() => setFormData({...formData, status: 'skateSharpening'})}
-              >
-                <Text style={[
-                  styles.pickerOptionText,
-                  formData.status === 'skateSharpening' && styles.pickerOptionTextSelected
-                ]}>
-                  {t('register.skateSharpening')}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-          
           {/* Страна - ПЕРЕД телефоном/email */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>
@@ -1425,9 +1392,6 @@ export default function RegisterScreen() {
               {t('register.termsLink')}
             </Text>
           </Text>
-          <TouchableOpacity style={styles.loginLink} onPress={() => router.replace('/login')}>
-            <Text style={styles.loginLinkText}>{t('register.haveAccount')} <Text style={styles.consentLink}>{t('register.signIn')}</Text></Text>
-          </TouchableOpacity>
           </>
           )}
           </>
@@ -1616,6 +1580,100 @@ export default function RegisterScreen() {
 
           {step === 'profile' && (
           <>
+          {/* Статус */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>
+              {t('register.whoAreYou')}
+              <Text style={{color: '#fa2f40'}}> *</Text>
+            </Text>
+            <View style={styles.pickerContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.pickerOption,
+                  formData.status === 'player' && styles.pickerOptionSelected
+                ]}
+                onPress={() => setFormData({...formData, status: 'player'})}
+              >
+                <Text style={[
+                  styles.pickerOptionText,
+                  formData.status === 'player' && styles.pickerOptionTextSelected
+                ]}>
+                  {t('register.player')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.pickerOption,
+                  formData.status === 'coach' && styles.pickerOptionSelected
+                ]}
+                onPress={() => setFormData({...formData, status: 'coach'})}
+              >
+                <Text style={[
+                  styles.pickerOptionText,
+                  formData.status === 'coach' && styles.pickerOptionTextSelected
+                ]}>
+                  {t('register.coach')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.pickerOption,
+                  formData.status === 'scout' && styles.pickerOptionSelected
+                ]}
+                onPress={() => setFormData({...formData, status: 'scout'})}
+              >
+                <Text style={[
+                  styles.pickerOptionText,
+                  formData.status === 'scout' && styles.pickerOptionTextSelected
+                ]}>
+                  {t('register.scout')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.pickerOption,
+                  formData.status === 'star' && styles.pickerOptionSelected
+                ]}
+                onPress={() => setFormData({...formData, status: 'star'})}
+              >
+                <Text style={[
+                  styles.pickerOptionText,
+                  formData.status === 'star' && styles.pickerOptionTextSelected
+                ]}>
+                  {t('register.star')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.pickerOption,
+                  formData.status === 'shop' && styles.pickerOptionSelected
+                ]}
+                onPress={() => setFormData({...formData, status: 'shop'})}
+              >
+                <Text style={[
+                  styles.pickerOptionText,
+                  formData.status === 'shop' && styles.pickerOptionTextSelected
+                ]}>
+                  {t('register.shop')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.pickerOption,
+                  formData.status === 'skateSharpening' && styles.pickerOptionSelected
+                ]}
+                onPress={() => setFormData({...formData, status: 'skateSharpening'})}
+              >
+                <Text style={[
+                  styles.pickerOptionText,
+                  formData.status === 'skateSharpening' && styles.pickerOptionTextSelected
+                ]}>
+                  {t('register.skateSharpening')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          
           {/* Имя/Название */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>
@@ -1974,7 +2032,7 @@ export default function RegisterScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.registerButton, styles.backButton]}
-            onPress={() => setStep(contactVerified && !isBypassPhone() ? 'code' : 'contact')}
+            onPress={() => { setContactVerified(false); setVerificationCode(''); existingUserRef.current = undefined; setStep('contact'); }}
             disabled={loading}
           >
             <Ionicons name="arrow-back" size={20} color="#fa2f40" />
@@ -2237,8 +2295,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   consentLink: { color: '#fa2f40', textDecorationLine: 'underline' },
-  loginLink: { alignSelf: 'center', marginTop: 18, paddingVertical: 6 },
-  loginLinkText: { color: 'rgba(255,255,255,0.7)', fontSize: 14, fontFamily: 'Gilroy-Regular' },
+  entrySubtitle: { color: 'rgba(255,255,255,0.6)', fontSize: 14, fontFamily: 'Gilroy-Regular', textAlign: 'center', marginBottom: 20, lineHeight: 20 },
   formContainer: {
     backgroundColor: 'rgba(11, 11, 14, 0.82)',
     borderRadius: 24,

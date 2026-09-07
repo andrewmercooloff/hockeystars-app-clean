@@ -3555,8 +3555,8 @@
     "step": {
       "contact": "Krok 1 · Kontakt",
       "code": "Krok 2 · Potvrdenie",
-      "profile": "Krok 3 · Profil",
-      "details": "Krok 4 · Údaje hráča"
+      "profile": "Krok 1 · Profil",
+      "details": "Krok 2 · Údaje hráča"
     },
     "currentTeam": "Súčasný tím",
     "currentTeamHint": "Cez tím sa prepájajú spoluhráči, titulná fotka a stránka tímu. Začnite písať a nájdeme existujúci.",
@@ -3564,7 +3564,11 @@
     "teamWillBeCreated": "Taký tím ešte nie je — vytvoríme ho za vás.",
     "consentByContinuing": "Klepnutím na „Pokračovať“ prijímate",
     "haveAccount": "Už máte účet?",
-    "signIn": "Prihlásiť sa"
+    "signIn": "Prihlásiť sa",
+    "entryTitle": "Na ľad",
+    "entrySubtitle": "Zadajte telefónne číslo. Prihlásime vás alebo vytvoríme účet.",
+    "codeSubtitle": "Zadajte kód zo správy",
+    "whoAreYou": "Kto ste?"
   },
   "navigation": {
     "home": "Domov",

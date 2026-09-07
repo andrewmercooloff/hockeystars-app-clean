@@ -3577,8 +3577,8 @@
     "step": {
       "contact": "1 žingsnis · Kontaktai",
       "code": "2 žingsnis · Patvirtinimas",
-      "profile": "3 žingsnis · Profilis",
-      "details": "4 žingsnis · Žaidėjo duomenys"
+      "profile": "1 žingsnis · Profilis",
+      "details": "2 žingsnis · Žaidėjo duomenys"
     },
     "currentTeam": "Dabartinė komanda",
     "currentTeamHint": "Per komandą susiejami komandos draugai, viršelis ir komandos puslapis. Pradėkite rašyti, kad rastumėte esamą.",
@@ -3586,7 +3586,11 @@
     "teamWillBeCreated": "Tokios komandos dar nėra — sukursime ją jums.",
     "consentByContinuing": "Paspausdami „Tęsti“ sutinkate su",
     "haveAccount": "Jau turite paskyrą?",
-    "signIn": "Prisijungti"
+    "signIn": "Prisijungti",
+    "entryTitle": "Į ledą",
+    "entrySubtitle": "Įveskite telefono numerį. Prijungsime jus arba sukursime paskyrą.",
+    "codeSubtitle": "Įveskite kodą iš žinutės",
+    "whoAreYou": "Kas jūs?"
   },
   "navigation": {
     "home": "Pradžia",

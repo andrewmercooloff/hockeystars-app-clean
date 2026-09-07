@@ -3563,8 +3563,8 @@
     "step": {
       "contact": "Étape 1 · Contact",
       "code": "Étape 2 · Confirmation",
-      "profile": "Étape 3 · Profil",
-      "details": "Étape 4 · Données du joueur"
+      "profile": "Étape 1 · Profil",
+      "details": "Étape 2 · Données du joueur"
     },
     "currentTeam": "Équipe actuelle",
     "currentTeamHint": "Les coéquipiers, la couverture et la page d'équipe y sont liés. Tapez pour trouver une équipe existante.",
@@ -3572,7 +3572,11 @@
     "teamWillBeCreated": "Cette équipe n'existe pas encore — nous la créerons pour vous.",
     "consentByContinuing": "En appuyant sur « Continuer », vous acceptez les",
     "haveAccount": "Déjà un compte ?",
-    "signIn": "Se connecter"
+    "signIn": "Se connecter",
+    "entryTitle": "Entrée sur la glace",
+    "entrySubtitle": "Saisissez votre numéro. Nous vous connectons ou créons un compte.",
+    "codeSubtitle": "Saisissez le code reçu",
+    "whoAreYou": "Qui êtes-vous ?"
   },
   "navigation": {
     "home": "Maison",
