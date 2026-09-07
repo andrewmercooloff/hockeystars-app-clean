@@ -13,6 +13,7 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import CachedBackground from '../components/CachedBackground';
 import CustomAlert from '../components/CustomAlert';
 import WebTextInput from '../components/WebTextInput';
@@ -571,7 +572,8 @@ export default function LoginScreen() {
   const formContent = (
       <View style={styles.container}>
         <CachedBackground source={ICE_BACKGROUND} style={styles.hockeyRink} resizeMode="cover" vignette={false}>
-            <View style={[styles.innerBorder, { pointerEvents: 'none' }]} />
+            <BlurView intensity={28} tint="dark" style={StyleSheet.absoluteFill} />
+            <View style={[styles.backdropTint, { pointerEvents: 'none' }]} />
             
             <View style={styles.modalOverlay}>
               <View style={[styles.modalContainer, { width: modalWidth, maxWidth: modalWidth, minWidth: 0, margin: 12 }]}>
@@ -769,8 +771,10 @@ const styles = StyleSheet.create({
   },
   hockeyRink: {
     flex: 1,
-    borderRadius: 50,
-    overflow: 'hidden',
+  },
+  backdropTint: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(8, 8, 12, 0.35)',
   },
   innerBorder: {
     position: 'absolute',
