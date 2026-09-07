@@ -23,6 +23,7 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import CustomAlert from '../components/CustomAlert';
 import CachedBackground from '../components/CachedBackground';
 import { addPlayer, saveCurrentUser, Team, createPlayer, getPlayerByPhone, setInvitedBy, createTeam, addPlayerTeam } from '../utils/playerStorage';
@@ -57,6 +58,18 @@ const currentYear = new Date().getFullYear();
 const availableCoachYears = Array.from({ length: currentYear - 2006 }, (_, i) => currentYear - i);
 
 // Маппинг ISO кодов регионов на русские названия стран (ключи из COUNTRIES)
+// Код страны для автоподстановки в поле телефона
+const COUNTRY_DIAL_CODE: { [country: string]: string } = {
+  'Беларусь': '+375', 'Россия': '+7', 'Казахстан': '+7', 'Украина': '+380', 'Польша': '+48',
+  'Литва': '+370', 'Латвия': '+371', 'Эстония': '+372', 'Чехия': '+420', 'Словакия': '+421',
+  'Германия': '+49', 'Австрия': '+43', 'Швейцария': '+41', 'Финляндия': '+358', 'Швеция': '+46',
+  'Норвегия': '+47', 'Дания': '+45', 'Франция': '+33', 'Италия': '+39', 'Испания': '+34',
+  'Великобритания': '+44', 'Нидерланды': '+31', 'Бельгия': '+32', 'Венгрия': '+36', 'Словения': '+386',
+  'Хорватия': '+385', 'Турция': '+90', 'Израиль': '+972', 'Узбекистан': '+998', 'Китай': '+86',
+  'Япония': '+81', 'Южная Корея': '+82', 'Австралия': '+61', 'Новая Зеландия': '+64',
+};
+const DIAL_CODES = new Set(Object.values(COUNTRY_DIAL_CODE));
+
 const REGION_TO_COUNTRY: { [key: string]: string } = {
   'BY': 'Беларусь',
   'RU': 'Россия',
@@ -167,7 +180,8 @@ export default function RegisterScreen() {
   const [countrySearchText, setCountrySearchText] = useState('');
   const [skateServices, setSkateServices] = useState<string[]>([]);
   const [coachYears, setCoachYears] = useState<number[]>([]);
-  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  // Согласие с правилами — по нажатию «Продолжить» (текст под кнопкой), без отдельного чекбокса
+  const agreedToTerms = true;
   const [showEmailInput, setShowEmailInput] = useState(false); // Показывать ли поле для ввода email
   const [emailInput, setEmailInput] = useState(''); // Поле для ввода email
   
@@ -253,6 +267,17 @@ export default function RegisterScreen() {
     }
   }, []);
   
+  // Подставляем код страны в телефон, пока пользователь не начал вводить свой номер
+  useEffect(() => {
+    const code = COUNTRY_DIAL_CODE[formData.country];
+    if (!code) return;
+    setFormData(prev => {
+      const cur = prev.phone.trim();
+      if (cur === '' || DIAL_CODES.has(cur)) return { ...prev, phone: code };
+      return prev;
+    });
+  }, [formData.country]);
+
   // Фильтрация стран - ищем и по русскому названию, и по переведённому
   const filteredCountries = useMemo(() => {
     if (!countrySearchText.trim()) {
@@ -520,7 +545,7 @@ export default function RegisterScreen() {
     // Для США/Канады проверяем email, для остальных - телефон
     const hasContact = isUSOrCanada 
       ? (formData.email && formData.email.trim().length > 0)
-      : (formData.phone && formData.phone.trim().length > 0);
+      : (formData.phone && formData.phone.replace(/\D/g, '').length >= 8 && !DIAL_CODES.has(formData.phone.trim()));
     const hasStatus = !!formData.status;
     const hasCountry = !!formData.country;
     
@@ -1162,10 +1187,13 @@ export default function RegisterScreen() {
 
   return (
     <CachedBackground source={ICE_BACKGROUND} style={styles.container} resizeMode="cover" vignette={false}>
+      <BlurView intensity={28} tint="dark" style={StyleSheet.absoluteFill} />
+      <View style={styles.backdropTint} pointerEvents="none" />
       <ScrollView 
         ref={scrollViewRef}
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.formContainer}>
@@ -1343,45 +1371,32 @@ export default function RegisterScreen() {
             </View>
           )}
 
-          {/* Чекбокс принятия условий - показываем только после выбора страны */}
           {formData.country && (
-            <View style={styles.termsContainer}>
-              <TouchableOpacity 
-                style={styles.checkbox}
-                onPress={() => setAgreedToTerms(!agreedToTerms)}
-                activeOpacity={0.7}
-              >
-                <View style={[styles.checkboxSquare, agreedToTerms && styles.checkboxSquareChecked]}>
-                  {agreedToTerms && <Ionicons name="checkmark" size={16} color="#fff" />}
-                </View>
-              </TouchableOpacity>
-              <Text style={styles.termsText}>
-                {t('register.agreeToTerms')}
-              </Text>
-            </View>
-          )}
-          {formData.country && (
-            <TouchableOpacity 
-              style={styles.termsLink}
+          <>
+          <TouchableOpacity
+            style={[styles.registerButton, loading && styles.registerButtonDisabled]}
+            onPress={handleSendCode}
+            disabled={loading}
+          >
+            <Ionicons name={loading ? "hourglass" : "arrow-forward"} size={20} color="#fff" />
+            <Text style={styles.registerButtonText}>{loading ? t('common.loading') : t('common.continue')}</Text>
+          </TouchableOpacity>
+          <Text style={styles.consentText}>
+            {t('register.consentByContinuing')}{' '}
+            <Text
+              style={styles.consentLink}
               onPress={() => {
                 const langParam = language === 'ru' ? '?lang=ru' : '?lang=en';
                 Linking.openURL(`https://hockey-stars.com/rules.html${langParam}`);
               }}
             >
-              <Ionicons name="document-text-outline" size={16} color="#fa2f40" />
-              <Text style={styles.termsLinkText}>{t('register.termsLink')}</Text>
-            </TouchableOpacity>
-          )}
-          
-          {formData.country && (
-          <TouchableOpacity
-            style={[styles.registerButton, (loading || !agreedToTerms) && styles.registerButtonDisabled]}
-            onPress={handleSendCode}
-            disabled={(loading || !agreedToTerms)}
-          >
-            <Ionicons name={loading ? "hourglass" : "arrow-forward"} size={20} color="#fff" />
-            <Text style={styles.registerButtonText}>{loading ? t('common.loading') : t('common.continue')}</Text>
+              {t('register.termsLink')}
+            </Text>
+          </Text>
+          <TouchableOpacity style={styles.loginLink} onPress={() => router.replace('/login')}>
+            <Text style={styles.loginLinkText}>{t('register.haveAccount')} <Text style={styles.consentLink}>{t('register.signIn')}</Text></Text>
           </TouchableOpacity>
+          </>
           )}
           </>
           )}
@@ -2174,7 +2189,7 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  stepIndicator: { alignItems: 'center', marginBottom: 22, gap: 10 },
+  stepIndicator: { alignItems: 'center', marginBottom: 18, gap: 8 },
   stepDots: { flexDirection: 'row', gap: 6 },
   stepDot: { width: 28, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.14)' },
   stepDotDone: { backgroundColor: 'rgba(250,47,64,0.55)' },
@@ -2187,15 +2202,32 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#050008',
   },
+  backdropTint: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(8, 8, 12, 0.35)',
+  },
   scrollContainer: {
     flexGrow: 1,
-    padding: 20,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 24,
   },
+  consentText: {
+    color: 'rgba(255,255,255,0.55)',
+    fontSize: 12,
+    fontFamily: 'Gilroy-Regular',
+    textAlign: 'center',
+    lineHeight: 17,
+    marginTop: 12,
+  },
+  consentLink: { color: '#fa2f40', textDecorationLine: 'underline' },
+  loginLink: { alignSelf: 'center', marginTop: 18, paddingVertical: 6 },
+  loginLinkText: { color: 'rgba(255,255,255,0.7)', fontSize: 14, fontFamily: 'Gilroy-Regular' },
   formContainer: {
-    backgroundColor: 'rgba(11, 11, 14, 0.85)',
-    borderRadius: 20,
-    padding: 25,
-    marginTop: 20,
+    backgroundColor: 'rgba(11, 11, 14, 0.82)',
+    borderRadius: 24,
+    padding: 22,
+    marginTop: 0,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)', // Тончайший красный контур
     maxWidth: Platform.OS === 'web' ? 500 : 'auto',
@@ -2208,11 +2240,11 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: 14,
   },
   inputContainer: {
     marginBottom: 20,

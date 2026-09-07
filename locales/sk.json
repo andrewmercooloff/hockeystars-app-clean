@@ -3561,7 +3561,10 @@
     "currentTeam": "Súčasný tím",
     "currentTeamHint": "Cez tím sa prepájajú spoluhráči, titulná fotka a stránka tímu. Začnite písať a nájdeme existujúci.",
     "teamPlaceholder": "napr. Dinamo Minsk 2012",
-    "teamWillBeCreated": "Taký tím ešte nie je — vytvoríme ho za vás."
+    "teamWillBeCreated": "Taký tím ešte nie je — vytvoríme ho za vás.",
+    "consentByContinuing": "Klepnutím na „Pokračovať“ prijímate",
+    "haveAccount": "Už máte účet?",
+    "signIn": "Prihlásiť sa"
   },
   "navigation": {
     "home": "Domov",

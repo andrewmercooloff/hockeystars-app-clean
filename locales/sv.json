@@ -3569,7 +3569,10 @@
     "currentTeam": "Nuvarande lag",
     "currentTeamHint": "Lagkamrater, omslag och lagsida kopplas via laget. Börja skriva för att hitta ett befintligt lag.",
     "teamPlaceholder": "t.ex. Dinamo Minsk 2012",
-    "teamWillBeCreated": "Laget finns inte ännu — vi skapar det åt dig."
+    "teamWillBeCreated": "Laget finns inte ännu — vi skapar det åt dig.",
+    "consentByContinuing": "Genom att trycka på ”Fortsätt” godkänner du",
+    "haveAccount": "Har du redan ett konto?",
+    "signIn": "Logga in"
   },
   "navigation": {
     "home": "Hem",

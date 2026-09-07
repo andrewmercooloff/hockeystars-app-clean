@@ -3363,7 +3363,10 @@
     "currentTeam": "Obecna drużyna",
     "currentTeamHint": "Przez drużynę łączą się koledzy z zespołu, zdjęcie w tle i strona drużyny. Zacznij pisać, aby znaleźć istniejącą.",
     "teamPlaceholder": "np. Dinamo Mińsk 2012",
-    "teamWillBeCreated": "Takiej drużyny jeszcze nie ma — utworzymy ją dla Ciebie."
+    "teamWillBeCreated": "Takiej drużyny jeszcze nie ma — utworzymy ją dla Ciebie.",
+    "consentByContinuing": "Naciskając „Dalej”, akceptujesz",
+    "haveAccount": "Masz już konto?",
+    "signIn": "Zaloguj się"
   },
   "navigation": {
     "home": "Dom",

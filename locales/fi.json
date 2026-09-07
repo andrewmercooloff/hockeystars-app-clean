@@ -3561,7 +3561,10 @@
     "currentTeam": "Nykyinen joukkue",
     "currentTeamHint": "Joukkueen kautta löytyvät joukkuekaverit, kansikuva ja joukkuesivu. Ala kirjoittaa löytääksesi olemassa olevan.",
     "teamPlaceholder": "esim. Dinamo Minsk 2012",
-    "teamWillBeCreated": "Tätä joukkuetta ei vielä ole — luomme sen sinulle."
+    "teamWillBeCreated": "Tätä joukkuetta ei vielä ole — luomme sen sinulle.",
+    "consentByContinuing": "Painamalla ”Jatka” hyväksyt",
+    "haveAccount": "Onko sinulla jo tili?",
+    "signIn": "Kirjaudu"
   },
   "navigation": {
     "home": "Kotiin",

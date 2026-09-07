@@ -335,6 +335,8 @@ export default function RootLayout() {
   const pathname = usePathname();
   const isDesktopLayout = useIsDesktopLayout();
   const isMobileWeb = Platform.OS === 'web' && !isDesktopLayout;
+  // Регистрация показывается как обычный экран с хедером и таббаром, логин — без них
+  const isLoginScreen = pathname === '/login' || !!pathname?.startsWith('/login');
   const isAuthScreen =
     pathname === '/login' ||
     pathname === '/register' ||
@@ -1744,7 +1746,7 @@ export default function RootLayout() {
                 />
                 
                 {/* Мобильный хедер; на desktop навигация в левой колонке */}
-                {!isDesktopLayout && !isAuthScreen ? <LogoHeader /> : null}
+                {!isDesktopLayout && !isLoginScreen ? <LogoHeader /> : null}
                 {Platform.OS === 'web' ? <WebYandexMetrika /> : null}
 
                 {(() => {
@@ -1752,7 +1754,7 @@ export default function RootLayout() {
                 <Tabs
             screenOptions={{
               headerShown: false, // Убираем встроенные хедеры
-              tabBarStyle: isDesktopLayout || isAuthScreen
+              tabBarStyle: isDesktopLayout || isLoginScreen
                 ? { display: 'none', height: 0, overflow: 'hidden' }
                 : { 
                 backgroundColor: 'rgba(11, 11, 14, 0.96)', 

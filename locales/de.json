@@ -3569,7 +3569,10 @@
     "currentTeam": "Aktuelles Team",
     "currentTeamHint": "Darüber werden Mitspieler, Cover und Teamseite verknüpft. Tippe, um ein bestehendes Team zu finden.",
     "teamPlaceholder": "z. B. Dinamo Minsk 2012",
-    "teamWillBeCreated": "Dieses Team gibt es noch nicht — wir legen es für dich an."
+    "teamWillBeCreated": "Dieses Team gibt es noch nicht — wir legen es für dich an.",
+    "consentByContinuing": "Mit „Weiter“ akzeptierst du die",
+    "haveAccount": "Schon ein Konto?",
+    "signIn": "Anmelden"
   },
   "navigation": {
     "home": "Heim",

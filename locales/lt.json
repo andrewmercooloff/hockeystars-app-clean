@@ -3583,7 +3583,10 @@
     "currentTeam": "Dabartinė komanda",
     "currentTeamHint": "Per komandą susiejami komandos draugai, viršelis ir komandos puslapis. Pradėkite rašyti, kad rastumėte esamą.",
     "teamPlaceholder": "pvz., Dinamo Minsk 2012",
-    "teamWillBeCreated": "Tokios komandos dar nėra — sukursime ją jums."
+    "teamWillBeCreated": "Tokios komandos dar nėra — sukursime ją jums.",
+    "consentByContinuing": "Paspausdami „Tęsti“ sutinkate su",
+    "haveAccount": "Jau turite paskyrą?",
+    "signIn": "Prisijungti"
   },
   "navigation": {
     "home": "Pradžia",
