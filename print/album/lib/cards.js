@@ -66,7 +66,7 @@ function cardCss(size) {
 .card.back.person table{top:${(B + 61 * s).toFixed(2)}mm;}
 .card.back.person td{padding:${mm(0.35)} 0;}
 .card.back.person .head{top:${(B + 3 * s).toFixed(2)}mm;left:${pad}mm;width:auto;flex-direction:column;align-items:center;gap:${mm(0.6)};}
-.card.back.person .head img{width:${mm(13)};height:${mm(13)};}
+.card.back.person .head img{width:${mm(17)};height:${mm(17)};}
 .card.back.person .head .t{display:none;}
 .card.back.person .head .yr{font-family:'Oswald';font-weight:600;font-size:${mm(2.4)};letter-spacing:.06em;color:var(--dark);}
 .card.back.team .photo img,.card.back.club .photo img{width:100%;height:100%;left:0;top:0;object-fit:cover;object-position:center center;}
