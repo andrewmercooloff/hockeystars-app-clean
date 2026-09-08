@@ -56,7 +56,9 @@ function cardCss(size) {
   linear-gradient(180deg,var(--primary),var(--dark));}
 /* Close-up of the face across the top of the back, pushed to the right so the header text sits on a dark fade. */
 .card.back .photo{position:absolute;left:0;right:0;top:0;height:${(B + 43 * s).toFixed(2)}mm;overflow:hidden;}
-.card.back .photo img{position:absolute;width:92%;height:auto;left:${(B + 14 * s).toFixed(2)}mm;top:${(B + 1 * s).toFixed(2)}mm;opacity:.92;}
+.card.back .photo img{position:absolute;width:92%;height:auto;left:${(B + 14 * s).toFixed(2)}mm;top:${(B + 1 * s).toFixed(2)}mm;opacity:.92;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 30%,#000 88%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0%,#000 30%,#000 88%,transparent 100%);}
+.card.back.team .photo img,.card.back.club .photo img{-webkit-mask-image:none;mask-image:none;}
 .card.back.coach .photo img{width:80%;left:${(B + 16 * s).toFixed(2)}mm;top:${(B + 2 * s).toFixed(2)}mm;}
 .card.back.team .photo img,.card.back.club .photo img{width:100%;height:100%;left:0;top:0;object-fit:cover;object-position:center center;}
 .card.back .photo::after{content:"";position:absolute;inset:0;background:
