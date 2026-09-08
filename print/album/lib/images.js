@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { pathToFileURL } = require('url');
+const { pathToFileURL, fileURLToPath } = require('url');
 
 let sharp = null;
 try {
@@ -61,7 +61,14 @@ function pdfToPng(srcPath, cacheDir, maxPx) {
       'doc = pymupdf.open(sys.argv[1]); page = doc[0]',
       'rect = page.rect; scale = float(sys.argv[3]) / max(rect.width, rect.height)',
       'pix = page.get_pixmap(matrix=pymupdf.Matrix(scale, scale), alpha=True)',
-      'pix.save(sys.argv[2])',
+      // Logos usually sit on an oversized transparent page: trim to the artwork plus a small margin.
+      'from PIL import Image',
+      'im = Image.frombytes("RGBA", (pix.width, pix.height), pix.samples)',
+      'box = im.getchannel("A").point(lambda v: 255 if v > 8 else 0).getbbox()',
+      'if box:',
+      '    pad = max(2, round(max(box[2] - box[0], box[3] - box[1]) * 0.02))',
+      '    im = im.crop((max(0, box[0] - pad), max(0, box[1] - pad), min(im.width, box[2] + pad), min(im.height, box[3] + pad)))',
+      'im.save(sys.argv[2], "PNG")',
     ].join('\n');
     try {
       execFileSync('python3', ['-c', script, srcPath, outPath, String(maxPx)], { stdio: 'pipe' });
@@ -101,4 +108,17 @@ async function prepareImage(srcPath, cacheDir, maxPx = 1600) {
   return fileUrl(outPath);
 }
 
-module.exports = { prepareImage, fileUrl, dataUri };
+// width / height of a prepared image (file:// URL or path); null when unknown.
+async function imageAspect(urlOrPath) {
+  if (!sharp || !urlOrPath) return null;
+  try {
+    const p = urlOrPath.startsWith('file://') ? fileURLToPath(urlOrPath) : urlOrPath;
+    const m = await sharp(p).metadata();
+    const swap = m.orientation >= 5;
+    return swap ? m.height / m.width : m.width / m.height;
+  } catch {
+    return null;
+  }
+}
+
+module.exports = { prepareImage, fileUrl, dataUri, imageAspect };

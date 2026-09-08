@@ -123,20 +123,26 @@ function cardBack(card, data) {
   const t = data.team;
   const total = data.cards.length;
   const rows = [];
-  if (card.position) rows.push(['Амплуа', card.position]);
+  const person = ['player', 'coach', 'legend'].includes(card.type);
+  if (!person) rows.push(['Серия', card.ribbon || 'Клуб']);
+  if (card.position) rows.push([card.type === 'coach' ? 'Должность' : person ? 'Амплуа' : 'Описание', card.position]);
   if (card.role) rows.push(['Роль', card.role === 'К' ? 'Капитан' : 'Ассистент капитана']);
   if (card.height) rows.push(['Рост', card.height + (/\d$/.test(card.height) ? ' см' : '')]);
   if (card.weight) rows.push(['Вес', card.weight + (/\d$/.test(card.weight) ? ' кг' : '')]);
   if (card.grip) rows.push(['Хват', card.grip]);
   if (card.birthdate) rows.push(['Дата рождения', card.birthdate]);
   const logo = data.assets.logo ? `<img src="${data.assets.logo}">` : '';
+  // Long names (patronymics) must stay on two lines above the stats table: shrink from 5.4 mm past ~16 characters.
+  const longest = Math.max((card.number ? card.number.length + 2 : 0) + card.surname.length, card.name.length);
+  const scale = data.cardSize.w / 63.5;
+  const nameSize = `${(5.4 * scale * Math.min(1, 16 / Math.max(longest, 1))).toFixed(2)}mm`;
   return `<div class="card back">
     <div class="bg"></div>
     <div class="band top"></div><div class="band top2"></div>
     <div class="head">${logo}<div class="t">${esc(t.name)}<small>${esc(t.city || '')}${t.city ? ' · ' : ''}Сезон ${esc(t.season)}</small></div></div>
     ${card.number ? `<div class="bignum">${esc(card.number)}</div>` : ''}
     <div class="who">
-      <div class="nm">${card.number ? `<span>#${esc(card.number)}${card.role ? `<sup>${esc(card.role)}</sup>` : ''}</span>` : ''}${esc(card.surname).toUpperCase()}<br>${esc(card.name).toUpperCase()}</div>
+      <div class="nm" style="font-size:${nameSize}">${card.number ? `<span>#${esc(card.number)}${card.role ? `<sup>${esc(card.role)}</sup>` : ''}</span>` : ''}${esc(card.surname).toUpperCase()}<br>${esc(card.name).toUpperCase()}</div>
     </div>
     <table>${rows.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('')}</table>
     <div class="foot"><img src="${data.brand.hockeystarsWhite}"><div class="idx"><b>${card.index}</b> / ${total}</div></div>

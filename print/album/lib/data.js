@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { prepareImage, fileUrl } = require('./images');
+const { prepareImage, fileUrl, imageAspect } = require('./images');
 
 const POSITIONS = {
   в: 'Вратарь',
@@ -121,6 +121,26 @@ function findAsset(assetsDir, baseNames) {
   return null;
 }
 
+function makeQr(url, cacheDir) {
+  const key = require('crypto').createHash('md5').update(url).digest('hex').slice(0, 12);
+  const out = path.join(cacheDir, `qr-${key}.png`);
+  if (!fs.existsSync(out)) {
+    fs.mkdirSync(cacheDir, { recursive: true });
+    const script = [
+      'import sys, qrcode',
+      'qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_M, box_size=24, border=2)',
+      'qr.add_data(sys.argv[1]); qr.make(fit=True)',
+      'qr.make_image(fill_color="black", back_color="white").save(sys.argv[2])',
+    ].join('\n');
+    try {
+      require('child_process').execFileSync('python3', ['-c', script, url, out], { stdio: 'pipe' });
+    } catch (e) {
+      throw new Error(`Не удалось сгенерировать QR (pip install qrcode pillow): ${e.stderr?.toString() || e.message}`);
+    }
+  }
+  return out;
+}
+
 // Optional folder with lifestyle photos for the "Жизнь команды" collage page.
 function listGallery(assetsDir) {
   const dir = path.join(assetsDir, 'gallery');
@@ -188,6 +208,9 @@ async function loadTeam(teamDir, cacheDir) {
     history: await asset(['history'], 1600),
     gallery: [],
   };
+  assets.coverAspect = await imageAspect(assets.cover);
+  // No qr.png but a link in team.json → generate the QR code (python `qrcode` package).
+  if (!assets.qr && team.qrUrl) assets.qr = fileUrl(makeQr(team.qrUrl, path.join(cacheDir, 'assets')));
   for (const p of listGallery(assetsDir)) assets.gallery.push(await prepareImage(p, path.join(cacheDir, 'gallery'), 1800));
 
   const brand = {
