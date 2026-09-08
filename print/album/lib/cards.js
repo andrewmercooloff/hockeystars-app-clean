@@ -51,21 +51,28 @@ function cardCss(size) {
   repeating-linear-gradient(115deg, rgba(255,255,255,.05) 0 1.2mm, transparent 1.2mm 8mm),
   radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.18), transparent 60%),
   linear-gradient(180deg,var(--primary),var(--dark));}
+/* Close-up of the face across the top of the back, pushed to the right so the header text sits on a dark fade. */
+.card.back .photo{position:absolute;left:0;right:0;top:0;height:${(B + 42 * s).toFixed(2)}mm;overflow:hidden;}
+.card.back .photo img{position:absolute;width:150%;height:auto;left:${(B + 2 * s).toFixed(2)}mm;top:${(B - 9 * s).toFixed(2)}mm;}
+.card.back.team .photo img,.card.back.club .photo img{width:100%;height:100%;left:0;top:0;object-fit:cover;object-position:center center;}
+.card.back .photo::after{content:"";position:absolute;inset:0;background:
+  linear-gradient(90deg,color-mix(in srgb,var(--primary) 96%,transparent) 0%,color-mix(in srgb,var(--primary) 88%,transparent) 30%,color-mix(in srgb,var(--primary) 35%,transparent) 55%,rgba(0,0,0,.05) 80%),
+  linear-gradient(180deg,rgba(0,0,0,0) 72%,var(--primary) 100%);}
 .card.back .band{position:absolute;left:-10mm;right:-10mm;height:${mm(7)};transform:rotate(-8deg);}
-.card.back .band.top{top:${(B + 15 * s).toFixed(2)}mm;background:var(--secondary);opacity:.95;}
-.card.back .band.top2{top:${(B + 21 * s).toFixed(2)}mm;height:${mm(1.5)};background:#fff;opacity:.5;}
+.card.back .band.top{top:${(B + 41.5 * s).toFixed(2)}mm;height:${mm(4)};background:var(--secondary);opacity:.95;}
+.card.back .band.top2{display:none;top:${(B + 29.5 * s).toFixed(2)}mm;height:${mm(1.5)};background:#fff;opacity:.5;}
 .card.back .head{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 3.5 * s).toFixed(2)}mm;display:flex;align-items:center;gap:${mm(2.5)};}
 .card.back .head img{width:${mm(10)};height:${mm(10)};object-fit:contain;}
 .card.back .head .t{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:${mm(4)};line-height:1.05;}
 .card.back .head .t small{display:block;font-family:'Roboto';font-weight:400;text-transform:none;font-size:${mm(2.4)};opacity:.8;margin-top:.6mm;}
-.card.back .bignum{position:absolute;right:${(B + 3 * s).toFixed(2)}mm;top:${(B + 24 * s).toFixed(2)}mm;font-family:'Oswald';font-weight:700;font-size:${mm(30)};line-height:1;color:rgba(255,255,255,.08);}
-.card.back .who{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 27 * s).toFixed(2)}mm;}
-.card.back .who .nm{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:${mm(5.4)};line-height:1.05;}
+.card.back .bignum{position:absolute;right:${(B + 3 * s).toFixed(2)}mm;top:${(B + 44 * s).toFixed(2)}mm;font-family:'Oswald';font-weight:700;font-size:${mm(30)};line-height:1;color:rgba(255,255,255,.08);}
+.card.back .who{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 29 * s).toFixed(2)}mm;}
+.card.back .who .nm{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:${mm(5.4)};line-height:1.05;text-shadow:0 0 1.5mm rgba(0,0,0,.9),0 .4mm 1mm rgba(0,0,0,.7);}
 .card.back .who .nm span{color:var(--accent);margin-right:1.5mm;}
 .card.back .who .nm sup{font-size:50%;vertical-align:top;position:relative;top:${mm(0.6)};}
 .card.back .who .pos{font-family:'Roboto';font-weight:500;font-size:${mm(2.7)};letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.85);margin-top:1.2mm;}
-.card.back table{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 41 * s).toFixed(2)}mm;width:calc(100% - ${pad * 2}mm);border-collapse:collapse;font-size:${mm(2.9)};}
-.card.back td{padding:${mm(1.1)} 0;border-bottom:.2mm solid rgba(255,255,255,.18);line-height:1.15;}
+.card.back table{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 47.5 * s).toFixed(2)}mm;width:calc(100% - ${pad * 2}mm);border-collapse:collapse;font-size:${mm(2.9)};}
+.card.back td{padding:${mm(0.7)} 0;border-bottom:.2mm solid rgba(255,255,255,.18);line-height:1.15;}
 .card.back td:first-child{font-family:'Roboto';font-weight:400;text-transform:uppercase;letter-spacing:.1em;font-size:${mm(2.4)};color:rgba(255,255,255,.7);}
 .card.back td:last-child{text-align:right;font-family:'Oswald';font-weight:600;font-size:${mm(3.6)};}
 .card.back .foot{position:absolute;left:${pad}mm;right:${pad}mm;bottom:${(B + 3.5 * s).toFixed(2)}mm;display:flex;align-items:center;justify-content:space-between;}
@@ -136,8 +143,9 @@ function cardBack(card, data) {
   const longest = Math.max((card.number ? card.number.length + 2 : 0) + card.surname.length, card.name.length);
   const scale = data.cardSize.w / 63.5;
   const nameSize = `${(5.4 * scale * Math.min(1, 16 / Math.max(longest, 1))).toFixed(2)}mm`;
-  return `<div class="card back">
+  return `<div class="card back ${card.type}">
     <div class="bg"></div>
+    ${card.hasPhoto ? `<div class="photo"><img src="${card.photo}"></div>` : ''}
     <div class="band top"></div><div class="band top2"></div>
     <div class="head">${logo}<div class="t">${esc(t.name)}<small>${esc(t.city || '')}${t.city ? ' · ' : ''}Сезон ${esc(t.season)}</small></div></div>
     ${card.number ? `<div class="bignum">${esc(card.number)}</div>` : ''}

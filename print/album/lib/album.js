@@ -67,7 +67,7 @@ ${cardCss(size)}
 .cover .count span{font-family:'Oswald';font-weight:600;text-transform:uppercase;font-size:4.6mm;letter-spacing:.08em;margin-top:1mm;}
 .cover .year{position:absolute;right:${bleed + 8}mm;bottom:${bleed + 14}mm;font-family:'Oswald';font-weight:700;font-size:52mm;line-height:.85;color:#fff;
   text-shadow:0 1.5mm 3mm rgba(0,0,0,.45);letter-spacing:-.01em;}
-.cover .brand{position:absolute;right:${bleed + 10}mm;bottom:${bleed + 6}mm;display:flex;align-items:center;gap:2mm;}
+.cover .brand{position:absolute;left:${bleed + 12}mm;bottom:${bleed + 6}mm;display:flex;align-items:center;gap:2mm;}
 .cover .brand img{height:7mm;filter:drop-shadow(0 .5mm 1mm rgba(0,0,0,.5));}
 .cover .teamname{position:absolute;left:${bleed + 8}mm;top:${bleed + 66}mm;font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:11mm;line-height:1;color:#fff;
   text-shadow:0 1mm 2.5mm rgba(0,0,0,.55);}
