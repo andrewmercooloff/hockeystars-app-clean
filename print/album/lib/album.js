@@ -92,8 +92,8 @@ ${cardCss(size)}
 .cover .photo.panel img{object-position:center center;}
 .cover .photo.panel .grad{background:linear-gradient(180deg,rgba(7,26,58,.25) 0%,rgba(7,26,58,0) 18%,rgba(7,26,58,0) 62%,color-mix(in srgb,var(--dark) 85%,transparent) 92%,var(--dark) 100%);}
 .cover .below{position:absolute;left:0;right:0;bottom:0;background:var(--dark);overflow:hidden;}
-.cover .below img{position:absolute;left:0;right:0;bottom:0;width:100%;height:130%;object-fit:cover;object-position:center 40%;opacity:.28;filter:grayscale(.6) contrast(1.1);}
-.cover .below::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,var(--dark) 0%,rgba(0,0,0,0) 45%,rgba(0,0,0,0) 100%);}
+.cover .below .bigpuck{position:absolute;right:-30mm;bottom:-60mm;width:200mm;height:120mm;opacity:.16;}
+.cover .below .bigpuck .puck{width:100%;height:100%;}
 .cover .nophoto{position:absolute;inset:0;background:
   radial-gradient(ellipse at 50% 30%,rgba(255,255,255,.35),transparent 60%),
   repeating-linear-gradient(115deg,rgba(255,255,255,.05) 0 2mm,transparent 2mm 16mm),
@@ -113,12 +113,12 @@ ${cardCss(size)}
 .cover .logo .badge .star{font-size:12mm;line-height:1;color:var(--secondary);text-shadow:0 0 1mm #fff,0 0 1mm #fff;}
 .cover .logo .badge .txt{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:9mm;line-height:.95;margin-top:1mm;padding:0 3mm;}
 .cover .logo .badge small{font-family:'Roboto';font-weight:500;font-size:2.6mm;letter-spacing:.14em;text-transform:uppercase;opacity:.85;margin-top:1.5mm;}
-.cover .count{position:absolute;left:${bleed + 12}mm;bottom:${bleed + 22}mm;width:42mm;height:42mm;border-radius:50%;background:var(--primary);
-  border:1.2mm solid #fff;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;box-shadow:0 1.5mm 4mm rgba(0,0,0,.4);}
-.cover .count b{font-family:'Russo One';font-weight:400;font-size:15mm;line-height:.9;color:var(--secondary);text-shadow:0 0 1mm #fff,0 0 1mm #fff;}
-.cover .count span{font-family:'Oswald';font-weight:600;text-transform:uppercase;font-size:4.6mm;letter-spacing:.08em;margin-top:1mm;}
-.cover .year{position:absolute;right:${bleed + 8}mm;bottom:${bleed + 12}mm;font-family:'Russo One';font-weight:400;font-size:40mm;line-height:.85;color:#fff;
-  text-shadow:0 1.5mm 3mm rgba(0,0,0,.45);letter-spacing:-.01em;}
+.cover .count{position:absolute;left:${bleed + 10}mm;bottom:${bleed + 18}mm;width:56mm;height:44mm;color:#fff;}
+.cover .count svg{position:absolute;inset:0;width:100%;height:100%;}
+.cover .count .in{position:absolute;left:0;right:0;top:8.5mm;text-align:center;}
+.cover .count b{display:block;font-family:'Russo One';font-weight:400;font-size:14mm;line-height:.95;color:var(--secondary);-webkit-text-stroke:.5mm #fff;paint-order:stroke fill;}
+.cover .count span{display:block;font-family:'Oswald';font-weight:600;text-transform:uppercase;font-size:3.8mm;letter-spacing:.14em;margin-top:0;}
+.cover .year{position:absolute;right:${bleed + 8}mm;bottom:${bleed + 12}mm;font-family:'Russo One';font-weight:400;font-size:40mm;line-height:.85;color:#fff;letter-spacing:-.01em;}
 .cover .brand{position:absolute;left:${bleed + 12}mm;bottom:${bleed + 6}mm;display:flex;align-items:center;gap:2mm;}
 .cover .brand img{height:7mm;filter:drop-shadow(0 .5mm 1mm rgba(0,0,0,.5));}
 .cover .teamname{position:absolute;left:${bleed + 8}mm;top:${bleed + 66}mm;font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:11mm;line-height:1;color:#fff;
@@ -305,6 +305,18 @@ const deco = (data, rinkOpacity = 0.14) =>
 const arrow = (color) => `<svg viewBox="0 0 60 44" fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
   <path d="M6 8 C 22 6, 40 10, 52 30"/><path d="M40 30 L 52 32 L 55 20"/></svg>`;
 
+// Puck seen from above at an angle: dark top face, black side, white rim — the "N cards" badge sits on the top face.
+function coverPuckSvg(colors) {
+  return `<svg viewBox="0 0 140 110" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="pk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3f48"/><stop offset="1" stop-color="#15181e"/></linearGradient></defs>
+  <ellipse cx="70" cy="74" rx="66" ry="30" fill="#05070a"/>
+  <rect x="4" y="46" width="132" height="28" fill="#05070a"/>
+  <ellipse cx="70" cy="46" rx="66" ry="30" fill="url(#pk)" stroke="#fff" stroke-width="2.4"/>
+  <ellipse cx="70" cy="46" rx="58" ry="24" fill="none" stroke="${colors.secondary}" stroke-width="1.2" opacity=".8"/>
+  <path d="M4 46 v28" stroke="#fff" stroke-width="2.4"/><path d="M136 46 v28" stroke="#fff" stroke-width="2.4"/>
+  <path d="M4 74 a66 30 0 0 0 132 0" fill="none" stroke="#fff" stroke-width="2.4"/></svg>`;
+}
+
 function coverPage(data) {
   const t = data.team;
   const { w, h, bleed } = PAGE;
@@ -315,7 +327,7 @@ function coverPage(data) {
     const top = bleed + 84;
     const panelH = Math.min((w + 2 * bleed) / aspect, h + 2 * bleed - 45 - top);
     const overlay = data.assets.history || data.assets.back;
-    photo = `<div class="below" style="top:${(top + panelH - 1).toFixed(1)}mm">${overlay ? `<img src="${overlay}">` : ''}</div>
+    photo = `<div class="below" style="top:${(top + panelH - 1).toFixed(1)}mm"><div class="bigpuck">${puckSvg('#3a4250', 'rgba(255,255,255,.5)')}</div></div>
     <div class="photo panel" style="height:${panelH.toFixed(1)}mm"><img src="${data.assets.cover}"><div class="grad"></div></div>`;
   } else if (data.assets.cover) {
     photo = `<div class="photo"><img src="${data.assets.cover}"><div class="grad"></div></div>`;
@@ -330,7 +342,7 @@ function coverPage(data) {
     <div class="season"><span>${sticksSvg('#fff', data.colors.accent, '#111')}Альбом с карточками <b>★</b> ${esc(t.season)}</span></div>
     ${data.assets.logo ? `<div class="teamname">${esc(t.name)}<small>${esc(t.city || '')}</small></div>` : ''}
     <div class="logo">${logo}</div>
-    <div class="count"><b>${data.cards.length}</b><span>карточек</span></div>
+    <div class="count">${coverPuckSvg(data.colors)}<div class="in"><b>${data.cards.length}</b><span>карточек</span></div></div>
     <div class="year">${esc(t.year || '')}</div>
     <div class="brand"><img src="${data.brand.hockeystarsWhite}"></div>
   </section>`;
