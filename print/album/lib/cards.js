@@ -56,11 +56,11 @@ function cardCss(size) {
   linear-gradient(180deg,var(--primary),var(--dark));}
 /* Close-up of the face across the top of the back, pushed to the right so the header text sits on a dark fade. */
 .card.back .photo{position:absolute;left:0;right:0;top:0;height:${(B + 43 * s).toFixed(2)}mm;overflow:hidden;}
-.card.back .photo img{position:absolute;width:${(w * 0.86).toFixed(2)}mm;height:auto;top:${(B + 10.5 * s).toFixed(2)}mm;}
-.card.back.coach .photo img{width:${(w * 0.7).toFixed(2)}mm;top:${(B + 13 * s).toFixed(2)}mm;}
+.card.back.person .photo{background:linear-gradient(180deg,#f3f5f8 0%,#e2e7ee 100%);}
+.card.back.person .photo img{position:absolute;height:${(B + 42 * s).toFixed(2)}mm;width:auto;top:0;}
 .card.back.team .photo img,.card.back.club .photo img{width:100%;height:100%;left:0;top:0;object-fit:cover;object-position:center center;}
-.card.back .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,color-mix(in srgb,var(--primary) 80%,transparent) 0%,color-mix(in srgb,var(--primary) 35%,transparent) 22%,rgba(0,0,0,0) 45%);}
-.card.back.team .photo::after,.card.back.club .photo::after{background:linear-gradient(90deg,color-mix(in srgb,var(--primary) 96%,transparent) 0%,color-mix(in srgb,var(--primary) 60%,transparent) 30%,rgba(0,0,0,0) 60%),linear-gradient(180deg,rgba(0,0,0,0) 80%,var(--primary) 100%);}
+.card.back.person .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(243,245,248,.9) 0%,rgba(243,245,248,.6) 22%,rgba(243,245,248,0) 40%);}
+.card.back.team .photo::after,.card.back.club .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,color-mix(in srgb,var(--primary) 92%,transparent) 0%,color-mix(in srgb,var(--primary) 70%,transparent) 22%,rgba(0,0,0,0) 45%),linear-gradient(180deg,rgba(0,0,0,0) 80%,var(--primary) 100%);}
 .card.back .band{position:absolute;left:-10mm;right:-10mm;height:${mm(7)};transform:rotate(-8deg);}
 .card.back .band.top{top:${(B + 41.5 * s).toFixed(2)}mm;height:${mm(4)};background:var(--secondary);opacity:.95;}
 .card.back .band.top2{display:none;top:${(B + 29.5 * s).toFixed(2)}mm;height:${mm(1.5)};background:#fff;opacity:.5;}
@@ -68,6 +68,10 @@ function cardCss(size) {
 .card.back .head img{width:${mm(10)};height:${mm(10)};object-fit:contain;}
 .card.back .head .t{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:${mm(4)};line-height:1.05;}
 .card.back .head .t small{display:block;font-family:'Roboto';font-weight:400;text-transform:none;font-size:${mm(2.4)};opacity:.8;margin-top:.6mm;}
+.card.back.person .head{top:${(B + 3 * s).toFixed(2)}mm;right:auto;width:${mm(30)};align-items:flex-start;gap:${mm(1.6)};color:var(--dark);}
+.card.back.person .head img{width:${mm(8.5)};height:${mm(8.5)};}
+.card.back.person .head .t{font-size:${mm(3.4)};line-height:1;padding-top:${mm(0.4)};}
+.card.back.person .head .t small{font-weight:500;font-size:${mm(2.1)};line-height:1.25;opacity:.85;margin-top:${mm(0.5)};}
 .card.back .bignum{position:absolute;right:${(B + 3 * s).toFixed(2)}mm;top:${(B + 54 * s).toFixed(2)}mm;font-family:'Russo One';font-weight:400;font-size:${mm(26)};line-height:1;color:rgba(255,255,255,.08);}
 .card.back .who{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 46.5 * s).toFixed(2)}mm;}
 .card.back .who .nm{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:${mm(5.4)};line-height:1.05;}
@@ -145,8 +149,10 @@ function posSize(card, size) {
 // Close-up on the back: image is 92 % (coach 80 %) of the card width; shift it so the face (card.focus, % of image
 // width) lands at ~70 % of the card width, leaving the left side for the header.
 function backPhotoLeft(card, size) {
-  const imgW = size.w * (card.type === 'coach' ? 0.7 : 0.86);
-  return size.bleed + size.w * 0.6 - (card.focus / 100) * imgW;
+  // the baked close-up is the top part of the photo (see images.backCloseup), displayed at the photo-zone height
+  const cropAspect = 1 / (Math.min(1 / (card.photoAspect || 0.75), 1.15) * 0.62);
+  const imgW = (size.bleed + 42 * (size.w / 63.5)) * cropAspect;
+  return size.bleed + size.w * 0.62 - (card.focus / 100) * imgW;
 }
 
 function cardBack(card, data) {
@@ -166,11 +172,12 @@ function cardBack(card, data) {
   const longest = Math.max((card.number ? card.number.length + 2 : 0) + card.surname.length, card.name.length);
   const scale = data.cardSize.w / 63.5;
   const nameSize = `${(5.4 * scale * Math.min(1, 16 / Math.max(longest, 1))).toFixed(2)}mm`;
-  return `<div class="card back ${card.type}">
+  const light = person && card.photoBack;
+  return `<div class="card back ${card.type}${light ? ' person' : ''}">
     <div class="bg"></div>
     ${card.hasPhoto ? `<div class="photo"><img src="${card.photoBack || card.photo}" style="${card.photoBack ? `left:${backPhotoLeft(card, data.cardSize).toFixed(2)}mm` : ''}"></div>` : ''}
     <div class="band top"></div><div class="band top2"></div>
-    <div class="head">${logo}<div class="t">${esc(t.name)}<small>${esc(t.city || '')}${t.city ? ' · ' : ''}Сезон ${esc(t.season)}</small></div></div>
+    <div class="head">${logo}<div class="t">${esc(t.name)}<small>${esc(t.city || '')}${t.city ? '<br>' : ''}Сезон ${esc(t.season)}</small></div></div>
     ${card.number ? `<div class="bignum">${esc(card.number)}</div>` : ''}
     <div class="who">
       <div class="nm" style="font-size:${nameSize}">${card.number ? `<span>#${esc(card.number)}${card.role ? `<sup>${esc(card.role)}</sup>` : ''}</span>` : ''}${esc(card.surname).toUpperCase()}<br>${esc(card.name).toUpperCase()}</div>
