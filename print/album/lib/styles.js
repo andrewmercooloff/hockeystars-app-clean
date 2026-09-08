@@ -5,6 +5,7 @@ const FONTS = [
   ['Oswald', 400, 'Oswald-Regular.ttf'],
   ['Oswald', 600, 'Oswald-SemiBold.ttf'],
   ['Oswald', 700, 'Oswald-Bold.ttf'],
+  ['Russo One', 400, 'RussoOne-Regular.ttf'],
   ['Roboto', 400, 'Roboto-Regular.ttf'],
   ['Roboto', 500, 'Roboto-Medium.ttf'],
   ['Roboto', 700, 'Roboto-Bold.ttf'],

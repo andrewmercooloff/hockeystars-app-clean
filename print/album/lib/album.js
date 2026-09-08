@@ -76,7 +76,7 @@ ${cardCss(size)}
 .gallery .hdr .sticks,.autographs .hdr .sticks,.history .hdr .sticks{width:14mm;height:14mm;vertical-align:-3mm;margin-left:3mm;}
 
 /* section title */
-.title{position:relative;display:inline-block;font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:17mm;line-height:1;color:var(--dark);
+.title{position:relative;display:inline-block;font-family:'Russo One';font-weight:400;text-transform:uppercase;font-size:13mm;line-height:1;color:var(--dark);
   padding:2mm 0;}
 .title::after{content:"";position:absolute;left:0;right:-6mm;bottom:-1mm;height:2mm;background:linear-gradient(90deg,var(--secondary) 0 60%,var(--primary) 60%);
   transform:skewX(-30deg);}
@@ -90,8 +90,10 @@ ${cardCss(size)}
 .cover .photo.panel{inset:auto;left:0;right:0;top:${bleed + 84}mm;clip-path:polygon(0 5mm,100% 0,100% 100%,0 100%);
   box-shadow:0 -2mm 6mm rgba(0,0,0,.25);}
 .cover .photo.panel img{object-position:center center;}
-.cover .photo.panel .grad{background:linear-gradient(180deg,rgba(7,26,58,.25) 0%,rgba(7,26,58,0) 18%,rgba(7,26,58,0) 70%,rgba(7,26,58,.7) 100%);}
-.cover .below{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,var(--dark),var(--primary));}
+.cover .photo.panel .grad{background:linear-gradient(180deg,rgba(7,26,58,.25) 0%,rgba(7,26,58,0) 18%,rgba(7,26,58,0) 62%,color-mix(in srgb,var(--dark) 85%,transparent) 92%,var(--dark) 100%);}
+.cover .below{position:absolute;left:0;right:0;bottom:0;background:var(--dark);overflow:hidden;}
+.cover .below img{position:absolute;left:0;right:0;bottom:0;width:100%;height:130%;object-fit:cover;object-position:center 40%;opacity:.28;filter:grayscale(.6) contrast(1.1);}
+.cover .below::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,var(--dark) 0%,rgba(0,0,0,0) 45%,rgba(0,0,0,0) 100%);}
 .cover .nophoto{position:absolute;inset:0;background:
   radial-gradient(ellipse at 50% 30%,rgba(255,255,255,.35),transparent 60%),
   repeating-linear-gradient(115deg,rgba(255,255,255,.05) 0 2mm,transparent 2mm 16mm),
@@ -113,9 +115,9 @@ ${cardCss(size)}
 .cover .logo .badge small{font-family:'Roboto';font-weight:500;font-size:2.6mm;letter-spacing:.14em;text-transform:uppercase;opacity:.85;margin-top:1.5mm;}
 .cover .count{position:absolute;left:${bleed + 12}mm;bottom:${bleed + 22}mm;width:42mm;height:42mm;border-radius:50%;background:var(--primary);
   border:1.2mm solid #fff;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;box-shadow:0 1.5mm 4mm rgba(0,0,0,.4);}
-.cover .count b{font-family:'Oswald';font-weight:700;font-size:19mm;line-height:.9;color:var(--secondary);text-shadow:0 0 1mm #fff,0 0 1mm #fff;}
+.cover .count b{font-family:'Russo One';font-weight:400;font-size:15mm;line-height:.9;color:var(--secondary);text-shadow:0 0 1mm #fff,0 0 1mm #fff;}
 .cover .count span{font-family:'Oswald';font-weight:600;text-transform:uppercase;font-size:4.6mm;letter-spacing:.08em;margin-top:1mm;}
-.cover .year{position:absolute;right:${bleed + 8}mm;bottom:${bleed + 14}mm;font-family:'Oswald';font-weight:700;font-size:52mm;line-height:.85;color:#fff;
+.cover .year{position:absolute;right:${bleed + 8}mm;bottom:${bleed + 12}mm;font-family:'Russo One';font-weight:400;font-size:40mm;line-height:.85;color:#fff;
   text-shadow:0 1.5mm 3mm rgba(0,0,0,.45);letter-spacing:-.01em;}
 .cover .brand{position:absolute;left:${bleed + 12}mm;bottom:${bleed + 6}mm;display:flex;align-items:center;gap:2mm;}
 .cover .brand img{height:7mm;filter:drop-shadow(0 .5mm 1mm rgba(0,0,0,.5));}
@@ -147,7 +149,7 @@ ${cardCss(size)}
 .team .hdr{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 9}mm;height:22mm;display:flex;align-items:center;justify-content:space-between;}
 .team .hdr .logo{width:22mm;height:22mm;display:flex;align-items:center;justify-content:center;}
 .team .hdr .logo img{max-width:100%;max-height:100%;object-fit:contain;}
-.team .hdr .title{font-size:16mm;}
+.team .hdr .title{font-size:13mm;}
 .team .hdr .sub{font-family:'Oswald';font-weight:600;text-transform:uppercase;font-size:3.6mm;letter-spacing:.14em;color:var(--secondary);text-align:right;margin-top:2mm;}
 .team .grid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${(bleed + gridTop(size)).toFixed(1)}mm;display:grid;
   grid-template-columns:repeat(${SLOT_COLS},${size.w}mm);justify-content:space-between;row-gap:${gridGap(size).toFixed(1)}mm;}
@@ -155,7 +157,7 @@ ${cardCss(size)}
 .cell .cap{height:${CAPTION_H}mm;padding-top:1.6mm;text-align:center;}
 .team.dense .hdr{top:${bleed + 5}mm;height:16mm;}
 .team.dense .hdr .logo{width:16mm;height:16mm;}
-.team.dense .hdr .title{font-size:11mm;}
+.team.dense .hdr .title{font-size:9.5mm;}
 .team.dense .hdr .sub{font-size:3mm;margin-top:1mm;}
 .team.dense .cell .cap{position:absolute;left:0;right:0;bottom:0;height:auto;padding:1.4mm 2mm 1.6mm;background:rgba(255,255,255,.9);border-top:.3mm solid color-mix(in srgb,var(--primary) 25%,transparent);}
 .team.dense .cell .cap .n{font-size:3.4mm;}
@@ -243,7 +245,7 @@ ${cardCss(size)}
 /* ---------- QUOTES ---------- */
 .quotes .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
 .quotes .hdr .sticks{width:14mm;height:14mm;vertical-align:-3mm;margin-left:3mm;}
-.quotes .hdr .title{font-size:12.5mm;}
+.quotes .hdr .title{font-size:9.5mm;}
 .quotes .goal{position:absolute;right:${bleed + 12}mm;bottom:${bleed + 4}mm;width:34mm;height:22mm;opacity:.5;}
 .quotes .qgrid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 42}mm;bottom:${bleed + 16}mm;display:grid;grid-template-columns:1fr 1fr;gap:5mm 6mm;align-content:space-between;}
 .quotes .qp{position:relative;background:linear-gradient(135deg,var(--primary),var(--dark));color:#fff;padding:5mm 6mm 5mm 7mm;transform:rotate(-1.2deg) skewX(-3deg);
@@ -258,7 +260,7 @@ ${cardCss(size)}
 .quotes .qp.odd::after{background:var(--accent);}
 /* ---------- BACK COVER: card wall ---------- */
 .backcover .collect{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 42}mm;}
-.backcover .collect .ttl{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:11mm;line-height:1;color:#fff;margin-bottom:6mm;}
+.backcover .collect .ttl{font-family:'Russo One';font-weight:400;text-transform:uppercase;font-size:9.5mm;line-height:1;color:#fff;margin-bottom:6mm;}
 .backcover .collect .ttl span{display:block;font-size:6mm;color:var(--accent);margin-top:1.5mm;letter-spacing:.06em;}
 .backcover .wall{display:grid;grid-template-columns:repeat(9,19mm);justify-content:space-between;row-gap:4mm;}
 .backcover .mini{position:relative;}
@@ -269,7 +271,7 @@ ${cardCss(size)}
 /* ---------- BACK COVER ---------- */
 .backcover{background:var(--dark);color:#fff;}
 .backcover > .photo{position:absolute;inset:0;}
-.backcover > .photo > img{width:100%;height:100%;object-fit:cover;opacity:.55;mix-blend-mode:luminosity;}
+.backcover > .photo > img{width:100%;height:100%;object-fit:cover;object-position:center 35%;opacity:.3;filter:grayscale(.7) contrast(1.1);}
 .backcover .tint{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,26,58,.35) 0%,rgba(7,26,58,.55) 60%,var(--dark) 100%);}
 .backcover .pattern{position:absolute;inset:0;background:
   radial-gradient(ellipse at 50% 35%,rgba(90,140,220,.45),transparent 55%),
@@ -312,7 +314,8 @@ function coverPage(data) {
     // Landscape group shot → panel under the title; full-bleed would hide half the team.
     const top = bleed + 84;
     const panelH = Math.min((w + 2 * bleed) / aspect, h + 2 * bleed - 45 - top);
-    photo = `<div class="below" style="top:${(top + panelH - 1).toFixed(1)}mm"></div>
+    const overlay = data.assets.history || data.assets.back;
+    photo = `<div class="below" style="top:${(top + panelH - 1).toFixed(1)}mm">${overlay ? `<img src="${overlay}">` : ''}</div>
     <div class="photo panel" style="height:${panelH.toFixed(1)}mm"><img src="${data.assets.cover}"><div class="grad"></div></div>`;
   } else if (data.assets.cover) {
     photo = `<div class="photo"><img src="${data.assets.cover}"><div class="grad"></div></div>`;
@@ -492,28 +495,63 @@ function autographsPage(data, pageNo, cards) {
   </section>`;
 }
 
-// Lifestyle photos from assets/gallery/. Fixed 6x6 mosaic for 12 photos per page (col, row, colSpan, rowSpan):
-// a landscape hero (#1), three portrait "tall" tiles (#2, #6, #9) and eight small landscape tiles.
-// Photos 1 / 13 / 25 in the folder should therefore be landscape; 2, 6, 9 (+12, +24) portrait.
-const GALLERY_PATTERN = [
-  [1, 1, 4, 2], [5, 1, 2, 2],
-  [1, 3, 2, 1], [3, 3, 2, 1], [5, 3, 2, 1],
-  [1, 4, 2, 2], [3, 4, 2, 1], [3, 5, 2, 1], [5, 4, 2, 2],
-  [1, 6, 2, 1], [3, 6, 2, 1], [5, 6, 2, 1],
-];
-function galleryPage(data, pageNo, photos, title) {
-  const tiles = photos
-    .slice(0, GALLERY_PATTERN.length)
-    .map((src, i) => {
-      const [c, r, cs, rs] = GALLERY_PATTERN[i];
-      return `<div class="ph" style="grid-column:${c} / span ${cs};grid-row:${r} / span ${rs}"><img src="${src}"></div>`;
+// Lifestyle photos from assets/gallery/ on a 6x6 grid. Tiles are chosen by photo orientation so nobody's head gets cut:
+// portrait photos go to 2x2 tiles, landscape photos to 2x1 or a 4x2 hero. Bands of tiles are stacked until 6 rows are used.
+const GALLERY_ROWS = 6;
+function galleryLayout(queue) {
+  const P = queue.filter((p) => p.aspect < 0.95);
+  const L = queue.filter((p) => p.aspect >= 0.95);
+  const tiles = [];
+  let row = 1;
+  let n = 0;
+  const take = (arr, k) => arr.splice(0, k);
+  while (row <= GALLERY_ROWS) {
+    const left = GALLERY_ROWS - row + 1;
+    if (left >= 2 && P.length >= 3 && n % 2 === 0) {
+      take(P, 3).forEach((p, i) => tiles.push({ p, c: 1 + i * 2, r: row, cs: 2, rs: 2 }));
+      row += 2;
+    } else if (left >= 2 && P.length >= 1 && L.length >= 1) {
+      const [l] = take(L, 1);
+      const [p] = take(P, 1);
+      if (n % 2) { tiles.push({ p, c: 1, r: row, cs: 2, rs: 2 }); tiles.push({ p: l, c: 3, r: row, cs: 4, rs: 2 }); }
+      else { tiles.push({ p: l, c: 1, r: row, cs: 4, rs: 2 }); tiles.push({ p, c: 5, r: row, cs: 2, rs: 2 }); }
+      row += 2;
+    } else if (left >= 2 && P.length >= 2) {
+      take(P, 2).forEach((p, i) => tiles.push({ p, c: 1 + i * 3, r: row, cs: 3, rs: 2 }));
+      row += 2;
+    } else if (L.length >= 3) {
+      take(L, 3).forEach((p, i) => tiles.push({ p, c: 1 + i * 2, r: row, cs: 2, rs: 1 }));
+      row += 1;
+    } else if (L.length >= 2) {
+      take(L, 2).forEach((p, i) => tiles.push({ p, c: 1 + i * 3, r: row, cs: 3, rs: 1 }));
+      row += 1;
+    } else if (left >= 2 && P.length === 1) {
+      const [p] = take(P, 1);
+      tiles.push({ p, c: 3, r: row, cs: 2, rs: 2 });
+      row += 2;
+    } else if (L.length === 1) {
+      const [p] = take(L, 1);
+      tiles.push({ p, c: 1, r: row, cs: 6, rs: Math.min(2, left) });
+      row += Math.min(2, left);
+    } else break;
+    n++;
+  }
+  return { tiles, used: tiles.length };
+}
+function galleryPage(data, pageNo, tiles, title) {
+  const html = tiles
+    .map(({ p, c, r, cs, rs }) => {
+      const tileAspect = (cs * 30) / (rs * 37);
+      // heads live in the upper part of a photo: anchor the crop towards the top when the tile is wider than the photo
+      const pos = p.aspect < tileAspect ? 'center 12%' : 'center 30%';
+      return `<div class="ph" style="grid-column:${c} / span ${cs};grid-row:${r} / span ${rs}"><img src="${p.src}" style="object-position:${pos}"></div>`;
     })
     .join('');
   return `<section class="page gallery ice">
     ${deco(data)}
     <div class="orn br" style="opacity:.9"></div>
     <div class="hdr"><div class="title">${esc(title || 'Жизнь команды')}</div>${sticksSvg(data.colors.primary, data.colors.secondary, data.colors.dark)}</div>
-    <div class="grid">${tiles}</div>
+    <div class="grid">${html}</div>
     <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
   </section>`;
 }
@@ -526,8 +564,9 @@ function backCoverPage(data) {
   const wall = data.cards
     .map((c) => `<div class="mini"><div class="mc">${cardFront({ ...c, photo: c.photoSmall }, data)}</div><span>${c.index}</span></div>`)
     .join('');
+  const overlay = data.assets.history || data.assets.back;
   return `<section class="page backcover">
-    <div class="pattern"></div>
+    ${overlay ? `<div class="photo"><img src="${overlay}"></div><div class="tint"></div>` : ''}<div class="pattern"></div>
     <div class="top"><div class="name">${esc(t.name)}<small>${esc(t.city || '')}${t.city ? ' · ' : ''}Сезон ${esc(t.season)}</small></div>${logo}</div>
     <div class="collect"><div class="ttl">Собери все карточки<span>до конца сезона</span></div><div class="wall">${wall}</div></div>
     <div class="cta"><h2>${texts.backTitle || 'Ты есть в <span>HockeyStars</span>?'}</h2><p>${esc(texts.backText || 'Твоя команда уже там, устанавливай по QR-коду')}</p></div>
@@ -566,19 +605,19 @@ function albumHtml(data) {
       const chunk = nextAutographs();
       if (chunk.length) inner.push((n) => autographsPage(data, n, chunk));
     } else if (kind.startsWith('gallery')) {
-      const photos = data.assets.gallery.slice(galleryOffset, galleryOffset + GALLERY_PATTERN.length);
-      galleryOffset += photos.length;
+      const { tiles, used } = galleryLayout(data.assets.gallery.slice(galleryOffset, galleryOffset + 12));
+      galleryOffset += used;
       const title = kind.includes(':') ? kind.slice(kind.indexOf(':') + 1) : albumCfg.galleryTitle;
-      if (photos.length) inner.push((n) => galleryPage(data, n, photos, title));
+      if (tiles.length) inner.push((n) => galleryPage(data, n, tiles, title));
     }
   }
   // Saddle-stitched booklet: pad to a multiple of 4 pages — leftover gallery photos, then autographs, then the match log.
   let statsUsed = extra.includes('stats');
   while ((inner.length + 2) % 4 !== 0) {
-    const photos = data.assets.gallery.slice(galleryOffset, galleryOffset + GALLERY_PATTERN.length);
-    if (photos.length >= 4) {
-      galleryOffset += photos.length;
-      inner.push((n) => galleryPage(data, n, photos, albumCfg.galleryTitle));
+    const { tiles, used } = galleryLayout(data.assets.gallery.slice(galleryOffset, galleryOffset + 12));
+    if (tiles.length >= 4) {
+      galleryOffset += used;
+      inner.push((n) => galleryPage(data, n, tiles, albumCfg.galleryTitle));
     } else if (autographOffset < people.length) {
       const autographs = nextAutographs();
       inner.push((n) => autographsPage(data, n, autographs));

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { prepareImage, fileUrl, imageAspect } = require('./images');
+const { prepareImage, fileUrl, imageAspect, backCloseup } = require('./images');
 
 const POSITIONS = {
   в: 'Вратарь',
@@ -191,6 +191,7 @@ async function loadTeam(teamDir, cacheDir) {
       photo: photoPath ? await prepareImage(photoPath, photoCache, 1600) : placeholderPhoto(number, colors.primary),
       // low-res copy for the faded "paste here" ghosts in the album
       photoSmall: photoPath ? await prepareImage(photoPath, photoCache, 500) : placeholderPhoto(number, colors.primary),
+      photoBack: photoPath && (type === 'player' || type === 'coach' || type === 'legend') ? await backCloseup(photoPath, photoCache) : null,
       hasPhoto: Boolean(photoPath),
       photoAspect: photoPath ? await imageAspect(photoPath) : 0.75,
       // horizontal position of the face in the photo (0–100 %), used to place the close-up on the card back
@@ -215,7 +216,7 @@ async function loadTeam(teamDir, cacheDir) {
   assets.coverAspect = await imageAspect(assets.cover);
   // No qr.png but a link in team.json → generate the QR code (python `qrcode` package).
   if (!assets.qr && team.qrUrl) assets.qr = fileUrl(makeQr(team.qrUrl, path.join(cacheDir, 'assets')));
-  for (const p of listGallery(assetsDir)) assets.gallery.push(await prepareImage(p, path.join(cacheDir, 'gallery'), 1800));
+  for (const p of listGallery(assetsDir)) assets.gallery.push({ src: await prepareImage(p, path.join(cacheDir, 'gallery'), 1800), aspect: (await imageAspect(p)) || 1.33 });
 
   const brand = {
     hockeystarsWhite: fileUrl(path.join(__dirname, 'brand', 'hockeystars-white.png')),
