@@ -55,6 +55,7 @@ import { platformCardShadow } from '../utils/androidShadow';
 import { registerTabScrollHandler } from '../utils/tabScrollRegistry';
 import LeaderShine from '../components/LeaderShine';
 import SearchRatingShareCard, { type SearchRatingShareEntry } from '../components/SearchRatingShareCard';
+import { RATING_SHARE_SEASON_KEY } from '../utils/seasonConfig';
 import { prefetchRatingShareAvatars } from '../utils/ratingShareExport';
 import {
   LEADER_BORDER_COLORS,
@@ -1947,6 +1948,7 @@ export default function SearchScreen() {
             ref={ratingShareRef}
             title={leadersShareTitle}
             filterLine={ratingShareFilterLine || undefined}
+            seasonLine={t('search.shareRatingSeason', { season: RATING_SHARE_SEASON_KEY })}
             goalieMode={isGoalieLeaderMode}
             entries={leaderShareEntries}
             t={t}
