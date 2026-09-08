@@ -144,6 +144,9 @@ ${cardCss(size)}
 .intro .teamphoto{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:22mm;bottom:${bleed + 10}mm;overflow:hidden;border-radius:1.5mm;
   box-shadow:0 2mm 6mm rgba(0,0,0,.25);background:#c9d5e3;}
 .intro .teamphoto img{width:100%;height:100%;object-fit:cover;object-position:center;}
+.intro .teamphoto.cutout{background:none;box-shadow:none;border-radius:0;overflow:visible;top:14mm;}
+.intro .teamphoto.cutout::before{content:"";position:absolute;left:8%;right:8%;bottom:-2mm;height:14mm;border-radius:50%;background:radial-gradient(ellipse at center,rgba(20,40,70,.28),rgba(20,40,70,0) 70%);}
+.intro .teamphoto.cutout img{position:absolute;left:0;right:0;bottom:2mm;width:100%;height:100%;object-fit:contain;object-position:center bottom;}
 .intro .teamphoto .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Oswald';font-weight:600;text-transform:uppercase;
   font-size:6mm;color:#5b6b80;letter-spacing:.1em;background:repeating-linear-gradient(45deg,#dbe4ee 0 6mm,#cfdae6 6mm 12mm);}
 
@@ -379,7 +382,7 @@ function introPage(data, pageNo) {
     </div>
     <div class="bottom">
       <div class="bigname" style="font-size:${bigSize.toFixed(1)}mm">${esc(bigName)}</div>
-      <div class="teamphoto">${teamPhoto}</div>
+      <div class="teamphoto${data.assets.teamCutout ? ' cutout' : ''}">${data.assets.teamCutout ? `<img src="${data.assets.teamCutout}">` : teamPhoto}</div>
     </div>
     <div class="pgnum l">${pageNo}</div>
   </section>`;
