@@ -620,9 +620,16 @@ function albumHtml(data) {
       const chunk = nextAutographs();
       if (chunk.length) inner.push((n) => autographsPage(data, n, chunk));
     } else if (kind.startsWith('gallery')) {
+      const title = kind.includes(':') ? kind.slice(kind.indexOf(':') + 1) : albumCfg.galleryTitle;
+      const folder = kind.split(':')[0];
+      if (folder !== 'gallery') {
+        // dedicated folder, e.g. "gallery-fans:Наши болельщики" → assets/gallery-fans/
+        const { tiles } = galleryLayout((data.assets.galleries?.[folder] || []).slice(0, 12));
+        if (tiles.length) inner.push((n) => galleryPage(data, n, tiles, title));
+        continue;
+      }
       const { tiles, used } = galleryLayout(data.assets.gallery.slice(galleryOffset, galleryOffset + 12));
       galleryOffset += used;
-      const title = kind.includes(':') ? kind.slice(kind.indexOf(':') + 1) : albumCfg.galleryTitle;
       if (tiles.length) inner.push((n) => galleryPage(data, n, tiles, title));
     }
   }

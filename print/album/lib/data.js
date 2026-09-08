@@ -142,8 +142,8 @@ function makeQr(url, cacheDir) {
 }
 
 // Optional folder with lifestyle photos for the "Жизнь команды" collage page.
-function listGallery(assetsDir) {
-  const dir = path.join(assetsDir, 'gallery');
+function listGallery(assetsDir, name = 'gallery') {
+  const dir = path.join(assetsDir, name);
   if (!fs.existsSync(dir)) return [];
   return fs
     .readdirSync(dir)
@@ -224,6 +224,13 @@ async function loadTeam(teamDir, cacheDir) {
   // No qr.png but a link in team.json → generate the QR code (python `qrcode` package).
   if (!assets.qr && team.qrUrl) assets.qr = fileUrl(makeQr(team.qrUrl, path.join(cacheDir, 'assets')));
   for (const p of listGallery(assetsDir)) assets.gallery.push({ src: await prepareImage(p, path.join(cacheDir, 'gallery'), 1800), aspect: (await imageAspect(p)) || 1.33 });
+  // extra photo folders (assets/gallery-<name>/) usable as "gallery-<name>:Заголовок" in album.extraPages
+  assets.galleries = {};
+  for (const d of fs.existsSync(assetsDir) ? fs.readdirSync(assetsDir) : []) {
+    if (!d.startsWith('gallery-') || !fs.statSync(path.join(assetsDir, d)).isDirectory()) continue;
+    assets.galleries[d] = [];
+    for (const p of listGallery(assetsDir, d)) assets.galleries[d].push({ src: await prepareImage(p, path.join(cacheDir, d), 1800), aspect: (await imageAspect(p)) || 1.33 });
+  }
 
   const brand = {
     hockeystarsWhite: fileUrl(path.join(__dirname, 'brand', 'hockeystars-white.png')),
