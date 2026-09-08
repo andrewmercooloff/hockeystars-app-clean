@@ -503,6 +503,7 @@ export default function SearchScreen() {
   const { currentUser, isUserLoading } = useUser();
   const isDesktop = useIsDesktopLayout();
   const playersListRef = useRef<FlatList<ScoutListRow>>(null);
+  const lastSearchRefreshAtRef = useRef(0);
 
   // Функция для форматирования даты в формат DD.MM.YYYY
   const formatBirthDate = (dateString: string): string => {
@@ -695,11 +696,15 @@ export default function SearchScreen() {
           setCurrentScreen(null, 'search');
         };
       }
-      if (players.length > 0) {
+      // Список уже есть: обновляем в фоне, но не чаще раза в минуту (realtime мог
+      // отвалиться в бэкграунде, и новичок иначе появится только после перезапуска).
+      const hasList = players.length > 0;
+      if (hasList && Date.now() - lastSearchRefreshAtRef.current < 60_000) {
         return () => {
           setCurrentScreen(null, 'search');
         };
       }
+      lastSearchRefreshAtRef.current = Date.now();
       const refreshData = async () => {
           try {
             const filterForSearch = (allPlayers: Player[]): Player[] => {
@@ -731,7 +736,7 @@ export default function SearchScreen() {
               });
             };
 
-            const allPlayers = await loadPlayers(false, {
+            const allPlayers = await loadPlayers(hasList, {
               onUpdated: (fresh) => {
                 void applyActivityRatingsToPlayers(fresh).then(() => applySearchPlayers(fresh));
               },
@@ -815,6 +820,26 @@ export default function SearchScreen() {
               return currentPlayers.filter((p) => p.id !== playerId);
             }
             return currentPlayers.map((p, i) => (i === idx ? row : p));
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'players' },
+        (payload) => {
+          // Новая регистрация: раньше обрабатывались только UPDATE/DELETE, и новичок
+          // появлялся в поиске лишь после перезапуска (кеш списка живёт 10 минут).
+          const playerId = (payload.new as { id?: string })?.id;
+          if (!playerId) return;
+          void AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]).catch(() => {});
+          void loadPlayers(true).then((allPlayers) => {
+            const fresh = allPlayers.find((p) => p.id === playerId);
+            if (!fresh || !isPlayerInSearchDirectory(fresh, isAdmin)) return;
+            setPlayers((prev) =>
+              prev.some((p) => p.id === playerId)
+                ? prev.map((p) => (p.id === playerId ? fresh : p))
+                : [...prev, fresh]
+            );
           });
         }
       )
