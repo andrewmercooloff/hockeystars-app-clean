@@ -56,12 +56,12 @@ function cardCss(size) {
   linear-gradient(180deg,var(--primary),var(--dark));}
 /* Close-up of the face across the top of the back, pushed to the right so the header text sits on a dark fade. */
 .card.back .photo{position:absolute;left:0;right:0;top:0;height:${(B + 38 * s).toFixed(2)}mm;overflow:hidden;}
-.card.back .photo img{position:absolute;width:112%;height:auto;left:${(B + 8 * s).toFixed(2)}mm;top:${(B + 0.5 * s).toFixed(2)}mm;}
-.card.back.coach .photo img{width:100%;left:${(B + 6 * s).toFixed(2)}mm;top:${(B + 1 * s).toFixed(2)}mm;}
+.card.back .photo img{position:absolute;width:92%;height:auto;left:${(B + 14 * s).toFixed(2)}mm;top:${(B + 1 * s).toFixed(2)}mm;opacity:.92;}
+.card.back.coach .photo img{width:80%;left:${(B + 16 * s).toFixed(2)}mm;top:${(B + 2 * s).toFixed(2)}mm;}
 .card.back.team .photo img,.card.back.club .photo img{width:100%;height:100%;left:0;top:0;object-fit:cover;object-position:center center;}
 .card.back .photo::after{content:"";position:absolute;inset:0;background:
-  linear-gradient(90deg,color-mix(in srgb,var(--primary) 96%,transparent) 0%,color-mix(in srgb,var(--primary) 80%,transparent) 28%,color-mix(in srgb,var(--primary) 20%,transparent) 50%,rgba(0,0,0,.03) 75%),
-  linear-gradient(180deg,rgba(0,0,0,0) 78%,var(--primary) 100%);}
+  linear-gradient(90deg,color-mix(in srgb,var(--primary) 96%,transparent) 0%,color-mix(in srgb,var(--primary) 75%,transparent) 26%,color-mix(in srgb,var(--primary) 10%,transparent) 42%,rgba(0,0,0,0) 60%),
+  linear-gradient(180deg,rgba(0,0,0,0) 80%,var(--primary) 100%);}
 .card.back .band{position:absolute;left:-10mm;right:-10mm;height:${mm(7)};transform:rotate(-8deg);}
 .card.back .band.top{top:${(B + 36.5 * s).toFixed(2)}mm;height:${mm(4)};background:var(--secondary);opacity:.95;}
 .card.back .band.top2{display:none;top:${(B + 29.5 * s).toFixed(2)}mm;height:${mm(1.5)};background:#fff;opacity:.5;}
@@ -135,6 +135,14 @@ function cardFront(card, data) {
   </div>`;
 }
 
+// Close-up on the back: image is 92 % (coach 80 %) of the card width; shift it so the face (card.focus, % of image
+// width) lands at ~70 % of the card width, leaving the left side for the header.
+function backPhotoLeft(card, size) {
+  const s = size.w / 63.5;
+  const imgW = size.w * (card.type === 'coach' ? 0.8 : 0.92);
+  return size.bleed + size.w * 0.66 - (card.focus / 100) * imgW + (card.type === 'coach' ? 2 : 0) * s;
+}
+
 function cardBack(card, data) {
   const t = data.team;
   const total = data.cards.length;
@@ -154,7 +162,7 @@ function cardBack(card, data) {
   const nameSize = `${(5.4 * scale * Math.min(1, 16 / Math.max(longest, 1))).toFixed(2)}mm`;
   return `<div class="card back ${card.type}">
     <div class="bg"></div>
-    ${card.hasPhoto ? `<div class="photo"><img src="${card.photo}"></div>` : ''}
+    ${card.hasPhoto ? `<div class="photo"><img src="${card.photo}" style="left:${backPhotoLeft(card, data.cardSize).toFixed(2)}mm"></div>` : ''}
     <div class="band top"></div><div class="band top2"></div>
     <div class="head">${logo}<div class="t">${esc(t.name)}<small>${esc(t.city || '')}${t.city ? ' · ' : ''}Сезон ${esc(t.season)}</small></div></div>
     ${card.number ? `<div class="bignum">${esc(card.number)}</div>` : ''}
@@ -213,21 +221,15 @@ function cardsHtml(data, opts = {}) {
   let pageSize;
   // One card per page (front, then back) for print shops that cut stacks: trim box + bleed + 5 mm white margin
   // with crop marks at the trim lines. Odd pages are fronts, even pages are backs → duplex, flip on long edge.
-  const M = 5;
+  // One card per page (front, then back) for print shops that cut stacks. Page = exact trim size (60x85):
+  // the artwork bleed is drawn but clipped by the page, so a slightly off cut still shows artwork, never white.
+  // Odd pages are fronts, even pages are backs → duplex, flip on long edge.
+  const M = 0;
   if (layout === 'single') {
-    pageSize = `${cw + 2 * M}mm ${ch + 2 * M}mm`;
-    const b = size.bleed;
-    const len = M - 1;
-    const marks = [
-      [M + b, 0, 'v'], [M + b + size.w, 0, 'v'], [M + b, ch + 2 * M - len, 'v'], [M + b + size.w, ch + 2 * M - len, 'v'],
-      [0, M + b, 'h'], [0, M + b + size.h, 'h'], [cw + 2 * M - len, M + b, 'h'], [cw + 2 * M - len, M + b + size.h, 'h'],
-    ]
-      .map(([x, y, k]) => `<div class="mark ${k}" style="left:${x}mm;top:${y}mm;${k === 'v' ? `height:${len}mm` : `width:${len}mm`}"></div>`)
-      .join('');
+    pageSize = `${size.w}mm ${size.h}mm`;
     for (const card of data.cards) {
-      const lbl = (side) => `<div class="sheetlabel" style="top:1mm">${card.index} / ${total} · ${side}</div>`;
-      pages += `<section class="page single">${marks}${lbl('лицо')}<div class="slot" style="left:${M}mm;top:${M}mm">${cardFront(card, data)}</div></section>`;
-      pages += `<section class="page single">${marks}${lbl('оборот')}<div class="slot" style="left:${M}mm;top:${M}mm">${cardBack(card, data)}</div></section>`;
+      pages += `<section class="page single"><div class="slot" style="left:${-size.bleed}mm;top:${-size.bleed}mm">${cardFront(card, data)}</div></section>`;
+      pages += `<section class="page single"><div class="slot" style="left:${-size.bleed}mm;top:${-size.bleed}mm">${cardBack(card, data)}</div></section>`;
     }
   } else {
     pageSize = `${sheet.w}mm ${sheet.h}mm`;
@@ -259,7 +261,7 @@ ${cardCss(size)}
 @page{size:${pageSize};margin:0;}
 .page{position:relative;page-break-after:always;overflow:hidden;background:#fff;}
 .page.sheet{width:${sheet.w}mm;height:${sheet.h}mm;}
-.page.single{width:${cw + 2 * M}mm;height:${ch + 2 * M}mm;}
+.page.single{width:${size.w}mm;height:${size.h}mm;}
 .slot{position:absolute;}
 .mark{position:absolute;background:#000;}
 .mark.v{width:.15mm;}

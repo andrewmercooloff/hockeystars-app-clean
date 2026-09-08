@@ -25,7 +25,9 @@
     "extraPages": [
       "gallery",
       "gallery",
-      "autographs"
+      "gallery:Наши болельщики",
+      "autographs",
+      "stats"
     ]
   },
   "texts": {

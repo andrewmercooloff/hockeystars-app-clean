@@ -1,4 +1,4 @@
-number;surname;name;position;role;height;weight;grip;birthdate;photo;type;ribbon
+number;surname;name;position;role;height;weight;grip;birthdate;photo;type;ribbon;focus
 33;Багдевич;Полина;Вратарь;;128;22;;;33;player;
 1;Боровиков;Александр;Вратарь;;128;26;;;1;player;
 2;Бойков;Дмитрий;Защитник;А;139;28;;;1245;player;
@@ -19,7 +19,10 @@ number;surname;name;position;role;height;weight;grip;birthdate;photo;type;ribbon
 ;Соломонов;Антон Сергеевич;Тренер по хоккею;;;;;;coach-solomonov;coach;
 ;Петров;Никита Сергеевич;Тренер по хоккею;;;;;;coach-petrov;coach;
 ;Тарасов;Андрей Сергеевич;Тренер по хоккею;;;;;;coach-tarasov;coach;
+;Дарья;;SMM-менеджер клуба;;;;;;daria;coach;Медиа;72
 ;Добрыня;Сезон 2025-2026;Наша команда;;;;;;1388;team;
 ;Добрыня;Хоккейный клуб;Санкт-Петербург · с 2013 года;;;;;;crest;club;
 ;Ледовая арена;Купчино;Наш дом;;;;;;arena;club;Арена
 ;Наши победы;;Играем, чтобы побеждать;;;;;;cup;club;Победы
+;Перед матчем;;Раздевалка · настрой на игру;;;;;;locker;club;Команда
+;Последний рубеж;;Наши вратари;;;;;;goalie;club;Вратари

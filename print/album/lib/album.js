@@ -8,17 +8,27 @@ const PAGE = { w: 210, h: 297, bleed: 3 };
 const SLOT_COLS = 3;
 const SLOT_GAP = 7;
 const CAPTION_H = 9;
+// Dense mode (3 rows of 60x85 on A4): compact header, 4 mm between slots, caption printed inside the slot.
+const DENSE = { header: 25, gap: 4, bottom: 7 };
+function denseRows(size) {
+  return Math.floor((PAGE.h - DENSE.header - DENSE.bottom + DENSE.gap) / (size.h + DENSE.gap));
+}
+function isDense(size) {
+  return denseRows(size) >= 3;
+}
 function slotRows(size) {
-  const avail = PAGE.h - 36 - 12; // header above, margin below
+  if (isDense(size)) return denseRows(size);
+  const avail = PAGE.h - 36 - 12;
   return Math.max(1, Math.floor((avail + SLOT_GAP) / (size.h + CAPTION_H + SLOT_GAP)));
 }
-// Rows are spread over the free height (larger gap, but capped) and the block is centred under the header.
 function gridGap(size) {
+  if (isDense(size)) return DENSE.gap;
   const rows = slotRows(size);
   const free = PAGE.h - 36 - 14 - rows * (size.h + CAPTION_H);
   return rows > 1 ? Math.min(22, Math.max(SLOT_GAP, free / (rows - 1) - 8)) : SLOT_GAP;
 }
 function gridTop(size) {
+  if (isDense(size)) return DENSE.header;
   const rows = slotRows(size);
   const content = rows * (size.h + CAPTION_H) + (rows - 1) * gridGap(size);
   return 36 + Math.max(0, (PAGE.h - 36 - 14 - content) / 2);
@@ -143,6 +153,14 @@ ${cardCss(size)}
   grid-template-columns:repeat(${SLOT_COLS},${size.w}mm);justify-content:space-between;row-gap:${gridGap(size).toFixed(1)}mm;}
 .cell{position:relative;width:${size.w}mm;}
 .cell .cap{height:${CAPTION_H}mm;padding-top:1.6mm;text-align:center;}
+.team.dense .hdr{top:${bleed + 5}mm;height:16mm;}
+.team.dense .hdr .logo{width:16mm;height:16mm;}
+.team.dense .hdr .title{font-size:11mm;}
+.team.dense .hdr .sub{font-size:3mm;margin-top:1mm;}
+.team.dense .cell .cap{position:absolute;left:0;right:0;bottom:0;height:auto;padding:1.4mm 2mm 1.6mm;background:rgba(255,255,255,.9);border-top:.3mm solid color-mix(in srgb,var(--primary) 25%,transparent);}
+.team.dense .cell .cap .n{font-size:3.4mm;}
+.team.dense .cell .cap .p{font-size:2.2mm;margin-top:.4mm;}
+.team.dense .pgnum{bottom:${bleed + 1.5}mm;}
 .cell .cap .n{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:3.6mm;line-height:1.05;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .cell .cap .n span{color:var(--secondary);margin-right:1.2mm;}
 .cell .cap .p{font-family:'Roboto';font-weight:500;text-transform:uppercase;letter-spacing:.12em;font-size:2.3mm;color:#4a5a70;margin-top:.6mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -337,7 +355,7 @@ function teamPage(data, cards, pageNo, idx, total) {
     )
     .join('');
   const even = pageNo % 2 === 0;
-  return `<section class="page team ice">
+  return `<section class="page team ice${isDense(data.cardSize) ? ' dense' : ''}">
     ${deco(data, 0.1)}
     <div class="orn br" style="opacity:.9"></div>
     <div class="hdr"><div class="logo">${logo}</div><div style="text-align:right"><div class="title">Команда</div><div class="sub">${esc(t.name)} · карточки ${cards[0].index}–${cards[cards.length - 1].index} из ${data.cards.length}</div></div></div>

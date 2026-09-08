@@ -193,6 +193,8 @@ async function loadTeam(teamDir, cacheDir) {
       photoSmall: photoPath ? await prepareImage(photoPath, photoCache, 500) : placeholderPhoto(number, colors.primary),
       hasPhoto: Boolean(photoPath),
       photoAspect: photoPath ? await imageAspect(photoPath) : 0.75,
+      // horizontal position of the face in the photo (0–100 %), used to place the close-up on the card back
+      focus: Number(String(row.focus || row['фокус'] || '50').replace('%', '')) || 50,
     });
   }
 
