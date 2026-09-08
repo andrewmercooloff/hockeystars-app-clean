@@ -56,8 +56,8 @@ function cardCss(size) {
   linear-gradient(180deg,var(--primary),var(--dark));}
 /* Close-up of the face across the top of the back, pushed to the right so the header text sits on a dark fade. */
 .card.back .photo{position:absolute;left:0;right:0;top:0;height:${(B + 43 * s).toFixed(2)}mm;overflow:hidden;}
-.card.back .photo img{position:absolute;width:${(w * 1.0).toFixed(2)}mm;height:auto;top:${(B + 0.5 * s).toFixed(2)}mm;}
-.card.back.coach .photo img{width:${(w * 0.86).toFixed(2)}mm;top:${(B + 1.5 * s).toFixed(2)}mm;}
+.card.back .photo img{position:absolute;width:${(w * 0.86).toFixed(2)}mm;height:auto;top:${(B + 10.5 * s).toFixed(2)}mm;}
+.card.back.coach .photo img{width:${(w * 0.7).toFixed(2)}mm;top:${(B + 13 * s).toFixed(2)}mm;}
 .card.back.team .photo img,.card.back.club .photo img{width:100%;height:100%;left:0;top:0;object-fit:cover;object-position:center center;}
 .card.back .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,color-mix(in srgb,var(--primary) 80%,transparent) 0%,color-mix(in srgb,var(--primary) 35%,transparent) 22%,rgba(0,0,0,0) 45%);}
 .card.back.team .photo::after,.card.back.club .photo::after{background:linear-gradient(90deg,color-mix(in srgb,var(--primary) 96%,transparent) 0%,color-mix(in srgb,var(--primary) 60%,transparent) 30%,rgba(0,0,0,0) 60%),linear-gradient(180deg,rgba(0,0,0,0) 80%,var(--primary) 100%);}
@@ -145,8 +145,8 @@ function posSize(card, size) {
 // Close-up on the back: image is 92 % (coach 80 %) of the card width; shift it so the face (card.focus, % of image
 // width) lands at ~70 % of the card width, leaving the left side for the header.
 function backPhotoLeft(card, size) {
-  const imgW = size.w * (card.type === 'coach' ? 0.86 : 1.0);
-  return size.bleed + size.w * 0.64 - (card.focus / 100) * imgW;
+  const imgW = size.w * (card.type === 'coach' ? 0.7 : 0.86);
+  return size.bleed + size.w * 0.6 - (card.focus / 100) * imgW;
 }
 
 function cardBack(card, data) {
