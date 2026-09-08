@@ -115,6 +115,9 @@ ${cardCss(size)}
 .cover .logo .badge small{font-family:'Roboto';font-weight:500;font-size:2.6mm;letter-spacing:.14em;text-transform:uppercase;opacity:.85;margin-top:1.5mm;}
 .cover .count{position:absolute;left:${bleed + 10}mm;bottom:${bleed + 18}mm;width:56mm;height:44mm;color:#fff;}
 .cover .count svg{position:absolute;inset:0;width:100%;height:100%;}
+.cover .count.real{width:60mm;height:48mm;left:${bleed + 8}mm;bottom:${bleed + 16}mm;}
+.cover .count.real img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;}
+.cover .count.real .in{top:5.5mm;}
 .cover .count .in{position:absolute;left:0;right:0;top:8.5mm;text-align:center;}
 .cover .count b{display:block;font-family:'Russo One';font-weight:400;font-size:14mm;line-height:.95;color:var(--secondary);-webkit-text-stroke:.5mm #fff;paint-order:stroke fill;}
 .cover .count span{display:block;font-family:'Oswald';font-weight:600;text-transform:uppercase;font-size:3.8mm;letter-spacing:.14em;margin-top:0;}
@@ -342,7 +345,7 @@ function coverPage(data) {
     <div class="season"><span>${sticksSvg('#fff', data.colors.accent, '#111')}Альбом с карточками <b>★</b> ${esc(t.season)}</span></div>
     ${data.assets.logo ? `<div class="teamname">${esc(t.name)}<small>${esc(t.city || '')}</small></div>` : ''}
     <div class="logo">${logo}</div>
-    <div class="count">${coverPuckSvg(data.colors)}<div class="in"><b>${data.cards.length}</b><span>карточек</span></div></div>
+    <div class="count${data.assets.puck ? ' real' : ''}">${data.assets.puck ? `<img src="${data.assets.puck}">` : coverPuckSvg(data.colors)}<div class="in"><b>${data.cards.length}</b><span>карточек</span></div></div>
     <div class="year">${esc(t.year || '')}</div>
     <div class="brand"><img src="${data.brand.hockeystarsWhite}"></div>
   </section>`;
