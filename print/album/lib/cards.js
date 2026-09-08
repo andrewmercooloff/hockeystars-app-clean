@@ -56,7 +56,7 @@ function cardCss(size) {
   linear-gradient(180deg,var(--primary),var(--dark));}
 /* Close-up of the face across the top of the back, pushed to the right so the header text sits on a dark fade. */
 .card.back .photo{position:absolute;left:0;right:0;top:0;height:${(B + 43 * s).toFixed(2)}mm;overflow:hidden;}
-.card.back.person .photo{height:${(B + 46 * s).toFixed(2)}mm;background:linear-gradient(180deg,#f3f5f8 0%,#e2e7ee 100%);
+.card.back.person .photo{height:${(B + 46 * s).toFixed(2)}mm;background:linear-gradient(180deg,#eef1f4 0%,#e4e8ed 100%);
   clip-path:polygon(0 0,100% 0,100% ${(B + 38.4 * s).toFixed(2)}mm,0 ${(B + 44 * s).toFixed(2)}mm);}
 .card.back.person .photo img{position:absolute;height:${(B + 42 * s).toFixed(2)}mm;width:auto;top:0;transform-origin:top left;}
 .card.back.person .band.top{transform:none;left:0;right:0;height:auto;top:0;bottom:0;background:none;}
@@ -155,10 +155,14 @@ function posSize(card, size) {
 
 // Close-up on the back: image is 92 % (coach 80 %) of the card width; shift it so the face (card.focus, % of image
 // width) lands at ~70 % of the card width, leaving the left side for the header.
+// The whole portrait (side edges faded, see images.backCloseup) is scaled to the light zone height and stands
+// behind the orange band, like on the front. Face (card.focus) lands at ~66 % of the card width, right of the logo.
+function backPhotoH(size) {
+  return size.bleed + 47 * (size.w / 63.5);
+}
 function backPhotoLeft(card, size) {
-  // the baked close-up is the top part of the photo (see images.backCloseup), displayed at the photo-zone height
-  const cropAspect = 1 / (Math.min(1 / (card.photoAspect || 0.75), 1.15) * 0.62);
-  const imgW = (size.bleed + 42 * (size.w / 63.5)) * card.zoom * cropAspect;
+  const aspect = Math.min(card.photoAspect || 0.75, 1.15);
+  const imgW = backPhotoH(size) * card.zoom * aspect;
   return size.bleed + size.w * 0.66 - (card.focus / 100) * imgW;
 }
 
@@ -182,7 +186,7 @@ function cardBack(card, data) {
   const light = person && card.photoBack;
   return `<div class="card back ${card.type}${light ? ' person' : ''}">
     <div class="bg"></div>
-    ${card.hasPhoto ? `<div class="photo"><img src="${card.photoBack || card.photo}" style="${card.photoBack ? `left:${backPhotoLeft(card, data.cardSize).toFixed(2)}mm;height:${((data.cardSize.bleed + 42 * (data.cardSize.w / 63.5)) * card.zoom).toFixed(2)}mm;top:${((data.cardSize.bleed + 42 * (data.cardSize.w / 63.5)) * (1 - card.zoom) * (card.type === 'coach' ? 0.25 : 1)).toFixed(2)}mm` : ''}"></div>` : ''}
+    ${card.hasPhoto ? `<div class="photo"><img src="${card.photoBack || card.photo}" style="${card.photoBack ? `left:${backPhotoLeft(card, data.cardSize).toFixed(2)}mm;height:${(backPhotoH(data.cardSize) * card.zoom).toFixed(2)}mm;top:${(backPhotoH(data.cardSize) * (1 - card.zoom) * 0.3).toFixed(2)}mm` : ''}"></div>` : ''}
     <div class="band top"></div><div class="band top2"></div>
     <div class="head">${logo}${light ? `<div class="yr">${esc(t.season)}</div>` : ''}<div class="t">${esc(t.name)}<small>${esc(t.city || '')}${t.city ? '<br>' : ''}Сезон ${esc(t.season)}</small></div></div>
     ${card.number ? `<div class="bignum">${esc(card.number)}</div>` : ''}

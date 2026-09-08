@@ -123,10 +123,10 @@ async function imageAspect(urlOrPath) {
 
 // Close-up for the card back: top `cropFrac` of the photo, alpha fade baked into the pixels (left / right / bottom)
 // so no CSS masks or blend modes are needed — those get dropped by some PDF viewers (iOS Preview).
-async function backCloseup(srcPath, cacheDir, cropFrac = 0.62, widthPx = 900) {
+async function backCloseup(srcPath, cacheDir, cropFrac = 1, widthPx = 900) {
   if (!sharp) return null;
   const stat = fs.statSync(srcPath);
-  const key = crypto.createHash('md5').update(`${srcPath}|${stat.size}|${stat.mtimeMs}|back2|${cropFrac}|${widthPx}`).digest('hex').slice(0, 12);
+  const key = crypto.createHash('md5').update(`${srcPath}|${stat.size}|${stat.mtimeMs}|back3|${cropFrac}|${widthPx}`).digest('hex').slice(0, 12);
   const outPath = path.join(cacheDir, `${path.basename(srcPath, path.extname(srcPath))}-${key}-back.png`);
   if (!fs.existsSync(outPath)) {
     fs.mkdirSync(cacheDir, { recursive: true });
@@ -139,8 +139,8 @@ async function backCloseup(srcPath, cacheDir, cropFrac = 0.62, widthPx = 900) {
     const outH = Math.round((cropH / W) * widthPx);
     const mask = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${widthPx}" height="${outH}">
       <defs>
-        <linearGradient id="x" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".22" stop-color="#fff" stop-opacity="1"/><stop offset=".86" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-        <linearGradient id="y" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".12" stop-color="#fff" stop-opacity="1"/><stop offset=".72" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <linearGradient id="x" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".18" stop-color="#fff" stop-opacity="1"/><stop offset=".82" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <linearGradient id="y" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".06" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity="1"/></linearGradient>
         <mask id="m"><rect width="100%" height="100%" fill="url(#y)"/></mask>
       </defs>
       <rect width="100%" height="100%" fill="url(#x)" mask="url(#m)"/></svg>`);
