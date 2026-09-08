@@ -209,6 +209,7 @@ async function loadTeam(teamDir, cacheDir) {
     back: await asset(['back', 'arena'], 3200),
     qr: await asset(['qr'], 1200),
     history: await asset(['history'], 1600),
+    history2: await asset(['history2'], 1600),
     gallery: [],
   };
   assets.coverAspect = await imageAspect(assets.cover);

@@ -21,27 +21,27 @@ function cardCss(size) {
 /* ---- FRONT ---- */
 .card.front{background:#fff;}
 .card.front .accents{position:absolute;inset:0;width:100%;height:100%;display:block;}
-.card.front .photo{position:absolute;left:${inset};top:${inset};right:${inset};bottom:${inset};overflow:hidden;background:#dfe6ee;
-  clip-path:polygon(${mm(13)} 0,100% 0,100% calc(100% - ${mm(13)}),calc(100% - ${mm(13)}) 100%,0 100%,0 ${mm(13)});}
+.card.front .photo{position:absolute;left:${inset};top:${inset};right:${inset};bottom:${(B + 2.6 * s + 22 * s).toFixed(2)}mm;overflow:hidden;background:#dfe6ee;
+  clip-path:polygon(${mm(13)} 0,100% 0,100% 100%,0 100%,0 ${mm(13)});}
 .card.front .photo img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;}
 .card.front.team .photo img,.card.front.club .photo img{object-position:center center;}
 .card.front.wide .photo{background:linear-gradient(180deg,color-mix(in srgb,var(--primary) 85%,#fff) 0%,var(--primary) 100%);}
 .card.front.wide .photo img{object-fit:contain;object-position:center 32%;}
 .card.front .photo::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 .45mm var(--primary);
-  clip-path:polygon(${mm(13)} 0,100% 0,100% calc(100% - ${mm(13)}),calc(100% - ${mm(13)}) 100%,0 100%,0 ${mm(13)});}
+  clip-path:polygon(${mm(13)} 0,100% 0,100% 100%,0 100%,0 ${mm(13)});}
 .card.front .num sup{font-size:38%;vertical-align:top;position:relative;top:${mm(1.2)};margin-left:${mm(0.4)};-webkit-text-stroke:${mm(0.35)} var(--primary);}
 .card.front .num{position:absolute;right:${(B + 3.4 * s).toFixed(2)}mm;top:${(B + 2.4 * s).toFixed(2)}mm;font-family:'Oswald';font-weight:700;font-size:${mm(13.5)};line-height:1;color:#fff;
   -webkit-text-stroke:${mm(0.55)} var(--primary);paint-order:stroke fill;filter:drop-shadow(0 .5mm 1mm rgba(0,0,0,.35));}
-.card.front .logo{position:absolute;left:${(B + 3.2 * s).toFixed(2)}mm;bottom:${(B + 3.2 * s).toFixed(2)}mm;width:${mm(10)};height:${mm(10)};z-index:2;}
+.card.front .logo{position:absolute;left:${(B + 4 * s).toFixed(2)}mm;bottom:${(B + 6.2 * s).toFixed(2)}mm;width:${mm(9.5)};height:${mm(9.5)};z-index:2;}
 .card.front .logo img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 .4mm .8mm rgba(0,0,0,.5));}
-.card.front .plate{position:absolute;left:${inset};right:${inset};bottom:${inset};padding:${mm(10)} ${mm(3)} ${mm(3.2)} ${mm(3)};
-  background:linear-gradient(180deg,rgba(8,10,16,0) 0%,rgba(8,10,16,.55) 35%,rgba(8,10,16,.92) 100%);
+.card.front .plate{position:absolute;left:${inset};right:${inset};bottom:${inset};height:${mm(22)};box-sizing:border-box;padding:${mm(2.6)} ${mm(3)} ${mm(2.4)} ${mm(3.2)};
+  background:linear-gradient(180deg,var(--primary) 0%,var(--dark) 100%);border-top:.6mm solid var(--secondary);
   clip-path:polygon(0 0,100% 0,100% calc(100% - ${mm(13)}),calc(100% - ${mm(13)}) 100%,0 100%);}
 .card.front.haslogo .plate{padding-left:${mm(14.5)};}
 .card.front .plate .nm{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:${mm(4.8)};line-height:1.02;text-shadow:0 .3mm .6mm rgba(0,0,0,.6);word-break:break-word;}
 .card.front .plate .nm small{display:block;font-weight:500;font-size:${mm(3.5)};opacity:.95;margin-top:.3mm;white-space:nowrap;}
-.card.front .plate .nm,.card.front .plate .pos{padding-right:${mm(7)};}
-.card.front .plate .pos{margin-top:${mm(1.2)};font-family:'Roboto';font-weight:500;font-size:${mm(2.5)};letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.92);line-height:1.2;}
+.card.front .plate .nm,.card.front .plate .pos{padding-right:${mm(9)};}
+.card.front .plate .pos{margin-top:${mm(1.2)};font-family:'Roboto';font-weight:500;font-size:${mm(2.5)};letter-spacing:.04em;text-transform:uppercase;color:rgba(255,255,255,.92);line-height:1.2;}
 .card.front .plate .pos::before{content:"";display:inline-block;width:${mm(5)};height:.6mm;background:var(--secondary);vertical-align:middle;margin-right:1.5mm;}
 .card.front.coach .plate .pos::before{background:var(--accent);}
 .card.front.coach .plate .pos{color:var(--accent);}
@@ -55,7 +55,7 @@ function cardCss(size) {
   radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.18), transparent 60%),
   linear-gradient(180deg,var(--primary),var(--dark));}
 /* Close-up of the face across the top of the back, pushed to the right so the header text sits on a dark fade. */
-.card.back .photo{position:absolute;left:0;right:0;top:0;height:${(B + 38 * s).toFixed(2)}mm;overflow:hidden;}
+.card.back .photo{position:absolute;left:0;right:0;top:0;height:${(B + 43 * s).toFixed(2)}mm;overflow:hidden;}
 .card.back .photo img{position:absolute;width:92%;height:auto;left:${(B + 14 * s).toFixed(2)}mm;top:${(B + 1 * s).toFixed(2)}mm;opacity:.92;}
 .card.back.coach .photo img{width:80%;left:${(B + 16 * s).toFixed(2)}mm;top:${(B + 2 * s).toFixed(2)}mm;}
 .card.back.team .photo img,.card.back.club .photo img{width:100%;height:100%;left:0;top:0;object-fit:cover;object-position:center center;}
@@ -63,22 +63,22 @@ function cardCss(size) {
   linear-gradient(90deg,color-mix(in srgb,var(--primary) 96%,transparent) 0%,color-mix(in srgb,var(--primary) 75%,transparent) 26%,color-mix(in srgb,var(--primary) 10%,transparent) 42%,rgba(0,0,0,0) 60%),
   linear-gradient(180deg,rgba(0,0,0,0) 80%,var(--primary) 100%);}
 .card.back .band{position:absolute;left:-10mm;right:-10mm;height:${mm(7)};transform:rotate(-8deg);}
-.card.back .band.top{top:${(B + 36.5 * s).toFixed(2)}mm;height:${mm(4)};background:var(--secondary);opacity:.95;}
+.card.back .band.top{top:${(B + 41.5 * s).toFixed(2)}mm;height:${mm(4)};background:var(--secondary);opacity:.95;}
 .card.back .band.top2{display:none;top:${(B + 29.5 * s).toFixed(2)}mm;height:${mm(1.5)};background:#fff;opacity:.5;}
 .card.back .head{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 3.5 * s).toFixed(2)}mm;display:flex;align-items:center;gap:${mm(2.5)};}
 .card.back .head img{width:${mm(10)};height:${mm(10)};object-fit:contain;}
 .card.back .head .t{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:${mm(4)};line-height:1.05;}
 .card.back .head .t small{display:block;font-family:'Roboto';font-weight:400;text-transform:none;font-size:${mm(2.4)};opacity:.8;margin-top:.6mm;}
-.card.back .bignum{position:absolute;right:${(B + 3 * s).toFixed(2)}mm;top:${(B + 50 * s).toFixed(2)}mm;font-family:'Oswald';font-weight:700;font-size:${mm(30)};line-height:1;color:rgba(255,255,255,.08);}
-.card.back .who{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 41.5 * s).toFixed(2)}mm;}
+.card.back .bignum{position:absolute;right:${(B + 3 * s).toFixed(2)}mm;top:${(B + 54 * s).toFixed(2)}mm;font-family:'Oswald';font-weight:700;font-size:${mm(30)};line-height:1;color:rgba(255,255,255,.08);}
+.card.back .who{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 46.5 * s).toFixed(2)}mm;}
 .card.back .who .nm{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:${mm(5.4)};line-height:1.05;text-shadow:0 0 1.5mm rgba(0,0,0,.9),0 .4mm 1mm rgba(0,0,0,.7);}
 .card.back .who .nm span{color:var(--accent);margin-right:1.5mm;}
 .card.back .who .nm sup{font-size:50%;vertical-align:top;position:relative;top:${mm(0.6)};}
 .card.back .who .pos{font-family:'Roboto';font-weight:500;font-size:${mm(2.7)};letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.85);margin-top:1.2mm;}
-.card.back table{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 55 * s).toFixed(2)}mm;width:calc(100% - ${pad * 2}mm);border-collapse:collapse;font-size:${mm(2.9)};}
-.card.back td{padding:${mm(0.7)} 0;border-bottom:.2mm solid rgba(255,255,255,.18);line-height:1.15;}
+.card.back table{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 59 * s).toFixed(2)}mm;width:calc(100% - ${pad * 2}mm);border-collapse:collapse;font-size:${mm(2.9)};}
+.card.back td{padding:${mm(0.45)} 0;border-bottom:.2mm solid rgba(255,255,255,.18);line-height:1.15;}
 .card.back td:first-child{font-family:'Roboto';font-weight:400;text-transform:uppercase;letter-spacing:.1em;font-size:${mm(2.4)};color:rgba(255,255,255,.7);}
-.card.back td:last-child{text-align:right;font-family:'Oswald';font-weight:600;font-size:${mm(3.6)};}
+.card.back td:last-child{text-align:right;font-family:'Oswald';font-weight:600;font-size:${mm(3.4)};}
 .card.back .foot{position:absolute;left:${pad}mm;right:${pad}mm;bottom:${(B + 3.5 * s).toFixed(2)}mm;display:flex;align-items:center;justify-content:space-between;}
 .card.back .foot img{height:${mm(4.2)};}
 .card.back .foot .idx{font-family:'Oswald';font-weight:600;font-size:${mm(3.2)};color:rgba(255,255,255,.85);}
@@ -130,9 +130,17 @@ function cardFront(card, data) {
     ${ribbon}${logo}${num}
     <div class="plate">
       <div class="nm">${nameHtml(card, data.cardSize.w / 63.5)}</div>
-      <div class="pos">${esc(card.position)}</div>
+      <div class="pos" style="font-size:${posSize(card, data.cardSize).toFixed(2)}mm">${esc(card.position)}</div>
     </div>
   </div>`;
+}
+
+// Position line must fit on one line next to the logo: shrink from 2.5 mm for long titles (min 2 mm).
+function posSize(card, size) {
+  const s = size.w / 63.5;
+  const avail = size.w - 2 * 2.6 * s - 14.5 * s - 3 * s - 9 * s - 6.5 * s; // minus the secondary-colour dash
+  // one line when it fits, otherwise two lines at 2.3 mm
+  return avail / (Math.max(card.position.length, 1) * 0.66) >= 2.5 * s ? 2.5 * s : 2.3 * s;
 }
 
 // Close-up on the back: image is 92 % (coach 80 %) of the card width; shift it so the face (card.focus, % of image
@@ -219,17 +227,14 @@ function cardsHtml(data, opts = {}) {
 
   let pages = '';
   let pageSize;
-  // One card per page (front, then back) for print shops that cut stacks: trim box + bleed + 5 mm white margin
-  // with crop marks at the trim lines. Odd pages are fronts, even pages are backs → duplex, flip on long edge.
-  // One card per page (front, then back) for print shops that cut stacks. Page = exact trim size (60x85):
-  // the artwork bleed is drawn but clipped by the page, so a slightly off cut still shows artwork, never white.
-  // Odd pages are fronts, even pages are backs → duplex, flip on long edge.
-  const M = 0;
+  // One card per page (front, then back) for print shops that cut stacks. Page = trim size + bleed on each side
+  // (60x85 + 2 mm → 64x89), no marks; text stays ≥ 3 mm inside the trim. Odd pages fronts, even pages backs → duplex,
+  // flip on long edge.
   if (layout === 'single') {
-    pageSize = `${size.w}mm ${size.h}mm`;
+    pageSize = `${cw}mm ${ch}mm`;
     for (const card of data.cards) {
-      pages += `<section class="page single"><div class="slot" style="left:${-size.bleed}mm;top:${-size.bleed}mm">${cardFront(card, data)}</div></section>`;
-      pages += `<section class="page single"><div class="slot" style="left:${-size.bleed}mm;top:${-size.bleed}mm">${cardBack(card, data)}</div></section>`;
+      pages += `<section class="page single"><div class="slot" style="left:0;top:0">${cardFront(card, data)}</div></section>`;
+      pages += `<section class="page single"><div class="slot" style="left:0;top:0">${cardBack(card, data)}</div></section>`;
     }
   } else {
     pageSize = `${sheet.w}mm ${sheet.h}mm`;
@@ -261,7 +266,7 @@ ${cardCss(size)}
 @page{size:${pageSize};margin:0;}
 .page{position:relative;page-break-after:always;overflow:hidden;background:#fff;}
 .page.sheet{width:${sheet.w}mm;height:${sheet.h}mm;}
-.page.single{width:${size.w}mm;height:${size.h}mm;}
+.page.single{width:${cw}mm;height:${ch}mm;}
 .slot{position:absolute;}
 .mark{position:absolute;background:#000;}
 .mark.v{width:.15mm;}

@@ -203,6 +203,9 @@ ${cardCss(size)}
 .history .fact b{display:block;font-family:'Oswald';font-weight:700;font-size:9mm;line-height:1;color:var(--secondary);}
 .history .fact span{display:block;font-size:2.9mm;line-height:1.25;color:#1b2940;margin-top:.8mm;white-space:pre-line;}
 .history .hphoto{position:absolute;right:${bleed + 10}mm;bottom:${bleed + 14}mm;width:44mm;height:60mm;border-radius:2mm;overflow:hidden;box-shadow:0 1.5mm 4mm rgba(0,0,0,.2);}
+.history .hphoto.p0{height:40mm;bottom:${bleed + 58}mm;}
+.history .hphoto.p1{height:40mm;}
+.history .hphoto .cap{position:absolute;left:0;right:0;bottom:0;padding:1.5mm 2.5mm;font-family:'Oswald';font-weight:600;font-size:2.8mm;text-transform:uppercase;letter-spacing:.06em;color:#fff;background:linear-gradient(180deg,transparent,rgba(0,0,0,.65));}
 .history .hphoto img{width:100%;height:100%;object-fit:cover;}
 
 /* ---------- STATS ---------- */
@@ -237,10 +240,36 @@ ${cardCss(size)}
 .gallery .ph .cap{position:absolute;left:0;right:0;bottom:0;padding:1.5mm 2.5mm;font-family:'Oswald';font-weight:600;font-size:3mm;text-transform:uppercase;letter-spacing:.06em;color:#fff;
   background:linear-gradient(180deg,transparent,rgba(0,0,0,.6));}
 
+/* ---------- QUOTES ---------- */
+.quotes .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
+.quotes .hdr .sticks{width:14mm;height:14mm;vertical-align:-3mm;margin-left:3mm;}
+.quotes .hdr .title{font-size:12.5mm;}
+.quotes .goal{position:absolute;right:${bleed + 12}mm;bottom:${bleed + 4}mm;width:34mm;height:22mm;opacity:.5;}
+.quotes .qgrid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 42}mm;bottom:${bleed + 16}mm;display:grid;grid-template-columns:1fr 1fr;gap:5mm 6mm;align-content:space-between;}
+.quotes .qp{position:relative;background:linear-gradient(135deg,var(--primary),var(--dark));color:#fff;padding:5mm 6mm 5mm 7mm;transform:rotate(-1.2deg) skewX(-3deg);
+  box-shadow:0 1.2mm 3mm rgba(0,0,0,.25);border-left:1.4mm solid var(--secondary);}
+.quotes .qp.odd{transform:rotate(1deg) skewX(-3deg);border-left-color:var(--accent);}
+.quotes .qp:nth-child(3n){margin-left:8mm;} .quotes .qp:nth-child(3n+1){margin-right:8mm;}
+.quotes .qp:last-child:nth-child(odd){grid-column:1 / span 2;margin:0 30mm 0 25mm;}
+.quotes .qp p{font-family:'Oswald';font-weight:600;text-transform:uppercase;font-size:4.1mm;line-height:1.18;transform:skewX(3deg);}
+.quotes .qp b{display:block;margin-top:2.4mm;font-family:'Roboto';font-weight:700;font-size:2.9mm;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);transform:skewX(3deg);}
+.quotes .qp.odd b{color:color-mix(in srgb,var(--secondary) 70%,#fff);}
+.quotes .qp::after{content:"";position:absolute;right:-1mm;bottom:-1mm;width:10mm;height:10mm;background:var(--secondary);clip-path:polygon(100% 0,100% 100%,0 100%);opacity:.9;}
+.quotes .qp.odd::after{background:var(--accent);}
+/* ---------- BACK COVER: card wall ---------- */
+.backcover .collect{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 42}mm;}
+.backcover .collect .ttl{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:11mm;line-height:1;color:#fff;margin-bottom:6mm;}
+.backcover .collect .ttl span{display:block;font-size:6mm;color:var(--accent);margin-top:1.5mm;letter-spacing:.06em;}
+.backcover .wall{display:grid;grid-template-columns:repeat(9,19mm);justify-content:space-between;row-gap:4mm;}
+.backcover .mini{position:relative;}
+.backcover .mini .mc{width:19mm;height:${(19 / size.w * size.h).toFixed(2)}mm;overflow:hidden;box-shadow:0 .6mm 1.5mm rgba(0,0,0,.5);}
+.backcover .mini .mc .card{transform-origin:top left;transform:translate(${(-size.bleed * 19 / size.w).toFixed(2)}mm,${(-size.bleed * 19 / size.w).toFixed(2)}mm) scale(${(19 / size.w).toFixed(4)});}
+.backcover .mini{height:${(19 / size.w * size.h + 4).toFixed(1)}mm;}
+.backcover .mini span{position:absolute;left:0;right:0;bottom:0;text-align:center;font-family:'Oswald';font-weight:600;font-size:2.6mm;color:rgba(255,255,255,.75);}
 /* ---------- BACK COVER ---------- */
 .backcover{background:var(--dark);color:#fff;}
-.backcover .photo{position:absolute;inset:0;}
-.backcover .photo img{width:100%;height:100%;object-fit:cover;opacity:.55;mix-blend-mode:luminosity;}
+.backcover > .photo{position:absolute;inset:0;}
+.backcover > .photo > img{width:100%;height:100%;object-fit:cover;opacity:.55;mix-blend-mode:luminosity;}
 .backcover .tint{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,26,58,.35) 0%,rgba(7,26,58,.55) 60%,var(--dark) 100%);}
 .backcover .pattern{position:absolute;inset:0;background:
   radial-gradient(ellipse at 50% 35%,rgba(90,140,220,.45),transparent 55%),
@@ -250,11 +279,11 @@ ${cardCss(size)}
 .backcover .rink::after{content:"";position:absolute;left:50%;top:50%;width:26mm;height:26mm;margin:-13mm 0 0 -13mm;border:1.2mm solid rgba(60,110,200,.9);border-radius:50%;}
 .backcover .rink i{position:absolute;top:0;bottom:0;width:1mm;background:rgba(60,110,200,.9);}
 .backcover .rink i.a{left:30%;} .backcover .rink i.b{right:30%;}
-.backcover .cta{position:absolute;left:${bleed + 12}mm;right:${bleed + 12}mm;bottom:${bleed + 22}mm;}
-.backcover .cta h2{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:17mm;line-height:.95;}
+.backcover .cta{position:absolute;left:${bleed + 12}mm;right:${bleed + 12}mm;bottom:${bleed + 22}mm;max-width:120mm;}
+.backcover .cta h2{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:13mm;line-height:.95;}
 .backcover .cta h2 span{color:var(--accent);}
-.backcover .cta p{font-size:4.6mm;line-height:1.35;margin-top:3mm;max-width:120mm;color:rgba(255,255,255,.9);}
-.backcover .qr{position:absolute;right:${bleed + 12}mm;bottom:${bleed + 22}mm;width:44mm;height:44mm;background:#fff;border-radius:2mm;padding:2.5mm;display:flex;align-items:center;justify-content:center;}
+.backcover .cta p{font-size:4mm;line-height:1.35;margin-top:3mm;max-width:120mm;color:rgba(255,255,255,.9);}
+.backcover .qr{position:absolute;right:${bleed + 12}mm;bottom:${bleed + 20}mm;width:38mm;height:38mm;background:#fff;border-radius:2mm;padding:2.5mm;display:flex;align-items:center;justify-content:center;}
 .backcover .qr img{width:100%;height:100%;object-fit:contain;}
 .backcover .qr .ph{font-family:'Roboto';font-size:3mm;color:#7b8798;text-align:center;line-height:1.3;}
 .backcover .brand{position:absolute;left:${bleed + 12}mm;bottom:${bleed + 9}mm;display:flex;align-items:center;gap:3mm;}
@@ -388,7 +417,34 @@ function historyPage(data, pageNo) {
             .join('')}</div>`
         : ''
     }
-    ${data.assets.history ? `<div class="hphoto"><img src="${data.assets.history}"></div>` : ''}
+    ${[data.assets.history, data.assets.history2].filter(Boolean).map((src, i) => `<div class="hphoto p${i}"><img src="${src}">${i === 0 && h.photoCaption ? `<div class="cap">${esc(h.photoCaption)}</div>` : ''}</div>`).join('')}
+    <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
+  </section>`;
+}
+
+const DEFAULT_QUOTES = [
+  { q: 'Ты промахиваешься в 100 % бросков, которые не сделал.', a: 'Уэйн Гретцки' },
+  { q: 'Хороший хоккеист играет там, где шайба. Великий — там, где она будет.', a: 'Уэйн Гретцки' },
+  { q: 'Хоккеист должен обладать мудростью шахматиста, точностью снайпера и ритмом музыканта.', a: 'Анатолий Тарасов' },
+  { q: 'Хоккей — это не просто игра, это жизнь.', a: 'Валерий Харламов' },
+  { q: 'Команда — это как семья, где каждый должен поддерживать друг друга.', a: 'Илья Ковальчук' },
+  { q: 'Если ты хочешь играть и выигрывать, то ты должен быть готов жертвовать всем, кроме здоровья.', a: 'Вячеслав Фетисов' },
+  { q: 'Мы боимся проиграть? Вот почему мы побеждаем: мы знаем, каково это — проигрывать, и слишком ненавидим это, чтобы не быть чемпионами.', a: 'Бобби Орр' },
+  { q: 'Великие моменты рождаются из великих возможностей.', a: 'Херб Брукс' },
+  { q: 'Никогда не переставай мечтать. Мечты сбываются, если работать.', a: 'Александр Овечкин' },
+];
+// "Фразы великих хоккеистов": dark skewed plates scattered on the ice, like the reference album.
+function quotesPage(data, pageNo) {
+  const list = (data.team.quotes?.length ? data.team.quotes : DEFAULT_QUOTES).slice(0, 9);
+  const plates = list
+    .map((it, i) => `<div class="qp ${i % 2 ? 'odd' : ''}" style="--i:${i}"><p>«${esc(it.q)}»</p><b>${esc(it.a)}</b></div>`)
+    .join('');
+  return `<section class="page quotes ice">
+    ${deco(data)}
+    <div class="orn br" style="opacity:.9"></div>
+    ${goalSvg(data.colors.secondary, `color-mix(in srgb,${data.colors.primary} 45%,transparent)`)}
+    <div class="hdr"><div class="title">Фразы великих хоккеистов</div>${sticksSvg(data.colors.primary, data.colors.secondary, data.colors.dark)}</div>
+    <div class="qgrid">${plates}</div>
     <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
   </section>`;
 }
@@ -465,14 +521,15 @@ function galleryPage(data, pageNo, photos, title) {
 function backCoverPage(data) {
   const t = data.team;
   const texts = t.texts || {};
-  const photo = data.assets.back
-    ? `<div class="photo"><img src="${data.assets.back}"></div><div class="tint"></div>`
-    : `<div class="pattern"></div><div class="rink"><i class="a"></i><i class="b"></i></div>`;
   const qr = data.assets.qr ? `<img src="${data.assets.qr}">` : `<div class="ph">QR-код<br>assets/qr.png</div>`;
   const logo = data.assets.logo ? `<img src="${data.assets.logo}">` : '';
+  const wall = data.cards
+    .map((c) => `<div class="mini"><div class="mc">${cardFront({ ...c, photo: c.photoSmall }, data)}</div><span>${c.index}</span></div>`)
+    .join('');
   return `<section class="page backcover">
-    ${photo}
+    <div class="pattern"></div>
     <div class="top"><div class="name">${esc(t.name)}<small>${esc(t.city || '')}${t.city ? ' · ' : ''}Сезон ${esc(t.season)}</small></div>${logo}</div>
+    <div class="collect"><div class="ttl">Собери все карточки<span>до конца сезона</span></div><div class="wall">${wall}</div></div>
     <div class="cta"><h2>${texts.backTitle || 'Ты есть в <span>HockeyStars</span>?'}</h2><p>${esc(texts.backText || 'Твоя команда уже там, устанавливай по QR-коду')}</p></div>
     <div class="qr">${qr}</div>
     <div class="brand"><img src="${data.brand.hockeystarsWhite}">${texts.backFooter ? `<small>${esc(texts.backFooter)}</small>` : ''}</div>
@@ -504,6 +561,7 @@ function albumHtml(data) {
   };
   for (const kind of extra) {
     if (kind === 'stats') inner.push((n) => statsPage(data, n));
+    else if (kind === 'quotes') inner.push((n) => quotesPage(data, n));
     else if (kind === 'autographs') {
       const chunk = nextAutographs();
       if (chunk.length) inner.push((n) => autographsPage(data, n, chunk));

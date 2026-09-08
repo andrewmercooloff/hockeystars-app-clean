@@ -27,7 +27,7 @@
       "gallery",
       "gallery:Наши болельщики",
       "autographs",
-      "stats"
+      "quotes"
     ]
   },
   "texts": {
@@ -87,7 +87,8 @@
         "value": "{count}",
         "label": "карточек\nв этом альбоме"
       }
-    ]
+    ],
+    "photoCaption": "Ледовая арена «Купчино» — наш дом"
   },
   "qrUrl": ""
 }
