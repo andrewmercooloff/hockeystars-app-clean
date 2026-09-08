@@ -25,6 +25,8 @@ function cardCss(size) {
   clip-path:polygon(${mm(13)} 0,100% 0,100% calc(100% - ${mm(13)}),calc(100% - ${mm(13)}) 100%,0 100%,0 ${mm(13)});}
 .card.front .photo img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;}
 .card.front.team .photo img,.card.front.club .photo img{object-position:center center;}
+.card.front.wide .photo{background:linear-gradient(180deg,color-mix(in srgb,var(--primary) 85%,#fff) 0%,var(--primary) 100%);}
+.card.front.wide .photo img{object-fit:contain;object-position:center 32%;}
 .card.front .photo::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 .45mm var(--primary);
   clip-path:polygon(${mm(13)} 0,100% 0,100% calc(100% - ${mm(13)}),calc(100% - ${mm(13)}) 100%,0 100%,0 ${mm(13)});}
 .card.front .num sup{font-size:38%;vertical-align:top;position:relative;top:${mm(1.2)};margin-left:${mm(0.4)};-webkit-text-stroke:${mm(0.35)} var(--primary);}
@@ -37,8 +39,9 @@ function cardCss(size) {
   clip-path:polygon(0 0,100% 0,100% calc(100% - ${mm(13)}),calc(100% - ${mm(13)}) 100%,0 100%);}
 .card.front.haslogo .plate{padding-left:${mm(14.5)};}
 .card.front .plate .nm{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:${mm(4.8)};line-height:1.02;text-shadow:0 .3mm .6mm rgba(0,0,0,.6);word-break:break-word;}
-.card.front .plate .nm small{display:block;font-weight:500;font-size:${mm(3.5)};opacity:.95;margin-top:.3mm;}
-.card.front .plate .pos{margin-top:${mm(1.2)};font-family:'Roboto';font-weight:500;font-size:${mm(2.5)};letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.92);}
+.card.front .plate .nm small{display:block;font-weight:500;font-size:${mm(3.5)};opacity:.95;margin-top:.3mm;white-space:nowrap;}
+.card.front .plate .nm,.card.front .plate .pos{padding-right:${mm(7)};}
+.card.front .plate .pos{margin-top:${mm(1.2)};font-family:'Roboto';font-weight:500;font-size:${mm(2.5)};letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.92);line-height:1.2;}
 .card.front .plate .pos::before{content:"";display:inline-block;width:${mm(5)};height:.6mm;background:var(--secondary);vertical-align:middle;margin-right:1.5mm;}
 .card.front.coach .plate .pos::before{background:var(--accent);}
 .card.front.coach .plate .pos{color:var(--accent);}
@@ -52,26 +55,27 @@ function cardCss(size) {
   radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.18), transparent 60%),
   linear-gradient(180deg,var(--primary),var(--dark));}
 /* Close-up of the face across the top of the back, pushed to the right so the header text sits on a dark fade. */
-.card.back .photo{position:absolute;left:0;right:0;top:0;height:${(B + 42 * s).toFixed(2)}mm;overflow:hidden;}
-.card.back .photo img{position:absolute;width:150%;height:auto;left:${(B + 2 * s).toFixed(2)}mm;top:${(B - 9 * s).toFixed(2)}mm;}
+.card.back .photo{position:absolute;left:0;right:0;top:0;height:${(B + 38 * s).toFixed(2)}mm;overflow:hidden;}
+.card.back .photo img{position:absolute;width:112%;height:auto;left:${(B + 8 * s).toFixed(2)}mm;top:${(B + 0.5 * s).toFixed(2)}mm;}
+.card.back.coach .photo img{width:100%;left:${(B + 6 * s).toFixed(2)}mm;top:${(B + 1 * s).toFixed(2)}mm;}
 .card.back.team .photo img,.card.back.club .photo img{width:100%;height:100%;left:0;top:0;object-fit:cover;object-position:center center;}
 .card.back .photo::after{content:"";position:absolute;inset:0;background:
-  linear-gradient(90deg,color-mix(in srgb,var(--primary) 96%,transparent) 0%,color-mix(in srgb,var(--primary) 88%,transparent) 30%,color-mix(in srgb,var(--primary) 35%,transparent) 55%,rgba(0,0,0,.05) 80%),
-  linear-gradient(180deg,rgba(0,0,0,0) 72%,var(--primary) 100%);}
+  linear-gradient(90deg,color-mix(in srgb,var(--primary) 96%,transparent) 0%,color-mix(in srgb,var(--primary) 80%,transparent) 28%,color-mix(in srgb,var(--primary) 20%,transparent) 50%,rgba(0,0,0,.03) 75%),
+  linear-gradient(180deg,rgba(0,0,0,0) 78%,var(--primary) 100%);}
 .card.back .band{position:absolute;left:-10mm;right:-10mm;height:${mm(7)};transform:rotate(-8deg);}
-.card.back .band.top{top:${(B + 41.5 * s).toFixed(2)}mm;height:${mm(4)};background:var(--secondary);opacity:.95;}
+.card.back .band.top{top:${(B + 36.5 * s).toFixed(2)}mm;height:${mm(4)};background:var(--secondary);opacity:.95;}
 .card.back .band.top2{display:none;top:${(B + 29.5 * s).toFixed(2)}mm;height:${mm(1.5)};background:#fff;opacity:.5;}
 .card.back .head{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 3.5 * s).toFixed(2)}mm;display:flex;align-items:center;gap:${mm(2.5)};}
 .card.back .head img{width:${mm(10)};height:${mm(10)};object-fit:contain;}
 .card.back .head .t{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:${mm(4)};line-height:1.05;}
 .card.back .head .t small{display:block;font-family:'Roboto';font-weight:400;text-transform:none;font-size:${mm(2.4)};opacity:.8;margin-top:.6mm;}
-.card.back .bignum{position:absolute;right:${(B + 3 * s).toFixed(2)}mm;top:${(B + 44 * s).toFixed(2)}mm;font-family:'Oswald';font-weight:700;font-size:${mm(30)};line-height:1;color:rgba(255,255,255,.08);}
-.card.back .who{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 29 * s).toFixed(2)}mm;}
+.card.back .bignum{position:absolute;right:${(B + 3 * s).toFixed(2)}mm;top:${(B + 50 * s).toFixed(2)}mm;font-family:'Oswald';font-weight:700;font-size:${mm(30)};line-height:1;color:rgba(255,255,255,.08);}
+.card.back .who{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 41.5 * s).toFixed(2)}mm;}
 .card.back .who .nm{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:${mm(5.4)};line-height:1.05;text-shadow:0 0 1.5mm rgba(0,0,0,.9),0 .4mm 1mm rgba(0,0,0,.7);}
 .card.back .who .nm span{color:var(--accent);margin-right:1.5mm;}
 .card.back .who .nm sup{font-size:50%;vertical-align:top;position:relative;top:${mm(0.6)};}
 .card.back .who .pos{font-family:'Roboto';font-weight:500;font-size:${mm(2.7)};letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.85);margin-top:1.2mm;}
-.card.back table{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 47.5 * s).toFixed(2)}mm;width:calc(100% - ${pad * 2}mm);border-collapse:collapse;font-size:${mm(2.9)};}
+.card.back table{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 55 * s).toFixed(2)}mm;width:calc(100% - ${pad * 2}mm);border-collapse:collapse;font-size:${mm(2.9)};}
 .card.back td{padding:${mm(0.7)} 0;border-bottom:.2mm solid rgba(255,255,255,.18);line-height:1.15;}
 .card.back td:first-child{font-family:'Roboto';font-weight:400;text-transform:uppercase;letter-spacing:.1em;font-size:${mm(2.4)};color:rgba(255,255,255,.7);}
 .card.back td:last-child{text-align:right;font-family:'Oswald';font-weight:600;font-size:${mm(3.6)};}
@@ -104,23 +108,28 @@ function accentSvg(size, colors) {
   </svg>`;
 }
 
-function nameHtml(card) {
+function nameHtml(card, scale = 1) {
   const surname = esc(card.surname).toUpperCase();
   const name = esc(card.name).toUpperCase();
-  return `${surname}${name ? ` <small>${name}</small>` : ''}`;
+  // ~30 mm of plate width: shrink the small name line past 14 characters instead of wrapping into the corner accent
+  const small = Math.min(1, 14 / Math.max(card.name.length, 1)) * 3.5 * scale;
+  const big = Math.min(1, 12 / Math.max(card.surname.length, 1)) * 4.8 * scale;
+  return `<span style="font-size:${big.toFixed(2)}mm">${surname}</span>${name ? ` <small style="font-size:${small.toFixed(2)}mm">${name}</small>` : ''}`;
 }
 
 function cardFront(card, data) {
   const logo = data.assets.logo ? `<div class="logo"><img src="${data.assets.logo}"></div>` : '';
   const num = card.number ? `<div class="num">${esc(card.number)}${card.role ? `<sup>${esc(card.role)}</sup>` : ''}</div>` : '';
   const ribbon = card.ribbon ? `<div class="ribbon"><span>${esc(card.ribbon)}</span></div>` : '';
-  const cls = ['card', 'front', card.type, data.assets.logo ? 'haslogo' : ''].filter(Boolean).join(' ');
+  const cls = ['card', 'front', card.type, data.assets.logo ? 'haslogo' : '', card.photoAspect > 1.15 && card.type !== 'player' && card.type !== 'coach' ? 'wide' : '']
+    .filter(Boolean)
+    .join(' ');
   return `<div class="${cls}">
     ${accentSvg(data.cardSize, data.colors)}
     <div class="photo"><img src="${card.photo}"></div>
     ${ribbon}${logo}${num}
     <div class="plate">
-      <div class="nm">${nameHtml(card)}</div>
+      <div class="nm">${nameHtml(card, data.cardSize.w / 63.5)}</div>
       <div class="pos">${esc(card.position)}</div>
     </div>
   </div>`;
@@ -153,7 +162,7 @@ function cardBack(card, data) {
       <div class="nm" style="font-size:${nameSize}">${card.number ? `<span>#${esc(card.number)}${card.role ? `<sup>${esc(card.role)}</sup>` : ''}</span>` : ''}${esc(card.surname).toUpperCase()}<br>${esc(card.name).toUpperCase()}</div>
     </div>
     <table>${rows.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('')}</table>
-    <div class="foot"><img src="${data.brand.hockeystarsWhite}"><div class="idx"><b>${card.index}</b> / ${total}</div></div>
+    <div class="foot">${data.team.cards?.brandOnBack === false ? '<span></span>' : `<img src="${data.brand.hockeystarsWhite}">`}<div class="idx"><b>${card.index}</b> / ${total}</div></div>
   </div>`;
 }
 
@@ -202,11 +211,23 @@ function cardsHtml(data, opts = {}) {
 
   let pages = '';
   let pageSize;
+  // One card per page (front, then back) for print shops that cut stacks: trim box + bleed + 5 mm white margin
+  // with crop marks at the trim lines. Odd pages are fronts, even pages are backs → duplex, flip on long edge.
+  const M = 5;
   if (layout === 'single') {
-    pageSize = `${cw}mm ${ch}mm`;
+    pageSize = `${cw + 2 * M}mm ${ch + 2 * M}mm`;
+    const b = size.bleed;
+    const len = M - 1;
+    const marks = [
+      [M + b, 0, 'v'], [M + b + size.w, 0, 'v'], [M + b, ch + 2 * M - len, 'v'], [M + b + size.w, ch + 2 * M - len, 'v'],
+      [0, M + b, 'h'], [0, M + b + size.h, 'h'], [cw + 2 * M - len, M + b, 'h'], [cw + 2 * M - len, M + b + size.h, 'h'],
+    ]
+      .map(([x, y, k]) => `<div class="mark ${k}" style="left:${x}mm;top:${y}mm;${k === 'v' ? `height:${len}mm` : `width:${len}mm`}"></div>`)
+      .join('');
     for (const card of data.cards) {
-      pages += `<section class="page single">${cardFront(card, data)}</section>`;
-      pages += `<section class="page single">${cardBack(card, data)}</section>`;
+      const lbl = (side) => `<div class="sheetlabel" style="top:1mm">${card.index} / ${total} · ${side}</div>`;
+      pages += `<section class="page single">${marks}${lbl('лицо')}<div class="slot" style="left:${M}mm;top:${M}mm">${cardFront(card, data)}</div></section>`;
+      pages += `<section class="page single">${marks}${lbl('оборот')}<div class="slot" style="left:${M}mm;top:${M}mm">${cardBack(card, data)}</div></section>`;
     }
   } else {
     pageSize = `${sheet.w}mm ${sheet.h}mm`;
@@ -238,7 +259,7 @@ ${cardCss(size)}
 @page{size:${pageSize};margin:0;}
 .page{position:relative;page-break-after:always;overflow:hidden;background:#fff;}
 .page.sheet{width:${sheet.w}mm;height:${sheet.h}mm;}
-.page.single{width:${cw}mm;height:${ch}mm;}
+.page.single{width:${cw + 2 * M}mm;height:${ch + 2 * M}mm;}
 .slot{position:absolute;}
 .mark{position:absolute;background:#000;}
 .mark.v{width:.15mm;}

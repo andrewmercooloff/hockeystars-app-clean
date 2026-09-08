@@ -192,6 +192,7 @@ async function loadTeam(teamDir, cacheDir) {
       // low-res copy for the faded "paste here" ghosts in the album
       photoSmall: photoPath ? await prepareImage(photoPath, photoCache, 500) : placeholderPhoto(number, colors.primary),
       hasPhoto: Boolean(photoPath),
+      photoAspect: photoPath ? await imageAspect(photoPath) : 0.75,
     });
   }
 

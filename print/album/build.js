@@ -3,7 +3,8 @@
 const fs = require('fs');
 const path = require('path');
 const { loadTeam } = require('./lib/data');
-const { albumHtml } = require('./lib/album');
+const { albumHtml, PAGE } = require('./lib/album');
+const { execFileSync } = require('child_process');
 const { cardsHtml } = require('./lib/cards');
 const { withBrowser, htmlToPdf, pdfPreviews } = require('./lib/render');
 
@@ -60,6 +61,24 @@ async function main() {
       fs.rmSync(cardsHtmlFile, { force: true });
     }
   });
+
+  // Finishing (PyMuPDF): smaller files, A3 saddle-stitch spreads of the album, light copies for phones.
+  const post = (cmd, src, dst, extra = []) => {
+    try {
+      execFileSync('python3', [path.join(__dirname, 'lib', 'postprocess.py'), cmd, src, dst, ...extra], { stdio: 'pipe' });
+      console.log(`✔ ${path.relative(process.cwd(), dst)}`);
+    } catch (e) {
+      console.warn(`⚠ ${cmd}: ${e.stderr?.toString().trim().split('\n').pop() || e.message} (pip install pymupdf)`);
+    }
+  };
+  for (const f of [albumPdf, cardsPdf]) {
+    const tmp = f + '.tmp';
+    post('optimize', f, tmp);
+    if (fs.existsSync(tmp)) fs.renameSync(tmp, f);
+  }
+  post('impose', albumPdf, path.join(outDir, `${slug}-album-A3-spreads.pdf`), [String(PAGE.bleed)]);
+  post('light', albumPdf, path.join(outDir, `${slug}-album-preview.pdf`));
+  post('light', cardsPdf, path.join(outDir, `${slug}-cards-preview.pdf`));
 }
 
 main().catch((e) => {

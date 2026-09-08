@@ -1,8 +1,31 @@
 const { baseCss, esc } = require('./styles');
 const { cardFront, cardCss } = require('./cards');
+const { rinkSvg, puckSvg, sticksSvg, goalSvg, scratchesSvg } = require('./hockey');
 
 const PAGE = { w: 210, h: 297, bleed: 3 };
-const SLOTS_PER_PAGE = 9;
+// Slots per "Команда" page: always 3 columns; rows depend on the card height (3 rows for 55x77, 2 rows for 60x85).
+// Each slot is exactly the card size so the card can be fixed with photo corners; the caption sits below the slot.
+const SLOT_COLS = 3;
+const SLOT_GAP = 7;
+const CAPTION_H = 9;
+function slotRows(size) {
+  const avail = PAGE.h - 36 - 12; // header above, margin below
+  return Math.max(1, Math.floor((avail + SLOT_GAP) / (size.h + CAPTION_H + SLOT_GAP)));
+}
+// Rows are spread over the free height (larger gap, but capped) and the block is centred under the header.
+function gridGap(size) {
+  const rows = slotRows(size);
+  const free = PAGE.h - 36 - 14 - rows * (size.h + CAPTION_H);
+  return rows > 1 ? Math.min(22, Math.max(SLOT_GAP, free / (rows - 1) - 8)) : SLOT_GAP;
+}
+function gridTop(size) {
+  const rows = slotRows(size);
+  const content = rows * (size.h + CAPTION_H) + (rows - 1) * gridGap(size);
+  return 36 + Math.max(0, (PAGE.h - 36 - 14 - content) / 2);
+}
+function slotsPerPage(size) {
+  return SLOT_COLS * slotRows(size);
+}
 
 function albumCss(data) {
   const { w, h, bleed } = PAGE;
@@ -24,6 +47,23 @@ ${cardCss(size)}
   background:linear-gradient(0deg,var(--primary) 0 34%,transparent 34% 44%,var(--secondary) 44% 62%,transparent 62% 70%,color-mix(in srgb,var(--secondary) 15%,transparent) 70% 80%,transparent 80%);}
 .orn.tr{right:-70mm;top:-32mm;width:170mm;height:50mm;transform:rotate(-24deg);
   background:linear-gradient(180deg,var(--secondary) 0 28%,transparent 28% 40%,var(--primary) 40% 58%,transparent 58%);}
+
+/* hockey decor: half rink along the bottom edge + skate scratches over the ice */
+.deco{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.deco .rink{position:absolute;left:-30mm;bottom:-22mm;width:200mm;height:133mm;}
+.deco .scratches{position:absolute;inset:0;width:100%;height:100%;}
+.team .deco .rink{left:auto;right:-30mm;bottom:-40mm;width:230mm;height:153mm;transform:scaleX(-1);opacity:.2 !important;}
+.cover .deco .rink{left:auto;right:-60mm;bottom:auto;top:-30mm;width:260mm;height:173mm;transform:rotate(90deg);}
+.cover .season .sticks{width:7mm;height:7mm;vertical-align:-1.4mm;margin-right:2mm;}
+.pucknum{display:inline-flex;align-items:center;justify-content:center;position:relative;width:12mm;height:8mm;flex:none;}
+.pucknum .puck{position:absolute;inset:0;width:100%;height:100%;}
+.pucknum b{position:relative;color:#fff;font-family:'Oswald';font-weight:700;font-size:4.2mm;line-height:1;margin-top:-1.2mm;}
+.hdr .count{display:inline-flex;align-items:center;gap:2mm;background:var(--dark);color:#fff;font-family:'Oswald';font-weight:600;text-transform:uppercase;
+  font-size:3.6mm;letter-spacing:.08em;padding:1.4mm 3.5mm 1.4mm 2.5mm;border-radius:6mm;margin-top:2mm;}
+.hdr .count .puck{width:6mm;height:3.6mm;}
+.stats .goal{position:absolute;right:${bleed + 10}mm;top:${bleed + 8}mm;width:44mm;height:28mm;}
+.autographs .box .puck{position:absolute;right:2mm;top:2mm;width:6mm;height:3.6mm;opacity:.85;}
+.gallery .hdr .sticks,.autographs .hdr .sticks,.history .hdr .sticks{width:14mm;height:14mm;vertical-align:-3mm;margin-left:3mm;}
 
 /* section title */
 .title{position:relative;display:inline-block;font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:17mm;line-height:1;color:var(--dark);
@@ -82,7 +122,7 @@ ${cardCss(size)}
 .intro .how{position:absolute;left:${bleed + 85}mm;right:${bleed + 12}mm;top:${bleed + 92}mm;}
 .intro .how h3{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:7.5mm;color:var(--dark);margin-bottom:5mm;}
 .intro .step{display:flex;align-items:flex-start;gap:3mm;margin-bottom:6mm;font-size:4mm;line-height:1.35;color:#1b2940;}
-.intro .step svg{flex:none;width:12mm;height:9mm;margin-top:-1mm;}
+.intro .step .pucknum{margin-top:-.5mm;}
 .intro .bottom{position:absolute;left:0;right:0;bottom:0;height:120mm;}
 .intro .bigname{position:absolute;left:${bleed + 6}mm;right:${bleed + 6}mm;top:0;font-family:'Oswald';font-weight:700;text-transform:uppercase;
   font-size:34mm;line-height:.95;color:transparent;-webkit-text-stroke:.9mm var(--secondary);text-align:center;white-space:nowrap;letter-spacing:.02em;}
@@ -99,9 +139,19 @@ ${cardCss(size)}
 .team .hdr .logo img{max-width:100%;max-height:100%;object-fit:contain;}
 .team .hdr .title{font-size:16mm;}
 .team .hdr .sub{font-family:'Oswald';font-weight:600;text-transform:uppercase;font-size:3.6mm;letter-spacing:.14em;color:var(--secondary);text-align:right;margin-top:2mm;}
-.team .grid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 36}mm;display:grid;
-  grid-template-columns:repeat(3,${size.w}mm);justify-content:space-between;row-gap:6mm;}
+.team .grid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${(bleed + gridTop(size)).toFixed(1)}mm;display:grid;
+  grid-template-columns:repeat(${SLOT_COLS},${size.w}mm);justify-content:space-between;row-gap:${gridGap(size).toFixed(1)}mm;}
+.cell{position:relative;width:${size.w}mm;}
+.cell .cap{height:${CAPTION_H}mm;padding-top:1.6mm;text-align:center;}
+.cell .cap .n{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:3.6mm;line-height:1.05;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cell .cap .n span{color:var(--secondary);margin-right:1.2mm;}
+.cell .cap .p{font-family:'Roboto';font-weight:500;text-transform:uppercase;letter-spacing:.12em;font-size:2.3mm;color:#4a5a70;margin-top:.6mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .slot{position:relative;width:${size.w}mm;height:${size.h}mm;border:.35mm dashed color-mix(in srgb,var(--primary) 55%,transparent);border-radius:1mm;overflow:hidden;background:#fff;}
+.slot .corner{position:absolute;width:6mm;height:6mm;border:.35mm solid color-mix(in srgb,var(--primary) 45%,transparent);}
+.slot .corner.tl{left:-.35mm;top:-.35mm;border-right:0;border-bottom:0;}
+.slot .corner.tr{right:-.35mm;top:-.35mm;border-left:0;border-bottom:0;}
+.slot .corner.bl{left:-.35mm;bottom:-.35mm;border-right:0;border-top:0;}
+.slot .corner.br{right:-.35mm;bottom:-.35mm;border-left:0;border-top:0;}
 .slot .ghost{position:absolute;left:${-size.bleed}mm;top:${-size.bleed}mm;filter:grayscale(1) contrast(.9);opacity:.28;}
 .slot .tag{position:absolute;left:50%;top:0;transform:translateX(-50%);background:var(--secondary);color:#fff;font-family:'Oswald';font-weight:600;
   font-size:3mm;line-height:1;padding:1mm 2.6mm 1.1mm;border-radius:0 0 1.5mm 1.5mm;letter-spacing:.06em;}
@@ -120,7 +170,7 @@ ${cardCss(size)}
 .history .tl::before{content:"";position:absolute;left:5.2mm;top:2mm;bottom:8mm;width:1.2mm;background:linear-gradient(180deg,var(--primary),var(--secondary));border-radius:1mm;}
 .history .item{position:relative;padding-left:16mm;margin-bottom:7mm;}
 .history .item:last-child{margin-bottom:0;}
-.history .item .dot{position:absolute;left:0;top:0;width:11.6mm;height:11.6mm;border-radius:50%;background:var(--secondary);color:#fff;
+.history .item .dot{position:absolute;left:0;top:0;width:11.6mm;height:11.6mm;border-radius:50%;background:var(--dark);color:#fff;box-shadow:inset 0 -1.6mm 0 rgba(0,0,0,.5),inset 0 .5mm 0 rgba(255,255,255,.25);
   font-family:'Oswald';font-weight:700;font-size:6mm;display:flex;align-items:center;justify-content:center;border:1mm solid #fff;box-shadow:0 0 0 .6mm var(--primary);}
 .history .item .yr{display:inline-block;background:var(--primary);color:#fff;font-family:'Oswald';font-weight:600;text-transform:uppercase;font-size:4mm;
   padding:1mm 3mm;transform:skewX(-10deg);margin-bottom:1.6mm;letter-spacing:.06em;}
@@ -199,6 +249,10 @@ ${cardCss(size)}
 `;
 }
 
+// Ice decor for inner pages: faint half rink in team colours + skate scratches.
+const deco = (data, rinkOpacity = 0.14) =>
+  `<div class="deco">${rinkSvg(data.colors.primary, data.colors.secondary, rinkOpacity)}${scratchesSvg('rgba(90,120,160,.5)', 0.35)}</div>`;
+
 const arrow = (color) => `<svg viewBox="0 0 60 44" fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
   <path d="M6 8 C 22 6, 40 10, 52 30"/><path d="M40 30 L 52 32 L 55 20"/></svg>`;
 
@@ -221,8 +275,9 @@ function coverPage(data) {
     : `<div class="badge"><div class="star">★</div><div class="txt">${esc(t.shortName || t.name)}</div><small>${esc(t.city || '')}</small></div>`;
   return `<section class="page cover">
     ${photo}
+    <div class="deco">${rinkSvg('rgba(255,255,255,.55)', data.colors.secondary, 0.22)}</div>
     <div class="orn tl"></div><div class="orn br"></div>
-    <div class="season"><span>Альбом с карточками <b>★</b> ${esc(t.season)}</span></div>
+    <div class="season"><span>${sticksSvg('#fff', data.colors.accent, '#111')}Альбом с карточками <b>★</b> ${esc(t.season)}</span></div>
     ${data.assets.logo ? `<div class="teamname">${esc(t.name)}<small>${esc(t.city || '')}</small></div>` : ''}
     <div class="logo">${logo}</div>
     <div class="count"><b>${data.cards.length}</b><span>карточек</span></div>
@@ -249,12 +304,13 @@ function introPage(data, pageNo) {
   const bigName = (t.shortName || t.name).toUpperCase();
   const bigSize = Math.min(34, (170 / Math.max(6, bigName.length)) * 1.75);
   return `<section class="page intro ice">
+    ${deco(data)}
     <div class="orn tr"></div>
     <div class="hdr"><div class="title">Альбом</div></div>
     <div class="lead">${intro.replace(/\n/g, '<br>')}</div>
     <div class="sample">${sample ? cardFront(sample, data) : ''}</div>
     <div class="how"><h3>Как это работает:</h3>
-      ${steps.map((s) => `<div class="step">${arrow(data.colors.secondary)}<div>${s}</div></div>`).join('')}
+      ${steps.map((s, i) => `<div class="step"><span class="pucknum">${puckSvg(data.colors.secondary, 'rgba(255,255,255,.5)')}<b>${i + 1}</b></span><div>${s}</div></div>`).join('')}
     </div>
     <div class="bottom">
       <div class="bigname" style="font-size:${bigSize.toFixed(1)}mm">${esc(bigName)}</div>
@@ -270,18 +326,21 @@ function teamPage(data, cards, pageNo, idx, total) {
   const logo = data.assets.logo ? `<img src="${data.assets.logo}">` : '';
   const slots = cards
     .map(
-      (c) => `<div class="slot ${style}">
+      (c) => `<div class="cell"><div class="slot ${style}">
         <div class="ghost">${cardFront({ ...c, photo: c.photoSmall }, data)}</div>
         ${style === 'outline' ? `<div class="bignum">${esc(c.number)}</div>` : ''}
         <div class="tag">${c.index}</div>
-        <div class="lbl"><div class="n">${c.number ? `<span>#${esc(c.number)}${esc(c.role || '')}</span>` : ''}${esc(c.surname)} ${esc(c.name)}</div><div class="p">${esc(c.position)}</div></div>
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      </div>
+      <div class="cap"><div class="n">${c.number ? `<span>#${esc(c.number)}${esc(c.role || '')}</span>` : ''}${esc(c.surname)} ${esc(c.name)}</div><div class="p">${esc(c.position)}</div></div>
       </div>`
     )
     .join('');
   const even = pageNo % 2 === 0;
   return `<section class="page team ice">
+    ${deco(data, 0.1)}
     <div class="orn br" style="opacity:.9"></div>
-    <div class="hdr"><div class="logo">${logo}</div><div><div class="title">Команда</div><div class="sub">${esc(t.name)} · карточки ${cards[0].index}–${cards[cards.length - 1].index} из ${data.cards.length}</div></div></div>
+    <div class="hdr"><div class="logo">${logo}</div><div style="text-align:right"><div class="title">Команда</div><div class="sub">${esc(t.name)} · карточки ${cards[0].index}–${cards[cards.length - 1].index} из ${data.cards.length}</div></div></div>
     <div class="grid">${slots}</div>
     <div class="pgnum ${even ? 'l' : 'r'}">${pageNo}</div>
   </section>`;
@@ -294,8 +353,9 @@ function historyPage(data, pageNo) {
   const facts = h.facts || [];
   const title = h.title || `История ${t.shortName || t.name}`;
   return `<section class="page history ice">
+    ${deco(data)}
     <div class="orn br" style="opacity:.95"></div>
-    <div class="hdr"><div class="title">${esc(title)}</div></div>
+    <div class="hdr"><div class="title">${esc(title)}</div>${sticksSvg(data.colors.primary, data.colors.secondary, data.colors.dark)}</div>
     <div class="tl">${items
       .map(
         (it, i) => `<div class="item"><div class="dot">${i + 1}</div>
@@ -318,7 +378,9 @@ function historyPage(data, pageNo) {
 function statsPage(data, pageNo) {
   const rows = Array.from({ length: 18 }, (_, i) => `<tr><td class="i">${i + 1}</td><td></td><td></td><td></td><td></td></tr>`).join('');
   return `<section class="page stats ice">
+    ${deco(data)}
     <div class="orn br" style="opacity:.9"></div>
+    ${goalSvg(data.colors.secondary, `color-mix(in srgb,${data.colors.primary} 45%,transparent)`)}
     <div class="hdr"><div class="title">Мой сезон</div></div>
     <div class="note">Записывай сюда матчи сезона ${esc(data.team.season)}: дату, соперника, счёт и номера карточек, которые ты получил за победу.</div>
     <table><thead><tr><th></th><th>Дата</th><th>Соперник</th><th>Счёт</th><th>Карточки</th></tr></thead><tbody>${rows}</tbody></table>
@@ -329,6 +391,7 @@ function statsPage(data, pageNo) {
 function notesPage(data, pageNo) {
   const lines = Array.from({ length: 22 }, () => '<div class="line"></div>').join('');
   return `<section class="page notes ice">
+    ${deco(data)}
     <div class="orn br" style="opacity:.9"></div>
     <div class="hdr"><div class="title">Мои заметки</div></div>
     <div class="lines">${lines}</div>
@@ -343,11 +406,12 @@ function autographsPage(data, pageNo, cards) {
   const rows = Math.max(1, Math.ceil(list.length / 3));
   const boxH = Math.min(33, (228 - (rows - 1) * 5) / rows);
   const boxes = list
-    .map((c) => `<div class="box"><div class="n">${c.number ? `<span>#${esc(c.number)}${esc(c.role || '')}</span>` : ''}${esc(c.surname)} ${esc(c.name)}</div></div>`)
+    .map((c) => `<div class="box">${puckSvg(data.colors.dark, 'rgba(255,255,255,.35)')}<div class="n">${c.number ? `<span>#${esc(c.number)}${esc(c.role || '')}</span>` : ''}${esc(c.surname)} ${esc(c.name)}</div></div>`)
     .join('');
   return `<section class="page autographs ice">
+    ${deco(data)}
     <div class="orn br" style="opacity:.9"></div>
-    <div class="hdr"><div class="title">Автографы</div></div>
+    <div class="hdr"><div class="title">Автографы</div>${sticksSvg(data.colors.primary, data.colors.secondary, data.colors.dark)}</div>
     <div class="note">Собери подписи всей команды: попроси каждого игрока и тренера расписаться в своей ячейке.</div>
     <div class="grid" style="--boxh:${boxH.toFixed(1)}mm">${boxes}</div>
     <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
@@ -372,8 +436,9 @@ function galleryPage(data, pageNo, photos, title) {
     })
     .join('');
   return `<section class="page gallery ice">
+    ${deco(data)}
     <div class="orn br" style="opacity:.9"></div>
-    <div class="hdr"><div class="title">${esc(title || 'Жизнь команды')}</div></div>
+    <div class="hdr"><div class="title">${esc(title || 'Жизнь команды')}</div>${sticksSvg(data.colors.primary, data.colors.secondary, data.colors.dark)}</div>
     <div class="grid">${tiles}</div>
     <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
   </section>`;
@@ -398,7 +463,8 @@ function backCoverPage(data) {
 
 function albumHtml(data) {
   const chunks = [];
-  for (let i = 0; i < data.cards.length; i += SLOTS_PER_PAGE) chunks.push(data.cards.slice(i, i + SLOTS_PER_PAGE));
+  const per = slotsPerPage(data.cardSize);
+  for (let i = 0; i < data.cards.length; i += per) chunks.push(data.cards.slice(i, i + per));
 
   // Inner page order: intro, team, history, team, team, ... then filler pages so the total is a multiple of 4.
   const inner = [];
