@@ -231,7 +231,7 @@ function introPage(data, pageNo) {
     `Собери всех игроков команды, тренеров и легенд ${esc(t.shortName || t.name)}.`,
     'Заполни альбом до конца сезона!',
   ];
-  const sample = data.cards[0];
+  const sample = data.cards.find((c) => c.role === 'К' && c.hasPhoto) || data.cards.find((c) => c.hasPhoto && c.type === 'player') || data.cards[0];
   const teamPhoto = data.assets.teamPhoto
     ? `<img src="${data.assets.teamPhoto}">`
     : `<div class="ph">Общее фото команды — assets/team.jpg</div>`;
@@ -263,7 +263,7 @@ function teamPage(data, cards, pageNo, idx, total) {
         <div class="ghost">${cardFront({ ...c, photo: c.photoSmall }, data)}</div>
         ${style === 'outline' ? `<div class="bignum">${esc(c.number)}</div>` : ''}
         <div class="tag">${c.index}</div>
-        <div class="lbl"><div class="n">${c.number ? `<span>#${esc(c.number)}</span>` : ''}${esc(c.surname)} ${esc(c.name)}</div><div class="p">${esc(c.position)}</div></div>
+        <div class="lbl"><div class="n">${c.number ? `<span>#${esc(c.number)}${esc(c.role || '')}</span>` : ''}${esc(c.surname)} ${esc(c.name)}</div><div class="p">${esc(c.position)}</div></div>
       </div>`
     )
     .join('');
@@ -328,7 +328,7 @@ function notesPage(data, pageNo) {
 function autographsPage(data, pageNo, cards) {
   const boxes = cards
     .slice(0, 18)
-    .map((c) => `<div class="box"><div class="n">${c.number ? `<span>#${esc(c.number)}</span>` : ''}${esc(c.surname)} ${esc(c.name)}</div></div>`)
+    .map((c) => `<div class="box"><div class="n">${c.number ? `<span>#${esc(c.number)}${esc(c.role || '')}</span>` : ''}${esc(c.surname)} ${esc(c.name)}</div></div>`)
     .join('');
   return `<section class="page autographs ice">
     <div class="orn br" style="opacity:.9"></div>
@@ -387,7 +387,7 @@ function albumHtml(data) {
   const albumCfg = data.team.album || {};
   const extra = albumCfg.extraPages?.length ? albumCfg.extraPages : data.assets.gallery.length ? ['gallery'] : [];
   let galleryOffset = 0;
-  const people = data.cards.filter((c) => c.type !== 'team');
+  const people = data.cards.filter((c) => ['player', 'coach', 'legend'].includes(c.type));
   let autographOffset = 0;
   const nextAutographs = () => {
     const chunk = people.slice(autographOffset, autographOffset + 18);

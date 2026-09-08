@@ -24,9 +24,10 @@ function cardCss(size) {
 .card.front .photo{position:absolute;left:${inset};top:${inset};right:${inset};bottom:${inset};overflow:hidden;background:#dfe6ee;
   clip-path:polygon(${mm(13)} 0,100% 0,100% calc(100% - ${mm(13)}),calc(100% - ${mm(13)}) 100%,0 100%,0 ${mm(13)});}
 .card.front .photo img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;}
-.card.front.team .photo img{object-position:center center;}
+.card.front.team .photo img,.card.front.club .photo img{object-position:center center;}
 .card.front .photo::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 .45mm var(--primary);
   clip-path:polygon(${mm(13)} 0,100% 0,100% calc(100% - ${mm(13)}),calc(100% - ${mm(13)}) 100%,0 100%,0 ${mm(13)});}
+.card.front .num sup{font-size:38%;vertical-align:top;position:relative;top:${mm(1.2)};margin-left:${mm(0.4)};-webkit-text-stroke:${mm(0.35)} var(--primary);}
 .card.front .num{position:absolute;right:${(B + 3.4 * s).toFixed(2)}mm;top:${(B + 2.4 * s).toFixed(2)}mm;font-family:'Oswald';font-weight:700;font-size:${mm(13.5)};line-height:1;color:#fff;
   -webkit-text-stroke:${mm(0.55)} var(--primary);paint-order:stroke fill;filter:drop-shadow(0 .5mm 1mm rgba(0,0,0,.35));}
 .card.front .logo{position:absolute;left:${(B + 3.2 * s).toFixed(2)}mm;bottom:${(B + 3.2 * s).toFixed(2)}mm;width:${mm(10)};height:${mm(10)};z-index:2;}
@@ -61,6 +62,7 @@ function cardCss(size) {
 .card.back .who{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 27 * s).toFixed(2)}mm;}
 .card.back .who .nm{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:${mm(5.4)};line-height:1.05;}
 .card.back .who .nm span{color:var(--accent);margin-right:1.5mm;}
+.card.back .who .nm sup{font-size:50%;vertical-align:top;position:relative;top:${mm(0.6)};}
 .card.back .who .pos{font-family:'Roboto';font-weight:500;font-size:${mm(2.7)};letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.85);margin-top:1.2mm;}
 .card.back table{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 41 * s).toFixed(2)}mm;width:calc(100% - ${pad * 2}mm);border-collapse:collapse;font-size:${mm(2.9)};}
 .card.back td{padding:${mm(1.1)} 0;border-bottom:.2mm solid rgba(255,255,255,.18);line-height:1.15;}
@@ -103,7 +105,7 @@ function nameHtml(card) {
 
 function cardFront(card, data) {
   const logo = data.assets.logo ? `<div class="logo"><img src="${data.assets.logo}"></div>` : '';
-  const num = card.number ? `<div class="num">${esc(card.number)}</div>` : '';
+  const num = card.number ? `<div class="num">${esc(card.number)}${card.role ? `<sup>${esc(card.role)}</sup>` : ''}</div>` : '';
   const ribbon = card.ribbon ? `<div class="ribbon"><span>${esc(card.ribbon)}</span></div>` : '';
   const cls = ['card', 'front', card.type, data.assets.logo ? 'haslogo' : ''].filter(Boolean).join(' ');
   return `<div class="${cls}">
@@ -122,6 +124,7 @@ function cardBack(card, data) {
   const total = data.cards.length;
   const rows = [];
   if (card.position) rows.push(['Амплуа', card.position]);
+  if (card.role) rows.push(['Роль', card.role === 'К' ? 'Капитан' : 'Ассистент капитана']);
   if (card.height) rows.push(['Рост', card.height + (/\d$/.test(card.height) ? ' см' : '')]);
   if (card.weight) rows.push(['Вес', card.weight + (/\d$/.test(card.weight) ? ' кг' : '')]);
   if (card.grip) rows.push(['Хват', card.grip]);
@@ -133,7 +136,7 @@ function cardBack(card, data) {
     <div class="head">${logo}<div class="t">${esc(t.name)}<small>${esc(t.city || '')}${t.city ? ' · ' : ''}Сезон ${esc(t.season)}</small></div></div>
     ${card.number ? `<div class="bignum">${esc(card.number)}</div>` : ''}
     <div class="who">
-      <div class="nm">${card.number ? `<span>#${esc(card.number)}</span>` : ''}${esc(card.surname).toUpperCase()}<br>${esc(card.name).toUpperCase()}</div>
+      <div class="nm">${card.number ? `<span>#${esc(card.number)}${card.role ? `<sup>${esc(card.role)}</sup>` : ''}</span>` : ''}${esc(card.surname).toUpperCase()}<br>${esc(card.name).toUpperCase()}</div>
     </div>
     <table>${rows.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('')}</table>
     <div class="foot"><img src="${data.brand.hockeystarsWhite}"><div class="idx"><b>${card.index}</b> / ${total}</div></div>

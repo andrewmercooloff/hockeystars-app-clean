@@ -165,7 +165,9 @@ async function loadTeam(teamDir, cacheDir) {
       weight: row.weight || row['вес'] || '',
       grip: row.grip || row['хват'] || '',
       birthdate: row.birthdate || row['дата рождения'] || row['дата_рождения'] || '',
-      ribbon: row.ribbon || row['метка'] || (type === 'coach' ? 'Тренерский штаб' : type === 'team' ? 'Команда' : type === 'legend' ? 'Легенда' : ''),
+      // К / A — captain / alternate captain, printed after the jersey number like on real cards
+      role: (row.role || row['роль'] || '').trim().toUpperCase().replace('A', 'А').replace('K', 'К'),
+      ribbon: row.ribbon || row['метка'] || (type === 'coach' ? 'Тренерский штаб' : type === 'team' ? 'Команда' : type === 'club' ? 'Клуб' : type === 'legend' ? 'Легенда' : ''),
       photo: photoPath ? await prepareImage(photoPath, photoCache, 1600) : placeholderPhoto(number, colors.primary),
       // low-res copy for the faded "paste here" ghosts in the album
       photoSmall: photoPath ? await prepareImage(photoPath, photoCache, 500) : placeholderPhoto(number, colors.primary),
@@ -194,6 +196,15 @@ async function loadTeam(teamDir, cacheDir) {
 
   const c = team.cards || {};
   const cardSize = { w: Number(c.width) || 55, h: Number(c.height) || 77, bleed: Number(c.bleed ?? 2) };
+
+  // {count} / {team} / {season} / {year} placeholders inside free texts
+  const vars = { count: String(cards.length), team: team.name, season: team.season || '', year: team.year || '' };
+  const fill = (v) => (typeof v === 'string' ? v.replace(/\{(count|team|season|year)\}/g, (_, k) => vars[k]) : Array.isArray(v) ? v.map(fill) : v);
+  if (team.texts) for (const k of Object.keys(team.texts)) team.texts[k] = fill(team.texts[k]);
+  if (team.history) {
+    for (const it of team.history.items || []) for (const k of ['years', 'title', 'text']) if (it[k]) it[k] = fill(it[k]);
+    for (const f of team.history.facts || []) for (const k of ['value', 'label']) if (f[k]) f[k] = fill(f[k]);
+  }
 
   return { team, colors, cards, assets, brand, missingPhotos, teamDir, cardSize };
 }
