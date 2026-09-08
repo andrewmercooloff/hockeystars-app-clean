@@ -191,8 +191,12 @@ async function loadTeam(teamDir, cacheDir) {
       photo: photoPath ? await prepareImage(photoPath, photoCache, 1600) : placeholderPhoto(number, colors.primary),
       // low-res copy for the faded "paste here" ghosts in the album
       photoSmall: photoPath ? await prepareImage(photoPath, photoCache, 500) : placeholderPhoto(number, colors.primary),
-      photoBack: photoPath && (type === 'player' || type === 'coach' || type === 'legend') ? await backCloseup(photoPath, photoCache) : null,
+      // optional second photo for the back (column photo2 / оборот); people get the faded close-up of the main photo
+      photoBack: (row.photo2 || row['оборот'])
+        ? await backCloseup(findPhoto(photosDir, { photo: row.photo2 || row['оборот'] }), photoCache)
+        : photoPath && (type === 'player' || type === 'coach' || type === 'legend') ? await backCloseup(photoPath, photoCache) : null,
       hasPhoto: Boolean(photoPath),
+      photo2Aspect: (row.photo2 || row['оборот']) ? await imageAspect(findPhoto(photosDir, { photo: row.photo2 || row['оборот'] })) : null,
       photoAspect: photoPath ? await imageAspect(photoPath) : 0.75,
       // horizontal position of the face in the photo (0–100 %), used to place the close-up on the card back
       focus: Number(String(row.focus || row['фокус'] || '50').replace('%', '')) || 50,

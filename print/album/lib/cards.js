@@ -69,9 +69,9 @@ function cardCss(size) {
 .card.back.person .head img{width:${mm(16)};height:${mm(16)};}
 .card.back.person .head .t{display:none;}
 .card.back.person .head .yr{font-family:'Oswald';font-weight:600;font-size:${mm(2)};letter-spacing:.08em;color:var(--dark);text-align:center;width:${mm(16)};margin-top:${mm(-0.2)};}
-.card.back.team .photo img,.card.back.club .photo img{width:100%;height:100%;left:0;top:0;object-fit:cover;object-position:center center;}
+.card.back.team:not(.person) .photo img,.card.back.club:not(.person) .photo img{width:100%;height:100%;left:0;top:0;object-fit:cover;object-position:center 35%;}
 .card.back.person .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(243,245,248,.9) 0%,rgba(243,245,248,.6) 22%,rgba(243,245,248,0) 40%);}
-.card.back.team .photo::after,.card.back.club .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,color-mix(in srgb,var(--primary) 92%,transparent) 0%,color-mix(in srgb,var(--primary) 70%,transparent) 22%,rgba(0,0,0,0) 45%),linear-gradient(180deg,rgba(0,0,0,0) 80%,var(--primary) 100%);}
+.card.back.team:not(.person) .photo::after,.card.back.club:not(.person) .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,color-mix(in srgb,var(--primary) 92%,transparent) 0%,color-mix(in srgb,var(--primary) 70%,transparent) 22%,rgba(0,0,0,0) 45%),linear-gradient(180deg,rgba(0,0,0,0) 80%,var(--primary) 100%);}
 .card.back .band{position:absolute;left:-10mm;right:-10mm;height:${mm(7)};transform:rotate(-8deg);}
 .card.back .band.top{top:${(B + 41.5 * s).toFixed(2)}mm;height:${mm(4)};background:var(--secondary);opacity:.95;}
 .card.back .band.top2{display:none;top:${(B + 29.5 * s).toFixed(2)}mm;height:${mm(1.5)};background:#fff;opacity:.5;}
@@ -161,7 +161,7 @@ function backPhotoH(size) {
   return size.bleed + 47 * (size.w / 63.5);
 }
 function backPhotoLeft(card, size) {
-  const aspect = Math.min(card.photoAspect || 0.75, 1.15);
+  const aspect = Math.min(card.photo2Aspect || card.photoAspect || 0.75, 1.15);
   const imgW = backPhotoH(size) * card.zoom * aspect;
   return size.bleed + size.w * 0.66 - (card.focus / 100) * imgW;
 }
@@ -183,7 +183,7 @@ function cardBack(card, data) {
   const longest = Math.max((card.number ? card.number.length + 2 : 0) + card.surname.length, card.name.length);
   const scale = data.cardSize.w / 63.5;
   const nameSize = `${(5.4 * scale * Math.min(1, 16 / Math.max(longest, 1))).toFixed(2)}mm`;
-  const light = person && card.photoBack;
+  const light = Boolean(card.photoBack) && (person || Boolean(card.photo2Aspect));
   return `<div class="card back ${card.type}${light ? ' person' : ''}">
     <div class="bg"></div>
     ${card.hasPhoto ? `<div class="photo"><img src="${card.photoBack || card.photo}" style="${card.photoBack ? `left:${backPhotoLeft(card, data.cardSize).toFixed(2)}mm;height:${(backPhotoH(data.cardSize) * card.zoom).toFixed(2)}mm;top:${(backPhotoH(data.cardSize) * (1 - card.zoom) * 0.3).toFixed(2)}mm` : ''}"></div>` : ''}

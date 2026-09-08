@@ -1,4 +1,4 @@
-number;surname;name;position;role;height;weight;grip;birthdate;photo;type;ribbon;focus;zoom
+number;surname;name;position;role;height;weight;grip;birthdate;photo;type;ribbon;focus;zoom;photo2
 33;Багдевич;Полина;Вратарь;;128;22;;;33;player;;50;
 1;Боровиков;Александр;Вратарь;;128;26;;;1;player;
 2;Бойков;Дмитрий;Защитник;А;139;28;;;1245;player;
@@ -25,4 +25,4 @@ number;surname;name;position;role;height;weight;grip;birthdate;photo;type;ribbon
 ;Ледовая арена;Купчино;Наш дом;;;;;;arena;club;Арена
 ;Наши победы;;Играем, чтобы побеждать;;;;;;cup;club;Победы
 ;Перед матчем;;Раздевалка · настрой на игру;;;;;;locker;club;Команда
-;Болельщики;;Самая громкая поддержка;;;;;;fans;club;Болельщики
+;Болельщики;;Самая громкая поддержка;;;;;;fans;club;Болельщики;;;fans-back
