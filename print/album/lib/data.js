@@ -196,6 +196,8 @@ async function loadTeam(teamDir, cacheDir) {
       photoAspect: photoPath ? await imageAspect(photoPath) : 0.75,
       // horizontal position of the face in the photo (0–100 %), used to place the close-up on the card back
       focus: Number(String(row.focus || row['фокус'] || '50').replace('%', '')) || 50,
+      // relative size of the close-up on the back (1 = default); <1 for photos that are already tightly cropped
+      zoom: Number(row.zoom || row['масштаб'] || 1) || 1,
     });
   }
 

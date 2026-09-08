@@ -56,8 +56,19 @@ function cardCss(size) {
   linear-gradient(180deg,var(--primary),var(--dark));}
 /* Close-up of the face across the top of the back, pushed to the right so the header text sits on a dark fade. */
 .card.back .photo{position:absolute;left:0;right:0;top:0;height:${(B + 43 * s).toFixed(2)}mm;overflow:hidden;}
-.card.back.person .photo{background:linear-gradient(180deg,#f3f5f8 0%,#e2e7ee 100%);}
-.card.back.person .photo img{position:absolute;height:${(B + 42 * s).toFixed(2)}mm;width:auto;top:0;}
+.card.back.person .photo{height:${(B + 46 * s).toFixed(2)}mm;background:linear-gradient(180deg,#f3f5f8 0%,#e2e7ee 100%);
+  clip-path:polygon(0 0,100% 0,100% ${(B + 38.4 * s).toFixed(2)}mm,0 ${(B + 44 * s).toFixed(2)}mm);}
+.card.back.person .photo img{position:absolute;height:${(B + 42 * s).toFixed(2)}mm;width:auto;top:0;transform-origin:top left;}
+.card.back.person .band.top{transform:none;left:0;right:0;height:auto;top:0;bottom:0;background:none;}
+.card.back.person .band.top::before{content:"";position:absolute;left:0;right:0;top:0;bottom:0;background:var(--secondary);
+  clip-path:polygon(0 ${(B + 44 * s).toFixed(2)}mm,100% ${(B + 38.4 * s).toFixed(2)}mm,100% ${(B + 42.4 * s).toFixed(2)}mm,0 ${(B + 48 * s).toFixed(2)}mm);}
+.card.back.person .who{top:${(B + 50 * s).toFixed(2)}mm;}
+.card.back.person table{top:${(B + 61 * s).toFixed(2)}mm;}
+.card.back.person td{padding:${mm(0.35)} 0;}
+.card.back.person .head{top:${(B + 3 * s).toFixed(2)}mm;left:${pad}mm;width:auto;flex-direction:column;align-items:center;gap:${mm(0.6)};}
+.card.back.person .head img{width:${mm(13)};height:${mm(13)};}
+.card.back.person .head .t{display:none;}
+.card.back.person .head .yr{font-family:'Oswald';font-weight:600;font-size:${mm(2.4)};letter-spacing:.06em;color:var(--dark);}
 .card.back.team .photo img,.card.back.club .photo img{width:100%;height:100%;left:0;top:0;object-fit:cover;object-position:center center;}
 .card.back.person .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(243,245,248,.9) 0%,rgba(243,245,248,.6) 22%,rgba(243,245,248,0) 40%);}
 .card.back.team .photo::after,.card.back.club .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,color-mix(in srgb,var(--primary) 92%,transparent) 0%,color-mix(in srgb,var(--primary) 70%,transparent) 22%,rgba(0,0,0,0) 45%),linear-gradient(180deg,rgba(0,0,0,0) 80%,var(--primary) 100%);}
@@ -151,7 +162,7 @@ function posSize(card, size) {
 function backPhotoLeft(card, size) {
   // the baked close-up is the top part of the photo (see images.backCloseup), displayed at the photo-zone height
   const cropAspect = 1 / (Math.min(1 / (card.photoAspect || 0.75), 1.15) * 0.62);
-  const imgW = (size.bleed + 42 * (size.w / 63.5)) * cropAspect;
+  const imgW = (size.bleed + 42 * (size.w / 63.5)) * card.zoom * cropAspect;
   return size.bleed + size.w * 0.62 - (card.focus / 100) * imgW;
 }
 
@@ -175,9 +186,9 @@ function cardBack(card, data) {
   const light = person && card.photoBack;
   return `<div class="card back ${card.type}${light ? ' person' : ''}">
     <div class="bg"></div>
-    ${card.hasPhoto ? `<div class="photo"><img src="${card.photoBack || card.photo}" style="${card.photoBack ? `left:${backPhotoLeft(card, data.cardSize).toFixed(2)}mm` : ''}"></div>` : ''}
+    ${card.hasPhoto ? `<div class="photo"><img src="${card.photoBack || card.photo}" style="${card.photoBack ? `left:${backPhotoLeft(card, data.cardSize).toFixed(2)}mm;height:${((data.cardSize.bleed + 42 * (data.cardSize.w / 63.5)) * card.zoom).toFixed(2)}mm;top:${((data.cardSize.bleed + 42 * (data.cardSize.w / 63.5)) * (1 - card.zoom)).toFixed(2)}mm` : ''}"></div>` : ''}
     <div class="band top"></div><div class="band top2"></div>
-    <div class="head">${logo}<div class="t">${esc(t.name)}<small>${esc(t.city || '')}${t.city ? '<br>' : ''}Сезон ${esc(t.season)}</small></div></div>
+    <div class="head">${logo}${light ? `<div class="yr">${esc(t.season)}</div>` : ''}<div class="t">${esc(t.name)}<small>${esc(t.city || '')}${t.city ? '<br>' : ''}Сезон ${esc(t.season)}</small></div></div>
     ${card.number ? `<div class="bignum">${esc(card.number)}</div>` : ''}
     <div class="who">
       <div class="nm" style="font-size:${nameSize}">${card.number ? `<span>#${esc(card.number)}${card.role ? `<sup>${esc(card.role)}</sup>` : ''}</span>` : ''}${esc(card.surname).toUpperCase()}<br>${esc(card.name).toUpperCase()}</div>
