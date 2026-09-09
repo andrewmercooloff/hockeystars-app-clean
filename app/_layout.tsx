@@ -1805,6 +1805,13 @@ export default function RootLayout() {
           name="index"
           listeners={({ navigation }) => ({
             tabPress: (e) => {
+              // Web: home rink lives at /feed (marketing owns /). Cannot set href
+              // on this tab — it uses a custom tabBarButton.
+              if (Platform.OS === 'web' && !navigation.isFocused()) {
+                e.preventDefault();
+                router.replace('/feed' as any);
+                return;
+              }
               if (!navigation.isFocused()) return;
               const handleHomeShake = (globalThis as { __handleHomeShake?: () => void }).__handleHomeShake;
               if (typeof handleHomeShake !== 'function') return;
@@ -1814,7 +1821,6 @@ export default function RootLayout() {
             },
           })}
           options={{
-            ...(Platform.OS === 'web' ? { href: '/feed' as const } : {}),
             tabBarLabel: () => null,
             tabBarIcon: ({ size }) => <HomeStarTabIcon size={size} />,
             tabBarButton: (props) => <HomeStarTabButton {...props} />,
