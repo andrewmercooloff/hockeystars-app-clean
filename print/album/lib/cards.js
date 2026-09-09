@@ -208,7 +208,9 @@ function cardBack(card, data) {
   const light = (Boolean(card.photoBack) && (person || Boolean(card.photo2Aspect))) || clubBack;
   const logoSide = backLogoSide(card);
   const wideBack = card.type === 'club' || card.type === 'team';
-  const backPos = card.focus === 50 ? (wideBack ? 'center' : '40') : `${card.focus}%`;
+  const backPosY = card.backFocusY || 22;
+  const backPosX = card.focus === 50 ? 'center' : `${card.focus}%`;
+  const backPos = wideBack ? `${backPosX} ${backPosY}%` : card.focus === 50 ? '40' : `${card.focus}%`;
   const backShift = card.backOffset ? `transform:translateY(${card.backOffset}mm);` : '';
   return `<div class="card back ${card.type}${light ? ' person' : ''}">
     <div class="bg"></div>

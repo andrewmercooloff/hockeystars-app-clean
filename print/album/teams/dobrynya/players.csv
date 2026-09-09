@@ -1,4 +1,4 @@
-number;surname;name;position;role;height;weight;grip;birthdate;photo;type;ribbon;focus;zoom;photo2;backOffset;logoSide
+number;surname;name;position;role;height;weight;grip;birthdate;photo;type;ribbon;focus;zoom;photo2;backOffset;logoSide;backFocusY
 ;Соловьев;Алексей Сергеевич;Главный тренер;;;;;;coach-solovyov;coach;Главный тренер
 ;Шамаев;Валентин Александрович;Тренер по хоккею;;;;;;coach-shamaev;coach;
 ;Хохлова;Алина Борисовна;Старший тренер по ОФП;;;;;;coach-khokhlova;coach;
@@ -30,8 +30,8 @@ number;surname;name;position;role;height;weight;grip;birthdate;photo;type;ribbon
 ;На природе;;Хоккей начинается на земле;;;;;;life2-front;club;Жизнь команды;25;;life2-back
 ;Сборы;;Вместе — сильнее;;;;;;life3-front;club;Жизнь команды;;;life3-back
 ;Команда — семья;;Вместе на льду и вне его;;;;;;life4-front;club;Жизнь команды;55;;life4-back
-;На турнире;;Играем, чтобы побеждать;;;;;;life5-front;club;Жизнь команды;;;life5-back;20;
-;После матча;;Эмоции, которые остаются;;;;;;life6-front;club;Жизнь команды;;;life6-back;;left
+;На турнире;;Играем, чтобы побеждать;;;;;;life5-front;club;Жизнь команды;55;;life5-back;;right;8
+;После матча;;Эмоции, которые остаются;;;;;;life6-front;club;Жизнь команды;;;life6-back;;left;8
 ;Вне льда;;Отдыхаем тоже вместе;;;;;;life7-front;club;Жизнь команды;;;life7-back
 ;Дружба;;Хоккей — это про людей;;;;;;life8-front;club;Жизнь команды;15;;life8-back
 ;На выезде;;Едем за победой;;;;;;life9-front;club;Жизнь команды;25;;life-away-back

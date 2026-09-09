@@ -206,6 +206,7 @@ async function loadTeam(teamDir, cacheDir) {
       logoSide: String(row.logoSide || row['лого'] || '').toLowerCase(),
       // optional vertical shift of the back photo in mm (positive = down)
       backOffset: Number(row.backOffset || row['сдвиг'] || 0) || 0,
+      backFocusY: Number(row.backFocusY || row['фокус_y'] || 0) || 0,
       // relative size of the close-up on the back (1 = default); <1 for photos that are already tightly cropped
       zoom: Number(row.zoom || row['масштаб'] || 1) || 1,
     });
