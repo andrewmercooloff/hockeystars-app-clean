@@ -66,6 +66,7 @@ import PuckGame from '../components/PuckGame';
 import HockeyStarQuizGame from '../components/HockeyStarQuizGame';
 import CachedBackground from '../components/CachedBackground';
 import { ICE_BACKGROUND } from '../utils/iceBackground';
+import { markHomeSceneMounted, markHomeSceneReady } from '../utils/homeSceneSignal';
 import HomeSeoHead from '../components/HomeSeoHead';
 import {
   getTopSeasonLeaderRanks,
@@ -2167,7 +2168,18 @@ export default function HomeScreen() {
   const params = useLocalSearchParams();
   const isFocused = useWebIsFocused();
   const pathname = useWebPathname();
+  // Web: render the rink only on /feed while focused — an inactive scene would sit
+  // on top of deep-linked player profiles and swallow touches.
+  const isWebHomeRoute =
+    Platform.OS === 'web' &&
+    (pathname === '/feed' || pathname === '/' || pathname === '');
   const performanceLevel = useMemo(() => getPerformanceLevel(), []);
+
+  // Заставка ждёт лёд: пока сцена не проявилась, логотип не уходит.
+  useEffect(() => {
+    if (Platform.OS === 'web' && !isWebHomeRoute) return;
+    markHomeSceneMounted();
+  }, [isWebHomeRoute]);
   const isDesktopLayout = useIsDesktopLayout();
   // Desktop: physics on (pucks move), drag off (no grab with mouse)
   const [physicsActive, setPhysicsActive] = useState(!isLowEndAndroid());
@@ -2929,7 +2941,10 @@ export default function HomeScreen() {
   // кадры, на которых старт «подтормаживает». Ждём конца проявления — дальше
   // композитинга нет и лёд оживает на чистом кадре.
   const [sceneRevealed, setSceneRevealed] = useState(false);
-  const handleSceneRevealed = useCallback(() => setSceneRevealed(true), []);
+  const handleSceneRevealed = useCallback(() => {
+    setSceneRevealed(true);
+    markHomeSceneReady();
+  }, []);
 
   const { puckPositions, updatePuckPosition, boundaries, registerSharedPosition, resetPucksMotion } = usePuckCollisionSystem(
     puckPlayersForScene,
@@ -3313,16 +3328,10 @@ export default function HomeScreen() {
   // Анимация запущена если есть шайбы
   const isRunning = puckPositions.length > 0;
 
-  // Web: render the rink only on /feed while focused — an inactive scene would sit
-  // on top of deep-linked player profiles and swallow touches.
-  //
   // Native: stay mounted when the tab blurs. Unmounting made the whole puck layer
   // repaint on every return, and those first frames are where the grey stripes come
   // from (iOS paints backgrounds/borders before their corner radii land). Physics is
   // already parked by `currentScreen`, so a blurred rink costs nothing.
-  const isWebHomeRoute =
-    Platform.OS === 'web' &&
-    (pathname === '/feed' || pathname === '/' || pathname === '');
   if (Platform.OS === 'web' && (!isFocused || !isWebHomeRoute)) {
     return null;
   }

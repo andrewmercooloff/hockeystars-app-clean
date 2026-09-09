@@ -49,6 +49,7 @@ import {
 // Исправляем импорт с учетом регистра
 import { dataCache, CACHE_KEYS } from '../utils/DataCache';
 import { safeHideSplashScreen } from '../utils/splashScreenUtils';
+import { isHomeSceneMounted, isHomeSceneReady, subscribeHomeScene } from '../utils/homeSceneSignal';
 import { useOtaUpdates } from '../hooks/useOtaUpdates';
 import { emitInboxRefresh, isMessagePushType } from '../utils/inboxEvents';
 import AnimatedSplash from '../components/AnimatedSplash';
@@ -284,13 +285,26 @@ const UserSync = React.memo(({
       }
   }, [params.refresh, loadUser, refreshUser]);
     
+    // Главная сообщает, когда шайбы проявились: заставка уходит только после этого.
+    const [sceneTick, setSceneTick] = React.useState(0);
+    React.useEffect(() => subscribeHomeScene(() => setSceneTick((t) => t + 1)), []);
+
     // Скрываем splash screen когда приложение готово и пользователь загружен
     React.useEffect(() => {
       // Overlay is (!loaded || showSplash || !appReady) — force-hide must clear both.
-      // Web: ~3s safety so a hung init cannot leave an infinite spinner.
       // Web: shorter ceiling — JS parse already costs time; don't add artificial wait.
-      const maxSplashTime = Platform.OS === 'web' ? 1600 : 2000;
-      const forceHideSplashTimeout = setTimeout(() => {
+      const minSplashTime = Platform.OS === 'web' ? 1600 : 2000;
+      // Потолок ожидания льда: зависшая загрузка не должна оставить логотип навсегда.
+      const maxSplashTime = Platform.OS === 'web' ? 3000 : 4000;
+      const elapsed = () => Date.now() - splashStartTime.current;
+
+      if (!showSplash) return;
+
+      const timers: ReturnType<typeof setTimeout>[] = [];
+      let hidden = false;
+      const hideSplash = () => {
+        if (hidden) return;
+        hidden = true;
         setAppReady(true);
         Animated.timing(splashOpacity, {
           toValue: 0,
@@ -299,35 +313,29 @@ const UserSync = React.memo(({
         }).start(() => {
           setShowSplash(false);
         });
-      }, maxSplashTime);
+      };
+
+      timers.push(setTimeout(hideSplash, Math.max(0, maxSplashTime - elapsed())));
 
       if (appReady && !isUserLoading && userLoaded) {
-        // Плавно скрываем наш кастомный splash screen когда все загружено
-        clearTimeout(forceHideSplashTimeout);
-        
-        // Вычисляем оставшееся время до максимума
-        const elapsed = Date.now() - splashStartTime.current;
-        const remainingTime = Math.max(0, maxSplashTime - elapsed);
-        
-        // Если уже прошло достаточно времени, скрываем сразу
-        // Если нет, ждем минимальное время для плавности
-        const hideDelay = remainingTime > 100 ? 100 : 0;
-        
-        setTimeout(() => {
-          Animated.timing(splashOpacity, {
-            toValue: 0,
-            duration: 300,
-            useNativeDriver: true,
-          }).start(() => {
-            setShowSplash(false);
-          });
-        }, hideDelay);
+        // Между уходом логотипа и выездом шайб был кадр пустого льда: данные уже
+        // загружены, а сцена ещё проявляется. Ждём её — тогда логотип растворяется
+        // сразу в готовый лёд. Если открыт не главный маршрут (deep link на профиль),
+        // сцены не будет вовсе, поэтому ждём только пока она вообще монтируется.
+        const sceneSettled =
+          isHomeSceneReady() || (!isHomeSceneMounted() && elapsed() >= minSplashTime);
+
+        if (sceneSettled) {
+          timers.push(setTimeout(hideSplash, Math.max(100, minSplashTime - elapsed())));
+        } else if (!isHomeSceneMounted()) {
+          timers.push(setTimeout(() => setSceneTick((t) => t + 1), minSplashTime - elapsed() + 20));
+        }
       }
 
       return () => {
-        clearTimeout(forceHideSplashTimeout);
+        timers.forEach(clearTimeout);
       };
-  }, [appReady, setAppReady, isUserLoading, userLoaded, showSplash, setShowSplash, splashOpacity, splashStartTime]);
+  }, [appReady, setAppReady, isUserLoading, userLoaded, showSplash, setShowSplash, splashOpacity, splashStartTime, sceneTick]);
     
     return null;
 });
