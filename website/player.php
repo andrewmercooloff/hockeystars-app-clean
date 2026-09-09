@@ -152,7 +152,7 @@ $ogLocale = $ogLocales[$lang] ?? 'ru_RU';
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="shortcut icon" href="/favicon.ico">
     <meta name="theme-color" content="#050008">
-    <link rel="stylesheet" href="/styles.css?v=20260909">
+    <link rel="stylesheet" href="/styles.css?v=20260909b">
     <style>
         .profile-seo-card {
             max-width: 720px;

@@ -149,7 +149,7 @@ header('Cache-Control: public, max-age=900');
     <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
     <link rel="shortcut icon" href="/favicon.ico">
     <meta name="theme-color" content="#0c0c10">
-    <link rel="stylesheet" href="/styles.css?v=20260909">
+    <link rel="stylesheet" href="/styles.css?v=20260909b">
     <style>
         .dir-wrap { max-width: 1040px; margin: 36px auto 24px; padding: 0 4px; }
         .dir-title { text-align: center; margin-bottom: 8px; }
