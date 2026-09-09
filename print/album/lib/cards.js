@@ -92,7 +92,7 @@ function cardCss(size) {
 .card.back td:last-child{text-align:right;font-family:'Fira Sans Extra Condensed';font-weight:600;font-size:${mm(3.4)};}
 /* team card: logo header on the light strip, full-width team photo below it, info block shifted down */
 .card.back.team.person .photo{height:${(B + 51 * s).toFixed(2)}mm;clip-path:polygon(0 0,100% 0,100% ${(B + 43.4 * s).toFixed(2)}mm,0 ${(B + 49 * s).toFixed(2)}mm);}
-.card.back.team.person .photo img{top:${(B + 13 * s).toFixed(2)}mm !important;height:${(38 * s).toFixed(2)}mm !important;width:100% !important;left:0 !important;object-fit:cover;object-position:center 40%;}
+.card.back.team.person .photo img{top:0 !important;height:100% !important;width:100% !important;left:0 !important;object-fit:cover;object-position:center center;}
 .card.back.team.person .band.top::before{clip-path:polygon(0 ${(B + 49 * s).toFixed(2)}mm,100% ${(B + 43.4 * s).toFixed(2)}mm,100% ${(B + 47.4 * s).toFixed(2)}mm,0 ${(B + 53 * s).toFixed(2)}mm);}
 .card.back.team.person .who{top:${(B + 55 * s).toFixed(2)}mm;}
 .card.back.team.person table{top:${(B + 66 * s).toFixed(2)}mm;}
@@ -193,7 +193,7 @@ function cardBack(card, data) {
   const light = Boolean(card.photoBack) && (person || Boolean(card.photo2Aspect));
   return `<div class="card back ${card.type}${light ? ' person' : ''}">
     <div class="bg"></div>
-    ${card.hasPhoto ? `<div class="photo"><img src="${card.photoBack || card.photo}" style="${card.photoBack && (card.type === 'club' || card.type === 'team') ? `left:0;top:0;width:100%;height:100%;object-fit:cover;object-position:center ${card.focus === 50 ? 35 : card.focus}%` : card.photoBack ? `left:${backPhotoLeft(card, data.cardSize).toFixed(2)}mm;height:${(backPhotoH(data.cardSize) * card.zoom).toFixed(2)}mm;top:${(backPhotoH(data.cardSize) * (1 - card.zoom) * 0.3).toFixed(2)}mm` : ''}"></div>` : ''}
+    ${card.hasPhoto ? `<div class="photo"><img src="${card.photoBack || card.photo}" style="${card.photoBack && card.type === 'team' ? 'left:0;top:0;width:100%;height:100%;object-fit:cover;object-position:center center' : card.photoBack && card.type === 'club' ? `left:0;top:0;width:100%;height:100%;object-fit:cover;object-position:center ${card.focus === 50 ? 35 : card.focus}%` : card.photoBack ? `left:${backPhotoLeft(card, data.cardSize).toFixed(2)}mm;height:${(backPhotoH(data.cardSize) * card.zoom).toFixed(2)}mm;top:${(backPhotoH(data.cardSize) * (1 - card.zoom) * 0.3).toFixed(2)}mm` : ''}"></div>` : ''}
     <div class="band top"></div><div class="band top2"></div>
     <div class="head">${logo}${light ? `<div class="yr">${esc(t.season)}</div>` : ''}<div class="t">${esc(t.name)}<small>${esc(t.city || '')}${t.city ? '<br>' : ''}Сезон ${esc(t.season)}</small></div></div>
     ${card.number ? `<div class="bignum">${esc(card.number)}</div>` : ''}
