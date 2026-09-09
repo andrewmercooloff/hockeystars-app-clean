@@ -3196,7 +3196,8 @@ export default function HomeScreen() {
       setShowQuizGame(true);
       return;
     }
-    if (!currentUser) {
+    // Web: guests can open public profiles; native app still requires sign-in.
+    if (!currentUser && Platform.OS !== 'web') {
       router.push('/login');
       return;
     }
@@ -3291,13 +3292,13 @@ export default function HomeScreen() {
   // Анимация запущена если есть шайбы
   const isRunning = puckPositions.length > 0;
 
-  // Inactive home tab, or web profile route: never paint the puck layer over profiles.
-  const onWebProfile =
+  // Web: render the rink only on /feed when this tab is focused — prevents the puck
+  // layer from blocking touches on deep-linked player profiles (promo site → player).
+  const isWebHomeRoute =
     Platform.OS === 'web' &&
-    typeof pathname === 'string' &&
-    (pathname.includes('/player/') || pathname.startsWith('/player/'));
-  if (!isFocused || onWebProfile) {
-    return <View style={{ flex: 1, backgroundColor: 'transparent' }} pointerEvents="none" />;
+    (pathname === '/feed' || pathname === '/' || pathname === '');
+  if (!isFocused || (Platform.OS === 'web' && !isWebHomeRoute)) {
+    return null;
   }
 
     return (

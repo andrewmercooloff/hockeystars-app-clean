@@ -202,6 +202,31 @@ const VIDEO_EDIT_GRID_GAP = 10;
 // scroll padding (20×2) + section padding (20×2) + section border (2×2)
 const VIDEO_EDIT_SECTION_INSET = 84;
 
+/** RN-web: TouchableWithoutFeedback around ScrollView content blocks finger scroll on iOS Safari. */
+function ProfileScrollWrap({
+  children,
+  isDesktop,
+}: {
+  children: React.ReactNode;
+  isDesktop: boolean;
+}) {
+  const wrapStyle = isDesktop ? styles.desktopContentWrap : undefined;
+  if (Platform.OS === 'web') {
+    return (
+      <View pointerEvents="box-none" style={wrapStyle}>
+        {children}
+      </View>
+    );
+  }
+  return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View pointerEvents="box-none" style={wrapStyle}>
+        {children}
+      </View>
+    </TouchableWithoutFeedback>
+  );
+}
+
 
 export default function PlayerProfile() {
   const { id: routeIdParam, scrollToMuseum, scrollToStats, scrollToPhotos, scrollToVideos, scrollToAchievements, scrollToExercises, scrollToNormatives, scrollToFriends, scrollToGift, scrollToSpeed, scrollToAnalysis, returnTo, chatId, returnToPlayerId, refreshProfile } = useLocalSearchParams();
@@ -4891,7 +4916,7 @@ export default function PlayerProfile() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
     >
-      <View style={styles.overlay}>
+      <View style={[styles.overlay, Platform.OS === 'web' && styles.overlayWeb]}>
           {/* Заголовок страницы с именем игрока */}
           {player && (
             <View style={[styles.pageHeader, isDesktop && styles.pageHeaderDesktop]}>
@@ -4917,6 +4942,12 @@ export default function PlayerProfile() {
                   } else if (returnToValue === 'search') {
                     // Возвращаемся в поиск
                     router.push('/search');
+                  } else if (returnToValue === 'marketing') {
+                    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+                      window.location.href = language === 'en' ? '/en' : '/';
+                    } else {
+                      goHome(router);
+                    }
                   } else if (returnToValue === 'home') {
                     goHome(router);
                   } else if (returnToValue === 'player' && returnPlayerIdValue) {
@@ -4999,8 +5030,7 @@ export default function PlayerProfile() {
               }}
               scrollEventThrottle={16}
           >
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-              <View pointerEvents="box-none" style={isDesktop ? styles.desktopContentWrap : undefined}>
+            <ProfileScrollWrap isDesktop={isDesktop}>
             {/* Фото и основная информация */}
             <View style={[styles.profileSection, isDesktop ? [styles.profileSectionDesktop, styles.profileSectionDesktopWithCover] : styles.profileSectionWithCover]}>
               {/* Клубная шапка за аватаром: свой ковер → эмблема команды → бренд */}
@@ -7859,8 +7889,7 @@ export default function PlayerProfile() {
               </View>
             )}
 
-              </View>
-            </TouchableWithoutFeedback>
+            </ProfileScrollWrap>
           </ScrollView>
         </View>
       
@@ -8648,11 +8677,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
   },
+  overlayWeb: {
+    minHeight: 0,
+  },
   scrollViewWeb: {
     flex: 1,
-    // RN-web: without flex the ScrollView cannot receive touch scroll on mobile Safari.
-    ...(Platform.OS === 'web' ? ({ overflow: 'auto', WebkitOverflowScrolling: 'touch' } as any) : null),
-  },
+    minHeight: 0,
+    touchAction: 'pan-y',
+    overflow: 'auto',
+    WebkitOverflowScrolling: 'touch',
+  } as ViewStyle,
   scrollContainer: {
     flexGrow: 1,
     paddingTop: 48, // Отступ для фиксированного заголовка

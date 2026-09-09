@@ -1824,6 +1824,7 @@ export default function RootLayout() {
             tabBarLabel: () => null,
             tabBarIcon: ({ size }) => <HomeStarTabIcon size={size} />,
             tabBarButton: (props) => <HomeStarTabButton {...props} />,
+            ...(Platform.OS === 'web' ? { unmountOnBlur: true } : {}),
           }}
         />
         <Tabs.Screen
@@ -2043,6 +2044,7 @@ export default function RootLayout() {
           name="feed"
           options={{
             href: null,
+            ...(Platform.OS === 'web' ? { unmountOnBlur: true } : {}),
           }}
         />
         <Tabs.Screen

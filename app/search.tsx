@@ -28,6 +28,7 @@ import CachedAvatar from '../components/CachedAvatar';
 import { BlurOrSolid } from '../components/BlurOrSolid';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useFocusEffect } from 'expo-router';
+import { useIsFocused } from '@react-navigation/native';
 import { navigateToPlayerProfile } from '../utils/navigateToPlayer';
 import * as SplashScreen from 'expo-splash-screen';
 import {
@@ -507,6 +508,7 @@ export default function SearchScreen() {
   const canBrowse = !!currentUser || isGuestWeb;
   const isAdmin = currentUser?.status === 'admin';
   const isDesktop = useIsDesktopLayout();
+  const isFocused = useIsFocused();
   const playersListRef = useRef<FlatList<ScoutListRow>>(null);
   const lastSearchRefreshAtRef = useRef(0);
 
@@ -1590,6 +1592,11 @@ export default function SearchScreen() {
         </View>
       );
     }
+  }
+
+  // Web: inactive tab must not paint over player profiles (blocks finger scroll).
+  if (Platform.OS === 'web' && !isFocused) {
+    return null;
   }
 
   // Если загружаем данные

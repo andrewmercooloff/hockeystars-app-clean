@@ -1,3 +1,20 @@
+// Залогиненный в веб-приложении пользователь, открыв корень сайта, ждёт свой каток,
+// а не лендинг: отправляем его на главную приложения (/feed).
+(function redirectAppUserHome() {
+    try {
+        var path = (window.location.pathname || '/').replace(/\/+$/, '') || '/';
+        if (path !== '/' && path !== '/index.html' && path !== '/en' && path !== '/index-en.html') return;
+        var raw = localStorage.getItem('hockeystars_current_user');
+        if (!raw) return;
+        var user = JSON.parse(raw);
+        if (user && user.id) {
+            window.location.replace('/feed');
+        }
+    } catch (e) {
+        // ignore
+    }
+})();
+
 // Translations
 const translations = {
     ru: {
@@ -961,6 +978,50 @@ function resolvePlayerAvatarUrl(avatar) {
     return `${HS_API}/storage/v1/object/public/${value.replace(/^\//, '')}`;
 }
 
+/** Small grid thumbnails — Supabase image transform keeps promo page light. */
+function resolvePlayerAvatarThumb(avatar, size) {
+    const full = resolvePlayerAvatarUrl(avatar);
+    if (!full) return '';
+    const px = size || 88;
+    if (full.includes('/storage/v1/object/public/')) {
+        return full.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')
+            + `?width=${px}&height=${px}&resize=cover&quality=75`;
+    }
+    return full;
+}
+
+const HS_FRIENDS_CACHE_KEY = 'hs_friends_avatars_v2';
+const HS_FRIENDS_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+
+function readFriendsCache() {
+    try {
+        const raw = localStorage.getItem(HS_FRIENDS_CACHE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || !Array.isArray(parsed.rows) || !parsed.ts) return null;
+        if (Date.now() - parsed.ts > HS_FRIENDS_CACHE_TTL_MS) return null;
+        return parsed.rows;
+    } catch (e) {
+        return null;
+    }
+}
+
+function writeFriendsCache(rows) {
+    try {
+        localStorage.setItem(HS_FRIENDS_CACHE_KEY, JSON.stringify({ ts: Date.now(), rows: rows }));
+    } catch (e) {
+        // ignore quota
+    }
+}
+
+function stashMarketingProfileNav() {
+    try {
+        sessionStorage.setItem('hs_profile_nav', JSON.stringify({ returnTo: 'marketing' }));
+    } catch (e) {
+        // ignore
+    }
+}
+
 function updateFriendsProfileLinks() {
     document.querySelectorAll('#friends-grid .friends-avatar[data-player-id]').forEach((link) => {
         const id = link.getAttribute('data-player-id');
@@ -970,9 +1031,63 @@ function updateFriendsProfileLinks() {
     });
 }
 
+function renderFriendsAvatars(rows) {
+    const grid = document.getElementById('friends-grid');
+    if (!grid || !Array.isArray(rows) || !rows.length) return;
+
+    const fragment = document.createDocumentFragment();
+    const seen = new Set();
+
+    rows.forEach((row) => {
+        const name = String(row.name || '').trim();
+        if (name.toUpperCase() === 'ADMIN') return;
+        const src = resolvePlayerAvatarThumb(row.avatar, 88);
+        if (!src || seen.has(row.id)) return;
+        seen.add(row.id);
+
+        const link = document.createElement('a');
+        link.className = 'friends-avatar';
+        link.href = playerProfilePath(row.id, name, currentLanguage);
+        link.setAttribute('role', 'listitem');
+        link.setAttribute('data-player-id', row.id);
+        link.setAttribute('data-player-name', name);
+        link.setAttribute('aria-label', name || 'Player');
+        link.title = name;
+        link.addEventListener('click', stashMarketingProfileNav);
+
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = name || '';
+        img.width = 88;
+        img.height = 88;
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.referrerPolicy = 'no-referrer';
+        img.addEventListener('error', () => {
+            const fallback = resolvePlayerAvatarUrl(row.avatar);
+            if (fallback && img.src !== fallback) {
+                img.src = fallback;
+                return;
+            }
+            link.classList.add('is-empty');
+            img.remove();
+        });
+
+        link.appendChild(img);
+        fragment.appendChild(link);
+    });
+
+    grid.appendChild(fragment);
+}
+
 async function loadFriendsAvatars() {
     const grid = document.getElementById('friends-grid');
     if (!grid) return;
+
+    const cached = readFriendsCache();
+    if (cached && cached.length) {
+        renderFriendsAvatars(cached);
+    }
 
     const url = `${HS_API}/rest/v1/players?select=id,name,avatar&is_hidden=eq.false&avatar=not.is.null&order=updated_at.desc&limit=200`;
 
@@ -988,41 +1103,9 @@ async function loadFriendsAvatars() {
         const rows = await response.json();
         if (!Array.isArray(rows) || !rows.length) return;
 
-        const fragment = document.createDocumentFragment();
-        const seen = new Set();
-
-        rows.forEach((row) => {
-            const name = String(row.name || '').trim();
-            if (name.toUpperCase() === 'ADMIN') return;
-            const src = resolvePlayerAvatarUrl(row.avatar);
-            if (!src || seen.has(src)) return;
-            seen.add(src);
-
-            const link = document.createElement('a');
-            link.className = 'friends-avatar';
-            link.href = playerProfilePath(row.id, name, currentLanguage);
-            link.setAttribute('role', 'listitem');
-            link.setAttribute('data-player-id', row.id);
-            link.setAttribute('data-player-name', name);
-            link.setAttribute('aria-label', name || 'Player');
-            link.title = name;
-
-            const img = document.createElement('img');
-            img.src = src;
-            img.alt = name || '';
-            img.loading = 'lazy';
-            img.decoding = 'async';
-            img.referrerPolicy = 'no-referrer';
-            img.addEventListener('error', () => {
-                link.classList.add('is-empty');
-                img.remove();
-            });
-
-            link.appendChild(img);
-            fragment.appendChild(link);
-        });
-
-        grid.appendChild(fragment);
+        writeFriendsCache(rows);
+        grid.innerHTML = '';
+        renderFriendsAvatars(rows);
     } catch (error) {
         console.warn('Friends avatars failed', error);
     }
@@ -1140,6 +1223,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Load avatars for pucks (uses placeholder avatars by default)
     loadPuckAvatars();
+
+    // Декоративные шайбы на лендинге ведут в каталог игроков (в приложении тап по шайбе = профиль)
+    document.querySelectorAll('.pucks-container .puck').forEach(function (puck) {
+        puck.style.pointerEvents = 'auto';
+        puck.style.cursor = 'pointer';
+        puck.addEventListener('click', function () {
+            window.location.href = '/search';
+        });
+    });
 
     // Wall of real player avatars
     loadFriendsAvatars();
