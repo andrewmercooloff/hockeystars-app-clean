@@ -12,7 +12,7 @@ header('Cache-Control: public, max-age=3600');
 
 $limit = min(5000, max(1, (int) ($_GET['limit'] ?? 2000)));
 $url = rtrim(HS_SUPABASE_URL, '/')
-    . '/rest/v1/players?select=id,name,updated_at&is_hidden=eq.false'
+    . '/rest/v1/players?select=id,name,updated_at&is_hidden=eq.false&status=neq.pending_verification'
     . '&order=updated_at.desc&limit=' . $limit;
 
 $ctx = stream_context_create([
@@ -29,7 +29,8 @@ $ctx = stream_context_create([
 
 $body = @file_get_contents($url, false, $ctx);
 $rows = is_string($body) ? json_decode($body, true) : [];
-$langs = hs_supported_langs();
+// Только реально переведённые версии (ru/en); остальные языки канонизируются в ru.
+$langs = hs_seo_langs();
 
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 ?>

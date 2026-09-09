@@ -1256,3 +1256,202 @@ body {
         font-size: 24px;
     }
 }
+
+/* =====================================================================
+   2026 design refresh — тот же язык, что в приложении:
+   почти чёрный лёд, красные звёзды-паттерн, карточки на полупрозрачном
+   белом с красноватой кромкой, красные «пилюли» кнопок.
+   Переопределяет базовые стили выше; структура HTML не менялась.
+   ===================================================================== */
+:root {
+    --hs-bg-0: #14131a;
+    --hs-bg-1: #0c0c10;
+    --hs-bg-2: #0e0709;
+    --hs-red: #fa2f40;
+    --hs-red-dim: rgba(250, 47, 64, 0.28);
+    --hs-card: rgba(255, 255, 255, 0.06);
+    --hs-card-hover: rgba(255, 255, 255, 0.09);
+    --hs-chrome: rgba(6, 4, 8, 0.92);
+}
+
+body {
+    background-color: var(--hs-bg-1);
+}
+
+/* Фон: градиент + повторяющиеся звёзды + два красных свечения (как на главной в приложении) */
+.background-overlay {
+    background-image: linear-gradient(180deg, var(--hs-bg-0) 0%, var(--hs-bg-1) 55%, var(--hs-bg-2) 100%);
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+.background-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('star.png');
+    background-repeat: repeat;
+    background-size: 190px 190px;
+    opacity: 0.11;
+    animation: none;
+}
+
+.background-overlay::after {
+    background:
+        radial-gradient(520px 520px at 8% 42%, rgba(180, 20, 40, 0.16), transparent 70%),
+        radial-gradient(640px 420px at 96% 96%, rgba(250, 47, 64, 0.16), transparent 70%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0) 22%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.55) 100%);
+    background-size: auto;
+    animation: none;
+}
+
+/* Шайбы: чёрный диск с тёмной кромкой, без блеска */
+.puck {
+    background: #000000;
+    border: 1.5px solid #26262b;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
+    opacity: 0.55;
+}
+
+.puck::before {
+    border-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Шапка и подвал */
+.header,
+.footer {
+    background: var(--hs-chrome);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Заголовки секций — как заголовки экранов в приложении */
+.section-title,
+.top-title,
+.contact-card h1 {
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+}
+
+.hero-subtitle {
+    color: var(--hs-red);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+/* Карточки */
+.for-whom-card,
+.feature-card,
+.contact-card,
+.modal-content,
+.profile-seo-card,
+.download-btn,
+.tester-form,
+.top-card,
+.top-row,
+.top-podium-card {
+    background: var(--hs-card);
+    border: 1px solid var(--hs-red-dim);
+    border-radius: 20px;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+}
+
+.for-whom-card:hover,
+.feature-card:hover {
+    background: var(--hs-card-hover);
+    border-color: rgba(250, 47, 64, 0.55);
+    box-shadow: 0 12px 32px rgba(250, 47, 64, 0.16);
+    transform: translateY(-2px);
+}
+
+.feature-card::before {
+    display: none;
+}
+
+.for-whom-icon,
+.feature-icon {
+    background: rgba(250, 47, 64, 0.12);
+    border: 1px solid var(--hs-red-dim);
+    color: var(--hs-red);
+}
+
+/* Кнопки-«пилюли» */
+.hero-login-btn,
+.cta-primary,
+.contact-submit,
+.btn-submit {
+    background: var(--hs-red);
+    color: #fff !important;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 10px 26px rgba(250, 47, 64, 0.32);
+}
+
+.hero-login-btn:hover,
+.cta-primary:hover,
+.contact-submit:hover,
+.btn-submit:hover {
+    background: #e02838;
+    box-shadow: 0 14px 32px rgba(250, 47, 64, 0.45);
+}
+
+.cta-secondary {
+    background: var(--hs-card);
+    border: 1px solid var(--hs-red-dim);
+    color: #fff;
+}
+
+.download-btn {
+    border-radius: 16px;
+}
+
+.download-btn:hover {
+    border-color: rgba(250, 47, 64, 0.6);
+    background: var(--hs-card-hover);
+    box-shadow: 0 12px 32px rgba(250, 47, 64, 0.16);
+}
+
+.download-btn svg {
+    color: #fff;
+}
+
+/* Языковой переключатель и мелкие подписи */
+.lang-btn.active {
+    background: var(--hs-red);
+    color: #fff;
+}
+
+.footer-text {
+    color: rgba(255, 255, 255, 0.55);
+    letter-spacing: 1px;
+}
+
+/* SEO-карточка игрока */
+.profile-seo-card {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.profile-avatar {
+    border: 3px solid var(--hs-red) !important;
+}
+
+.profile-stat {
+    background: var(--hs-card);
+    border: 1px solid var(--hs-red-dim);
+}
+
+.gate-box {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px dashed rgba(250, 47, 64, 0.35);
+}

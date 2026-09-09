@@ -32,6 +32,13 @@ Disallow: /_debug
 Disallow: /_sitemap
 Disallow: /+not-found
 
+# Public player directory (PHP + query string, so it must be allowed explicitly)
+Allow: /players.php
+Allow: /players.php?
+Allow: /sitemap.xml
+Allow: /sitemap-static.xml
+Allow: /sitemap-players.xml
+
 # System / API / PHP entry points
 Disallow: /api/
 Disallow: /*.php$
