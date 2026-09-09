@@ -57,15 +57,6 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
   // Failover direct ↔ proxy: URL пересчитывается через rewriteSupabasePublicUrl при рендере,
   // поэтому достаточно форсировать рендер — иначе картинка висит на мёртвом origin.
   const [, setOriginVersion] = React.useState(getSupabaseOriginVersion);
-  React.useEffect(
-    () =>
-      subscribeSupabaseOrigin(() => {
-        setOriginVersion(getSupabaseOriginVersion());
-        retryCountRef.current = 0;
-        setRetryNonce((n) => n + 1);
-      }),
-    []
-  );
   // URL, который РЕАЛЬНО загрузился (а не просто был назначен) — им затыкаем сбои сети.
   const lastLoadedUrlRef = React.useRef<string | null>(null);
   // Принудительная замена URL после сбоев: сначала «голый» URL без версии (он чаще всего
@@ -205,17 +196,38 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
   }, [displayAvatarUrl, retryNonce, overrideUrl]);
   sourceUriRef.current = sourceUri ?? null;
 
+  // handleError меняет идентичность на каждый setState, а сторожок ниже должен
+  // перезапускаться только от смены URL — иначе он сбрасывает «картинка загружена»
+  // на ровном месте и через 8 с подменяет URL уже показанному аватару.
+  const handleErrorRef = React.useRef(handleError);
+  handleErrorRef.current = handleError;
+
+  // Смена origin (direct ↔ proxy) прилетает фоновым probe'ом через секунду после
+  // старта. Уже показанный аватар трогать нельзя: он загрузился, значит его хост
+  // жив, а перерисовка увела бы все шайбы разом на новый URL — сеть встаёт колом,
+  // аватары мигают, шайбы дёргаются. Перерешиваем только то, что ещё не загрузилось.
+  React.useEffect(
+    () =>
+      subscribeSupabaseOrigin(() => {
+        if (loadedRef.current) return;
+        retryCountRef.current = 0;
+        setOriginVersion(getSupabaseOriginVersion());
+      }),
+    []
+  );
+
   // Сторожок зависшей загрузки: у expo-image нет таймаута, а недоступный origin
   // (например, прокси за VPN) держит запрос минутами — шайба остаётся чёрной.
   React.useEffect(() => {
-    loadedRef.current = false;
     const isRemote = !!sourceUri && (sourceUri.startsWith('http://') || sourceUri.startsWith('https://'));
     if (!isRemote) return;
+    if (lastLoadedUrlRef.current === sourceUri) return;
+    loadedRef.current = false;
     const tid = setTimeout(() => {
-      if (!loadedRef.current) handleError();
+      if (!loadedRef.current) handleErrorRef.current();
     }, 8000);
     return () => clearTimeout(tid);
-  }, [sourceUri, handleError]);
+  }, [sourceUri]);
 
   if (status === 'scout') {
     return (

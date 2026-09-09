@@ -59,6 +59,10 @@ const Puck: React.FC<PuckProps> = ({
     readyNotifiedRef.current = true;
     onAvatarReady?.();
   }, [onAvatarReady]);
+  const handleAvatarError = useCallback(() => {
+    setImageError(true);
+    notifyAvatarReady();
+  }, [notifyAvatarReady]);
   const hasRemoteAvatar = !!avatar && !!playerId && status !== 'scout';
   useEffect(() => {
     if (!hasRemoteAvatar) notifyAvatarReady();
@@ -235,10 +239,7 @@ const Puck: React.FC<PuckProps> = ({
                 borderRadius: dimensions.avatarBorderRadius - 2,
               }}
               onLoad={notifyAvatarReady}
-              onError={() => {
-                setImageError(true);
-                notifyAvatarReady();
-              }}
+              onError={handleAvatarError}
             />
           </View>
         ) : status === 'scout' ? (
