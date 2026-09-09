@@ -9,10 +9,14 @@
   <style>
     :root {
       color-scheme: dark;
-      --panel: rgba(17, 31, 54, 0.88);
-      --accent: #f58220;
-      --text: #eef3fb;
-      --muted: #c8d6ea;
+      --orange: #f05a1a;
+      --gold: #ffb347;
+      --ice: #b8dff5;
+      --panel: rgba(12, 28, 48, 0.78);
+      --panel-border: rgba(184, 223, 245, 0.22);
+      --accent: var(--orange);
+      --text: #f8fbff;
+      --muted: #b8cfe8;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
@@ -25,13 +29,23 @@
       display: flex;
       flex-direction: column;
       min-height: 100dvh;
-      background: #0a1628 center / cover no-repeat fixed;
+      background: #0c1a2e center / cover no-repeat fixed;
     }
     body::before {
       content: "";
       position: fixed;
       inset: 0;
-      background: rgba(8, 18, 34, 0.62);
+      background:
+        radial-gradient(ellipse 90% 70% at 50% 40%, rgba(184, 223, 245, 0.18), transparent 70%),
+        linear-gradient(180deg, rgba(8, 20, 38, 0.45) 0%, rgba(12, 28, 48, 0.55) 45%, rgba(8, 16, 30, 0.72) 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, transparent 35%, rgba(0, 0, 0, 0.35) 100%);
       pointer-events: none;
       z-index: 0;
     }
@@ -41,20 +55,37 @@
       flex: 0 0 auto;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
       flex-wrap: wrap;
-      padding: 8px 14px; background: var(--panel);
-      border-bottom: 1px solid rgba(255,255,255,.1);
-      backdrop-filter: blur(8px);
+      padding: 10px 14px;
+      background: linear-gradient(180deg, rgba(14, 32, 56, 0.92), rgba(10, 24, 42, 0.82));
+      border-bottom: 1px solid var(--panel-border);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(14px) saturate(1.2);
     }
     .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
-    .brand img.logo { height: 42px; width: auto; display: block; filter: drop-shadow(0 2px 6px rgba(0,0,0,.35)); }
-    .brand .tagline { font-size: 12px; color: var(--muted); white-space: nowrap; }
+    .brand img.logo {
+      height: 44px; width: auto; display: block;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,.4)) drop-shadow(0 0 12px rgba(240, 90, 26, 0.25));
+    }
+    .brand .tagline {
+      font-size: 12px; color: var(--ice); white-space: nowrap;
+      text-shadow: 0 1px 8px rgba(0,0,0,.35);
+    }
 
     .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
     .tabs button {
-      border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.06); color: var(--text);
+      border: 1px solid rgba(184, 223, 245, 0.25);
+      background: rgba(255,255,255,.08);
+      color: var(--text);
       padding: 6px 12px; border-radius: 999px; font-size: 13px; cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
     }
-    .tabs button.active { background: var(--accent); border-color: var(--accent); color: #111; font-weight: 600; }
+    .tabs button.active {
+      background: linear-gradient(180deg, var(--gold), var(--orange));
+      border-color: var(--gold);
+      color: #1a1008;
+      font-weight: 700;
+      box-shadow: 0 4px 14px rgba(240, 90, 26, 0.35);
+    }
 
     .card-side {
       display: none; gap: 6px; flex: 1 1 100%; justify-content: flex-end;
@@ -78,10 +109,21 @@
     }
     main.grid-mode { padding: 8px; align-items: stretch; }
 
+    main::before {
+      content: "";
+      position: absolute;
+      inset: 8% 10%;
+      border-radius: 24px;
+      background: radial-gradient(ellipse at center, rgba(184, 223, 245, 0.12) 0%, transparent 72%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
     .stage {
       width: 100%; height: 100%;
       display: flex; align-items: center; justify-content: center;
       min-height: 0;
+      z-index: 1;
     }
 
     .book {
@@ -89,12 +131,23 @@
       display: flex;
       align-items: stretch;
       flex-shrink: 0;
-      box-shadow: 0 18px 50px rgba(0,0,0,.55);
-      background: #000;
+      background: #0a1018;
       cursor: zoom-in;
-      transition: transform .2s ease, box-shadow .2s ease;
+      border-radius: 4px;
+      border: 1px solid rgba(184, 223, 245, 0.15);
+      box-shadow:
+        0 2px 0 rgba(255,255,255,.06) inset,
+        0 28px 60px rgba(0, 0, 0, 0.55),
+        0 8px 24px rgba(240, 90, 26, 0.12),
+        0 0 0 1px rgba(0,0,0,.4);
+      transition: transform .2s ease, box-shadow .25s ease;
     }
-    .book:active { transform: scale(0.98); }
+    .book:active {
+      transform: scale(0.98) translateY(2px);
+      box-shadow:
+        0 12px 32px rgba(0, 0, 0, 0.45),
+        0 4px 12px rgba(240, 90, 26, 0.1);
+    }
 
     .book.single-mode .half { flex: 1 1 100%; border: none; }
 
@@ -128,15 +181,20 @@
     }
     .cards-grid.visible { display: grid; }
     .cards-grid button {
-      border: none;
+      border: 1px solid rgba(184, 223, 245, 0.2);
       padding: 0;
-      background: rgba(0,0,0,.25);
-      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.2));
+      border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 4px 14px rgba(0,0,0,.35);
+      box-shadow: 0 6px 18px rgba(0,0,0,.35), 0 0 0 1px rgba(0,0,0,.2);
       cursor: zoom-in;
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
     }
-    .cards-grid button:active { transform: scale(0.96); }
+    .cards-grid button:active {
+      transform: scale(0.96);
+      border-color: rgba(255, 179, 71, 0.55);
+      box-shadow: 0 8px 22px rgba(240, 90, 26, 0.25);
+    }
     .cards-grid img {
       width: 100%;
       aspect-ratio: 60 / 85;
@@ -153,11 +211,19 @@
 
     .nav {
       position: absolute; top: 50%; transform: translateY(-50%);
-      width: 40px; height: 56px; border: none; border-radius: 8px;
-      background: rgba(17,31,54,.9); color: #fff; font-size: 26px; cursor: pointer;
+      width: 40px; height: 56px; border: 1px solid rgba(184, 223, 245, 0.25);
+      border-radius: 10px;
+      background: rgba(12, 28, 48, 0.88);
+      color: #fff; font-size: 26px; cursor: pointer;
       z-index: 6;
+      box-shadow: 0 8px 20px rgba(0,0,0,.35);
+      backdrop-filter: blur(8px);
     }
-    .nav:active { background: var(--accent); color: #111; }
+    .nav:active {
+      background: linear-gradient(180deg, var(--gold), var(--orange));
+      color: #1a1008;
+      border-color: var(--gold);
+    }
     .nav:disabled { opacity: .2; pointer-events: none; }
     .nav.prev { left: 4px; }
     .nav.next { right: 4px; }
@@ -167,12 +233,13 @@
       flex: 0 0 auto;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
       padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
-      background: var(--panel);
-      border-top: 1px solid rgba(255,255,255,.1);
+      background: linear-gradient(0deg, rgba(10, 24, 42, 0.92), rgba(14, 32, 56, 0.82));
+      border-top: 1px solid var(--panel-border);
       font-size: 13px; color: var(--muted);
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(14px) saturate(1.15);
+      box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.22);
     }
-    .counter { color: var(--text); font-weight: 600; }
+    .counter { color: var(--ice); font-weight: 600; text-shadow: 0 1px 6px rgba(0,0,0,.3); }
 
     .loading {
       position: absolute; inset: 0; display: flex; flex-direction: column;
@@ -184,7 +251,9 @@
 
     .zoom-overlay {
       position: fixed; inset: 0; z-index: 100;
-      background: rgba(0,0,0,.94);
+      background:
+        radial-gradient(ellipse at center, rgba(184, 223, 245, 0.08), transparent 60%),
+        rgba(4, 12, 24, 0.96);
       display: none; flex-direction: column;
     }
     .zoom-overlay.open { display: flex; }
@@ -284,7 +353,7 @@
   </div>
 
   <script>
-    const VER = '20260909b';
+    const VER = '20260909c';
     const REPO = 'andrewmercooloff/hockeystars-app-clean';
     const BRANCH = 'cursor/hockey-card-album-generator-a9a3';
     const CDN = `https://cdn.jsdelivr.net/gh/${REPO}@${BRANCH}/print/album`;
@@ -293,6 +362,8 @@
     const ICE_BG = `${CDN}/share/dobrynya/ice-bg.jpg?v=${VER}`;
 
     document.body.style.backgroundImage = `url("${ICE_BG}")`;
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
     document.getElementById('logo').src = LOGO;
     const fav = document.createElement('link');
     fav.rel = 'icon'; fav.href = LOGO; fav.type = 'image/png';
