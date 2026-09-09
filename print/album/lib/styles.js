@@ -43,13 +43,7 @@ ${fontFaces()}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 html,body{font-family:'Roboto',Arial,sans-serif;color:#0f1b2d;}
 .h{font-family:'Fira Sans Extra Condensed','Roboto',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.01em;}
-.ice{
-  background:
-    radial-gradient(ellipse at 20% 10%, rgba(255,255,255,.9), transparent 55%),
-    radial-gradient(ellipse at 80% 90%, rgba(255,255,255,.8), transparent 50%),
-    repeating-linear-gradient(115deg, rgba(120,150,190,.06) 0 2px, transparent 2px 14px),
-    linear-gradient(160deg,#f7fafd 0%,var(--ice) 55%,#dfe8f2 100%);
-}
+.ice{background:#dce8f2;}
 `;
 }
 

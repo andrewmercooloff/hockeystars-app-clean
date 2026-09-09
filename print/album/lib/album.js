@@ -48,12 +48,14 @@ ${cardCss(size)}
 .safe{position:absolute;left:${bleed + 7}mm;top:${bleed + 7}mm;right:${bleed + 7}mm;bottom:${bleed + 7}mm;}
 .pgnum{position:absolute;bottom:${bleed + 3}mm;font-family:'Fira Sans Extra Condensed';font-weight:600;font-size:3.2mm;color:var(--primary);opacity:.8;}
 .pgnum.l{left:${bleed + 8}mm;} .pgnum.r{right:${bleed + 8}mm;}
-/* page background: soft ice gradient + blurred arena photo + a wide brand-colour band under the header */
-.page.ice{background:linear-gradient(180deg,#f3f6fa 0%,#e7edf4 55%,#dfe7f0 100%);}
-.bgimg{position:absolute;inset:0;overflow:hidden;opacity:.28;}
-.bgimg img{width:100%;height:100%;object-fit:cover;}
+/* page background: raster ice photo (assets/bg-ice.jpg) + light wash; vector rink stays very faint on top */
+.page.ice{background:#dce8f2;}
+.page.ice:has(.bgimg){background:linear-gradient(180deg,rgba(255,255,255,.35) 0%,rgba(220,232,242,.25) 100%);}
+.bgimg{position:absolute;inset:0;overflow:hidden;opacity:.62;}
+.bgimg img{width:100%;height:100%;object-fit:cover;filter:saturate(.88) contrast(1.06) brightness(1.04);}
+.page.ice .bgimg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.42) 0%,rgba(210,225,240,.18) 55%,rgba(200,218,235,.32) 100%);}
 .bgband{position:absolute;left:-20mm;right:-20mm;top:-6mm;height:${bleed + 46}mm;transform:skewY(-3deg);
-  background:linear-gradient(90deg,color-mix(in srgb,var(--primary) 92%,#fff),color-mix(in srgb,var(--secondary) 80%,var(--primary)));opacity:.13;}
+  background:linear-gradient(90deg,color-mix(in srgb,var(--primary) 92%,#fff),color-mix(in srgb,var(--secondary) 80%,var(--primary)));opacity:.08;}
 
 /* facts / glossary / profile pages */
 .facts .hdr,.glossary .hdr,.profile .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
@@ -341,10 +343,14 @@ ${cardCss(size)}
 `;
 }
 
-// Ice decor for inner pages: faint half rink in team colours + skate scratches.
-const deco = (data, rinkOpacity = 0.14) =>
-  `${data.assets.bg ? `<div class="bgimg"><img src="${data.assets.bg}"></div>` : ''}<div class="bgband"></div>
-  <div class="deco">${rinkSvg(data.colors.primary, data.colors.secondary, rinkOpacity)}${scratchesSvg('rgba(90,120,160,.5)', 0.35)}</div>`;
+// Ice decor: raster ice texture when assets/bg-ice.jpg exists; vector rink only as a faint overlay.
+const deco = (data, rinkOpacity = 0.14) => {
+  const hasBg = !!data.assets.bg;
+  const ro = hasBg ? Math.min(rinkOpacity, 0.07) : rinkOpacity;
+  const scr = hasBg ? 0.12 : 0.35;
+  return `${hasBg ? `<div class="bgimg"><img src="${data.assets.bg}"></div>` : ''}<div class="bgband"></div>
+  <div class="deco">${rinkSvg(data.colors.primary, data.colors.secondary, ro)}${scratchesSvg('rgba(90,120,160,.45)', scr)}</div>`;
+};
 
 const arrow = (color) => `<svg viewBox="0 0 60 44" fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
   <path d="M6 8 C 22 6, 40 10, 52 30"/><path d="M40 30 L 52 32 L 55 20"/></svg>`;
