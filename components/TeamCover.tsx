@@ -41,7 +41,7 @@ const STAR_PITCH_X = STAR * 2;
 const STAR_PITCH_Y = STAR * 1.15;
 
 /** Team emblem wallpaper: same rhythm, slightly denser. */
-const LOGO = 48;
+const LOGO = 60;
 const LOGO_PITCH_X = LOGO * 1.9;
 const LOGO_PITCH_Y = LOGO * 1.1;
 
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: LOGO,
     height: LOGO,
-    opacity: 0.16,
+    opacity: 0.26,
   },
   nameRow: {
     height: NAME_LINE,
