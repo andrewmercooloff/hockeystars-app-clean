@@ -8,21 +8,22 @@ function findProfileScrollRoot(): HTMLElement | null {
   const byId = document.getElementById('hs-profile-scroll');
   if (byId) return byId;
 
-  // Fallback while slug/profile is still resolving.
-  for (const el of document.querySelectorAll('div')) {
+  // Fallback while the slug is still resolving and the tagged ScrollView has not mounted.
+  for (const el of Array.from(document.querySelectorAll<HTMLElement>('div'))) {
     const s = getComputedStyle(el);
-    if (s.overflowY === 'auto' && s.touchAction.includes('pan-y')) {
-      const r = el.getBoundingClientRect();
-      if (r.width > 200 && r.height > 300) return el;
-    }
+    if (s.overflowY !== 'auto' || !s.touchAction.includes('pan-y')) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width > 200 && r.height > 300) return el;
   }
   return null;
 }
 
 /**
- * RN-web bottom tabs mount every scene as position:absolute siblings.
- * On a cold deep-link to /ru/player/… the home tab scene can sit above the
- * profile and steal touches even though the profile is visible underneath.
+ * RN-web bottom tabs render every screen as a full-size absolutely positioned
+ * sibling. On a cold deep link to /ru/player/… the home tab keeps a scene on top
+ * of the profile, so the finger never reaches the profile ScrollView.
+ *
+ * Walk the profile's ancestor chain and mute every full-screen sibling scene.
  */
 export default function WebProfileTouchFix() {
   const pathname = usePathname();
@@ -31,47 +32,61 @@ export default function WebProfileTouchFix() {
     if (Platform.OS !== 'web' || typeof document === 'undefined') return;
     if (!PROFILE_PATH.test(pathname || '')) return;
 
+    const muted = new Map<HTMLElement, string>();
+    let frame = 0;
     let cancelled = false;
-    let observer: MutationObserver | null = null;
+
+    const mute = (el: HTMLElement) => {
+      if (el.style.pointerEvents === 'none') return;
+      if (!muted.has(el)) muted.set(el, el.style.pointerEvents);
+      el.style.pointerEvents = 'none';
+    };
 
     const apply = () => {
+      frame = 0;
       if (cancelled) return;
       const scrollRoot = findProfileScrollRoot();
       if (!scrollRoot) return;
 
-      // Walk up from the profile ScrollView and ensure its branch receives touches.
-      for (let node: HTMLElement | null = scrollRoot; node && node !== document.body; node = node.parentElement) {
-        node.style.pointerEvents = 'auto';
-        if (node.style.zIndex === '' || node.style.zIndex === '0') {
-          node.style.zIndex = '10';
-        }
-      }
-
-      // Full-screen absolute tab scenes that do NOT contain the profile scroll view block swipes.
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      document.querySelectorAll('div').forEach((el) => {
-        if (el === scrollRoot || el.contains(scrollRoot) || scrollRoot.contains(el)) return;
-        const s = getComputedStyle(el);
-        if (s.position !== 'absolute') return;
-        const r = el.getBoundingClientRect();
-        if (r.width < vw * 0.85 || r.height < vh * 0.5) return;
-        el.style.pointerEvents = 'none';
-      });
+
+      for (let node: HTMLElement | null = scrollRoot; node && node !== document.body; node = node.parentElement) {
+        if (node.style.pointerEvents === 'none') node.style.pointerEvents = 'auto';
+
+        const parent = node.parentElement;
+        if (!parent) break;
+        for (const sibling of Array.from(parent.children)) {
+          if (sibling === node || !(sibling instanceof HTMLElement)) continue;
+          if (getComputedStyle(sibling).position !== 'absolute') continue;
+          const r = sibling.getBoundingClientRect();
+          if (r.width < vw * 0.85 || r.height < vh * 0.5) continue;
+          mute(sibling);
+        }
+      }
+    };
+
+    const schedule = () => {
+      if (cancelled || frame) return;
+      frame = requestAnimationFrame(apply);
     };
 
     apply();
-    const t1 = requestAnimationFrame(apply);
-    const timers = [120, 400, 900, 1800].map((ms) => window.setTimeout(apply, ms));
+    const timers = [80, 250, 700, 1500, 3000].map((ms) => window.setTimeout(apply, ms));
 
-    observer = new MutationObserver(() => apply());
-    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+    // Scenes are added/removed as tabs mount, so keep re-checking — but coalesce
+    // into one rAF pass, otherwise our own style writes retrigger the observer.
+    const observer = new MutationObserver(schedule);
+    observer.observe(document.body, { childList: true, subtree: true });
 
     return () => {
       cancelled = true;
-      cancelAnimationFrame(t1);
+      if (frame) cancelAnimationFrame(frame);
       timers.forEach(clearTimeout);
-      observer?.disconnect();
+      observer.disconnect();
+      muted.forEach((original, el) => {
+        el.style.pointerEvents = original;
+      });
     };
   }, [pathname]);
 
