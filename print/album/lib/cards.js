@@ -79,7 +79,6 @@ function cardCss(size) {
 .card.back.club.person .head .yr,.card.back.team.person .head .yr{width:${mm(8)};font-size:${mm(1.65)};margin-top:${mm(-0.3)};}
 .card.back.club.person .head.lo-left,.card.back.team.person .head.lo-left{left:${pad}mm;right:auto;}
 .card.back.club.person .head.lo-right,.card.back.team.person .head.lo-right{right:${pad}mm;left:auto;}
-.card.back.club.person .head::before,.card.back.team.person .head::before{content:"";position:absolute;inset:-0.8mm -1.2mm;background:rgba(255,255,255,.78);border-radius:1.2mm;z-index:-1;}
 .card.back.team:not(.person) .photo::after,.card.back.club:not(.person) .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,color-mix(in srgb,var(--primary) 92%,transparent) 0%,color-mix(in srgb,var(--primary) 70%,transparent) 22%,rgba(0,0,0,0) 45%),linear-gradient(180deg,rgba(0,0,0,0) 80%,var(--primary) 100%);}
 .card.back .band{position:absolute;left:-10mm;right:-10mm;height:${mm(7)};transform:rotate(-8deg);}
 .card.back .band.top{top:${(B + 41.5 * s).toFixed(2)}mm;height:${mm(4)};background:var(--secondary);opacity:.95;}
