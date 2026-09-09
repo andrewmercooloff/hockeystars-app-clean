@@ -77,7 +77,6 @@ ${cardCss(size)}
 .facts .f .pk b{position:relative;top:-3px;font-family:'Unbounded';font-weight:800;font-size:5.4mm;color:#fff;line-height:1;
   text-shadow:0 .3mm .8mm rgba(0,0,0,.75),0 0 .4mm rgba(0,0,0,.45);}
 .facts .f p{font-size:3.5mm;line-height:1.3;color:#1b2940;}
-.glossary .sticks{position:absolute;right:${bleed + 12}mm;top:${bleed + 8}mm;width:26mm;height:26mm;opacity:.8;}
 .glossary .ggrid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 44}mm;bottom:${bleed + 16}mm;display:grid;grid-template-columns:1fr 1fr;gap:4mm 8mm;align-content:space-between;}
 .glossary .g{background:linear-gradient(135deg,var(--primary),var(--dark));color:#fff;padding:3mm 5mm;transform:skewX(-6deg);border-left:1.4mm solid var(--secondary);}
 .glossary .g.alt{background:linear-gradient(135deg,var(--secondary),color-mix(in srgb,var(--secondary) 70%,#000));border-left-color:#fff;}
@@ -124,7 +123,8 @@ ${cardCss(size)}
 .hdr .count .puck{width:6mm;height:3.6mm;}
 .stats .goal{position:absolute;right:${bleed + 10}mm;top:${bleed + 8}mm;width:44mm;height:28mm;}
 .autographs .box .puck{position:absolute;right:2mm;top:2mm;width:6mm;height:3.6mm;opacity:.85;}
-.gallery .hdr .sticks,.autographs .hdr .sticks,.history .hdr .sticks{width:14mm;height:14mm;vertical-align:-3mm;margin-left:3mm;}
+.gallery .hdr .sticks,.autographs .hdr .sticks,.history .hdr .sticks,.glossary .hdr .sticks{width:14mm;height:14mm;vertical-align:-3mm;margin-left:3mm;opacity:.9;}
+.glossary .hdr .sub{display:block;margin-top:2.5mm;}
 
 /* section title */
 .title{position:relative;display:inline-block;font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:10mm;line-height:1;color:var(--dark);
@@ -188,14 +188,16 @@ ${cardCss(size)}
 .intro .how{position:absolute;left:${bleed + 85}mm;right:${bleed + 12}mm;top:${bleed + 92}mm;}
 .intro .how h3{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:7.5mm;color:var(--dark);margin-bottom:5mm;}
 .intro .step{display:flex;align-items:flex-start;gap:3mm;margin-bottom:6mm;font-size:4mm;line-height:1.35;color:#1b2940;}
-.intro .step .pucknum{margin-top:-.5mm;}
+.intro .step .pucknum{width:13mm;height:13mm;margin-top:-1mm;flex:none;}
+.intro .step .pucknum .puck-photo{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 .5mm 1mm rgba(0,0,0,.18));}
+.intro .step .pucknum b{text-shadow:0 .25mm .7mm rgba(0,0,0,.75);}
 .intro .bottom{position:absolute;left:0;right:0;bottom:0;height:120mm;}
-.intro .bigname{position:absolute;left:${bleed + 6}mm;right:${bleed + 6}mm;top:0;font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;
+.intro .bigname{position:absolute;left:${bleed + 6}mm;right:${bleed + 6}mm;top:14mm;font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;
   font-size:34mm;line-height:.95;color:transparent;-webkit-text-stroke:.9mm var(--secondary);text-align:center;white-space:nowrap;letter-spacing:.02em;}
 .intro .teamphoto{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:22mm;bottom:${bleed + 10}mm;overflow:hidden;border-radius:1.5mm;
   box-shadow:0 2mm 6mm rgba(0,0,0,.25);background:#c9d5e3;}
 .intro .teamphoto img{width:100%;height:100%;object-fit:cover;object-position:center;}
-.intro .teamphoto.cutout{background:none;box-shadow:none;border-radius:0;overflow:visible;top:14mm;}
+.intro .teamphoto.cutout{background:none;box-shadow:none;border-radius:0;overflow:visible;top:20mm;}
 .intro .teamphoto.cutout::before{content:"";position:absolute;left:8%;right:8%;bottom:-2mm;height:14mm;border-radius:50%;background:radial-gradient(ellipse at center,rgba(20,40,70,.28),rgba(20,40,70,0) 70%);}
 .intro .teamphoto.cutout img{position:absolute;left:0;right:0;bottom:2mm;width:100%;height:100%;object-fit:contain;object-position:center bottom;}
 .intro .teamphoto .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;
@@ -459,7 +461,7 @@ function introPage(data, pageNo) {
     <div class="lead">${intro.replace(/\n/g, '<br>')}</div>
     <div class="sample">${sample ? cardFront(sample, data) : ''}</div>
     <div class="how"><h3>Как это работает:</h3>
-      ${steps.map((s, i) => `<div class="step"><span class="pucknum">${puckSvg(data.colors.secondary, 'rgba(255,255,255,.5)')}<b>${i + 1}</b></span><div>${s}</div></div>`).join('')}
+      ${steps.map((s, i) => `<div class="step"><span class="pucknum">${factPuckHtml(data, i)}<b>${i + 1}</b></span><div>${s}</div></div>`).join('')}
     </div>
     <div class="bottom">
       <div class="bigname" style="font-size:${bigSize.toFixed(1)}mm">${esc(bigName)}</div>
@@ -609,7 +611,7 @@ function glossaryPage(data, pageNo) {
   return `<section class="page glossary ice">
     ${deco(data)}
     <div class="orn br" style="opacity:.9"></div>
-    <div class="hdr"><div class="title">Хоккейный словарик</div><div class="sub">Говори как профи</div>${sticksSvg(data.colors.primary, data.colors.secondary, data.colors.dark)}</div>
+    <div class="hdr"><div class="title">Хоккейный словарик</div>${sticksSvg(data.colors.primary, data.colors.secondary, data.colors.dark)}<div class="sub">Говори как профи</div></div>
     <div class="ggrid">${list.map(([w, d], i) => `<div class="g ${i % 3 === 1 ? 'alt' : ''}"><b>${esc(w)}</b><span>${esc(d)}</span></div>`).join('')}</div>
     <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
   </section>`;
