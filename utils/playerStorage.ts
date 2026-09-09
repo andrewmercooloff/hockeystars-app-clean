@@ -777,8 +777,7 @@ const batchLoadPlayerTeamsForPlayerIds = async (
     });
   };
 
-  for (let i = 0; i < playerIds.length; i += CHUNK) {
-    const chunk = playerIds.slice(i, i + CHUNK);
+  const loadChunk = async (chunk: string[]) => {
     const { data, error } = await supabase
       .from('player_teams')
       .select(`
@@ -802,15 +801,27 @@ const batchLoadPlayerTeamsForPlayerIds = async (
 
     if (error) {
       console.error('❌ batchLoadPlayerTeamsForPlayerIds:', error);
-      continue;
+      return [];
     }
+    return data || [];
+  };
 
-    for (const row of data || []) {
-      const pid = row.player_id as string;
-      if (!pid) continue;
-      const pt = mapRow(row);
-      if (!byPlayer.has(pid)) byPlayer.set(pid, []);
-      byPlayer.get(pid)!.push(pt);
+  const chunks: string[][] = [];
+  for (let i = 0; i < playerIds.length; i += CHUNK) {
+    chunks.push(playerIds.slice(i, i + CHUNK));
+  }
+  // По три пачки за раз: строго по очереди весь каталог растягивается на секунды,
+  // и каждый ответ разбирается ровно тогда, когда шайбы уже едут.
+  for (let i = 0; i < chunks.length; i += 3) {
+    const results = await Promise.all(chunks.slice(i, i + 3).map(loadChunk));
+    for (const rows of results) {
+      for (const row of rows) {
+        const pid = row.player_id as string;
+        if (!pid) continue;
+        const pt = mapRow(row);
+        if (!byPlayer.has(pid)) byPlayer.set(pid, []);
+        byPlayer.get(pid)!.push(pt);
+      }
     }
   }
 
@@ -1474,23 +1485,18 @@ async function enrichPlayersMeta(
 ): Promise<void> {
   const AsyncStorage = require('@react-native-async-storage/async-storage').default;
   try {
-    const { getPlayersActivityRatings } = await import('../services/activityService');
-    const playerIds = players.map((p) => p.id);
-    const [activityRatings, teamsByPlayer] = await Promise.all([
-      getPlayersActivityRatings(playerIds),
-      batchLoadPlayerTeamsForPlayerIds(playerIds),
-    ]);
+    // Рейтинг активности сюда не входит намеренно: суммировать activity_log по всему
+    // каталогу — это десятки запросов подряд, и они приходятся ровно на первые секунды
+    // главной, где шайбы уже едут. Показывает его только поиск, и он берёт его сам.
+    const teamsByPlayer = await batchLoadPlayerTeamsForPlayerIds(players.map((p) => p.id));
     players.forEach((player) => {
-      if (activityRatings[player.id] !== undefined) {
-        player.activityRating = activityRatings[player.id];
-      }
       player.teams = teamsByPlayer.get(player.id) ?? [];
     });
     await AsyncStorage.setItem(cacheKey, JSON.stringify({ players, timestamp: Date.now() }));
     onUpdated?.(players);
   } catch (metaErr) {
-    console.warn('⚠️ Ошибка догрузки рейтингов/команд:', metaErr);
-    // Сеть с рейтингами не удалась, но свежий список игроков всё равно кешируем,
+    console.warn('⚠️ Ошибка догрузки команд:', metaErr);
+    // Сеть с командами не удалась, но свежий список игроков всё равно кешируем,
     // если вызывающая сторона отложила запись кеша до этого места.
     if (writeCacheOnFailure) {
       try {
@@ -1582,10 +1588,8 @@ export const loadPlayers = async (
           if (Date.now() - timestamp < cacheTime) {
             console.log('💾 Загрузили игроков из кеша', cacheKey);
             warmPlayerAvatarsFromList(players);
-            const needsRatings = players.some(
-              (player: Player) => player.activityRating === undefined || player.activityRating === null
-            );
-            if (needsRatings) {
+            const needsTeams = players.some((player: Player) => player.teams === undefined);
+            if (needsTeams) {
               void enrichPlayersMeta(players, cacheKey, onUpdated);
             }
             return players;
