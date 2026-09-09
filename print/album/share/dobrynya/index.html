@@ -21,7 +21,7 @@
       color: var(--text);
       font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
       overflow: hidden;
-      touch-action: manipulation;
+      touch-action: pan-y;
     }
     body { display: flex; flex-direction: column; min-height: 100dvh; }
 
@@ -29,7 +29,7 @@
       flex: 0 0 auto;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
       padding: 10px 16px; background: var(--panel); border-bottom: 1px solid rgba(255,255,255,.08);
-      z-index: 2;
+      z-index: 5;
     }
     header h1 { font-size: 15px; font-weight: 600; line-height: 1.25; }
     header p { font-size: 12px; color: var(--muted); margin-top: 2px; }
@@ -47,51 +47,86 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      padding: 8px;
+      padding: 6px 48px;
     }
 
-    #book-wrap {
+    .stage {
       width: 100%;
       height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
+      perspective: 2200px;
     }
 
-    #book {
-      box-shadow: 0 16px 48px rgba(0,0,0,.55);
+    .book {
+      position: relative;
+      display: flex;
+      align-items: stretch;
+      max-width: 100%;
+      max-height: 100%;
+      box-shadow: 0 18px 50px rgba(0,0,0,.55);
+      transform-style: preserve-3d;
+      background: #000;
     }
+
+    .book.spread-mode { aspect-ratio: 420 / 297; height: min(calc(100dvh - 130px), 100%); width: auto; }
+    .book.page-mode  { aspect-ratio: 420 / 297; height: min(calc(100dvh - 130px), 100%); width: auto; }
+
+    .half {
+      flex: 1 1 50%;
+      position: relative;
+      overflow: hidden;
+      background: #0d1520;
+      min-width: 0;
+    }
+    .half.left  { border-right: 1px solid rgba(255,255,255,.08); }
+    .half img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      user-select: none; -webkit-user-drag: none; pointer-events: none;
+    }
+    .half.empty { background: linear-gradient(135deg, #0d1520, #162236); }
+
+    .book.spread-mode .spread-img {
+      width: 100%; height: 100%; object-fit: contain; display: block;
+      user-select: none; -webkit-user-drag: none;
+    }
+
+    .book { transition: opacity .25s ease; }
+    .book.turning { opacity: .15; }
 
     .nav {
       position: absolute; top: 50%; transform: translateY(-50%);
-      width: 44px; height: 64px; border: none; border-radius: 8px;
-      background: rgba(17,31,54,.88); color: #fff; font-size: 28px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      backdrop-filter: blur(6px); z-index: 3;
+      width: 40px; height: 56px; border: none; border-radius: 8px;
+      background: rgba(17,31,54,.9); color: #fff; font-size: 26px; cursor: pointer;
+      z-index: 6;
     }
-    .nav:active { background: rgba(245,130,32,.95); color: #111; }
+    .nav:active { background: var(--accent); color: #111; }
     .nav:disabled { opacity: .2; pointer-events: none; }
-    .nav.prev { left: 8px; }
-    .nav.next { right: 8px; }
+    .nav.prev { left: 4px; }
+    .nav.next { right: 4px; }
 
     footer {
       flex: 0 0 auto;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
       padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
       background: var(--panel); border-top: 1px solid rgba(255,255,255,.08);
-      font-size: 13px; color: var(--muted); z-index: 2;
+      font-size: 13px; color: var(--muted); z-index: 5;
     }
     .counter { color: var(--text); font-weight: 600; }
 
     .loading {
-      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-      background: rgba(10,22,40,.75); font-size: 14px; z-index: 4;
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 10px;
+      background: rgba(10,22,40,.82); font-size: 14px; z-index: 10;
     }
     .loading.hidden { display: none; }
+    .loading progress { width: min(220px, 70vw); accent-color: var(--accent); }
 
     @media (max-width: 640px) {
+      main { padding: 4px 36px; }
       header { flex-wrap: wrap; }
-      .nav { width: 36px; height: 52px; font-size: 22px; }
+      .nav { width: 32px; height: 48px; font-size: 22px; }
     }
   </style>
 </head>
@@ -99,169 +134,199 @@
   <header>
     <div>
       <h1>HK «Дobrynya» — альбом 2026–2027</h1>
-      <p>Листайте пальцем или нажимайте на край страницы</p>
+      <p>Открытый разворот — видны левая и правая страницы</p>
     </div>
-    <div class="tabs" role="tablist">
-      <button type="button" class="active" data-mode="spreads" role="tab">Развороты</button>
-      <button type="button" data-mode="pages" role="tab">Страницы</button>
-      <button type="button" data-mode="cards" role="tab">Карточки</button>
+    <div class="tabs">
+      <button type="button" class="active" data-mode="spreads">Развороты</button>
+      <button type="button" data-mode="pages">Страницы</button>
+      <button type="button" data-mode="cards">Карточки</button>
     </div>
   </header>
 
-  <main>
-    <div class="loading" id="loading">Загрузка альбома…</div>
+  <main id="main">
+    <div class="loading" id="loading">
+      <span id="loading-text">Загрузка альбома…</span>
+      <progress id="loading-bar" max="100" value="0"></progress>
+    </div>
     <button type="button" class="nav prev" id="prev" aria-label="Назад">‹</button>
-    <div id="book-wrap"><div id="book"></div></div>
+    <div class="stage">
+      <div class="book spread-mode" id="book"></div>
+    </div>
     <button type="button" class="nav next" id="next" aria-label="Вперёд">›</button>
   </main>
 
   <footer>
     <span class="counter" id="counter">—</span>
-    <span id="hint">Свайп или тап по краю</span>
+    <span>Свайп или тап по краю</span>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
   <script>
     const REPO = 'andrewmercooloff/hockeystars-app-clean';
     const BRANCH = 'cursor/hockey-card-album-generator-a9a3';
     const IMG = (file) =>
-      `https://cdn.jsdelivr.net/gh/${REPO}@${encodeURIComponent(BRANCH)}/print/album/print-ready/dobrynya/pages/${file}`;
+      `https://cdn.jsdelivr.net/gh/${REPO}@${BRANCH}/print/album/print-ready/dobrynya/pages/${file}`;
 
-    const sets = {
+    const albumPages = Array.from({ length: 16 }, (_, i) => IMG(`album-${String(i + 1).padStart(2, '0')}.jpg`));
+    const spreadPages = Array.from({ length: 8 }, (_, i) => IMG(`spread-${String(i + 1).padStart(2, '0')}.jpg`));
+
+    const modes = {
       spreads: {
         label: 'разворот',
-        pages: Array.from({ length: 8 }, (_, i) => IMG(`spread-${String(i + 1).padStart(2, '0')}.jpg`)),
-        ratio: 420 / 297,
+        type: 'spread',
+        items: spreadPages,
       },
       pages: {
-        label: 'страница',
-        pages: Array.from({ length: 16 }, (_, i) => IMG(`album-${String(i + 1).padStart(2, '0')}.jpg`)),
-        ratio: 210 / 297,
+        label: 'разворот',
+        type: 'book',
+        // Пары страниц как в открытом журнале: обложка одна, дальше 2–3, 4–5 …
+        pairs: [
+          { left: null, right: 0, caption: 'Обложка' },
+          { left: 1, right: 2 }, { left: 3, right: 4 }, { left: 5, right: 6 },
+          { left: 7, right: 8 }, { left: 9, right: 10 }, { left: 11, right: 12 },
+          { left: 13, right: 14 }, { left: null, right: 15, caption: 'Задняя обложка' },
+        ],
+        urls: albumPages,
       },
       cards: {
         label: 'лист',
-        pages: [IMG('cards-all-fronts.jpg'), IMG('cards-all-backs.jpg')],
-        ratio: 1.2,
+        type: 'spread',
+        items: [IMG('cards-all-fronts.jpg'), IMG('cards-all-backs.jpg')],
       },
     };
 
     let mode = 'spreads';
-    let flip = null;
+    let index = 0;
+    const cache = new Map();
+
     const bookEl = document.getElementById('book');
     const loadingEl = document.getElementById('loading');
+    const loadingText = document.getElementById('loading-text');
+    const loadingBar = document.getElementById('loading-bar');
     const counterEl = document.getElementById('counter');
     const prevBtn = document.getElementById('prev');
     const nextBtn = document.getElementById('next');
     const tabs = document.querySelectorAll('.tabs button');
+    const mainEl = document.getElementById('main');
 
-    function bookSize(ratio) {
-      const wrap = document.getElementById('book-wrap');
-      const pad = 24;
-      const maxW = wrap.clientWidth - pad;
-      const maxH = wrap.clientHeight - pad;
-      let w, h;
-      if (maxW / maxH > ratio) {
-        h = maxH;
-        w = h * ratio;
-      } else {
-        w = maxW;
-        h = w / ratio;
-      }
-      return { width: Math.floor(w), height: Math.floor(h) };
-    }
-
-    function preload(urls) {
-      return Promise.all(urls.map((src) => new Promise((resolve, reject) => {
+    function loadImage(src) {
+      if (cache.has(src)) return cache.get(src);
+      const p = new Promise((resolve, reject) => {
         const img = new Image();
+        img.decoding = 'async';
         img.onload = () => resolve(src);
         img.onerror = () => reject(new Error(src));
         img.src = src;
-      })));
-    }
-
-    function updateNav() {
-      if (!flip) return;
-      const idx = flip.getCurrentPageIndex();
-      const total = flip.getPageCount();
-      const cfg = sets[mode];
-      counterEl.textContent = `${idx + 1} / ${total} · ${cfg.label}`;
-      prevBtn.disabled = idx <= 0;
-      nextBtn.disabled = idx >= total - 1;
-    }
-
-    function destroyFlip() {
-      if (flip) {
-        flip.destroy();
-        flip = null;
-      }
-      bookEl.innerHTML = '';
-    }
-
-    async function buildFlip(nextMode) {
-      mode = nextMode;
-      tabs.forEach((btn) => btn.classList.toggle('active', btn.dataset.mode === mode));
-      destroyFlip();
-      loadingEl.classList.remove('hidden');
-
-      const cfg = sets[mode];
-      try {
-        await preload(cfg.pages);
-      } catch (e) {
-        loadingEl.textContent = 'Не удалось загрузить изображения. Проверьте интернет.';
-        return;
-      }
-
-      const { width, height } = bookSize(cfg.ratio);
-      flip = new St.PageFlip(bookEl, {
-        width,
-        height,
-        size: 'fixed',
-        minWidth: 220,
-        maxWidth: 2000,
-        minHeight: 300,
-        maxHeight: 2000,
-        maxShadowOpacity: 0.45,
-        showCover: false,
-        mobileScrollSupport: false,
-        usePortrait: mode === 'pages',
-        drawShadow: true,
-        flippingTime: 700,
-        useMouseEvents: true,
-        swipeDistance: 30,
-        clickEventForward: false,
       });
+      cache.set(src, p);
+      return p;
+    }
 
-      flip.loadFromImages(cfg.pages);
-      flip.on('flip', updateNav);
-      flip.on('init', () => {
-        loadingEl.classList.add('hidden');
-        updateNav();
-      });
+    async function preloadAll(urls) {
+      let done = 0;
+      const total = urls.length;
+      loadingBar.max = total;
+      loadingBar.value = 0;
+      await Promise.all(urls.map(async (src) => {
+        try {
+          await loadImage(src);
+        } catch (_) { /* покажем с broken — не блокируем весь альбом */ }
+        done += 1;
+        loadingBar.value = done;
+        loadingText.textContent = `Загрузка… ${done}/${total}`;
+      }));
+    }
 
-      loadingEl.classList.add('hidden');
+    function halfHtml(side, src, empty) {
+      if (empty) return `<div class="half ${side} empty"></div>`;
+      return `<div class="half ${side}"><img src="${src}" alt="" loading="eager" decoding="async"></div>`;
+    }
+
+    function renderSpread(src) {
+      bookEl.className = 'book spread-mode';
+      bookEl.innerHTML = `<img class="spread-img" src="${src}" alt="" decoding="async">`;
+    }
+
+    function renderBookPair(pair) {
+      bookEl.className = 'book page-mode';
+      const urls = modes.pages.urls;
+      const left = pair.left == null ? null : urls[pair.left];
+      const right = pair.right == null ? null : urls[pair.right];
+      bookEl.innerHTML =
+        halfHtml('left', left, !left) +
+        halfHtml('right', right, !right);
+    }
+
+    function renderCurrent() {
+      bookEl.classList.add('turning');
+      const cfg = modes[mode];
+      if (cfg.type === 'spread') {
+        renderSpread(cfg.items[index]);
+      } else {
+        renderBookPair(cfg.pairs[index]);
+      }
+      requestAnimationFrame(() => bookEl.classList.remove('turning'));
       updateNav();
     }
 
-    prevBtn.addEventListener('click', () => flip && flip.flipPrev());
-    nextBtn.addEventListener('click', () => flip && flip.flipNext());
+    function updateNav() {
+      const cfg = modes[mode];
+      const total = cfg.type === 'spread' ? cfg.items.length : cfg.pairs.length;
+      const n = index + 1;
+      const pair = cfg.type === 'book' ? cfg.pairs[index] : null;
+      let detail = `${n} / ${total} · ${cfg.label}`;
+      if (pair) {
+        const l = pair.left != null ? pair.left + 1 : '—';
+        const r = pair.right != null ? pair.right + 1 : '—';
+        detail += ` · стр. ${l} и ${r}`;
+      }
+      counterEl.textContent = detail;
+      prevBtn.disabled = index <= 0;
+      nextBtn.disabled = index >= total - 1;
+    }
+
+    function go(delta) {
+      const cfg = modes[mode];
+      const total = cfg.type === 'spread' ? cfg.items.length : cfg.pairs.length;
+      const next = index + delta;
+      if (next < 0 || next >= total || busy) return;
+      index = next;
+      renderCurrent();
+    }
+
+    async function setMode(nextMode) {
+      mode = nextMode;
+      index = 0;
+      tabs.forEach((btn) => btn.classList.toggle('active', btn.dataset.mode === mode));
+      loadingEl.classList.remove('hidden');
+      const urls = mode === 'pages' ? albumPages : modes[mode].items;
+      await preloadAll(urls);
+      loadingEl.classList.add('hidden');
+      renderCurrent();
+    }
+
+    prevBtn.addEventListener('click', () => go(-1));
+    nextBtn.addEventListener('click', () => go(1));
     tabs.forEach((btn) => btn.addEventListener('click', () => {
-      if (btn.dataset.mode !== mode) buildFlip(btn.dataset.mode);
+      if (btn.dataset.mode !== mode) setMode(btn.dataset.mode);
     }));
 
     window.addEventListener('keydown', (e) => {
-      if (!flip) return;
-      if (e.key === 'ArrowLeft') flip.flipPrev();
-      if (e.key === 'ArrowRight') flip.flipNext();
+      if (e.key === 'ArrowLeft') go(-1);
+      if (e.key === 'ArrowRight') go(1);
     });
 
-    window.addEventListener('resize', () => {
-      if (!flip) return;
-      const cfg = sets[mode];
-      const { width, height } = bookSize(cfg.ratio);
-      flip.update({ width, height });
-    });
+    let touchX = null;
+    mainEl.addEventListener('touchstart', (e) => {
+      touchX = e.changedTouches[0].clientX;
+    }, { passive: true });
+    mainEl.addEventListener('touchend', (e) => {
+      if (touchX == null) return;
+      const dx = e.changedTouches[0].clientX - touchX;
+      if (Math.abs(dx) > 42) go(dx < 0 ? 1 : -1);
+      touchX = null;
+    }, { passive: true });
 
-    buildFlip('spreads');
+    setMode('spreads');
   </script>
 </body>
 </html>
