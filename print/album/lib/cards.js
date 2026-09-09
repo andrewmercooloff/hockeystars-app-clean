@@ -70,7 +70,8 @@ function cardCss(size) {
 .card.back.person .head .t{display:none;}
 .card.back.person .head .yr{font-family:'Fira Sans Extra Condensed';font-weight:600;font-size:${mm(2)};letter-spacing:.08em;color:var(--dark);text-align:center;width:${mm(16)};margin-top:${mm(-0.2)};}
 .card.back.team:not(.person) .photo img,.card.back.club:not(.person) .photo img{width:100%;height:100%;left:0;top:0;object-fit:cover;object-position:center 35%;}
-.card.back.person .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(243,245,248,.9) 0%,rgba(243,245,248,.6) 22%,rgba(243,245,248,0) 40%);}
+/* white left fade only on player/coach portrait backs — not on team/club full-width photos */
+.card.back.person:not(.team):not(.club) .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(243,245,248,.9) 0%,rgba(243,245,248,.6) 22%,rgba(243,245,248,0) 40%);}
 .card.back.team:not(.person) .photo::after,.card.back.club:not(.person) .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,color-mix(in srgb,var(--primary) 92%,transparent) 0%,color-mix(in srgb,var(--primary) 70%,transparent) 22%,rgba(0,0,0,0) 45%),linear-gradient(180deg,rgba(0,0,0,0) 80%,var(--primary) 100%);}
 .card.back .band{position:absolute;left:-10mm;right:-10mm;height:${mm(7)};transform:rotate(-8deg);}
 .card.back .band.top{top:${(B + 41.5 * s).toFixed(2)}mm;height:${mm(4)};background:var(--secondary);opacity:.95;}
