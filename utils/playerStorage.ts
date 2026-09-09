@@ -5,7 +5,7 @@ import {
   throwIfSupabaseNetworkError,
   ensureSupabaseRouting,
 } from './supabase';
-import { avatarCache, updateAvatarGlobally, ensureAvatarCached, preloadPlayerAvatars, seedPlayerAvatarUrls } from './AvatarCache';
+import { avatarCache, updateAvatarGlobally, ensureAvatarCached, isSameAvatarFile, preloadPlayerAvatars, seedPlayerAvatarUrls } from './AvatarCache';
 import { dataCache, CACHE_KEYS } from './DataCache';
 import { addActivityPoints } from '../services/activityService';
 import {
@@ -2346,10 +2346,16 @@ export function mergePlayerFromPlayersRealtimeRow(
   const next: Player = { ...cur };
   const str = (v: unknown) => (v != null ? String(v) : '');
 
-  if (row.avatar !== undefined && row.avatar !== cur.avatar) {
-    next.avatar = row.avatar as string;
-    changed = true;
-    invalidatePlayersListCache = true;
+  // Realtime отдаёт URL таким, каким он лежит в БД, а в списке аватар уже переписан
+  // на активный origin. Сравнение строк объявляло бы смену аватара на каждом
+  // обновлении строки (онлайн, last_seen) и сбрасывало бы кеш картинки.
+  if (row.avatar !== undefined) {
+    const nextAvatar = rewriteSupabasePublicUrl(row.avatar as string | null);
+    if (!isSameAvatarFile(nextAvatar, cur.avatar)) {
+      next.avatar = nextAvatar as string;
+      changed = true;
+      invalidatePlayersListCache = true;
+    }
   }
 
   const statPairs: [keyof Player, string][] = [

@@ -43,7 +43,7 @@ import {
 } from '../utils/playerStorage';
 import { applyActivityRatingsToPlayers } from '../services/activityService';
 
-import { updateAvatarGlobally } from '../utils/AvatarCache';
+import { isSameAvatarFile, updateAvatarGlobally } from '../utils/AvatarCache';
 import { supabase } from '../utils/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
 import OptimizedBackground from '../components/OptimizedBackground';
@@ -817,7 +817,7 @@ export default function SearchScreen() {
             if (merged.invalidatePlayersListCache) {
               void AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]).catch(() => {});
             }
-            if (playerData.avatar != null && playerData.avatar !== cur.avatar) {
+            if (playerData.avatar != null && !isSameAvatarFile(String(playerData.avatar), cur.avatar)) {
               void updateAvatarGlobally(playerId, String(playerData.avatar));
             }
             const row = merged.next;

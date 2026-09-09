@@ -1755,9 +1755,11 @@ export default function PlayerProfile() {
           
           console.log('✅ Профиль обновлен через Realtime');
           setPlayer(updatedPlayer);
-          if (updatedPlayer.avatar && updatedPlayer.avatar !== player.avatar) {
-            const { updateAvatarGlobally } = await import('../../utils/AvatarCache');
-            await updateAvatarGlobally(player.id, updatedPlayer.avatar);
+          if (updatedPlayer.avatar) {
+            const { isSameAvatarFile, updateAvatarGlobally } = await import('../../utils/AvatarCache');
+            if (!isSameAvatarFile(updatedPlayer.avatar, player.avatar)) {
+              await updateAvatarGlobally(player.id, updatedPlayer.avatar);
+            }
           }
 
           // Обновляем кеш состояния

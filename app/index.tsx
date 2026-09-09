@@ -48,7 +48,7 @@ import {
   mergePlayerFromPlayersRealtimeRow,
   getPlayerSeasonPoints,
 } from '../utils/playerStorage';
-import { preloadPlayerAvatars, seedPlayerAvatarUrls, updateAvatarGlobally } from '../utils/AvatarCache';
+import { isSameAvatarFile, preloadPlayerAvatars, seedPlayerAvatarUrls, updateAvatarGlobally } from '../utils/AvatarCache';
 import { supabase } from '../utils/supabase';
 import CountryFilter from '../components/CountryFilter';
 import YearFilter from '../components/YearFilter';
@@ -3147,7 +3147,7 @@ export default function HomeScreen() {
               const AsyncStorage = require('@react-native-async-storage/async-storage').default;
               AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]).catch(() => {});
             }
-            if (playerData.avatar != null && playerData.avatar !== cur.avatar) {
+            if (playerData.avatar != null && !isSameAvatarFile(playerData.avatar as string, cur.avatar)) {
               void updateAvatarGlobally(playerId, playerData.avatar as string);
             }
             return currentPlayers.map((p, i) => (i === idx ? merged.next : p));

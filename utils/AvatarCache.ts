@@ -182,6 +182,17 @@ class AvatarCache {
 
 export const avatarCache = AvatarCache.getInstance();
 
+/**
+ * Один и тот же файл или разные. Хост не учитываем: direct и proxy отдают один
+ * объект, а строки приходят из разных мест — realtime отдаёт URL как в БД, а в
+ * списках он уже переписан на активный origin. Параметры (?v=, _v=) оставляем:
+ * перезаписанный под тем же именем файл — это уже другой аватар.
+ */
+export const isSameAvatarFile = (a?: string | null, b?: string | null): boolean => {
+  const path = (url?: string | null) => (url || '').replace(/^https?:\/\/[^/]+/, '');
+  return path(a) === path(b);
+};
+
 // Хук для подписки на изменения аватаров
 export const useAvatarCache = (playerId: string, fallbackUrl?: string) => {
   const [avatarUrl, setAvatarUrl] = React.useState<string | null>(() => 
