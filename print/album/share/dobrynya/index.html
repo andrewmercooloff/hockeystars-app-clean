@@ -360,7 +360,7 @@
       if (cfg.type === 'spread') return cfg.items[index];
       const pair = cfg.pairs[index];
       if (pair.single != null) return cfg.urls[pair.single];
-      return cfg.items ? cfg.items[index] : cfg.urls[pair.right];
+      return cfg.urls[pair.right];
     }
 
     function loadImage(src) {
