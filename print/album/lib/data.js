@@ -204,6 +204,8 @@ async function loadTeam(teamDir, cacheDir) {
       focus: Number(String(row.focus || row['фокус'] || '50').replace('%', '')) || 50,
       // optional: force logo on back to left or right (otherwise derived from focus for club/team cards)
       logoSide: String(row.logoSide || row['лого'] || '').toLowerCase(),
+      // optional vertical shift of the back photo in mm (positive = down)
+      backOffset: Number(row.backOffset || row['сдвиг'] || 0) || 0,
       // relative size of the close-up on the back (1 = default); <1 for photos that are already tightly cropped
       zoom: Number(row.zoom || row['масштаб'] || 1) || 1,
     });

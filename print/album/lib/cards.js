@@ -204,13 +204,15 @@ function cardBack(card, data) {
   const longest = Math.max((card.number ? card.number.length + 2 : 0) + card.surname.length, card.name.length);
   const scale = data.cardSize.w / 63.5;
   const nameSize = `${(5.4 * scale * Math.min(1, 16 / Math.max(longest, 1))).toFixed(2)}mm`;
-  const light = Boolean(card.photoBack) && (person || Boolean(card.photo2Aspect));
+  const clubBack = (card.type === 'club' || card.type === 'team') && card.hasPhoto;
+  const light = (Boolean(card.photoBack) && (person || Boolean(card.photo2Aspect))) || clubBack;
   const logoSide = backLogoSide(card);
   const wideBack = card.type === 'club' || card.type === 'team';
   const backPos = card.focus === 50 ? (wideBack ? 'center' : '40') : `${card.focus}%`;
+  const backShift = card.backOffset ? `transform:translateY(${card.backOffset}mm);` : '';
   return `<div class="card back ${card.type}${light ? ' person' : ''}">
     <div class="bg"></div>
-    ${card.hasPhoto ? `<div class="photo"><img src="${card.photoBack || card.photo}" style="${card.photoBack && wideBack ? `object-position:center ${backPos}` : card.photoBack ? `left:${backPhotoLeft(card, data.cardSize).toFixed(2)}mm;height:${(backPhotoH(data.cardSize) * card.zoom).toFixed(2)}mm;top:${(backPhotoH(data.cardSize) * (1 - card.zoom) * 0.3).toFixed(2)}mm` : ''}"></div>` : ''}
+    ${card.hasPhoto ? `<div class="photo"><img src="${card.photoBack || card.photo}" style="${wideBack && (card.photoBack || card.photo) ? `object-position:center ${backPos};${backShift}` : card.photoBack ? `left:${backPhotoLeft(card, data.cardSize).toFixed(2)}mm;height:${(backPhotoH(data.cardSize) * card.zoom).toFixed(2)}mm;top:${(backPhotoH(data.cardSize) * (1 - card.zoom) * 0.3).toFixed(2)}mm` : ''}"></div>` : ''}
     <div class="band top"></div><div class="band top2"></div>
     <div class="head lo-${logoSide}">${logo}${light ? `<div class="yr">${esc(t.season)}</div>` : ''}<div class="t">${esc(t.name)}<small>${esc(t.city || '')}${t.city ? '<br>' : ''}Сезон ${esc(t.season)}</small></div></div>
     ${card.number ? `<div class="bignum">${esc(card.number)}</div>` : ''}
