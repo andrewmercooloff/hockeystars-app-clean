@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState, useCallback, useMe
 import { View, StyleSheet, Dimensions, Image as RNImage, TouchableOpacity, Platform, Vibration, AppState, AppStateStatus, InteractionManager } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image as ExpoImage } from 'expo-image';
-import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useRouter, useFocusEffect, useLocalSearchParams, usePathname } from 'expo-router';
 import { useIsFocused } from '@react-navigation/native';
 import Animated, { Easing as ReEasing, makeMutable, useAnimatedStyle, useSharedValue, withDelay, withTiming, runOnJS, type SharedValue } from 'react-native-reanimated';
 
@@ -1775,6 +1775,8 @@ const OriginalPuckAnimator = React.memo(({
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [hasDragged, setHasDragged] = useState(false);
+  const isDraggingRef = useRef(false);
+  const pointerActiveRef = useRef(false);
   const dragStartRef = useRef({ x: 0, y: 0, pageX: 0, pageY: 0, time: 0, startX: 0, startY: 0 });
   const lastPositionRef = useRef({ x: 0, y: 0 });
   const hasDraggedRef = useRef(false);
@@ -1844,6 +1846,7 @@ const OriginalPuckAnimator = React.memo(({
     // Синхронизация с устаревшими position.x/y вызывала "мелькание" шайбы в пустом месте
     
     setIsDragging(true);
+    isDraggingRef.current = true;
     
     // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Сразу обновляем физику с текущей позицией
     // Это предотвращает "мелькание" шайбы в пустом месте при касании
@@ -1859,7 +1862,7 @@ const OriginalPuckAnimator = React.memo(({
   };
 
   const handleTouchMove = (e: any) => {
-    if (!isDragging || !onDrag) return;
+    if (!isDraggingRef.current || !onDrag) return;
     
     const touch = e.nativeEvent;
     const now = Date.now();
@@ -1927,6 +1930,7 @@ const OriginalPuckAnimator = React.memo(({
 
   const handleTouchEnd = () => {
     setIsDragging(false);
+    isDraggingRef.current = false;
     
     if (onDrag && hasDraggedRef.current) {
       // Это был drag - применяем скорость движения, с которой двигали шайбу
@@ -2037,19 +2041,83 @@ const OriginalPuckAnimator = React.memo(({
     }, 100);
   };
 
+  const beginPointerInteraction = useCallback((pageX: number, pageY: number) => {
+    dragStartRef.current = {
+      x: 0,
+      y: 0,
+      pageX,
+      pageY,
+      time: Date.now(),
+      startX: animatedX.value,
+      startY: animatedY.value,
+    };
+    lastPositionRef.current = { x: animatedX.value, y: animatedY.value };
+    hasDraggedRef.current = false;
+    setHasDragged(false);
+    dragVelocityRef.current = { vx: 0, vy: 0 };
+    dragHistoryRef.current = [];
+    setIsDragging(true);
+    isDraggingRef.current = true;
+    if (onDrag) {
+      onDrag(position.id, animatedX.value, animatedY.value, 0, 0, true);
+    }
+  }, [animatedX, animatedY, onDrag, position.id]);
+
+  const webPointerProps = useMemo(() => {
+    if (Platform.OS !== 'web' || !enableDrag) return null;
+    return {
+      onPointerDown: (e: any) => {
+        if (e?.button != null && e.button !== 0) return;
+        pointerActiveRef.current = true;
+        const ne = e?.nativeEvent || e || {};
+        beginPointerInteraction(ne.pageX ?? ne.clientX ?? 0, ne.pageY ?? ne.clientY ?? 0);
+        if (typeof e?.preventDefault === 'function') e.preventDefault();
+      },
+      onPointerMove: (e: any) => {
+        if (!pointerActiveRef.current) return;
+        const ne = e?.nativeEvent || e || {};
+        handleTouchMove({
+          nativeEvent: {
+            pageX: ne.pageX ?? ne.clientX ?? 0,
+            pageY: ne.pageY ?? ne.clientY ?? 0,
+          },
+        });
+      },
+      onPointerUp: (e: any) => {
+        if (!pointerActiveRef.current) return;
+        pointerActiveRef.current = false;
+        const wasDrag = hasDraggedRef.current;
+        handleTouchEnd();
+        if (!wasDrag) {
+          onNav();
+        }
+      },
+      onPointerCancel: () => {
+        pointerActiveRef.current = false;
+        handleTouchEnd();
+      },
+    } as any;
+  }, [enableDrag, beginPointerInteraction, handleTouchMove, handleTouchEnd, onNav]);
+
   return (
     <Animated.View 
-      style={[styles.puckContainer, animatedStyle]}
-      onTouchStart={enableDrag ? handleTouchStart : undefined}
-      onTouchMove={enableDrag ? handleTouchMove : undefined}
-      onTouchEnd={enableDrag ? handleTouchEnd : undefined}
+      style={[
+        styles.puckContainer,
+        animatedStyle,
+        Platform.OS === 'web' && ({ touchAction: 'none', cursor: 'grab' } as any),
+      ]}
+      {...(webPointerProps ?? {})}
+      onTouchStart={enableDrag && Platform.OS !== 'web' ? handleTouchStart : undefined}
+      onTouchMove={enableDrag && Platform.OS !== 'web' ? handleTouchMove : undefined}
+      onTouchEnd={enableDrag && Platform.OS !== 'web' ? handleTouchEnd : undefined}
     >
       <Puck
           avatar={player.avatar}
           playerId={player.id}
           denseScene
+          suppressWebTap={Platform.OS === 'web'}
           onPress={() => {
-            if (!hasDragged) {
+            if (!hasDraggedRef.current) {
               onNav();
             }
           }}
@@ -2091,6 +2159,7 @@ export default function HomeScreen() {
   const { setCurrentScreen, currentScreen } = useScreenContext();
   const params = useLocalSearchParams();
   const isFocused = useIsFocused();
+  const pathname = usePathname();
   const performanceLevel = useMemo(() => getPerformanceLevel(), []);
   const isDesktopLayout = useIsDesktopLayout();
   // Desktop: physics on (pucks move), drag off (no grab with mouse)
@@ -3222,9 +3291,13 @@ export default function HomeScreen() {
   // Анимация запущена если есть шайбы
   const isRunning = puckPositions.length > 0;
 
-  // A inactive home tab must not paint over deep-linked /ru/player on mobile web Tabs.
-  if (!isFocused) {
-    return <View style={{ flex: 1, backgroundColor: 'transparent' }} />;
+  // Inactive home tab, or web profile route: never paint the puck layer over profiles.
+  const onWebProfile =
+    Platform.OS === 'web' &&
+    typeof pathname === 'string' &&
+    (pathname.includes('/player/') || pathname.startsWith('/player/'));
+  if (!isFocused || onWebProfile) {
+    return <View style={{ flex: 1, backgroundColor: 'transparent' }} pointerEvents="none" />;
   }
 
     return (

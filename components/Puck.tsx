@@ -32,6 +32,8 @@ interface PuckProps {
   denseScene?: boolean;
   /** Аватар декодирован (или его нет / ошибка) — шайбу можно показывать без «чёрной дырки». */
   onAvatarReady?: () => void;
+  /** Родитель (OriginalPuckAnimator) сам ловит pointer-события на web. */
+  suppressWebTap?: boolean;
 }
 
 const Puck: React.FC<PuckProps> = ({ 
@@ -48,6 +50,7 @@ const Puck: React.FC<PuckProps> = ({
   leaderRank,
   denseScene = false,
   onAvatarReady,
+  suppressWebTap = false,
 }) => {
   const [imageError, setImageError] = useState(false);
   const readyNotifiedRef = useRef(false);
@@ -133,7 +136,7 @@ const Puck: React.FC<PuckProps> = ({
   // короткое нажатие с малым смещением. Состояние в ref, поэтому переживает перерисовки.
   const tapStartRef = useRef<{ t: number; x: number; y: number } | null>(null);
   const webTapProps = useMemo(() => {
-    if (Platform.OS !== 'web') return null;
+    if (Platform.OS !== 'web' || suppressWebTap) return null;
     return {
       onPointerDown: (e: any) => {
         const ne = e?.nativeEvent || e || {};
@@ -151,7 +154,7 @@ const Puck: React.FC<PuckProps> = ({
         }
       },
     } as any;
-  }, [onPress]);
+  }, [onPress, suppressWebTap]);
 
   return (
     <Animated.View

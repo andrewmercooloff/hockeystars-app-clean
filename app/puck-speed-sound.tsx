@@ -33,6 +33,7 @@ import {
 import { useRouter, useFocusEffect } from 'expo-router';
 import { buildPlayerPath } from '../utils/playerSeoPath';
 import { navigateToPlayerProfile } from '../utils/navigateToPlayer';
+import { goHome } from '../utils/webHome';
 import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 // Динамический импорт для react-native-audio-recorder-player (только для нативных платформ)
@@ -1549,7 +1550,7 @@ export default function PuckSpeedSoundScreen() {
                   router.back();
                 } else {
                   // Если нет истории и нет пользователя, возвращаемся на главную
-                  router.replace('/');
+                  goHome(router);
                 }
               }} 
               style={styles.backButton}

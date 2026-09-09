@@ -28,6 +28,7 @@ import { addActivityPoints, ensureRegistrationActivityPoints } from '../services
 import { initializePushNotifications } from '../utils/notificationService';
 import * as Notifications from 'expo-notifications';
 import { configureSystemUI } from '../utils/systemUI';
+import { webHomePath } from '../utils/webHome';
 import { scaleSize, scaleFont } from '../utils/fontUtils';
 import { forceGilroyFont } from '../utils/forceGilroyFont';
 import { initializeSounds } from '../utils/soundService';
@@ -336,6 +337,15 @@ export default function RootLayout() {
   const router = useRouter();
   const pathname = usePathname();
   const isDesktopLayout = useIsDesktopLayout();
+
+  // Web: marketing site owns `/`; keep the app rink at `/feed` so URLs never collide.
+  React.useEffect(() => {
+    if (Platform.OS !== 'web') return;
+    const bare = (pathname || '/').replace(/\/+$/, '') || '/';
+    if (bare === '/' || bare === '/index.html') {
+      router.replace(webHomePath() as any);
+    }
+  }, [pathname, router]);
   const isMobileWeb = Platform.OS === 'web' && !isDesktopLayout;
   const isAuthScreen =
     pathname === '/login' ||
@@ -1804,6 +1814,7 @@ export default function RootLayout() {
             },
           })}
           options={{
+            ...(Platform.OS === 'web' ? { href: '/feed' as const } : {}),
             tabBarLabel: () => null,
             tabBarIcon: ({ size }) => <HomeStarTabIcon size={size} />,
             tabBarButton: (props) => <HomeStarTabButton {...props} />,

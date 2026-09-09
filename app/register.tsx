@@ -27,6 +27,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import CustomAlert from '../components/CustomAlert';
 import CachedBackground from '../components/CachedBackground';
+import { goHome } from '../utils/webHome';
 import { addPlayer, saveCurrentUser, Team, createPlayer, getPlayerByPhone, getPlayerByEmail, setInvitedBy, createTeam, addPlayerTeam, Player } from '../utils/playerStorage';
 import RegisterTeamPicker, { RegisterTeamValue } from '../components/RegisterTeamPicker';
 import { requiresParentalConsent, registerChildWithParentalConsent, calculateAge } from '../utils/parentalConsentService';
@@ -217,7 +218,7 @@ export default function RegisterScreen() {
     refreshUser(true);
     showAlert(t('auth.welcomeBack'), t('auth.welcomeBackMessage', { name: user.name }), 'success', () => {
       setAlert(prev => ({ ...prev, visible: false }));
-      setTimeout(() => router.replace({ pathname: '/', params: { refresh: String(Date.now()) } }), 100);
+      setTimeout(() => goHome(router, { refresh: String(Date.now()) }), 100);
     });
   };
 
@@ -464,7 +465,7 @@ export default function RegisterScreen() {
     if (alert.type === 'success' && alert.title === t('register.welcome')) {
       setAlert(prev => ({ ...prev, visible: false }));
       setTimeout(() => {
-        router.push(Platform.OS === 'web' ? '/feed' : '/');
+        goHome(router);
       }, 100);
     } else {
       // Во всех остальных случаях просто закрываем алерт
@@ -1234,7 +1235,7 @@ export default function RegisterScreen() {
           setAlert(prev => ({ ...prev, visible: false }));
           setTimeout(() => {
             // Переходим на главную с параметром refresh для обновления списка игроков
-            router.replace({ pathname: '/', params: { refresh: String(Date.now()) } });
+            goHome(router, { refresh: String(Date.now()) });
           }, 100);
         }
       );

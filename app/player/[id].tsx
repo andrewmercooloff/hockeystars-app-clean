@@ -102,6 +102,7 @@ import {
   readProfileNavParams,
   type ProfileNavParams,
 } from '../../utils/navigateToPlayer';
+import { goHome } from '../../utils/webHome';
 
 const iceBg = ICE_BACKGROUND;
 
@@ -1013,7 +1014,7 @@ export default function PlayerProfile() {
             console.log('⚠️ Текущий пользователь не найден в базе, очищаем данные и редиректим');
             await dataCache.remove(CACHE_KEYS.USER_PROFILE);
             setGlobalCurrentUser(null);
-            router.replace('/');
+            goHome(router);
             void logoutUser().catch(() => undefined);
             return;
           }
@@ -4463,7 +4464,7 @@ export default function PlayerProfile() {
               t('common.success') || t('success'), 
               t('profile.userDeleted', { name: player.name }),
               'success',
-              () => router.replace({ pathname: '/', params: { refresh: String(Date.now()) } })
+              () => goHome(router, { refresh: String(Date.now()) })
             );
         } else {
           showCustomAlert(
@@ -4572,14 +4573,14 @@ export default function PlayerProfile() {
           // пользователя обратно через refreshUser.
           await dataCache.remove(CACHE_KEYS.USER_PROFILE);
           setGlobalCurrentUser(null);
-          router.replace('/');
+          goHome(router);
           void logoutUser().catch((err) =>
             console.warn('⚠️ Ошибка при сетевом выходе (не критично):', err)
           );
         } catch (error) {
           console.error('❌ Ошибка при выходе:', error);
           setGlobalCurrentUser(null);
-          router.replace('/');
+          goHome(router);
         }
       },
       onCancel: () => {
@@ -4645,7 +4646,7 @@ export default function PlayerProfile() {
           () => {
             // Переходим на главный экран - useFocusEffect автоматически обновит данные
             // так как с момента последнего обновления прошло >2 секунд
-            router.replace('/');
+            goHome(router);
           }
         );
       } else {
@@ -4682,7 +4683,7 @@ export default function PlayerProfile() {
             console.error('❌ Ошибка при выходе:', error);
           }
         }
-        router.replace('/');
+        goHome(router);
       }, 5000);
       
       setPlayerNotFoundTimeout(timeout);
@@ -4738,12 +4739,12 @@ export default function PlayerProfile() {
                     try {
                       await dataCache.remove(CACHE_KEYS.USER_PROFILE);
                       setGlobalCurrentUser(null);
-                      router.replace('/');
+                      goHome(router);
                       void logoutUser().catch(() => undefined);
                     } catch (error) {
                       console.error('❌ Ошибка при выходе:', error);
                       setGlobalCurrentUser(null);
-                      router.replace('/');
+                      goHome(router);
                     }
                   }}
                 >
@@ -4752,7 +4753,7 @@ export default function PlayerProfile() {
               )}
               <TouchableOpacity
                 style={[styles.button, { marginTop: 10, backgroundColor: 'rgba(255, 255, 255, 0.2)' }]}
-                onPress={() => router.replace('/')}
+                onPress={() => goHome(router)}
               >
                 <Text style={styles.buttonText}>На главную</Text>
               </TouchableOpacity>
@@ -4917,8 +4918,7 @@ export default function PlayerProfile() {
                     // Возвращаемся в поиск
                     router.push('/search');
                   } else if (returnToValue === 'home') {
-                    // Web home feed lives at /feed (marketing owns /)
-                    router.push(Platform.OS === 'web' ? '/feed' : '/');
+                    goHome(router);
                   } else if (returnToValue === 'player' && returnPlayerIdValue) {
                     // Возвращаемся в профиль другого игрока (из списка друзей)
                     navigateToPlayerProfile(router, {
@@ -4935,7 +4935,7 @@ export default function PlayerProfile() {
                         router.back();
                       } else {
                         // Если нет истории, переходим на главный экран
-                        router.replace(Platform.OS === 'web' ? '/feed' : '/');
+                        goHome(router);
                       }
                     } catch (error) {
                       // Если произошла ошибка, пробуем router.back()
@@ -4943,7 +4943,7 @@ export default function PlayerProfile() {
                       if (router.canGoBack()) {
                         router.back();
                       } else {
-                        router.replace('/');
+                        goHome(router);
                       }
                     }
                   }
@@ -4979,7 +4979,8 @@ export default function PlayerProfile() {
           )}
           
           <ScrollView 
-            ref={scrollViewRef} 
+            ref={scrollViewRef}
+            style={Platform.OS === 'web' ? styles.scrollViewWeb : undefined}
             contentContainerStyle={[styles.scrollContainer, isDesktop && styles.scrollContainerDesktop]}
             keyboardShouldPersistTaps="handled"
               keyboardDismissMode="on-drag"
@@ -7626,7 +7627,7 @@ export default function PlayerProfile() {
                                     {
                                       text: 'OK',
                                       onPress: () => {
-                                        router.replace('/');
+                                        goHome(router);
                                       }
                                     }
                                   ]
@@ -8646,6 +8647,11 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: 'transparent',
+  },
+  scrollViewWeb: {
+    flex: 1,
+    // RN-web: without flex the ScrollView cannot receive touch scroll on mobile Safari.
+    ...(Platform.OS === 'web' ? ({ overflow: 'auto', WebkitOverflowScrolling: 'touch' } as any) : null),
   },
   scrollContainer: {
     flexGrow: 1,
