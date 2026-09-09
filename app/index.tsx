@@ -11,16 +11,22 @@ import Animated, { Easing as ReEasing, makeMutable, useAnimatedStyle, useSharedV
  * rectangles for a few frames; a single opacity ramp on the parent hides
  * that window and reads as "the ice lights up".
  */
-const PuckSceneFade: React.FC<{ ready: boolean; children: React.ReactNode }> = ({ ready, children }) => {
+const PuckSceneFade: React.FC<{
+  ready: boolean;
+  onRevealed: () => void;
+  children: React.ReactNode;
+}> = ({ ready, onRevealed, children }) => {
   const opacity = useSharedValue(0);
   useEffect(() => {
     if (!ready) return;
     // Two frames for native layout/border rendering to settle, then ramp up.
     opacity.value = withDelay(
       120,
-      withTiming(1, { duration: 380, easing: ReEasing.out(ReEasing.cubic) })
+      withTiming(1, { duration: 380, easing: ReEasing.out(ReEasing.cubic) }, (finished) => {
+        if (finished) runOnJS(onRevealed)();
+      })
     );
-  }, [opacity, ready]);
+  }, [opacity, ready, onRevealed]);
   const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
   return (
     <Animated.View style={[StyleSheet.absoluteFill, style]} pointerEvents="box-none">
@@ -2850,24 +2856,23 @@ export default function HomeScreen() {
     lastPuckPrefetchSigRef.current = sig;
 
     const concurrency =
-      performanceLevel === 'low' ? 3 : performanceLevel === 'medium' ? 5 : 12;
+      performanceLevel === 'low' ? 3 : performanceLevel === 'medium' ? 5 : 8;
 
     const run = () => {
       preloadPlayerAvatars(puckPlayers, { concurrency }).catch(() => {});
     };
 
-    if (isLowEndAndroid()) {
-      let timeout: ReturnType<typeof setTimeout> | null = null;
-      const handle = InteractionManager.runAfterInteractions(() => {
-        timeout = setTimeout(run, physicsActive ? 0 : startupPhysicsDeferMs());
-      });
-      return () => {
-        handle.cancel?.();
-        if (timeout) clearTimeout(timeout);
-      };
-    }
-
-    run();
+    // Шайбы на льду грузят те же URL сами, поэтому прогрев ничего не ускоряет —
+    // он только греет диск на будущее. Запускать его прямо на монтировании значит
+    // отдать первым кадрам горсть параллельных загрузок: старт заметно дёргается.
+    let timeout: ReturnType<typeof setTimeout> | null = null;
+    const handle = InteractionManager.runAfterInteractions(() => {
+      timeout = setTimeout(run, isLowEndAndroid() && !physicsActive ? startupPhysicsDeferMs() : 0);
+    });
+    return () => {
+      handle.cancel?.();
+      if (timeout) clearTimeout(timeout);
+    };
   }, [allVisiblePlayers, performanceLevel, physicsActive]);
 
   // Для игры: берём игроков НЕЗАВИСИМО от фильтров (страна/год),
@@ -2918,6 +2923,13 @@ export default function HomeScreen() {
   const effectiveScreenForPhysics = (showGame || showQuizGame) ? 'game-modal' : (currentScreen || undefined);
   const iceDustRef = useRef<IceDustHandle | null>(null);
 
+  // Шайбы стоят, пока сцена проявляется. Групповая прозрачность заставляет iOS
+  // композитить весь слой шайб offscreen, и физика в этот момент отъедает те самые
+  // кадры, на которых старт «подтормаживает». Ждём конца проявления — дальше
+  // композитинга нет и лёд оживает на чистом кадре.
+  const [sceneRevealed, setSceneRevealed] = useState(false);
+  const handleSceneRevealed = useCallback(() => setSceneRevealed(true), []);
+
   const { puckPositions, updatePuckPosition, boundaries, registerSharedPosition, resetPucksMotion } = usePuckCollisionSystem(
     puckPlayersForScene,
     currentUser?.id,
@@ -2925,7 +2937,7 @@ export default function HomeScreen() {
     puckFieldWidth,
     puckFieldHeight,
     playfieldLayoutReady,
-    physicsActive,
+    physicsActive && sceneRevealed,
     homeLeaderRanks,
     scaledPuckSize,
     iceDustRef,
@@ -3249,6 +3261,14 @@ export default function HomeScreen() {
     return () => clearTimeout(timeout);
   }, [avatarsSettled, puckPositions.length, checkAvatarsSettled]);
 
+  // Физика ждёт конца проявления сцены. Если та анимация почему-то не доиграет,
+  // лёд остался бы мёртвым — поэтому отпускаем шайбы по таймеру в любом случае.
+  useEffect(() => {
+    if (sceneRevealed || puckPositions.length === 0) return;
+    const timeout = setTimeout(() => setSceneRevealed(true), 2500);
+    return () => clearTimeout(timeout);
+  }, [sceneRevealed, puckPositions.length]);
+
   const renderedPucks = useMemo(() => {
     // Карта позиций по ID для быстрого доступа
     const positionMap = new Map<string, PuckPosition>();
@@ -3329,7 +3349,10 @@ export default function HomeScreen() {
         )}
         
         {/* Шайбы рендерятся через мемоизированный список для оптимизации производительности */}
-        <PuckSceneFade ready={puckPositions.length > 0 && avatarsSettled}>
+        <PuckSceneFade
+          ready={puckPositions.length > 0 && avatarsSettled}
+          onRevealed={handleSceneRevealed}
+        >
           <IceDustLayer ref={iceDustRef} enabled={performanceLevel !== 'low'} />
           {renderedPucks}
         </PuckSceneFade>
