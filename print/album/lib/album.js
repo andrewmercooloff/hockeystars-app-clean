@@ -114,19 +114,11 @@ ${cardCss(size)}
 .autographs .box .puck{position:absolute;right:2mm;top:2mm;width:6mm;height:3.6mm;opacity:.85;}
 .gallery .hdr .sticks,.autographs .hdr .sticks,.history .hdr .sticks{width:14mm;height:14mm;vertical-align:-3mm;margin-left:3mm;}
 
-/* section headers: slight skew + orange slash under title */
-.page.ice > .hdr,.team .hdr{z-index:2;transform:skewX(-5deg);transform-origin:left top;}
-.page.ice > .hdr > *,.team .hdr > *{transform:skewX(5deg);}
-.page.ice > .hdr::after,.team .hdr::after{
-  content:"";position:absolute;left:-6mm;right:-18mm;bottom:-2.2mm;height:2.8mm;
-  background:linear-gradient(90deg,var(--secondary) 0 62%,var(--primary) 62%);
-  transform:skewX(-24deg);box-shadow:0 .7mm 2mm color-mix(in srgb,var(--secondary) 32%,transparent);
-  border-radius:.4mm;pointer-events:none;z-index:-1;}
+/* section title */
 .title{position:relative;display:inline-block;font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:10mm;line-height:1;color:var(--dark);
-  padding:2mm 0 2.5mm;}
-.title::after{content:"";position:absolute;left:0;width:72%;bottom:.4mm;height:1.1mm;
-  background:linear-gradient(90deg,color-mix(in srgb,var(--secondary) 92%,#fff),var(--secondary));
-  transform:skewX(-32deg);opacity:.55;}
+  padding:2mm 0;}
+.title::after{content:"";position:absolute;left:0;right:-6mm;bottom:-1mm;height:2mm;background:linear-gradient(90deg,var(--secondary) 0 60%,var(--primary) 60%);
+  transform:skewX(-30deg);}
 
 /* ---------- COVER ---------- */
 .cover{background:var(--dark);}
