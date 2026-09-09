@@ -11,9 +11,27 @@ type Props = {
   opacity: Animated.Value;
 };
 
+const tap = (style: Haptics.ImpactFeedbackStyle) => {
+  if (Platform.OS === 'web') return;
+  Haptics.impactAsync(style).catch(() => {});
+};
+
+/**
+ * Клюшка бьёт по шайбе, шайба уходит и катится к воротам: резкий удар, затем
+ * всё более редкие и мягкие толчки — шайба теряет скорость, — и глухой удар в сетке.
+ */
+const SLAPSHOT: { at: number; style: Haptics.ImpactFeedbackStyle }[] = [
+  { at: 0, style: Haptics.ImpactFeedbackStyle.Heavy },
+  { at: 110, style: Haptics.ImpactFeedbackStyle.Light },
+  { at: 250, style: Haptics.ImpactFeedbackStyle.Light },
+  { at: 420, style: Haptics.ImpactFeedbackStyle.Soft },
+  { at: 620, style: Haptics.ImpactFeedbackStyle.Soft },
+  { at: 860, style: Haptics.ImpactFeedbackStyle.Medium },
+];
+
 /**
  * Launch splash: logo rises with a soft spring, a warm brand glow breathes
- * behind it, and a single light haptic tick confirms the app is alive.
+ * behind it, and a slapshot runs through the haptics as it lands.
  * Exit zoom is derived from the shared opacity so the logo "steps forward"
  * as the overlay dissolves into the home screen.
  */
@@ -22,14 +40,17 @@ const AnimatedSplash: React.FC<Props> = ({ opacity }) => {
   const glow = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    const shots: ReturnType<typeof setTimeout>[] = [];
+    for (const step of SLAPSHOT) {
+      if (step.at === 0) tap(step.style);
+      else shots.push(setTimeout(() => tap(step.style), step.at));
     }
 
+    // Меньше демпфирования: логотип чуть проскакивает и осаживается назад — визуальный удар.
     Animated.spring(enter, {
       toValue: 1,
-      damping: 14,
-      stiffness: 120,
+      damping: 11,
+      stiffness: 155,
       mass: 0.9,
       useNativeDriver: true,
     }).start();
@@ -47,9 +68,7 @@ const AnimatedSplash: React.FC<Props> = ({ opacity }) => {
       });
       current.start(({ finished }) => {
         if (!alive || !finished) return;
-        if (Platform.OS !== 'web') {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft).catch(() => {});
-        }
+        tap(Haptics.ImpactFeedbackStyle.Light);
         exhale();
       });
     };
@@ -70,6 +89,7 @@ const AnimatedSplash: React.FC<Props> = ({ opacity }) => {
     return () => {
       alive = false;
       current?.stop();
+      shots.forEach(clearTimeout);
     };
   }, [enter, glow]);
 
