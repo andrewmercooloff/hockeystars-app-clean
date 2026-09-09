@@ -250,13 +250,30 @@ ${cardCss(size)}
 .history .item .yr span{display:inline-block;transform:skewX(10deg);}
 .history .item h4{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:5.4mm;line-height:1.05;color:var(--dark);margin-bottom:1.2mm;}
 .history .item p{font-size:3.7mm;line-height:1.35;color:#1b2940;white-space:pre-line;}
-.history .facts{position:absolute;right:${bleed + 10}mm;top:${bleed + 44}mm;width:44mm;background:#fff;border:.5mm solid var(--primary);border-radius:2mm;padding:4mm 3mm;
-  box-shadow:0 1.5mm 4mm color-mix(in srgb,var(--primary) 12%,transparent);}
-.history .facts h5{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:4.6mm;color:var(--dark);text-align:center;line-height:1.05;margin-bottom:3mm;
-  padding-bottom:2mm;border-bottom:.5mm solid var(--secondary);}
-.history .fact{text-align:center;margin-bottom:4.5mm;}
-.history .fact b{display:block;font-family:'Fira Sans Extra Condensed';font-weight:700;font-size:9mm;line-height:1;color:var(--secondary);}
-.history .fact span{display:block;font-size:2.9mm;line-height:1.25;color:#1b2940;margin-top:.8mm;white-space:pre-line;}
+.history .facts{position:absolute;right:${bleed + 10}mm;top:${bleed + 42}mm;width:48mm;transform:rotate(.9deg);transform-origin:right top;
+  filter:drop-shadow(0 2.8mm 5.5mm rgba(7,26,58,.24)) drop-shadow(0 .9mm 2mm rgba(0,0,0,.12));}
+.history .facts-cap{position:relative;padding:3.8mm 3mm 3.2mm;background:linear-gradient(145deg,var(--dark) 0%,var(--primary) 100%);
+  border-radius:2.8mm 2.8mm 0 0;transform:skewX(-4deg);transform-origin:left bottom;margin-bottom:-.8mm;
+  box-shadow:inset 0 .5mm 0 rgba(255,255,255,.14),0 .8mm 2mm rgba(0,0,0,.18);}
+.history .facts-cap::after{content:"";position:absolute;left:2.5mm;right:2.5mm;bottom:-.2mm;height:2mm;
+  background:linear-gradient(90deg,var(--secondary) 0 62%,var(--accent) 62%);transform:skewX(-14deg);border-radius:.3mm;
+  box-shadow:0 .5mm 1.2mm color-mix(in srgb,var(--secondary) 35%,transparent);}
+.history .facts-cap h5{font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:4.4mm;color:#fff;
+  text-align:center;line-height:1.05;margin:0;padding:0;border:0;transform:skewX(4deg);
+  text-shadow:0 .5mm 1mm rgba(0,0,0,.35);}
+.history .facts-panel{position:relative;background:linear-gradient(180deg,#fff 0%,#eef4fb 55%,#e4edf7 100%);
+  border:.5mm solid color-mix(in srgb,var(--primary) 38%,transparent);border-top:none;border-radius:0 0 2.8mm 2.8mm;
+  padding:1.5mm 0 2mm;transform:skewX(-2.5deg);transform-origin:left top;
+  box-shadow:inset 0 1.8mm 3.5mm rgba(255,255,255,.85),inset 0 -.6mm 1.2mm rgba(20,40,70,.07);}
+.history .facts-panel::before{content:"";position:absolute;left:0;top:0;right:0;height:3mm;
+  background:linear-gradient(180deg,rgba(255,255,255,.65),transparent);pointer-events:none;border-radius:0 0 1mm 1mm;}
+.history .fact{position:relative;text-align:center;padding:3.2mm 3mm 3.6mm;margin:0;}
+.history .fact:not(:last-child){border-bottom:.35mm dashed color-mix(in srgb,var(--primary) 24%,transparent);}
+.history .fact b{display:block;font-family:'Unbounded';font-weight:800;font-size:10.2mm;line-height:1;color:var(--secondary);
+  -webkit-text-stroke:.18mm color-mix(in srgb,var(--secondary) 55%,#fff);paint-order:stroke fill;
+  text-shadow:0 .6mm 0 rgba(255,255,255,.95),0 1.4mm 2mm color-mix(in srgb,var(--secondary) 22%,transparent);}
+.history .fact span{display:block;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;
+  font-size:2.85mm;line-height:1.22;letter-spacing:.05em;color:#3a4d66;margin-top:1.3mm;white-space:pre-line;}
 .history .hphoto{position:absolute;right:${bleed + 10}mm;bottom:${bleed + 14}mm;width:44mm;height:60mm;border-radius:2mm;overflow:hidden;box-shadow:0 1.5mm 4mm rgba(0,0,0,.2);}
 .history .hphoto.p0{height:40mm;bottom:${bleed + 58}mm;}
 .history .hphoto.p1{height:40mm;}
@@ -489,9 +506,9 @@ function historyPage(data, pageNo) {
       .join('')}</div>
     ${
       facts.length
-        ? `<div class="facts"><h5>${esc(h.factsTitle || 'Цифры успеха')}</h5>${facts
+        ? `<div class="facts"><div class="facts-cap"><h5>${esc(h.factsTitle || 'Цифры успеха')}</h5></div><div class="facts-panel">${facts
             .map((f) => `<div class="fact"><b>${esc(f.value)}</b><span>${esc(f.label)}</span></div>`)
-            .join('')}</div>`
+            .join('')}</div></div>`
         : ''
     }
     ${[data.assets.history, data.assets.history2].filter(Boolean).map((src, i) => `<div class="hphoto p${i}"><img src="${src}">${i === 0 && h.photoCaption ? `<div class="cap">${esc(h.photoCaption)}</div>` : ''}</div>`).join('')}
