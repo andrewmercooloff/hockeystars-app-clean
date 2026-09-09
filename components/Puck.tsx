@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import PressableScale from './PressableScale';
+
+const PuckTouchable: React.ComponentType<any> = Platform.OS === 'web' ? View : PressableScale;
 import { Image } from 'expo-image';
 import Animated from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
@@ -126,6 +128,31 @@ const Puck: React.FC<PuckProps> = ({
 
   }, [avatar]);
 
+  // Web: шайба непрерывно движется под курсором/пальцем, и браузерный click (на него
+  // опирается Pressable RN-web) часто не рождается. Считаем тап сами по pointerdown/up:
+  // короткое нажатие с малым смещением. Состояние в ref, поэтому переживает перерисовки.
+  const tapStartRef = useRef<{ t: number; x: number; y: number } | null>(null);
+  const webTapProps = useMemo(() => {
+    if (Platform.OS !== 'web') return null;
+    return {
+      onPointerDown: (e: any) => {
+        const ne = e?.nativeEvent || e || {};
+        tapStartRef.current = { t: Date.now(), x: ne.clientX ?? 0, y: ne.clientY ?? 0 };
+      },
+      onPointerUp: (e: any) => {
+        const start = tapStartRef.current;
+        tapStartRef.current = null;
+        if (!start) return;
+        const ne = e?.nativeEvent || e || {};
+        const dx = (ne.clientX ?? start.x) - start.x;
+        const dy = (ne.clientY ?? start.y) - start.y;
+        if (Date.now() - start.t < 500 && dx * dx + dy * dy < 24 * 24) {
+          onPress();
+        }
+      },
+    } as any;
+  }, [onPress]);
+
   return (
     <Animated.View
       style={[
@@ -160,7 +187,10 @@ const Puck: React.FC<PuckProps> = ({
         animatedShadowStyle
       ]} /> */}
       
-      <PressableScale onPress={onPress} scaleTo={0.92} style={styles.puckTouchable}>
+      <PuckTouchable
+        {...(webTapProps ?? { onPress, scaleTo: 0.92 })}
+        style={[styles.puckTouchable, Platform.OS === 'web' && ({ cursor: 'pointer' } as any)]}
+      >
         {leaderRank != null ? (
           <>
             <View
@@ -312,7 +342,7 @@ const Puck: React.FC<PuckProps> = ({
             <Text style={styles.pointsText}>{points}</Text>
           </View>
         )}
-      </PressableScale>
+      </PuckTouchable>
     </Animated.View>
   );
 };
