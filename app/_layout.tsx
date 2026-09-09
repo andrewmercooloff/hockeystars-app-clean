@@ -28,7 +28,8 @@ import { addActivityPoints, ensureRegistrationActivityPoints } from '../services
 import { initializePushNotifications } from '../utils/notificationService';
 import * as Notifications from 'expo-notifications';
 import { configureSystemUI } from '../utils/systemUI';
-import { webHomePath } from '../utils/webHome';
+import WebDeepLinkSync from '../components/WebDeepLinkSync';
+import WebProfileTouchFix from '../components/WebProfileTouchFix';
 import { scaleSize, scaleFont } from '../utils/fontUtils';
 import { forceGilroyFont } from '../utils/forceGilroyFont';
 import { initializeSounds } from '../utils/soundService';
@@ -337,15 +338,6 @@ export default function RootLayout() {
   const router = useRouter();
   const pathname = usePathname();
   const isDesktopLayout = useIsDesktopLayout();
-
-  // Web: marketing site owns `/`; keep the app rink at `/feed` so URLs never collide.
-  React.useEffect(() => {
-    if (Platform.OS !== 'web') return;
-    const bare = (pathname || '/').replace(/\/+$/, '') || '/';
-    if (bare === '/' || bare === '/index.html') {
-      router.replace(webHomePath() as any);
-    }
-  }, [pathname, router]);
   const isMobileWeb = Platform.OS === 'web' && !isDesktopLayout;
   const isAuthScreen =
     pathname === '/login' ||
@@ -1796,6 +1788,8 @@ export default function RootLayout() {
               // и тогда виден фон контейнера. Делаем прозрачным, чтобы всегда был виден лёд.
               // expo-router Tabs типы не всегда знают этот проп — оставляем runtime‑поведение.
               sceneStyle: { backgroundColor: 'transparent' },
+              // Web: mount only the active tab — otherwise inactive absolute scenes block profile scroll on cold deep-links.
+              lazy: Platform.OS === 'web' ? true : deferSecondaryTabs,
               ...(Platform.OS === 'android'
                 ? ({ sceneContainerStyle: { backgroundColor: 'transparent', flex: 1 } } as any)
                 : ({ sceneContainerStyle: { backgroundColor: 'transparent', flex: 1 } } as any)),
@@ -1969,6 +1963,9 @@ export default function RootLayout() {
           name="player/[id]"
           options={{
             href: null,
+            ...(Platform.OS === 'web'
+              ? { sceneStyle: { backgroundColor: 'transparent', zIndex: 20 } }
+              : {}),
           }}
         />
         <Tabs.Screen
@@ -2057,6 +2054,9 @@ export default function RootLayout() {
           name="[lang]/player/[id]"
           options={{
             href: null,
+            ...(Platform.OS === 'web'
+              ? { sceneStyle: { backgroundColor: 'transparent', zIndex: 20 } }
+              : {}),
           }}
         />
 
@@ -2076,6 +2076,12 @@ export default function RootLayout() {
                 })()}
           
           <OtaResurfaceOverlay />
+          {Platform.OS === 'web' ? (
+            <>
+              <WebDeepLinkSync />
+              <WebProfileTouchFix />
+            </>
+          ) : null}
 
           {/* Splash screen поверх всего интерфейса */}
           {(!loaded || showSplash || !appReady) && (

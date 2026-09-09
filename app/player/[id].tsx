@@ -5011,6 +5011,7 @@ export default function PlayerProfile() {
           
           <ScrollView 
             ref={scrollViewRef}
+            nativeID="hs-profile-scroll"
             style={Platform.OS === 'web' ? styles.scrollViewWeb : undefined}
             contentContainerStyle={[styles.scrollContainer, isDesktop && styles.scrollContainerDesktop]}
             keyboardShouldPersistTaps="handled"
