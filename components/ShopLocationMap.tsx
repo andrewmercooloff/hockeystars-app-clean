@@ -81,7 +81,9 @@ export default function ShopLocationMap({
   return (
     <WebView
       key={stablePayload}
-      source={{ html }}
+      // baseUrl: без него относительные ссылки внутри HTML (и Referer для геокодера)
+      // резолвятся от about:blank — Leaflet не загружался, карта была пустой.
+      source={{ html, baseUrl: MAP_ASSETS_ORIGIN }}
       style={[styles.map, { height }]}
       javaScriptEnabled
       domStorageEnabled
@@ -92,6 +94,10 @@ export default function ShopLocationMap({
     />
   );
 }
+
+/** Leaflet и стили лежат на нашем сайте; для web — тот же origin, для WebView — абсолютно. */
+const MAP_ASSETS_ORIGIN = 'https://hockey-stars.com';
+const LEAFLET_CDN = 'https://unpkg.com/leaflet@1.9.4/dist';
 
 function buildMapHtml(addresses: string[], city: string): string {
   const addressesJson = JSON.stringify(addresses);
@@ -118,13 +124,21 @@ function buildMapHtml(addresses: string[], city: string): string {
       overflow: hidden !important;
     }
   </style>
-  <link rel="stylesheet" href="/vendor/leaflet/leaflet.css" />
-  <script src="/vendor/leaflet/leaflet.js"></script>
+  <link rel="stylesheet" href="${MAP_ASSETS_ORIGIN}/vendor/leaflet/leaflet.css" />
+  <script src="${MAP_ASSETS_ORIGIN}/vendor/leaflet/leaflet.js"></script>
+  <script>
+    // Запасной источник Leaflet, если наш хост недоступен из сети пользователя
+    if (typeof L === 'undefined') {
+      document.write('<link rel="stylesheet" href="${LEAFLET_CDN}/leaflet.css" />');
+      document.write('<script src="${LEAFLET_CDN}/leaflet.js"><\/script>');
+    }
+  </script>
 </head>
 <body>
   <div id="map"></div>
   <script>
     (function () {
+      if (typeof L === 'undefined') return;
       var addresses = ${addressesJson};
       var city = ${cityJson};
       var map = L.map('map', {
@@ -161,21 +175,35 @@ function buildMapHtml(addresses: string[], city: string): string {
       var chain = Promise.resolve();
       addresses.forEach(function (addr, idx) {
         chain = chain.then(function () {
+          var q = queryFor(addr);
           return fetch(
-            'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' +
-              encodeURIComponent(queryFor(addr)),
+            'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q),
             { headers: { 'Accept-Language': 'ru,en' } }
           )
             .then(function (r) { return r.json(); })
             .then(function (data) {
               if (data && data.length > 0) {
-                var lat = parseFloat(data[0].lat);
-                var lon = parseFloat(data[0].lon);
-                points.push([lat, lon]);
-                placeMarker(lat, lon);
+                return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+              }
+              throw new Error('empty');
+            })
+            .catch(function () {
+              // Запасной геокодер (Photon/komoot), тоже без ключа
+              return fetch('https://photon.komoot.io/api/?limit=1&lang=en&q=' + encodeURIComponent(q))
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                  var f = data && data.features && data.features[0];
+                  if (!f) return null;
+                  return [f.geometry.coordinates[1], f.geometry.coordinates[0]];
+                })
+                .catch(function () { return null; });
+            })
+            .then(function (pt) {
+              if (pt) {
+                points.push(pt);
+                placeMarker(pt[0], pt[1]);
               }
             })
-            .catch(function () {})
             .then(function () {
               return new Promise(function (resolve) {
                 setTimeout(resolve, idx === addresses.length - 1 ? 0 : 350);
