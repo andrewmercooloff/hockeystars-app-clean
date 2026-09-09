@@ -1,6 +1,9 @@
 const { baseCss, esc } = require('./styles');
 const { cardFront, cardCss } = require('./cards');
-const { rinkSvg, puckSvg, sticksSvg, goalSvg, scratchesSvg } = require('./hockey');
+const { rinkSvg, puckSvg, sticksSvg, goalSvg, scratchesSvg, historyIconSvg } = require('./hockey');
+
+const HISTORY_ICONS = ['start', 'school', 'arena', 'heart', 'rise'];
+const HISTORY_PHOTOS = [null, 'history2', 'history', null, null];
 
 const PAGE = { w: 210, h: 297, bleed: 3 };
 // Slots per "Команда" page: always 3 columns; rows depend on the card height (3 rows for 55x77, 2 rows for 60x85).
@@ -217,7 +220,10 @@ ${cardCss(size)}
 .slot .corner.tr{right:-.35mm;top:-.35mm;border-left:0;border-bottom:0;}
 .slot .corner.bl{left:-.35mm;bottom:-.35mm;border-right:0;border-top:0;}
 .slot .corner.br{right:-.35mm;bottom:-.35mm;border-left:0;border-top:0;}
-.slot .ghost{position:absolute;left:${-size.bleed}mm;top:${-size.bleed}mm;filter:grayscale(1) contrast(.9);opacity:.28;}
+.slot .ghost{position:absolute;left:${-size.bleed}mm;top:${-size.bleed}mm;filter:grayscale(.42) saturate(1.55) sepia(.22) hue-rotate(-16deg) contrast(.96);opacity:.38;}
+.slot .ghost::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(125deg,color-mix(in srgb,var(--secondary) 34%,transparent) 0%,transparent 38%,color-mix(in srgb,var(--secondary) 18%,transparent) 100%);
+  mix-blend-mode:color;}
 .slot .tag{position:absolute;left:50%;top:0;transform:translateX(-50%);background:var(--secondary);color:#fff;font-family:'Fira Sans Extra Condensed';font-weight:600;
   font-size:3mm;line-height:1;padding:1mm 2.6mm 1.1mm;border-radius:0 0 1.5mm 1.5mm;letter-spacing:.06em;}
 .slot .lbl{position:absolute;left:0;right:0;bottom:0;padding:1.6mm 2mm 1.8mm;text-align:center;background:rgba(255,255,255,.88);border-top:.3mm solid color-mix(in srgb,var(--primary) 25%,transparent);}
@@ -231,12 +237,22 @@ ${cardCss(size)}
 /* ---------- HISTORY ---------- */
 .history .orn.br{right:-60mm;bottom:-40mm;width:170mm;height:40mm;}
 .history .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
-.history .tl{position:absolute;left:${bleed + 12}mm;top:${bleed + 44}mm;width:126mm;}
+.history .tl{position:absolute;left:${bleed + 12}mm;top:${bleed + 44}mm;right:${bleed + 58}mm;}
 .history .tl::before{content:"";position:absolute;left:5.2mm;top:2mm;bottom:8mm;width:1.2mm;background:linear-gradient(180deg,var(--primary),var(--secondary));border-radius:1mm;}
-.history .item{position:relative;padding-left:16mm;margin-bottom:7mm;}
-.history .item:last-child{margin-bottom:0;}
-.history .item .dot{position:absolute;left:0;top:0;width:11.6mm;height:11.6mm;border-radius:50%;background:var(--dark);color:#fff;box-shadow:inset 0 -1.6mm 0 rgba(0,0,0,.5),inset 0 .5mm 0 rgba(255,255,255,.25);
-  font-family:'Fira Sans Extra Condensed';font-weight:700;font-size:6mm;display:flex;align-items:center;justify-content:center;border:1mm solid #fff;box-shadow:0 0 0 .6mm var(--primary);}
+.history .item-wrap{display:grid;grid-template-columns:1fr;gap:0;margin-bottom:5.5mm;}
+.history .item-wrap.has-photo{grid-template-columns:1fr 38mm;gap:0 4mm;align-items:start;}
+.history .item-wrap:last-child{margin-bottom:0;}
+.history .item{position:relative;padding-left:16mm;}
+.history .item .dot{position:absolute;left:0;top:0;width:11.6mm;height:11.6mm;border-radius:50%;background:var(--dark);color:#fff;
+  display:flex;align-items:center;justify-content:center;border:1mm solid #fff;box-shadow:0 0 0 .6mm var(--primary),inset 0 -.8mm 0 rgba(0,0,0,.35);}
+.history .item .dot .hico{width:7.2mm;height:7.2mm;display:block;}
+.history .item .dot i{position:absolute;right:-1.2mm;bottom:-1.2mm;min-width:4.8mm;height:4.8mm;padding:0 .8mm;border-radius:3mm;
+  background:var(--secondary);color:#fff;font-family:'Fira Sans Extra Condensed';font-weight:700;font-size:2.8mm;font-style:normal;line-height:4.8mm;text-align:center;
+  box-shadow:0 .4mm 1mm rgba(0,0,0,.25);}
+.history .item-photo{width:38mm;height:26mm;border-radius:2.2mm;overflow:hidden;transform:rotate(1.4deg);margin-top:.5mm;
+  box-shadow:0 1.8mm 4mm rgba(7,26,58,.2),0 .5mm 1.2mm rgba(0,0,0,.12);border:.35mm solid rgba(255,255,255,.85);}
+.history .item-wrap.has-photo:nth-child(even) .item-photo{transform:rotate(-1.1deg);}
+.history .item-photo img{width:100%;height:100%;object-fit:cover;object-position:center;}
 .history .item .yr{display:inline-block;background:var(--primary);color:#fff;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:4mm;
   padding:1mm 3mm;transform:skewX(-10deg);margin-bottom:1.6mm;letter-spacing:.06em;}
 .history .item .yr span{display:inline-block;transform:skewX(10deg);}
@@ -244,9 +260,12 @@ ${cardCss(size)}
 .history .item p{font-size:3.7mm;line-height:1.35;color:#1b2940;white-space:pre-line;}
 .history .facts{position:absolute;right:${bleed + 10}mm;top:${bleed + 42}mm;width:48mm;transform:rotate(.9deg);transform-origin:right top;
   filter:drop-shadow(0 2.8mm 5.5mm rgba(7,26,58,.24)) drop-shadow(0 .9mm 2mm rgba(0,0,0,.12));}
-.history .facts-cap{position:relative;padding:3.8mm 3mm 3.2mm;background:linear-gradient(145deg,var(--dark) 0%,var(--primary) 100%);
+.history .facts-cap{position:relative;padding:3mm 3mm 3.2mm;background:linear-gradient(145deg,var(--dark) 0%,var(--primary) 100%);
   border-radius:2.8mm 2.8mm 0 0;transform:skewX(-4deg);transform-origin:left bottom;margin-bottom:-.8mm;
-  box-shadow:inset 0 .5mm 0 rgba(255,255,255,.14),0 .8mm 2mm rgba(0,0,0,.18);}
+  box-shadow:inset 0 .5mm 0 rgba(255,255,255,.14),0 .8mm 2mm rgba(0,0,0,.18);display:flex;flex-direction:column;align-items:center;gap:2mm;}
+.history .facts-logo{width:16mm;height:16mm;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:50%;
+  padding:1.2mm;box-shadow:0 .6mm 1.8mm rgba(0,0,0,.22);transform:skewX(4deg);}
+.history .facts-logo img{max-width:100%;max-height:100%;object-fit:contain;}
 .history .facts-cap::after{content:"";position:absolute;left:2.5mm;right:2.5mm;bottom:-.2mm;height:2mm;
   background:linear-gradient(90deg,var(--secondary) 0 62%,var(--accent) 62%);transform:skewX(-14deg);border-radius:.3mm;
   box-shadow:0 .5mm 1.2mm color-mix(in srgb,var(--secondary) 35%,transparent);}
@@ -266,12 +285,6 @@ ${cardCss(size)}
   text-shadow:0 .6mm 0 rgba(255,255,255,.95),0 1.4mm 2mm color-mix(in srgb,var(--secondary) 22%,transparent);}
 .history .fact span{display:block;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;
   font-size:2.85mm;line-height:1.22;letter-spacing:.05em;color:#3a4d66;margin-top:1.3mm;white-space:pre-line;}
-.history .hphoto{position:absolute;right:${bleed + 10}mm;bottom:${bleed + 14}mm;width:44mm;height:60mm;border-radius:2mm;overflow:hidden;box-shadow:0 1.5mm 4mm rgba(0,0,0,.2);}
-.history .hphoto.p0{height:40mm;bottom:${bleed + 58}mm;}
-.history .hphoto.p1{height:40mm;}
-.history .hphoto .cap{position:absolute;left:0;right:0;bottom:0;padding:1.5mm 2.5mm;font-family:'Fira Sans Extra Condensed';font-weight:600;font-size:2.8mm;text-transform:uppercase;letter-spacing:.06em;color:#fff;background:linear-gradient(180deg,transparent,rgba(0,0,0,.65));}
-.history .hphoto img{width:100%;height:100%;object-fit:cover;}
-
 /* ---------- STATS ---------- */
 .stats .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
 .stats .note{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 40}mm;font-size:3.8mm;color:#1b2940;line-height:1.35;}
@@ -485,25 +498,30 @@ function historyPage(data, pageNo) {
   const items = h.items || [];
   const facts = h.facts || [];
   const title = h.title || `История ${t.shortName || t.name}`;
+  const logo = data.assets.logo ? `<div class="facts-logo"><img src="${data.assets.logo}"></div>` : '';
+  const photoAt = h.photosAt || HISTORY_PHOTOS;
+  const icons = h.icons || HISTORY_ICONS;
   return `<section class="page history ice">
     ${deco(data)}
     <div class="orn br" style="opacity:.95"></div>
     <div class="hdr"><div class="title">${esc(title)}</div>${sticksSvg(data.colors.primary, data.colors.secondary, data.colors.dark)}</div>
     <div class="tl">${items
-      .map(
-        (it, i) => `<div class="item"><div class="dot">${i + 1}</div>
+      .map((it, i) => {
+        const assetKey = photoAt[i] || (it.photo && data.assets[it.photo] ? it.photo : null);
+        const photoSrc = assetKey && data.assets[assetKey] ? data.assets[assetKey] : null;
+        const icon = it.icon || icons[i] || 'start';
+        return `<div class="item-wrap${photoSrc ? ' has-photo' : ''}"><div class="item"><div class="dot">${historyIconSvg(icon, data.colors.primary, data.colors.secondary)}<i>${i + 1}</i></div>
         ${it.years ? `<div class="yr"><span>${esc(it.years)}</span></div>` : ''}
-        <h4>${esc(it.title)}</h4><p>${esc(it.text)}</p></div>`
-      )
+        <h4>${esc(it.title)}</h4><p>${esc(it.text)}</p></div>${photoSrc ? `<div class="item-photo"><img src="${photoSrc}"></div>` : ''}</div>`;
+      })
       .join('')}</div>
     ${
       facts.length
-        ? `<div class="facts"><div class="facts-cap"><h5>${esc(h.factsTitle || 'Цифры успеха')}</h5></div><div class="facts-panel">${facts
+        ? `<div class="facts"><div class="facts-cap">${logo}<h5>${esc(h.factsTitle || 'Цифры успеха')}</h5></div><div class="facts-panel">${facts
             .map((f) => `<div class="fact"><b>${esc(f.value)}</b><span>${esc(f.label)}</span></div>`)
             .join('')}</div></div>`
         : ''
     }
-    ${[data.assets.history, data.assets.history2].filter(Boolean).map((src, i) => `<div class="hphoto p${i}"><img src="${src}">${i === 0 && h.photoCaption ? `<div class="cap">${esc(h.photoCaption)}</div>` : ''}</div>`).join('')}
     <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
   </section>`;
 }

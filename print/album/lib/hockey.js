@@ -49,4 +49,16 @@ function scratchesSvg(color, opacity = 0.35) {
   <path d="M-20 240 C 260 300, 500 240, 820 320"/></svg>`;
 }
 
-module.exports = { rinkSvg, puckSvg, sticksSvg, goalSvg, scratchesSvg };
+// Small milestone icons for the history timeline (40×40 viewBox).
+function historyIconSvg(kind, primary, secondary) {
+  const icons = {
+    start: `<circle cx="20" cy="20" r="14" fill="${primary}"/><ellipse cx="20" cy="24" rx="10" ry="4" fill="${secondary}"/><ellipse cx="20" cy="16" rx="10" ry="4" fill="${secondary}"/>`,
+    school: `<path d="M12 30 L28 14" stroke="${secondary}" stroke-width="3.5" stroke-linecap="round"/><path d="M28 30 L12 14" stroke="${secondary}" stroke-width="3.5" stroke-linecap="round"/><ellipse cx="20" cy="32" rx="8" ry="3" fill="${primary}"/>`,
+    arena: `<path d="M8 28 V14 L20 8 L32 14 V28 Z" fill="${primary}" stroke="${secondary}" stroke-width="1.5"/><path d="M12 28 V18 H28 V28" fill="${secondary}" opacity=".85"/><path d="M14 28 V20 H18 V28 M22 28 V20 H26 V28" fill="#fff" opacity=".7"/>`,
+    heart: `<path d="M20 32 C12 26 8 22 8 17 A6 6 0 0 1 20 12 A6 6 0 0 1 32 17 C32 22 28 26 20 32 Z" fill="${secondary}"/><path d="M20 28 C14 23 11 20 11 17 A4.5 4.5 0 0 1 20 14 A4.5 4.5 0 0 1 29 17 C29 20 26 23 20 28 Z" fill="${primary}"/>`,
+    rise: `<path d="M20 8 V28 M20 8 L14 16 M20 8 L26 16" stroke="${secondary}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="30" r="3" fill="${primary}"/>`,
+  };
+  return `<svg class="hico" viewBox="0 0 40 40" fill="none">${icons[kind] || icons.start}</svg>`;
+}
+
+module.exports = { rinkSvg, puckSvg, sticksSvg, goalSvg, scratchesSvg, historyIconSvg };
