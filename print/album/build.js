@@ -83,11 +83,15 @@ async function main() {
   const shareHtml = path.join(__dirname, 'share', slug, 'index.html');
   if (fs.existsSync(shareHtml)) {
     try {
+      const branch = execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { encoding: 'utf8' }).trim();
       const remote = execFileSync('git', ['remote', 'get-url', 'origin'], { encoding: 'utf8' }).trim();
       const m = remote.match(/github\.com[:/](.+?)(?:\.git)?$/);
       if (m) {
         const [owner, repo] = m[1].split('/');
-        console.log(`\n🔗 Ссылка для клиента (перелистывание):\n   https://${owner}.github.io/${repo}/${slug}/`);
+        const rel = path.relative(path.join(__dirname, '..', '..'), shareHtml).split(path.sep).join('/');
+        const raw = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${rel}`;
+        console.log(`\n🔗 Ссылка для клиента (перелистывание, работает сразу):\n   https://htmlpreview.github.io/?${raw}`);
+        console.log(`\n   Красивая ссылка (после включения GitHub Pages → GitHub Actions):\n   https://${owner}.github.io/${repo}/${slug}/`);
       }
     } catch (_) { /* not a git repo — skip */ }
   }
