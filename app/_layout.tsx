@@ -1789,7 +1789,9 @@ export default function RootLayout() {
               // expo-router Tabs типы не всегда знают этот проп — оставляем runtime‑поведение.
               sceneStyle: { backgroundColor: 'transparent' },
               // Web: mount only the active tab — otherwise inactive absolute scenes block profile scroll on cold deep-links.
-              lazy: Platform.OS === 'web' ? true : deferSecondaryTabs,
+              // Native keeps the navigator default; forcing it here would also eagerly
+              // mount hidden screens (messages/mass, admin, chat…) on launch.
+              ...(Platform.OS === 'web' ? { lazy: true } : {}),
               ...(Platform.OS === 'android'
                 ? ({ sceneContainerStyle: { backgroundColor: 'transparent', flex: 1 } } as any)
                 : ({ sceneContainerStyle: { backgroundColor: 'transparent', flex: 1 } } as any)),
