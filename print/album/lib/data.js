@@ -225,6 +225,8 @@ async function loadTeam(teamDir, cacheDir) {
     history: await asset(['history'], 1600),
     history2: await asset(['history2'], 1600),
     puck: await asset(['puck'], 1200),
+    puckBlack: await asset(['puck-black', 'puck_black', 'puck'], 800),
+    puckOrange: await asset(['puck-orange', 'puck_orange'], 800),
     teamCutout: await asset(['team-cutout', 'cutout'], 3000),
     gallery: [],
   };
