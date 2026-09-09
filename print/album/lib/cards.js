@@ -186,7 +186,7 @@ function cardBack(card, data) {
   const light = Boolean(card.photoBack) && (person || Boolean(card.photo2Aspect));
   return `<div class="card back ${card.type}${light ? ' person' : ''}">
     <div class="bg"></div>
-    ${card.hasPhoto ? `<div class="photo"><img src="${card.photoBack || card.photo}" style="${card.photoBack ? `left:${backPhotoLeft(card, data.cardSize).toFixed(2)}mm;height:${(backPhotoH(data.cardSize) * card.zoom).toFixed(2)}mm;top:${(backPhotoH(data.cardSize) * (1 - card.zoom) * 0.3).toFixed(2)}mm` : ''}"></div>` : ''}
+    ${card.hasPhoto ? `<div class="photo"><img src="${card.photoBack || card.photo}" style="${card.photoBack && card.type === 'club' ? `left:0;top:0;width:100%;height:100%;object-fit:cover;object-position:center ${card.focus === 50 ? 35 : card.focus}%` : card.photoBack ? `left:${backPhotoLeft(card, data.cardSize).toFixed(2)}mm;height:${(backPhotoH(data.cardSize) * card.zoom).toFixed(2)}mm;top:${(backPhotoH(data.cardSize) * (1 - card.zoom) * 0.3).toFixed(2)}mm` : ''}"></div>` : ''}
     <div class="band top"></div><div class="band top2"></div>
     <div class="head">${logo}${light ? `<div class="yr">${esc(t.season)}</div>` : ''}<div class="t">${esc(t.name)}<small>${esc(t.city || '')}${t.city ? '<br>' : ''}Сезон ${esc(t.season)}</small></div></div>
     ${card.number ? `<div class="bignum">${esc(card.number)}</div>` : ''}
