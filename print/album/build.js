@@ -8,6 +8,28 @@ const { execFileSync } = require('child_process');
 const { cardsHtml } = require('./lib/cards');
 const { withBrowser, htmlToPdf, pdfPreviews } = require('./lib/render');
 
+function syncSharePages(slug, outDir) {
+  const previewDir = path.join(outDir, 'preview');
+  const pagesDir = path.join(__dirname, 'print-ready', slug, 'pages');
+  if (!fs.existsSync(previewDir)) return;
+  fs.mkdirSync(pagesDir, { recursive: true });
+  try {
+    execFileSync(
+      'python3',
+      [
+        path.join(__dirname, 'lib', 'export-share-pages.py'),
+        previewDir,
+        pagesDir,
+        path.join(outDir, `${slug}-album-A3-spreads.pdf`),
+      ],
+      { stdio: 'pipe' }
+    );
+    console.log(`✔ share pages → ${path.relative(process.cwd(), pagesDir)}/`);
+  } catch (e) {
+    console.warn(`⚠ share pages: ${e.stderr?.toString().trim().split('\n').pop() || e.message}`);
+  }
+}
+
 function parseArgs(argv) {
   const args = { team: null, sheet: null, layout: null, preview: false, keepHtml: false };
   for (let i = 0; i < argv.length; i++) {
@@ -79,6 +101,10 @@ async function main() {
   post('impose', albumPdf, path.join(outDir, `${slug}-album-A3-spreads.pdf`), [String(PAGE.bleed)]);
   post('light', albumPdf, path.join(outDir, `${slug}-album-preview.pdf`));
   post('light', cardsPdf, path.join(outDir, `${slug}-cards-preview.pdf`));
+
+  if (args.preview) {
+    syncSharePages(slug, outDir);
+  }
 
   const shareHtml = path.join(__dirname, 'share', slug, 'index.html');
   if (fs.existsSync(shareHtml)) {

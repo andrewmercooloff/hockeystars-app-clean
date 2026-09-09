@@ -232,8 +232,7 @@
       <span class="tagline">Альбом 2026–2027</span>
     </div>
     <div class="tabs">
-      <button type="button" class="active" data-mode="spreads">Развороты</button>
-      <button type="button" data-mode="pages">Страницы</button>
+      <button type="button" class="active" data-mode="pages">Перелистывание</button>
       <button type="button" data-mode="cards">Карточки</button>
     </div>
     <div class="card-side" id="card-side">
@@ -283,13 +282,12 @@
 
   <script>
     (function () {
-      const CDN = 'https://cdn.jsdelivr.net/gh/andrewmercooloff/hockeystars-app-clean@cursor/hockey-card-album-generator-a9a3/print/album';
-      const IMG = (file) => CDN + '/print-ready/dobrynya/pages/' + file;
+      const REV = '20260909b';
+      const RAW = 'https://raw.githubusercontent.com/andrewmercooloff/hockeystars-app-clean/cursor/hockey-card-album-generator-a9a3/print/album';
+      const IMG = (file) => RAW + '/print-ready/dobrynya/pages/' + file + '?v=' + REV;
 
       const albumPages = [];
       for (let i = 1; i <= 16; i++) albumPages.push(IMG('album-' + String(i).padStart(2, '0') + '.jpg'));
-      const spreadPages = [];
-      for (let i = 1; i <= 8; i++) spreadPages.push(IMG('spread-' + String(i).padStart(2, '0') + '.jpg'));
       const cardFronts = [];
       const cardBacks = [];
       for (let i = 1; i <= 36; i++) {
@@ -299,7 +297,6 @@
       }
 
       const modes = {
-        spreads: { label: 'разворот', type: 'spread', items: spreadPages },
         pages: {
           label: 'разворот', type: 'book',
           pairs: [
@@ -312,7 +309,7 @@
         cards: { label: 'карточка', type: 'grid', count: 36 },
       };
 
-      let mode = 'spreads';
+      let mode = 'pages';
       let index = 0;
       let cardSide = 'front';
       const PREVIEW = 0.62;
@@ -351,7 +348,6 @@
       function currentZoomSrc() {
         const cfg = modes[mode];
         if (cfg.type === 'grid') return cardList()[index];
-        if (cfg.type === 'spread') return cfg.items[index];
         const pair = cfg.pairs[index];
         if (pair.single != null) return cfg.urls[pair.single];
         return cfg.urls[pair.right];
@@ -409,7 +405,7 @@
         if (cardIndex != null) index = cardIndex;
         zoomTitle.textContent = mode === 'cards'
           ? 'Карточка ' + (index + 1) + ' · ' + (cardSide === 'front' ? 'лицо' : 'оборот')
-          : (mode === 'spreads' ? 'Разворот ' + (index + 1) : 'Страницы ' + (index + 1));
+          : 'Страницы ' + (index + 1);
         zoomImg.onload = function () {
           zoomScale = 1; zoomPanX = 0; zoomPanY = 0;
           applyZoomTransform();
@@ -432,12 +428,6 @@
         });
       }
 
-      function renderSpread(src) {
-        bookEl.className = 'book spread-mode';
-        bookEl.innerHTML = '<img class="spread-img" src="' + src + '" alt="">';
-        fitBook();
-      }
-
       function renderBookPair(pair) {
         var urls = modes.pages.urls;
         if (pair.single != null) {
@@ -453,8 +443,7 @@
       function renderCurrent() {
         var cfg = modes[mode];
         if (cfg.type === 'grid') { buildCardsGrid(); updateNav(); return; }
-        if (cfg.type === 'spread') renderSpread(cfg.items[index]);
-        else renderBookPair(cfg.pairs[index]);
+        renderBookPair(cfg.pairs[index]);
         updateNav();
       }
 
@@ -472,8 +461,8 @@
           hintEl.textContent = 'Нажмите на карточку';
           return;
         }
-        var total = cfg.type === 'book' ? cfg.pairs.length : cfg.items.length;
-        var pair = cfg.type === 'book' ? cfg.pairs[index] : null;
+        var total = cfg.pairs.length;
+        var pair = cfg.pairs[index];
         var detail = (index + 1) + ' / ' + total + ' · ' + cfg.label;
         if (pair) {
           if (pair.single != null) detail += ' · стр. ' + (pair.single + 1);
@@ -488,7 +477,7 @@
       function go(delta) {
         var cfg = modes[mode];
         if (cfg.type === 'grid') return;
-        var total = cfg.type === 'book' ? cfg.pairs.length : cfg.items.length;
+        var total = cfg.pairs.length;
         var next = index + delta;
         if (next < 0 || next >= total) return;
         index = next;
@@ -502,15 +491,12 @@
           btn.classList.toggle('active', btn.dataset.mode === mode);
         });
         loadingEl.classList.remove('hidden');
-        var urls = mode === 'pages' ? albumPages.slice(0, 2)
-          : mode === 'cards' ? cardFronts.slice(0, 4)
-          : spreadPages.slice(0, 2);
+        var urls = mode === 'cards' ? cardFronts.slice(0, 4) : albumPages.slice(0, 2);
         return preloadAll(urls).then(function () {
           loadingEl.classList.add('hidden');
           renderCurrent();
           if (mode === 'cards') preloadAll(cardList());
-          else if (mode === 'pages') preloadAll(albumPages);
-          else preloadAll(spreadPages);
+          else preloadAll(albumPages);
         });
       }
 
@@ -593,7 +579,7 @@
       window.addEventListener('resize', fitBook);
       window.addEventListener('orientationchange', function () { setTimeout(fitBook, 120); });
 
-      setMode('spreads').catch(function (e) { showError(e.message); });
+      setMode('pages').catch(function (e) { showError(e.message); });
     })();
   </script>
 </body>

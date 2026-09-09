@@ -1,8 +1,6 @@
 const { baseCss, esc } = require('./styles');
 const { cardFront, cardCss } = require('./cards');
-const { rinkSvg, puckSvg, sticksSvg, goalSvg, scratchesSvg, historyIconSvg } = require('./hockey');
-
-const HISTORY_ICONS = ['start', 'school', 'arena', 'heart', 'rise'];
+const { rinkSvg, puckSvg, sticksSvg, goalSvg, scratchesSvg } = require('./hockey');
 
 function puckFactFontSize(text) {
   const len = String(text).length;
@@ -273,10 +271,7 @@ ${cardCss(size)}
 .history .item{position:relative;padding-left:16mm;}
 .history .item .dot{position:absolute;left:0;top:0;width:11.6mm;height:11.6mm;border-radius:50%;background:var(--dark);color:#fff;
   display:flex;align-items:center;justify-content:center;border:1mm solid #fff;box-shadow:0 0 0 .6mm var(--primary),inset 0 -.8mm 0 rgba(0,0,0,.35);}
-.history .item .dot .hico{width:7.2mm;height:7.2mm;display:block;}
-.history .item .dot i{position:absolute;right:-1.2mm;bottom:-1.2mm;min-width:4.8mm;height:4.8mm;padding:0 .8mm;border-radius:3mm;
-  background:var(--secondary);color:#fff;font-family:'Fira Sans Extra Condensed';font-weight:700;font-size:2.8mm;font-style:normal;line-height:4.8mm;text-align:center;
-  box-shadow:0 .4mm 1mm rgba(0,0,0,.25);}
+.history .item .dot .num{font-family:'Fira Sans Extra Condensed';font-weight:700;font-size:5.2mm;line-height:1;}
 .history .item .yr{display:inline-block;background:var(--primary);color:#fff;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:4mm;
   padding:1mm 3mm;transform:skewX(-10deg);margin-bottom:1.6mm;letter-spacing:.06em;}
 .history .item .yr span{display:inline-block;transform:skewX(10deg);}
@@ -526,7 +521,6 @@ function historyPage(data, pageNo) {
   const facts = h.facts || [];
   const title = h.title || `История ${t.shortName || t.name}`;
   const logo = data.assets.logo ? `<div class="facts-logo"><img src="${data.assets.logo}"></div>` : '';
-  const icons = h.icons || HISTORY_ICONS;
   const arenaPhotos = [data.assets.history, data.assets.history2].filter(Boolean)
     .map((src) => `<div class="hp"><img src="${src}"></div>`)
     .join('');
@@ -535,12 +529,9 @@ function historyPage(data, pageNo) {
     <div class="orn br" style="opacity:.95"></div>
     <div class="hdr"><div class="title">${esc(title)}</div>${sticksSvg(data.colors.primary, data.colors.secondary, data.colors.dark)}</div>
     <div class="tl">${items
-      .map((it, i) => {
-        const icon = it.icon || icons[i] || 'start';
-        return `<div class="item-wrap"><div class="item"><div class="dot">${historyIconSvg(icon, data.colors.primary, data.colors.secondary)}<i>${i + 1}</i></div>
+      .map((it, i) => `<div class="item-wrap"><div class="item"><div class="dot"><span class="num">${i + 1}</span></div>
         ${it.years ? `<div class="yr"><span>${esc(it.years)}</span></div>` : ''}
-        <h4>${esc(it.title)}</h4><p>${esc(it.text)}</p></div></div>`;
-      })
+        <h4>${esc(it.title)}</h4><p>${esc(it.text)}</p></div></div>`)
       .join('')}${data.assets.logo ? `<div class="tl-finale"><div class="dot logo"><img src="${data.assets.logo}" alt=""></div></div>` : ''}</div>
     ${
       facts.length || arenaPhotos
