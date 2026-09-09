@@ -2,10 +2,12 @@ const path = require('path');
 const { fileUrl } = require('./images');
 
 const FONTS = [
-  ['Oswald', 400, 'Oswald-Regular.ttf'],
-  ['Oswald', 600, 'Oswald-SemiBold.ttf'],
-  ['Oswald', 700, 'Oswald-Bold.ttf'],
-  ['Russo One', 400, 'RussoOne-Regular.ttf'],
+  // Condensed heavy sans for names/labels (weights mapped one step heavier than the old Oswald set).
+  ['Fira Sans Extra Condensed', 400, 'FiraSansExtraCondensed-Medium.ttf'],
+  ['Fira Sans Extra Condensed', 600, 'FiraSansExtraCondensed-Bold.ttf'],
+  ['Fira Sans Extra Condensed', 700, 'FiraSansExtraCondensed-Black.ttf'],
+  // Wide aggressive display face for titles and big numbers (variable font).
+  ['Unbounded', '200 900', 'Unbounded.ttf'],
   ['Roboto', 400, 'Roboto-Regular.ttf'],
   ['Roboto', 500, 'Roboto-Medium.ttf'],
   ['Roboto', 700, 'Roboto-Bold.ttf'],
@@ -40,7 +42,7 @@ ${fontFaces()}
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 html,body{font-family:'Roboto',Arial,sans-serif;color:#0f1b2d;}
-.h{font-family:'Oswald','Roboto',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.01em;}
+.h{font-family:'Fira Sans Extra Condensed','Roboto',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.01em;}
 .ice{
   background:
     radial-gradient(ellipse at 20% 10%, rgba(255,255,255,.9), transparent 55%),

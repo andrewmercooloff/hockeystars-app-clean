@@ -30,7 +30,7 @@ function cardCss(size) {
 .card.front .photo::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 .45mm var(--primary);
   clip-path:polygon(${mm(13)} 0,100% 0,100% 100%,0 100%,0 ${mm(13)});}
 .card.front .num sup{font-size:38%;vertical-align:top;position:relative;top:${mm(1.2)};margin-left:${mm(0.4)};-webkit-text-stroke:${mm(0.4)} var(--primary);}
-.card.front .num{position:absolute;right:${(B + 3.4 * s).toFixed(2)}mm;top:${(B + 2.4 * s).toFixed(2)}mm;font-family:'Russo One';font-weight:400;font-size:${mm(12)};line-height:1;color:var(--secondary);
+.card.front .num{position:absolute;right:${(B + 3.4 * s).toFixed(2)}mm;top:${(B + 2.4 * s).toFixed(2)}mm;font-family:'Unbounded';font-weight:800;font-size:${mm(12)};line-height:1;color:var(--secondary);
   -webkit-text-stroke:${mm(0.7)} var(--primary);paint-order:stroke fill;}
 .card.front .logo{position:absolute;left:${(B + 4 * s).toFixed(2)}mm;bottom:${(B + 6.2 * s).toFixed(2)}mm;width:${mm(9.5)};height:${mm(9.5)};z-index:2;}
 .card.front .logo img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 .4mm .8mm rgba(0,0,0,.5));}
@@ -38,14 +38,14 @@ function cardCss(size) {
   background:linear-gradient(180deg,var(--primary) 0%,var(--dark) 100%);border-top:.6mm solid var(--secondary);
   clip-path:polygon(0 0,100% 0,100% calc(100% - ${mm(13)}),calc(100% - ${mm(13)}) 100%,0 100%);}
 .card.front.haslogo .plate{padding-left:${mm(14.5)};}
-.card.front .plate .nm{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:${mm(4.8)};line-height:1.02;word-break:break-word;}
+.card.front .plate .nm{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:${mm(4.8)};line-height:1.02;word-break:break-word;}
 .card.front .plate .nm small{display:block;font-weight:500;font-size:${mm(3.5)};opacity:.95;margin-top:.3mm;white-space:nowrap;}
 .card.front .plate .nm,.card.front .plate .pos{padding-right:${mm(9)};}
 .card.front .plate .pos{margin-top:${mm(1.2)};font-family:'Roboto';font-weight:500;font-size:${mm(2.5)};letter-spacing:.04em;text-transform:uppercase;color:rgba(255,255,255,.92);line-height:1.2;}
 .card.front .plate .pos::before{content:"";display:inline-block;width:${mm(5)};height:.6mm;background:var(--secondary);vertical-align:middle;margin-right:1.5mm;}
 .card.front.coach .plate .pos::before{background:var(--accent);}
 .card.front.coach .plate .pos{color:var(--accent);}
-.card.front .ribbon{position:absolute;left:${(B + 3.2 * s).toFixed(2)}mm;top:${(B + 3.2 * s).toFixed(2)}mm;background:var(--accent);color:var(--dark);font-family:'Oswald';font-weight:700;
+.card.front .ribbon{position:absolute;left:${(B + 3.2 * s).toFixed(2)}mm;top:${(B + 3.2 * s).toFixed(2)}mm;background:var(--accent);color:var(--dark);font-family:'Fira Sans Extra Condensed';font-weight:700;
   text-transform:uppercase;font-size:${mm(2.6)};letter-spacing:.1em;padding:${mm(0.8)} ${mm(2)};transform:skewX(-10deg);box-shadow:0 .4mm .8mm rgba(0,0,0,.35);}
 .card.front .ribbon span{display:inline-block;transform:skewX(10deg);}
 /* ---- BACK ---- */
@@ -68,7 +68,7 @@ function cardCss(size) {
 .card.back.person .head{top:${(B + 3 * s).toFixed(2)}mm;left:${pad}mm;right:auto;width:auto;z-index:3;flex-direction:column;align-items:center;gap:${mm(0.6)};}
 .card.back.person .head img{width:${mm(16)};height:${mm(16)};}
 .card.back.person .head .t{display:none;}
-.card.back.person .head .yr{font-family:'Oswald';font-weight:600;font-size:${mm(2)};letter-spacing:.08em;color:var(--dark);text-align:center;width:${mm(16)};margin-top:${mm(-0.2)};}
+.card.back.person .head .yr{font-family:'Fira Sans Extra Condensed';font-weight:600;font-size:${mm(2)};letter-spacing:.08em;color:var(--dark);text-align:center;width:${mm(16)};margin-top:${mm(-0.2)};}
 .card.back.team:not(.person) .photo img,.card.back.club:not(.person) .photo img{width:100%;height:100%;left:0;top:0;object-fit:cover;object-position:center 35%;}
 .card.back.person .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(243,245,248,.9) 0%,rgba(243,245,248,.6) 22%,rgba(243,245,248,0) 40%);}
 .card.back.team:not(.person) .photo::after,.card.back.club:not(.person) .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,color-mix(in srgb,var(--primary) 92%,transparent) 0%,color-mix(in srgb,var(--primary) 70%,transparent) 22%,rgba(0,0,0,0) 45%),linear-gradient(180deg,rgba(0,0,0,0) 80%,var(--primary) 100%);}
@@ -77,21 +77,21 @@ function cardCss(size) {
 .card.back .band.top2{display:none;top:${(B + 29.5 * s).toFixed(2)}mm;height:${mm(1.5)};background:#fff;opacity:.5;}
 .card.back .head{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 3.5 * s).toFixed(2)}mm;display:flex;align-items:center;gap:${mm(2.5)};}
 .card.back .head img{width:${mm(10)};height:${mm(10)};object-fit:contain;}
-.card.back .head .t{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:${mm(4)};line-height:1.05;}
+.card.back .head .t{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:${mm(4)};line-height:1.05;}
 .card.back .head .t small{display:block;font-family:'Roboto';font-weight:400;text-transform:none;font-size:${mm(2.4)};opacity:.8;margin-top:.6mm;}
-.card.back .bignum{position:absolute;right:${(B + 3 * s).toFixed(2)}mm;top:${(B + 54 * s).toFixed(2)}mm;font-family:'Russo One';font-weight:400;font-size:${mm(26)};line-height:1;color:rgba(255,255,255,.08);}
+.card.back .bignum{position:absolute;right:${(B + 3 * s).toFixed(2)}mm;top:${(B + 54 * s).toFixed(2)}mm;font-family:'Unbounded';font-weight:800;font-size:${mm(26)};line-height:1;color:rgba(255,255,255,.08);}
 .card.back .who{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 46.5 * s).toFixed(2)}mm;}
-.card.back .who .nm{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:${mm(5.4)};line-height:1.05;}
+.card.back .who .nm{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:${mm(5.4)};line-height:1.05;}
 .card.back .who .nm span{color:var(--accent);margin-right:1.5mm;}
 .card.back .who .nm sup{font-size:50%;vertical-align:top;position:relative;top:${mm(0.6)};}
 .card.back .who .pos{font-family:'Roboto';font-weight:500;font-size:${mm(2.7)};letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.85);margin-top:1.2mm;}
 .card.back table{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 59 * s).toFixed(2)}mm;width:calc(100% - ${pad * 2}mm);border-collapse:collapse;font-size:${mm(2.9)};}
 .card.back td{padding:${mm(0.45)} 0;border-bottom:.2mm solid rgba(255,255,255,.18);line-height:1.15;}
 .card.back td:first-child{font-family:'Roboto';font-weight:400;text-transform:uppercase;letter-spacing:.1em;font-size:${mm(2.4)};color:rgba(255,255,255,.7);}
-.card.back td:last-child{text-align:right;font-family:'Oswald';font-weight:600;font-size:${mm(3.4)};}
+.card.back td:last-child{text-align:right;font-family:'Fira Sans Extra Condensed';font-weight:600;font-size:${mm(3.4)};}
 .card.back .foot{position:absolute;left:${pad}mm;right:${pad}mm;bottom:${(B + 3.5 * s).toFixed(2)}mm;display:flex;align-items:center;justify-content:space-between;}
 .card.back .foot img{height:${mm(4.2)};}
-.card.back .foot .idx{font-family:'Oswald';font-weight:600;font-size:${mm(3.2)};color:rgba(255,255,255,.85);}
+.card.back .foot .idx{font-family:'Fira Sans Extra Condensed';font-weight:600;font-size:${mm(3.2)};color:rgba(255,255,255,.85);}
 .card.back .foot .idx b{color:var(--accent);}
 `;
 }

@@ -46,7 +46,7 @@ ${cardCss(size)}
 @page{size:${w + bleed * 2}mm ${h + bleed * 2}mm;margin:0;}
 .page{position:relative;width:${w + bleed * 2}mm;height:${h + bleed * 2}mm;overflow:hidden;page-break-after:always;background:#fff;}
 .safe{position:absolute;left:${bleed + 7}mm;top:${bleed + 7}mm;right:${bleed + 7}mm;bottom:${bleed + 7}mm;}
-.pgnum{position:absolute;bottom:${bleed + 3}mm;font-family:'Oswald';font-weight:600;font-size:3.2mm;color:var(--primary);opacity:.8;}
+.pgnum{position:absolute;bottom:${bleed + 3}mm;font-family:'Fira Sans Extra Condensed';font-weight:600;font-size:3.2mm;color:var(--primary);opacity:.8;}
 .pgnum.l{left:${bleed + 8}mm;} .pgnum.r{right:${bleed + 8}mm;}
 /* page background: soft ice gradient + blurred arena photo + a wide brand-colour band under the header */
 .page.ice{background:linear-gradient(180deg,#f3f6fa 0%,#e7edf4 55%,#dfe7f0 100%);}
@@ -58,33 +58,33 @@ ${cardCss(size)}
 /* facts / glossary / profile pages */
 .facts .hdr,.glossary .hdr,.profile .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
 .facts .hdr .title,.glossary .hdr .title,.profile .hdr .title{font-size:11mm;}
-.facts .hdr .sub,.glossary .hdr .sub,.profile .hdr .sub{font-family:'Oswald';font-weight:600;text-transform:uppercase;font-size:3.6mm;letter-spacing:.14em;color:var(--secondary);margin-top:2.5mm;}
+.facts .hdr .sub,.glossary .hdr .sub,.profile .hdr .sub{font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:3.6mm;letter-spacing:.14em;color:var(--secondary);margin-top:2.5mm;}
 .facts .goal{position:absolute;right:${bleed + 12}mm;top:${bleed + 8}mm;width:40mm;height:26mm;opacity:.6;}
 .facts .fgrid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 44}mm;bottom:${bleed + 16}mm;display:grid;grid-template-columns:1fr 1fr;gap:6mm 8mm;grid-auto-rows:1fr;}
 .facts .f{position:relative;display:flex;align-items:center;padding:0 5mm;gap:5mm;background:rgba(255,255,255,.88);border-left:1.4mm solid var(--secondary);padding:4mm 5mm 4mm 4mm;box-shadow:0 1mm 3mm rgba(20,40,70,.08);}
 .facts .f .pk{position:relative;flex:0 0 30mm;height:19mm;display:flex;align-items:center;justify-content:center;}
 .facts .f .pk svg{position:absolute;inset:0;width:100%;height:100%;}
-.facts .f .pk b{position:relative;top:-3px;font-family:'Russo One';font-weight:400;font-size:5.4mm;color:#fff;line-height:1;}
+.facts .f .pk b{position:relative;top:-3px;font-family:'Unbounded';font-weight:800;font-size:5.4mm;color:#fff;line-height:1;}
 .facts .f p{font-size:3.5mm;line-height:1.3;color:#1b2940;}
 .glossary .sticks{position:absolute;right:${bleed + 12}mm;top:${bleed + 8}mm;width:26mm;height:26mm;opacity:.8;}
 .glossary .ggrid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 44}mm;bottom:${bleed + 16}mm;display:grid;grid-template-columns:1fr 1fr;gap:4mm 8mm;align-content:space-between;}
 .glossary .g{background:linear-gradient(135deg,var(--primary),var(--dark));color:#fff;padding:3mm 5mm;transform:skewX(-6deg);border-left:1.4mm solid var(--secondary);}
 .glossary .g.alt{background:linear-gradient(135deg,var(--secondary),color-mix(in srgb,var(--secondary) 70%,#000));border-left-color:#fff;}
-.glossary .g b{display:block;font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:4.6mm;letter-spacing:.04em;transform:skewX(6deg);}
+.glossary .g b{display:block;font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:4.6mm;letter-spacing:.04em;transform:skewX(6deg);}
 .glossary .g span{display:block;font-size:3.3mm;line-height:1.3;margin-top:1mm;color:rgba(255,255,255,.88);transform:skewX(6deg);}
 .profile .photo{position:absolute;right:${bleed + 12}mm;top:${bleed + 42}mm;width:${size.w}mm;height:${size.h}mm;}
-.profile .photo .frame{position:absolute;inset:0;border:.5mm dashed var(--primary);background:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;font-family:'Oswald';font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-size:3.6mm;color:var(--primary);}
+.profile .photo .frame{position:absolute;inset:0;border:.5mm dashed var(--primary);background:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-size:3.6mm;color:var(--primary);}
 .profile .fields{position:absolute;left:${bleed + 10}mm;right:${bleed + 12 + size.w + 10}mm;top:${bleed + 42}mm;}
 .profile .fld{display:flex;align-items:flex-end;gap:3mm;height:12.5mm;}
-.profile .fld b{font-family:'Oswald';font-weight:600;text-transform:uppercase;font-size:3.6mm;color:var(--dark);white-space:nowrap;padding-bottom:1mm;}
+.profile .fld b{font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:3.6mm;color:var(--dark);white-space:nowrap;padding-bottom:1mm;}
 .profile .fld span{flex:1;border-bottom:.4mm solid var(--secondary);height:8mm;}
 .profile .goals{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 172}mm;}
-.profile .goals h5{font-family:'Russo One';font-weight:400;text-transform:uppercase;font-size:6.5mm;color:var(--dark);margin-bottom:4mm;}
+.profile .goals h5{font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:6.5mm;color:var(--dark);margin-bottom:4mm;}
 .profile .goal{display:flex;align-items:center;gap:4mm;margin-bottom:6mm;}
 .profile .goal i{flex:1;border-bottom:.4mm solid var(--primary);height:8mm;}
 .profile .goal .pucknum{position:relative;width:14mm;height:9mm;flex:0 0 14mm;display:flex;align-items:center;justify-content:center;}
 .profile .goal .pucknum svg{position:absolute;inset:0;width:100%;height:100%;}
-.profile .goal .pucknum b{position:relative;color:#fff;font-family:'Oswald';font-weight:700;font-size:4.6mm;}
+.profile .goal .pucknum b{position:relative;color:#fff;font-family:'Fira Sans Extra Condensed';font-weight:700;font-size:4.6mm;}
 
 /* corner ornaments: torn diagonal bands */
 .orn{position:absolute;pointer-events:none;}
@@ -104,8 +104,8 @@ ${cardCss(size)}
 .cover .season .sticks{width:7mm;height:7mm;vertical-align:-1.4mm;margin-right:2mm;}
 .pucknum{display:inline-flex;align-items:center;justify-content:center;position:relative;width:12mm;height:8mm;flex:none;}
 .pucknum .puck{position:absolute;inset:0;width:100%;height:100%;}
-.pucknum b{position:relative;color:#fff;font-family:'Oswald';font-weight:700;font-size:4.2mm;line-height:1;margin-top:-1.2mm;}
-.hdr .count{display:inline-flex;align-items:center;gap:2mm;background:var(--dark);color:#fff;font-family:'Oswald';font-weight:600;text-transform:uppercase;
+.pucknum b{position:relative;color:#fff;font-family:'Fira Sans Extra Condensed';font-weight:700;font-size:4.2mm;line-height:1;margin-top:-1.2mm;}
+.hdr .count{display:inline-flex;align-items:center;gap:2mm;background:var(--dark);color:#fff;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;
   font-size:3.6mm;letter-spacing:.08em;padding:1.4mm 3.5mm 1.4mm 2.5mm;border-radius:6mm;margin-top:2mm;}
 .hdr .count .puck{width:6mm;height:3.6mm;}
 .stats .goal{position:absolute;right:${bleed + 10}mm;top:${bleed + 8}mm;width:44mm;height:28mm;}
@@ -113,7 +113,7 @@ ${cardCss(size)}
 .gallery .hdr .sticks,.autographs .hdr .sticks,.history .hdr .sticks{width:14mm;height:14mm;vertical-align:-3mm;margin-left:3mm;}
 
 /* section title */
-.title{position:relative;display:inline-block;font-family:'Russo One';font-weight:400;text-transform:uppercase;font-size:13mm;line-height:1;color:var(--dark);
+.title{position:relative;display:inline-block;font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:13mm;line-height:1;color:var(--dark);
   padding:2mm 0;}
 .title::after{content:"";position:absolute;left:0;right:-6mm;bottom:-1mm;height:2mm;background:linear-gradient(90deg,var(--secondary) 0 60%,var(--primary) 60%);
   transform:skewX(-30deg);}
@@ -139,7 +139,7 @@ ${cardCss(size)}
   background:linear-gradient(180deg,#fff 0 36%,var(--secondary) 36% 52%,transparent 52% 60%,var(--primary) 60% 72%,transparent 72% 80%,rgba(255,255,255,.35) 80% 86%,transparent 86%);}
 .cover .orn.br{right:-60mm;bottom:-60mm;width:250mm;height:120mm;
   background:linear-gradient(0deg,var(--primary) 0 42%,transparent 42% 50%,var(--secondary) 50% 62%,transparent 62% 70%,rgba(255,255,255,.4) 70% 76%,transparent 76%);}
-.cover .season{position:absolute;left:${bleed + 8}mm;top:${bleed + 52}mm;background:var(--secondary);color:#fff;font-family:'Oswald';font-weight:600;
+.cover .season{position:absolute;left:${bleed + 8}mm;top:${bleed + 52}mm;background:var(--secondary);color:#fff;font-family:'Fira Sans Extra Condensed';font-weight:600;
   text-transform:uppercase;font-size:5.6mm;letter-spacing:.06em;padding:1.6mm 4mm 1.6mm 3mm;transform:skewX(-8deg);box-shadow:0 1mm 2mm rgba(0,0,0,.3);}
 .cover .season span{display:inline-block;transform:skewX(8deg);}
 .cover .season b{color:var(--accent);margin:0 1.5mm;}
@@ -148,7 +148,7 @@ ${cardCss(size)}
 .cover .logo .badge{width:58mm;height:58mm;border-radius:50%;background:radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--primary) 70%,#fff),var(--primary) 70%);border:1.6mm solid #fff;
   box-shadow:0 0 0 1.2mm var(--secondary),0 2mm 5mm rgba(0,0,0,.4);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;}
 .cover .logo .badge .star{font-size:12mm;line-height:1;color:var(--secondary);text-shadow:0 0 1mm #fff,0 0 1mm #fff;}
-.cover .logo .badge .txt{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:9mm;line-height:.95;margin-top:1mm;padding:0 3mm;}
+.cover .logo .badge .txt{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:9mm;line-height:.95;margin-top:1mm;padding:0 3mm;}
 .cover .logo .badge small{font-family:'Roboto';font-weight:500;font-size:2.6mm;letter-spacing:.14em;text-transform:uppercase;opacity:.85;margin-top:1.5mm;}
 .cover .count{position:absolute;left:${bleed + 10}mm;bottom:${bleed + 18}mm;width:56mm;height:44mm;color:#fff;}
 .cover .count svg{position:absolute;inset:0;width:100%;height:100%;}
@@ -156,12 +156,12 @@ ${cardCss(size)}
 .cover .count.real img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;}
 .cover .count.real .in{top:5.5mm;}
 .cover .count .in{position:absolute;left:0;right:0;top:8.5mm;text-align:center;}
-.cover .count b{display:block;font-family:'Russo One';font-weight:400;font-size:14mm;line-height:.95;color:var(--secondary);-webkit-text-stroke:.5mm #fff;paint-order:stroke fill;}
-.cover .count span{display:block;font-family:'Oswald';font-weight:600;text-transform:uppercase;font-size:3.8mm;letter-spacing:.14em;margin-top:0;}
-.cover .year{position:absolute;right:${bleed + 8}mm;bottom:${bleed + 12}mm;font-family:'Russo One';font-weight:400;font-size:40mm;line-height:.85;color:#fff;letter-spacing:-.01em;}
+.cover .count b{display:block;font-family:'Unbounded';font-weight:800;font-size:14mm;line-height:.95;color:var(--secondary);-webkit-text-stroke:.5mm #fff;paint-order:stroke fill;}
+.cover .count span{display:block;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:3.8mm;letter-spacing:.14em;margin-top:0;}
+.cover .year{position:absolute;right:${bleed + 8}mm;bottom:${bleed + 12}mm;font-family:'Unbounded';font-weight:800;font-size:40mm;line-height:.85;color:#fff;letter-spacing:-.01em;}
 .cover .brand{position:absolute;left:${bleed + 12}mm;bottom:${bleed + 6}mm;display:flex;align-items:center;gap:2mm;}
 .cover .brand img{height:7mm;filter:drop-shadow(0 .5mm 1mm rgba(0,0,0,.5));}
-.cover .teamname{position:absolute;left:${bleed + 8}mm;top:${bleed + 66}mm;font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:11mm;line-height:1;color:#fff;
+.cover .teamname{position:absolute;left:${bleed + 8}mm;top:${bleed + 66}mm;font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:11mm;line-height:1;color:#fff;
   text-shadow:0 1mm 2.5mm rgba(0,0,0,.55);}
 .cover .teamname small{display:block;font-size:5mm;font-weight:600;letter-spacing:.12em;opacity:.95;margin-top:1.5mm;}
 
@@ -172,11 +172,11 @@ ${cardCss(size)}
 .intro .sample{position:absolute;left:${bleed + 12}mm;top:${bleed + 92}mm;transform-origin:top left;transform:scale(1);
   box-shadow:0 2mm 5mm rgba(0,0,0,.25);border-radius:1mm;}
 .intro .how{position:absolute;left:${bleed + 85}mm;right:${bleed + 12}mm;top:${bleed + 92}mm;}
-.intro .how h3{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:7.5mm;color:var(--dark);margin-bottom:5mm;}
+.intro .how h3{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:7.5mm;color:var(--dark);margin-bottom:5mm;}
 .intro .step{display:flex;align-items:flex-start;gap:3mm;margin-bottom:6mm;font-size:4mm;line-height:1.35;color:#1b2940;}
 .intro .step .pucknum{margin-top:-.5mm;}
 .intro .bottom{position:absolute;left:0;right:0;bottom:0;height:120mm;}
-.intro .bigname{position:absolute;left:${bleed + 6}mm;right:${bleed + 6}mm;top:0;font-family:'Oswald';font-weight:700;text-transform:uppercase;
+.intro .bigname{position:absolute;left:${bleed + 6}mm;right:${bleed + 6}mm;top:0;font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;
   font-size:34mm;line-height:.95;color:transparent;-webkit-text-stroke:.9mm var(--secondary);text-align:center;white-space:nowrap;letter-spacing:.02em;}
 .intro .teamphoto{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:22mm;bottom:${bleed + 10}mm;overflow:hidden;border-radius:1.5mm;
   box-shadow:0 2mm 6mm rgba(0,0,0,.25);background:#c9d5e3;}
@@ -184,7 +184,7 @@ ${cardCss(size)}
 .intro .teamphoto.cutout{background:none;box-shadow:none;border-radius:0;overflow:visible;top:14mm;}
 .intro .teamphoto.cutout::before{content:"";position:absolute;left:8%;right:8%;bottom:-2mm;height:14mm;border-radius:50%;background:radial-gradient(ellipse at center,rgba(20,40,70,.28),rgba(20,40,70,0) 70%);}
 .intro .teamphoto.cutout img{position:absolute;left:0;right:0;bottom:2mm;width:100%;height:100%;object-fit:contain;object-position:center bottom;}
-.intro .teamphoto .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Oswald';font-weight:600;text-transform:uppercase;
+.intro .teamphoto .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;
   font-size:6mm;color:#5b6b80;letter-spacing:.1em;background:repeating-linear-gradient(45deg,#dbe4ee 0 6mm,#cfdae6 6mm 12mm);}
 
 /* ---------- TEAM ---------- */
@@ -193,7 +193,7 @@ ${cardCss(size)}
 .team .hdr .logo{width:22mm;height:22mm;display:flex;align-items:center;justify-content:center;}
 .team .hdr .logo img{max-width:100%;max-height:100%;object-fit:contain;}
 .team .hdr .title{font-size:13mm;}
-.team .hdr .sub{font-family:'Oswald';font-weight:600;text-transform:uppercase;font-size:3.6mm;letter-spacing:.14em;color:var(--secondary);text-align:right;margin-top:2mm;}
+.team .hdr .sub{font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:3.6mm;letter-spacing:.14em;color:var(--secondary);text-align:right;margin-top:2mm;}
 .team .grid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${(bleed + gridTop(size)).toFixed(1)}mm;display:grid;
   grid-template-columns:repeat(${SLOT_COLS},${size.w}mm);justify-content:space-between;row-gap:${gridGap(size).toFixed(1)}mm;}
 .cell{position:relative;width:${size.w}mm;}
@@ -206,7 +206,7 @@ ${cardCss(size)}
 .team.dense .cell .cap .n{font-size:3.4mm;}
 .team.dense .cell .cap .p{font-size:2.2mm;margin-top:.4mm;}
 .team.dense .pgnum{bottom:${bleed + 1.5}mm;}
-.cell .cap .n{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:3.6mm;line-height:1.05;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cell .cap .n{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:3.6mm;line-height:1.05;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .cell .cap .n span{color:var(--secondary);margin-right:1.2mm;}
 .cell .cap .p{font-family:'Roboto';font-weight:500;text-transform:uppercase;letter-spacing:.12em;font-size:2.3mm;color:#4a5a70;margin-top:.6mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .slot{position:relative;width:${size.w}mm;height:${size.h}mm;border:.35mm dashed color-mix(in srgb,var(--primary) 55%,transparent);border-radius:1mm;overflow:hidden;background:#fff;}
@@ -216,15 +216,15 @@ ${cardCss(size)}
 .slot .corner.bl{left:-.35mm;bottom:-.35mm;border-right:0;border-top:0;}
 .slot .corner.br{right:-.35mm;bottom:-.35mm;border-left:0;border-top:0;}
 .slot .ghost{position:absolute;left:${-size.bleed}mm;top:${-size.bleed}mm;filter:grayscale(1) contrast(.9);opacity:.28;}
-.slot .tag{position:absolute;left:50%;top:0;transform:translateX(-50%);background:var(--secondary);color:#fff;font-family:'Oswald';font-weight:600;
+.slot .tag{position:absolute;left:50%;top:0;transform:translateX(-50%);background:var(--secondary);color:#fff;font-family:'Fira Sans Extra Condensed';font-weight:600;
   font-size:3mm;line-height:1;padding:1mm 2.6mm 1.1mm;border-radius:0 0 1.5mm 1.5mm;letter-spacing:.06em;}
 .slot .lbl{position:absolute;left:0;right:0;bottom:0;padding:1.6mm 2mm 1.8mm;text-align:center;background:rgba(255,255,255,.88);border-top:.3mm solid color-mix(in srgb,var(--primary) 25%,transparent);}
-.slot .lbl .n{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:3.9mm;line-height:1.05;color:var(--dark);}
+.slot .lbl .n{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:3.9mm;line-height:1.05;color:var(--dark);}
 .slot .lbl .n span{color:var(--secondary);margin-right:1.2mm;}
 .slot .lbl .p{font-family:'Roboto';font-weight:500;text-transform:uppercase;letter-spacing:.12em;font-size:2.4mm;color:#4a5a70;margin-top:.7mm;}
 .slot.outline .ghost{display:none;}
 .slot.outline{background:linear-gradient(160deg,#fff,var(--ice));}
-.slot.outline .bignum{position:absolute;left:0;right:0;top:34%;text-align:center;font-family:'Oswald';font-weight:700;font-size:20mm;line-height:1;color:color-mix(in srgb,var(--primary) 12%,transparent);}
+.slot.outline .bignum{position:absolute;left:0;right:0;top:34%;text-align:center;font-family:'Fira Sans Extra Condensed';font-weight:700;font-size:20mm;line-height:1;color:color-mix(in srgb,var(--primary) 12%,transparent);}
 
 /* ---------- HISTORY ---------- */
 .history .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
@@ -234,32 +234,32 @@ ${cardCss(size)}
 .history .item{position:relative;padding-left:16mm;margin-bottom:7mm;}
 .history .item:last-child{margin-bottom:0;}
 .history .item .dot{position:absolute;left:0;top:0;width:11.6mm;height:11.6mm;border-radius:50%;background:var(--dark);color:#fff;box-shadow:inset 0 -1.6mm 0 rgba(0,0,0,.5),inset 0 .5mm 0 rgba(255,255,255,.25);
-  font-family:'Oswald';font-weight:700;font-size:6mm;display:flex;align-items:center;justify-content:center;border:1mm solid #fff;box-shadow:0 0 0 .6mm var(--primary);}
-.history .item .yr{display:inline-block;background:var(--primary);color:#fff;font-family:'Oswald';font-weight:600;text-transform:uppercase;font-size:4mm;
+  font-family:'Fira Sans Extra Condensed';font-weight:700;font-size:6mm;display:flex;align-items:center;justify-content:center;border:1mm solid #fff;box-shadow:0 0 0 .6mm var(--primary);}
+.history .item .yr{display:inline-block;background:var(--primary);color:#fff;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:4mm;
   padding:1mm 3mm;transform:skewX(-10deg);margin-bottom:1.6mm;letter-spacing:.06em;}
 .history .item .yr span{display:inline-block;transform:skewX(10deg);}
-.history .item h4{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:5.4mm;line-height:1.05;color:var(--dark);margin-bottom:1.2mm;}
+.history .item h4{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:5.4mm;line-height:1.05;color:var(--dark);margin-bottom:1.2mm;}
 .history .item p{font-size:3.7mm;line-height:1.35;color:#1b2940;white-space:pre-line;}
 .history .facts{position:absolute;right:${bleed + 10}mm;top:${bleed + 44}mm;width:44mm;background:#fff;border:.5mm solid var(--primary);border-radius:2mm;padding:4mm 3mm;
   box-shadow:0 1.5mm 4mm color-mix(in srgb,var(--primary) 12%,transparent);}
-.history .facts h5{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:4.6mm;color:var(--dark);text-align:center;line-height:1.05;margin-bottom:3mm;
+.history .facts h5{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:4.6mm;color:var(--dark);text-align:center;line-height:1.05;margin-bottom:3mm;
   padding-bottom:2mm;border-bottom:.5mm solid var(--secondary);}
 .history .fact{text-align:center;margin-bottom:4.5mm;}
-.history .fact b{display:block;font-family:'Oswald';font-weight:700;font-size:9mm;line-height:1;color:var(--secondary);}
+.history .fact b{display:block;font-family:'Fira Sans Extra Condensed';font-weight:700;font-size:9mm;line-height:1;color:var(--secondary);}
 .history .fact span{display:block;font-size:2.9mm;line-height:1.25;color:#1b2940;margin-top:.8mm;white-space:pre-line;}
 .history .hphoto{position:absolute;right:${bleed + 10}mm;bottom:${bleed + 14}mm;width:44mm;height:60mm;border-radius:2mm;overflow:hidden;box-shadow:0 1.5mm 4mm rgba(0,0,0,.2);}
 .history .hphoto.p0{height:40mm;bottom:${bleed + 58}mm;}
 .history .hphoto.p1{height:40mm;}
-.history .hphoto .cap{position:absolute;left:0;right:0;bottom:0;padding:1.5mm 2.5mm;font-family:'Oswald';font-weight:600;font-size:2.8mm;text-transform:uppercase;letter-spacing:.06em;color:#fff;background:linear-gradient(180deg,transparent,rgba(0,0,0,.65));}
+.history .hphoto .cap{position:absolute;left:0;right:0;bottom:0;padding:1.5mm 2.5mm;font-family:'Fira Sans Extra Condensed';font-weight:600;font-size:2.8mm;text-transform:uppercase;letter-spacing:.06em;color:#fff;background:linear-gradient(180deg,transparent,rgba(0,0,0,.65));}
 .history .hphoto img{width:100%;height:100%;object-fit:cover;}
 
 /* ---------- STATS ---------- */
 .stats .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
 .stats .note{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 40}mm;font-size:3.8mm;color:#1b2940;line-height:1.35;}
 .stats table{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 56}mm;width:calc(100% - ${(bleed + 10) * 2}mm);border-collapse:collapse;font-size:3.6mm;}
-.stats th{font-family:'Oswald';font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:3.4mm;color:#fff;background:var(--primary);padding:2.4mm 2mm;text-align:left;}
+.stats th{font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:3.4mm;color:#fff;background:var(--primary);padding:2.4mm 2mm;text-align:left;}
 .stats td{border-bottom:.3mm solid color-mix(in srgb,var(--primary) 25%,transparent);height:9.6mm;padding:0 2mm;color:#7b8798;}
-.stats td.i{width:9mm;text-align:center;font-family:'Oswald';font-weight:600;color:var(--secondary);}
+.stats td.i{width:9mm;text-align:center;font-family:'Fira Sans Extra Condensed';font-weight:600;color:var(--secondary);}
 .stats tr:nth-child(even) td{background:rgba(238,243,249,.7);}
 
 /* ---------- NOTES ---------- */
@@ -272,7 +272,7 @@ ${cardCss(size)}
 .autographs .note{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 40}mm;font-size:3.8mm;color:#1b2940;line-height:1.35;}
 .autographs .grid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 54}mm;display:grid;grid-template-columns:repeat(3,1fr);gap:5mm 6mm;}
 .autographs .box{height:var(--boxh,33mm);border:.35mm solid color-mix(in srgb,var(--primary) 30%,transparent);border-radius:1.5mm;position:relative;background:rgba(255,255,255,.75);}
-.autographs .box .n{position:absolute;left:3mm;right:3mm;bottom:2.4mm;font-family:'Oswald';font-weight:600;font-size:3.3mm;text-transform:uppercase;color:var(--dark);
+.autographs .box .n{position:absolute;left:3mm;right:3mm;bottom:2.4mm;font-family:'Fira Sans Extra Condensed';font-weight:600;font-size:3.3mm;text-transform:uppercase;color:var(--dark);
   border-top:.3mm solid var(--secondary);padding-top:1.2mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .autographs .box .n span{color:var(--secondary);margin-right:1mm;}
 
@@ -282,7 +282,7 @@ ${cardCss(size)}
   grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(6,1fr);}
 .gallery .ph{position:relative;overflow:hidden;border-radius:1.5mm;background:#c9d5e3;box-shadow:0 1mm 3mm rgba(0,0,0,.18);}
 .gallery .ph img{width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block;}
-.gallery .ph .cap{position:absolute;left:0;right:0;bottom:0;padding:1.5mm 2.5mm;font-family:'Oswald';font-weight:600;font-size:3mm;text-transform:uppercase;letter-spacing:.06em;color:#fff;
+.gallery .ph .cap{position:absolute;left:0;right:0;bottom:0;padding:1.5mm 2.5mm;font-family:'Fira Sans Extra Condensed';font-weight:600;font-size:3mm;text-transform:uppercase;letter-spacing:.06em;color:#fff;
   background:linear-gradient(180deg,transparent,rgba(0,0,0,.6));}
 
 /* ---------- QUOTES ---------- */
@@ -296,21 +296,21 @@ ${cardCss(size)}
 .quotes .qp.odd{transform:rotate(1deg) skewX(-3deg);border-left-color:var(--accent);}
 .quotes .qp:nth-child(3n){margin-left:8mm;} .quotes .qp:nth-child(3n+1){margin-right:8mm;}
 .quotes .qp:last-child:nth-child(odd){grid-column:1 / span 2;margin:0 30mm 0 25mm;}
-.quotes .qp p{font-family:'Oswald';font-weight:600;text-transform:uppercase;font-size:4.1mm;line-height:1.18;transform:skewX(3deg);}
+.quotes .qp p{font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:4.1mm;line-height:1.18;transform:skewX(3deg);}
 .quotes .qp b{display:block;margin-top:2.4mm;font-family:'Roboto';font-weight:700;font-size:2.9mm;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);transform:skewX(3deg);}
 .quotes .qp.odd b{color:color-mix(in srgb,var(--secondary) 70%,#fff);}
 .quotes .qp::after{content:"";position:absolute;right:-1mm;bottom:-1mm;width:10mm;height:10mm;background:var(--secondary);clip-path:polygon(100% 0,100% 100%,0 100%);opacity:.9;}
 .quotes .qp.odd::after{background:var(--accent);}
 /* ---------- BACK COVER: card wall ---------- */
 .backcover .collect{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 42}mm;}
-.backcover .collect .ttl{font-family:'Russo One';font-weight:400;text-transform:uppercase;font-size:9.5mm;line-height:1;color:#fff;margin-bottom:6mm;}
+.backcover .collect .ttl{font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:9.5mm;line-height:1;color:#fff;margin-bottom:6mm;}
 .backcover .collect .ttl span{display:block;font-size:6mm;color:var(--accent);margin-top:1.5mm;letter-spacing:.06em;}
 .backcover .wall{display:grid;grid-template-columns:repeat(9,19mm);justify-content:space-between;row-gap:4mm;}
 .backcover .mini{position:relative;}
 .backcover .mini .mc{width:19mm;height:${(19 / size.w * size.h).toFixed(2)}mm;overflow:hidden;box-shadow:0 .6mm 1.5mm rgba(0,0,0,.5);}
 .backcover .mini .mc .card{transform-origin:top left;transform:translate(${(-size.bleed * 19 / size.w).toFixed(2)}mm,${(-size.bleed * 19 / size.w).toFixed(2)}mm) scale(${(19 / size.w).toFixed(4)});}
 .backcover .mini{height:${(19 / size.w * size.h + 4).toFixed(1)}mm;}
-.backcover .mini span{position:absolute;left:0;right:0;bottom:0;text-align:center;font-family:'Oswald';font-weight:600;font-size:2.6mm;color:rgba(255,255,255,.75);}
+.backcover .mini span{position:absolute;left:0;right:0;bottom:0;text-align:center;font-family:'Fira Sans Extra Condensed';font-weight:600;font-size:2.6mm;color:rgba(255,255,255,.75);}
 /* ---------- BACK COVER ---------- */
 .backcover{background:var(--dark);color:#fff;}
 .backcover > .photo{position:absolute;inset:0;}
@@ -325,7 +325,7 @@ ${cardCss(size)}
 .backcover .rink i{position:absolute;top:0;bottom:0;width:1mm;background:rgba(60,110,200,.9);}
 .backcover .rink i.a{left:30%;} .backcover .rink i.b{right:30%;}
 .backcover .cta{position:absolute;left:${bleed + 12}mm;right:${bleed + 12}mm;bottom:${bleed + 22}mm;max-width:120mm;}
-.backcover .cta h2{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:13mm;line-height:.95;}
+.backcover .cta h2{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:13mm;line-height:.95;}
 .backcover .cta h2 span{color:var(--accent);}
 .backcover .cta p{font-size:4mm;line-height:1.35;margin-top:3mm;max-width:120mm;color:rgba(255,255,255,.9);}
 .backcover .qr{position:absolute;right:${bleed + 12}mm;bottom:${bleed + 20}mm;width:38mm;height:38mm;background:#fff;border-radius:2mm;padding:2.5mm;display:flex;align-items:center;justify-content:center;}
@@ -335,7 +335,7 @@ ${cardCss(size)}
 .backcover .brand img{height:8mm;}
 .backcover .brand small{font-size:3mm;color:rgba(255,255,255,.7);}
 .backcover .top{position:absolute;left:${bleed + 12}mm;right:${bleed + 12}mm;top:${bleed + 14}mm;display:flex;align-items:center;justify-content:space-between;}
-.backcover .top .name{font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:7mm;line-height:1;}
+.backcover .top .name{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:7mm;line-height:1;}
 .backcover .top .name small{display:block;font-family:'Roboto';font-weight:400;text-transform:none;font-size:3.4mm;color:rgba(255,255,255,.75);margin-top:1.5mm;}
 .backcover .top img{height:20mm;object-fit:contain;}
 `;
