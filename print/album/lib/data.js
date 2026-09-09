@@ -221,6 +221,7 @@ async function loadTeam(teamDir, cacheDir) {
     teamCutout: await asset(['team-cutout', 'cutout'], 3000),
     gallery: [],
   };
+  assets.bg = fs.existsSync(path.join(assetsDir, 'bg-ice.jpg')) ? await prepareImage(path.join(assetsDir, 'bg-ice.jpg'), path.join(cacheDir, 'assets'), 1600) : null;
   assets.coverAspect = await imageAspect(assets.cover);
   // No qr.png but a link in team.json → generate the QR code (python `qrcode` package).
   if (!assets.qr && team.qrUrl) assets.qr = fileUrl(makeQr(team.qrUrl, path.join(cacheDir, 'assets')));

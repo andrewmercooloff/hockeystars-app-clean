@@ -22,12 +22,21 @@
   "album": {
     "slotStyle": "ghost",
     "galleryTitle": "Жизнь команды",
-    "extraPages": [
+    "pages": [
+      "history",
+      "team",
+      "intro",
+      "team",
+      "team",
       "gallery",
       "gallery",
+      "team",
       "gallery-fans:Наши болельщики",
-      "autographs",
-      "quotes"
+      "quotes",
+      "facts",
+      "glossary",
+      "profile",
+      "autographs"
     ]
   },
   "texts": {

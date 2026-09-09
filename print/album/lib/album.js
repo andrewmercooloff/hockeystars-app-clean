@@ -48,6 +48,43 @@ ${cardCss(size)}
 .safe{position:absolute;left:${bleed + 7}mm;top:${bleed + 7}mm;right:${bleed + 7}mm;bottom:${bleed + 7}mm;}
 .pgnum{position:absolute;bottom:${bleed + 3}mm;font-family:'Oswald';font-weight:600;font-size:3.2mm;color:var(--primary);opacity:.8;}
 .pgnum.l{left:${bleed + 8}mm;} .pgnum.r{right:${bleed + 8}mm;}
+/* page background: soft ice gradient + blurred arena photo + a wide brand-colour band under the header */
+.page.ice{background:linear-gradient(180deg,#f3f6fa 0%,#e7edf4 55%,#dfe7f0 100%);}
+.bgimg{position:absolute;inset:0;overflow:hidden;opacity:.28;}
+.bgimg img{width:100%;height:100%;object-fit:cover;}
+.bgband{position:absolute;left:-20mm;right:-20mm;top:-6mm;height:${bleed + 46}mm;transform:skewY(-3deg);
+  background:linear-gradient(90deg,color-mix(in srgb,var(--primary) 92%,#fff),color-mix(in srgb,var(--secondary) 80%,var(--primary)));opacity:.13;}
+
+/* facts / glossary / profile pages */
+.facts .hdr,.glossary .hdr,.profile .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
+.facts .hdr .title,.glossary .hdr .title,.profile .hdr .title{font-size:11mm;}
+.facts .hdr .sub,.glossary .hdr .sub,.profile .hdr .sub{font-family:'Oswald';font-weight:600;text-transform:uppercase;font-size:3.6mm;letter-spacing:.14em;color:var(--secondary);margin-top:2.5mm;}
+.facts .goal{position:absolute;right:${bleed + 12}mm;top:${bleed + 8}mm;width:40mm;height:26mm;opacity:.6;}
+.facts .fgrid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 44}mm;bottom:${bleed + 16}mm;display:grid;grid-template-columns:1fr 1fr;gap:6mm 8mm;grid-auto-rows:1fr;}
+.facts .f{position:relative;display:flex;align-items:center;padding:0 5mm;gap:5mm;background:rgba(255,255,255,.88);border-left:1.4mm solid var(--secondary);padding:4mm 5mm 4mm 4mm;box-shadow:0 1mm 3mm rgba(20,40,70,.08);}
+.facts .f .pk{position:relative;flex:0 0 30mm;height:19mm;display:flex;align-items:center;justify-content:center;}
+.facts .f .pk svg{position:absolute;inset:0;width:100%;height:100%;}
+.facts .f .pk b{position:relative;font-family:'Russo One';font-weight:400;font-size:5.4mm;color:#fff;line-height:1;}
+.facts .f p{font-size:3.5mm;line-height:1.3;color:#1b2940;}
+.glossary .sticks{position:absolute;right:${bleed + 12}mm;top:${bleed + 8}mm;width:26mm;height:26mm;opacity:.8;}
+.glossary .ggrid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 44}mm;bottom:${bleed + 16}mm;display:grid;grid-template-columns:1fr 1fr;gap:4mm 8mm;align-content:space-between;}
+.glossary .g{background:linear-gradient(135deg,var(--primary),var(--dark));color:#fff;padding:3mm 5mm;transform:skewX(-6deg);border-left:1.4mm solid var(--secondary);}
+.glossary .g.alt{background:linear-gradient(135deg,var(--secondary),color-mix(in srgb,var(--secondary) 70%,#000));border-left-color:#fff;}
+.glossary .g b{display:block;font-family:'Oswald';font-weight:700;text-transform:uppercase;font-size:4.6mm;letter-spacing:.04em;transform:skewX(6deg);}
+.glossary .g span{display:block;font-size:3.3mm;line-height:1.3;margin-top:1mm;color:rgba(255,255,255,.88);transform:skewX(6deg);}
+.profile .photo{position:absolute;right:${bleed + 12}mm;top:${bleed + 42}mm;width:${size.w}mm;height:${size.h}mm;}
+.profile .photo .frame{position:absolute;inset:0;border:.5mm dashed var(--primary);background:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;font-family:'Oswald';font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-size:3.6mm;color:var(--primary);}
+.profile .fields{position:absolute;left:${bleed + 10}mm;right:${bleed + 12 + size.w + 10}mm;top:${bleed + 42}mm;}
+.profile .fld{display:flex;align-items:flex-end;gap:3mm;height:12.5mm;}
+.profile .fld b{font-family:'Oswald';font-weight:600;text-transform:uppercase;font-size:3.6mm;color:var(--dark);white-space:nowrap;padding-bottom:1mm;}
+.profile .fld span{flex:1;border-bottom:.4mm solid var(--secondary);height:8mm;}
+.profile .goals{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 172}mm;}
+.profile .goals h5{font-family:'Russo One';font-weight:400;text-transform:uppercase;font-size:6.5mm;color:var(--dark);margin-bottom:4mm;}
+.profile .goal{display:flex;align-items:center;gap:4mm;margin-bottom:6mm;}
+.profile .goal i{flex:1;border-bottom:.4mm solid var(--primary);height:8mm;}
+.profile .goal .pucknum{position:relative;width:14mm;height:9mm;flex:0 0 14mm;display:flex;align-items:center;justify-content:center;}
+.profile .goal .pucknum svg{position:absolute;inset:0;width:100%;height:100%;}
+.profile .goal .pucknum b{position:relative;color:#fff;font-family:'Oswald';font-weight:700;font-size:4.6mm;}
 
 /* corner ornaments: torn diagonal bands */
 .orn{position:absolute;pointer-events:none;}
@@ -306,7 +343,8 @@ ${cardCss(size)}
 
 // Ice decor for inner pages: faint half rink in team colours + skate scratches.
 const deco = (data, rinkOpacity = 0.14) =>
-  `<div class="deco">${rinkSvg(data.colors.primary, data.colors.secondary, rinkOpacity)}${scratchesSvg('rgba(90,120,160,.5)', 0.35)}</div>`;
+  `${data.assets.bg ? `<div class="bgimg"><img src="${data.assets.bg}"></div>` : ''}<div class="bgband"></div>
+  <div class="deco">${rinkSvg(data.colors.primary, data.colors.secondary, rinkOpacity)}${scratchesSvg('rgba(90,120,160,.5)', 0.35)}</div>`;
 
 const arrow = (color) => `<svg viewBox="0 0 60 44" fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
   <path d="M6 8 C 22 6, 40 10, 52 30"/><path d="M40 30 L 52 32 L 55 20"/></svg>`;
@@ -405,10 +443,14 @@ function teamPage(data, cards, pageNo, idx, total) {
     )
     .join('');
   const even = pageNo % 2 === 0;
+  const allCoach = cards.every((c) => c.type === 'coach' || c.photo === undefined || c.type === 'club');
+  const ribbons = new Set(cards.map((c) => c.ribbon));
+  const title = cards.some((c) => c.type === 'coach') && !cards.some((c) => c.type === 'player') ? 'Тренерский штаб'
+    : ribbons.size === 1 && cards[0].ribbon && !cards.some((c) => c.type === 'player') ? cards[0].ribbon : 'Команда';
   return `<section class="page team ice${isDense(data.cardSize) ? ' dense' : ''}">
     ${deco(data, 0.1)}
     <div class="orn br" style="opacity:.9"></div>
-    <div class="hdr"><div class="logo">${logo}</div><div style="text-align:right"><div class="title">Команда</div><div class="sub">${esc(t.name)} · карточки ${cards[0].index}–${cards[cards.length - 1].index} из ${data.cards.length}</div></div></div>
+    <div class="hdr"><div class="logo">${logo}</div><div style="text-align:right"><div class="title">${esc(title)}</div><div class="sub">${esc(t.name)} · карточки ${cards[0].index}–${cards[cards.length - 1].index} из ${data.cards.length}</div></div></div>
     <div class="grid">${slots}</div>
     <div class="pgnum ${even ? 'l' : 'r'}">${pageNo}</div>
   </section>`;
@@ -466,6 +508,79 @@ function quotesPage(data, pageNo) {
     ${goalSvg(data.colors.secondary, `color-mix(in srgb,${data.colors.primary} 45%,transparent)`)}
     <div class="hdr"><div class="title">Фразы великих хоккеистов</div>${sticksSvg(data.colors.primary, data.colors.secondary, data.colors.dark)}</div>
     <div class="qgrid">${plates}</div>
+    <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
+  </section>`;
+}
+
+const DEFAULT_FACTS = [
+  { v: '160 км/ч', t: 'Скорость полёта шайбы после щелчка у профессионалов — быстрее поезда!' },
+  { v: '-9 °C', t: 'Температура льда на арене. Чем холоднее лёд, тем он быстрее.' },
+  { v: '170 г', t: 'Вес шайбы. Перед игрой её замораживают, чтобы она меньше подпрыгивала.' },
+  { v: '1946', t: 'Год первого чемпионата СССР по хоккею. Наша страна — 27-кратный чемпион мира.' },
+  { v: '3 × 20', t: 'Три периода по 20 минут. Но матч длится больше двух часов!' },
+  { v: '12 000', t: 'Столько шайб уходит на сезон в одной хоккейной лиге.' },
+  { v: '50 000', t: 'Больше 50 тысяч мальчишек и девчонок занимаются хоккеем в России.' },
+  { v: '#99', t: 'Номер Уэйна Гретцки — единственный номер, закреплённый за игроком во всей НХЛ.' },
+];
+// "Знаешь ли ты?" — fun hockey facts on puck-shaped badges; the client asked for pages kids will enjoy.
+function factsPage(data, pageNo) {
+  const list = (data.team.facts?.length ? data.team.facts : DEFAULT_FACTS).slice(0, 8);
+  return `<section class="page facts ice">
+    ${deco(data)}
+    <div class="orn tr"></div>
+    <div class="hdr"><div class="title">Знаешь ли ты?</div><div class="sub">Интересные факты о хоккее</div></div>
+    <div class="fgrid">${list
+      .map((f, i) => `<div class="f"><div class="pk">${puckSvg(i % 2 ? data.colors.secondary : data.colors.dark, 'rgba(255,255,255,.55)')}<b>${esc(f.v)}</b></div><p>${esc(f.t)}</p></div>`)
+      .join('')}</div>
+    ${goalSvg(data.colors.secondary, `color-mix(in srgb,${data.colors.primary} 45%,transparent)`)}
+    <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
+  </section>`;
+}
+
+const DEFAULT_GLOSSARY = [
+  ['Буллит', 'штрафной бросок один на один с вратарём'],
+  ['Хет-трик', 'три гола одного игрока за матч'],
+  ['Овертайм', 'дополнительное время, если счёт равный'],
+  ['Силовой приём', 'разрешённый толчок соперника корпусом'],
+  ['Пас', 'передача шайбы партнёру'],
+  ['Щелчок', 'самый сильный бросок с замахом'],
+  ['Дриблинг', 'ведение шайбы, обводка соперника'],
+  ['Форчекинг', 'давление на соперника в его зоне'],
+  ['Большинство', 'когда у соперника удалён игрок'],
+  ['Сэйв', 'спасение — вратарь отбил шайбу'],
+  ['Ассист', 'голевая передача'],
+  ['Кистевой', 'быстрый точный бросок кистями'],
+  ['Плей-офф', 'игры на вылет за кубок'],
+  ['Капитан', 'игрок с буквой «К» — лидер команды'],
+  ['Смена', 'выход пятёрки на лёд на 40–60 секунд'],
+  ['Проброс', 'шайба через две линии — свисток'],
+];
+// "Хоккейный словарик" — two-column glossary on skewed orange/dark tags.
+function glossaryPage(data, pageNo) {
+  const list = (data.team.glossary?.length ? data.team.glossary : DEFAULT_GLOSSARY).slice(0, 16);
+  return `<section class="page glossary ice">
+    ${deco(data)}
+    <div class="orn br" style="opacity:.9"></div>
+    <div class="hdr"><div class="title">Хоккейный словарик</div><div class="sub">Говори как профи</div></div>
+    <div class="ggrid">${list.map(([w, d], i) => `<div class="g ${i % 3 === 1 ? 'alt' : ''}"><b>${esc(w)}</b><span>${esc(d)}</span></div>`).join('')}</div>
+    ${sticksSvg(data.colors.primary, data.colors.secondary, data.colors.dark)}
+    <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
+  </section>`;
+}
+
+// "Моя анкета" — a fill-in page for the album owner (name, number, dream, favourite player...).
+function profilePage(data, pageNo) {
+  const fields = data.team.profileFields || [
+    'Меня зовут', 'Мой номер', 'Моя позиция', 'Хват', 'Любимый игрок', 'Любимая команда', 'Моя мечта', 'Лучший момент сезона', 'Мой девиз',
+  ];
+  const t = data.team;
+  return `<section class="page profile ice">
+    ${deco(data)}
+    <div class="orn tr"></div>
+    <div class="hdr"><div class="title">Моя анкета</div><div class="sub">${esc(t.shortName || t.name)} · сезон ${esc(t.season)}</div></div>
+    <div class="photo"><div class="frame"><span>Моё фото</span></div><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i></div>
+    <div class="fields">${fields.map((f) => `<div class="fld"><b>${esc(f)}</b><span></span></div>`).join('')}</div>
+    <div class="goals"><h5>Мои цели на сезон</h5>${[1, 2, 3].map((n) => `<div class="goal"><span class="pucknum">${puckSvg(data.colors.secondary, 'rgba(255,255,255,.5)')}<b>${n}</b></span><i></i></div>`).join('')}</div>
     <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
   </section>`;
 }
@@ -598,16 +713,21 @@ function albumHtml(data) {
   const per = slotsPerPage(data.cardSize);
   for (let i = 0; i < data.cards.length; i += per) chunks.push(data.cards.slice(i, i + per));
 
-  // Inner page order: intro, team, history, team, team, ... then filler pages so the total is a multiple of 4.
+  // Inner page order. With `album.pages` in team.json the whole order is explicit ("team" takes the next chunk of cards);
+  // otherwise: intro, team, history, team, team, ... + extraPages, then filler pages so the total is a multiple of 4.
   const inner = [];
-  inner.push((n) => introPage(data, n));
-  if (chunks.length) inner.push((n) => teamPage(data, chunks[0], n));
-  inner.push((n) => historyPage(data, n));
-  chunks.slice(1).forEach((chunk) => inner.push((n) => teamPage(data, chunk, n)));
-  // Extra pages: "stats" (match log), "gallery" (assets/gallery/*), "gallery:Заголовок".
-  // With no explicit list, gallery photos (if any) get their own page automatically.
   const albumCfg = data.team.album || {};
-  const extra = albumCfg.extraPages?.length ? albumCfg.extraPages : data.assets.gallery.length ? ['gallery'] : [];
+  let chunkIdx = 0;
+  let extra;
+  if (albumCfg.pages?.length) {
+    extra = albumCfg.pages;
+  } else {
+    inner.push((n) => introPage(data, n));
+    if (chunks.length) inner.push((n) => teamPage(data, chunks[chunkIdx++], n));
+    inner.push((n) => historyPage(data, n));
+    extra = albumCfg.extraPages?.length ? albumCfg.extraPages : data.assets.gallery.length ? ['gallery'] : [];
+    extra = [...Array(chunks.length - chunkIdx).fill('team'), ...extra];
+  }
   let galleryOffset = 0;
   const people = data.cards.filter((c) => ['player', 'coach', 'legend'].includes(c.type));
   let autographOffset = 0;
@@ -617,7 +737,14 @@ function albumHtml(data) {
     return chunk;
   };
   for (const kind of extra) {
-    if (kind === 'stats') inner.push((n) => statsPage(data, n));
+    if (kind === 'team') { if (chunkIdx < chunks.length) { const chunk = chunks[chunkIdx++]; inner.push((n) => teamPage(data, chunk, n)); } }
+    else if (kind === 'intro') inner.push((n) => introPage(data, n));
+    else if (kind === 'history') inner.push((n) => historyPage(data, n));
+    else if (kind === 'facts') inner.push((n) => factsPage(data, n));
+    else if (kind === 'glossary') inner.push((n) => glossaryPage(data, n));
+    else if (kind === 'profile') inner.push((n) => profilePage(data, n));
+    else if (kind === 'notes') inner.push((n) => notesPage(data, n));
+    else if (kind === 'stats') inner.push((n) => statsPage(data, n));
     else if (kind === 'quotes') inner.push((n) => quotesPage(data, n));
     else if (kind === 'autographs') {
       const chunk = nextAutographs();
@@ -636,6 +763,7 @@ function albumHtml(data) {
       if (tiles.length) inner.push((n) => galleryPage(data, n, tiles, title));
     }
   }
+  while (chunkIdx < chunks.length) { const chunk = chunks[chunkIdx++]; inner.push((n) => teamPage(data, chunk, n)); }
   // Saddle-stitched booklet: pad to a multiple of 4 pages — leftover gallery photos, then autographs, then the match log.
   let statsUsed = extra.includes('stats');
   while ((inner.length + 2) % 4 !== 0) {
