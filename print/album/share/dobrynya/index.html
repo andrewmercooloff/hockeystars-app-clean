@@ -4,38 +4,54 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
   <meta name="robots" content="noindex, nofollow">
-  <title>HK «Дobrynya» — альбом 2026–2027</title>
+  <title>Дobrynya — альбом 2026–2027</title>
+  <link rel="icon" href="logo.png" type="image/png">
   <style>
     :root {
       color-scheme: dark;
-      --bg: #0a1628;
-      --panel: #111f36;
+      --panel: rgba(17, 31, 54, 0.88);
       --accent: #f58220;
       --text: #eef3fb;
-      --muted: #8fa3c0;
+      --muted: #c8d6ea;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
       height: 100%;
-      background: var(--bg);
       color: var(--text);
       font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
       overflow: hidden;
-      touch-action: pan-y;
     }
-    body { display: flex; flex-direction: column; min-height: 100dvh; }
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100dvh;
+      background: #0a1628 url("ice-bg.jpg") center / cover no-repeat fixed;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 18, 34, 0.68);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body > * { position: relative; z-index: 1; }
 
     header {
       flex: 0 0 auto;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      padding: 10px 16px; background: var(--panel); border-bottom: 1px solid rgba(255,255,255,.08);
-      z-index: 5;
+      flex-wrap: wrap;
+      padding: 8px 14px; background: var(--panel);
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      backdrop-filter: blur(8px);
     }
-    header h1 { font-size: 15px; font-weight: 600; line-height: 1.25; }
-    header p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .brand img.logo { height: 42px; width: auto; display: block; filter: drop-shadow(0 2px 6px rgba(0,0,0,.35)); }
+    .brand .tagline { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
     .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
     .tabs button {
-      border: 1px solid rgba(255,255,255,.15); background: transparent; color: var(--text);
+      border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.06); color: var(--text);
       padding: 6px 12px; border-radius: 999px; font-size: 13px; cursor: pointer;
     }
     .tabs button.active { background: var(--accent); border-color: var(--accent); color: #111; font-weight: 600; }
@@ -49,7 +65,9 @@
       overflow: hidden;
       padding: 6px 44px;
       min-height: 0;
+      touch-action: pan-y;
     }
+    main.cards-mode { touch-action: none; }
 
     .stage {
       width: 100%;
@@ -57,7 +75,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      perspective: 2200px;
       min-height: 0;
     }
 
@@ -67,7 +84,6 @@
       align-items: stretch;
       flex-shrink: 0;
       box-shadow: 0 18px 50px rgba(0,0,0,.55);
-      transform-style: preserve-3d;
       background: #000;
     }
 
@@ -80,21 +96,34 @@
       background: #0d1520;
       min-width: 0;
     }
-    .half.left  { border-right: 1px solid rgba(255,255,255,.08); }
-    .half img {
-      width: 100%; height: 100%; object-fit: contain; display: block;
-      user-select: none; -webkit-user-drag: none; pointer-events: none;
-      background: #0d1520;
-    }
-    .half.empty { background: linear-gradient(135deg, #0d1520, #162236); }
-
-    .book.spread-mode .spread-img {
+    .half.left { border-right: 1px solid rgba(255,255,255,.08); }
+    .half img,
+    .book.spread-mode .spread-img,
+    .book.card-mode .card-img {
       width: 100%; height: 100%; object-fit: contain; display: block;
       user-select: none; -webkit-user-drag: none;
+      background: #0d1520;
     }
 
     .book { transition: opacity .25s ease; }
     .book.turning { opacity: .15; }
+
+    .card-side {
+      display: none;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .card-side.visible { display: flex; }
+    .card-side button {
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .card-side button.active { background: var(--accent); color: #111; border-color: var(--accent); font-weight: 600; }
 
     .nav {
       position: absolute; top: 50%; transform: translateY(-50%);
@@ -107,12 +136,31 @@
     .nav.prev { left: 4px; }
     .nav.next { right: 4px; }
 
+    .zoom-btn {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      width: 46px; height: 46px;
+      border: none; border-radius: 50%;
+      background: rgba(17,31,54,.92);
+      color: #fff;
+      font-size: 22px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.35);
+      cursor: pointer;
+      z-index: 7;
+      display: none;
+    }
+    .zoom-btn.visible { display: block; }
+    .zoom-btn:active { background: var(--accent); color: #111; }
+
     footer {
       flex: 0 0 auto;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
-      background: var(--panel); border-top: 1px solid rgba(255,255,255,.08);
-      font-size: 13px; color: var(--muted); z-index: 5;
+      padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+      background: var(--panel);
+      border-top: 1px solid rgba(255,255,255,.1);
+      font-size: 13px; color: var(--muted);
+      backdrop-filter: blur(8px);
     }
     .counter { color: var(--text); font-weight: 600; }
 
@@ -124,23 +172,76 @@
     .loading.hidden { display: none; }
     .loading progress { width: min(220px, 70vw); accent-color: var(--accent); }
 
+    .zoom-overlay {
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(0,0,0,.92);
+      display: none;
+      flex-direction: column;
+    }
+    .zoom-overlay.open { display: flex; }
+    .zoom-toolbar {
+      flex: 0 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px calc(8px + env(safe-area-inset-top));
+      background: rgba(17,31,54,.95);
+    }
+    .zoom-toolbar span { font-size: 14px; color: var(--text); }
+    .zoom-toolbar button {
+      border: none; background: transparent; color: #fff;
+      font-size: 28px; line-height: 1; cursor: pointer; padding: 4px 8px;
+    }
+    .zoom-stage {
+      flex: 1 1 auto;
+      overflow: hidden;
+      touch-action: none;
+      position: relative;
+    }
+    .zoom-stage img {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(1);
+      transform-origin: center center;
+      max-width: none;
+      max-height: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    .zoom-controls {
+      flex: 0 0 auto;
+      display: flex; justify-content: center; gap: 16px;
+      padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+      background: rgba(17,31,54,.95);
+    }
+    .zoom-controls button {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(255,255,255,.08);
+      color: #fff; font-size: 22px; cursor: pointer;
+    }
+    .zoom-controls button:active { background: var(--accent); color: #111; }
+
     @media (max-width: 640px) {
       main { padding: 2px 30px; }
       header { flex-wrap: wrap; }
+      .brand img.logo { height: 36px; }
       .nav { width: 28px; height: 44px; font-size: 20px; }
     }
   </style>
 </head>
 <body>
   <header>
-    <div>
-      <h1>HK «Дobrynya» — альбом 2026–2027</h1>
-      <p>Открытый разворот — видны левая и правая страницы</p>
+    <div class="brand">
+      <img class="logo" src="logo.png" alt="HK «Дobrynya»">
+      <span class="tagline">Альбом 2026–2027</span>
     </div>
     <div class="tabs">
       <button type="button" class="active" data-mode="spreads">Развороты</button>
       <button type="button" data-mode="pages">Страницы</button>
       <button type="button" data-mode="cards">Карточки</button>
+    </div>
+    <div class="card-side" id="card-side">
+      <button type="button" class="active" data-side="front">Лицо</button>
+      <button type="button" data-side="back">Оборот</button>
     </div>
   </header>
 
@@ -154,12 +255,28 @@
       <div class="book spread-mode" id="book"></div>
     </div>
     <button type="button" class="nav next" id="next" aria-label="Вперёд">›</button>
+    <button type="button" class="zoom-btn" id="zoom-open" aria-label="Увеличить" title="Лупа">🔍</button>
   </main>
 
   <footer>
     <span class="counter" id="counter">—</span>
-    <span>Свайп или тап по краю</span>
+    <span id="hint">Свайп или тап по краю</span>
   </footer>
+
+  <div class="zoom-overlay" id="zoom">
+    <div class="zoom-toolbar">
+      <span id="zoom-title">Карточка</span>
+      <button type="button" id="zoom-close" aria-label="Закрыть">×</button>
+    </div>
+    <div class="zoom-stage" id="zoom-stage">
+      <img id="zoom-img" alt="">
+    </div>
+    <div class="zoom-controls">
+      <button type="button" id="zoom-out" aria-label="Уменьшить">−</button>
+      <button type="button" id="zoom-reset" aria-label="Сброс">◎</button>
+      <button type="button" id="zoom-in" aria-label="Увеличить">+</button>
+    </div>
+  </div>
 
   <script>
     const REPO = 'andrewmercooloff/hockeystars-app-clean';
@@ -169,17 +286,14 @@
 
     const albumPages = Array.from({ length: 16 }, (_, i) => IMG(`album-${String(i + 1).padStart(2, '0')}.jpg`));
     const spreadPages = Array.from({ length: 8 }, (_, i) => IMG(`spread-${String(i + 1).padStart(2, '0')}.jpg`));
+    const cardFronts = Array.from({ length: 36 }, (_, i) => IMG(`card-${String(i + 1).padStart(2, '0')}-front.jpg`));
+    const cardBacks = Array.from({ length: 36 }, (_, i) => IMG(`card-${String(i + 1).padStart(2, '0')}-back.jpg`));
 
     const modes = {
-      spreads: {
-        label: 'разворот',
-        type: 'spread',
-        items: spreadPages,
-      },
+      spreads: { label: 'разворот', type: 'spread', items: spreadPages },
       pages: {
         label: 'разворот',
         type: 'book',
-        // Пары страниц как в открытом журнале: обложка одна, дальше 2–3, 4–5 …
         pairs: [
           { single: 0, caption: 'Обложка' },
           { left: 1, right: 2 }, { left: 3, right: 4 }, { left: 5, right: 6 },
@@ -189,15 +303,12 @@
         ],
         urls: albumPages,
       },
-      cards: {
-        label: 'лист',
-        type: 'spread',
-        items: [IMG('cards-all-fronts.jpg'), IMG('cards-all-backs.jpg')],
-      },
+      cards: { label: 'карточка', type: 'card', count: 36 },
     };
 
     let mode = 'spreads';
     let index = 0;
+    let cardSide = 'front';
     const cache = new Map();
 
     const bookEl = document.getElementById('book');
@@ -206,10 +317,39 @@
     const loadingText = document.getElementById('loading-text');
     const loadingBar = document.getElementById('loading-bar');
     const counterEl = document.getElementById('counter');
+    const hintEl = document.getElementById('hint');
     const prevBtn = document.getElementById('prev');
     const nextBtn = document.getElementById('next');
     const tabs = document.querySelectorAll('.tabs button');
     const mainEl = document.getElementById('main');
+    const cardSideEl = document.getElementById('card-side');
+    const cardSideBtns = document.querySelectorAll('.card-side button');
+    const zoomOpenBtn = document.getElementById('zoom-open');
+    const zoomOverlay = document.getElementById('zoom');
+    const zoomImg = document.getElementById('zoom-img');
+    const zoomStage = document.getElementById('zoom-stage');
+    const zoomTitle = document.getElementById('zoom-title');
+
+    let zoomScale = 1;
+    let zoomPanX = 0;
+    let zoomPanY = 0;
+    let pinchStartDist = 0;
+    let pinchStartScale = 1;
+    let dragStart = null;
+
+    function currentCardSrc() {
+      const list = cardSide === 'front' ? cardFronts : cardBacks;
+      return list[index];
+    }
+
+    function currentZoomSrc() {
+      const cfg = modes[mode];
+      if (cfg.type === 'card') return currentCardSrc();
+      if (cfg.type === 'spread') return cfg.items[index];
+      const pair = cfg.pairs[index];
+      if (pair.single != null) return cfg.urls[pair.single];
+      return cfg.urls[pair.right];
+    }
 
     function loadImage(src) {
       if (cache.has(src)) return cache.get(src);
@@ -230,22 +370,19 @@
       loadingBar.max = total;
       loadingBar.value = 0;
       await Promise.all(urls.map(async (src) => {
-        try {
-          await loadImage(src);
-        } catch (_) { /* покажем с broken — не блокируем весь альбом */ }
+        try { await loadImage(src); } catch (_) {}
         done += 1;
         loadingBar.value = done;
         loadingText.textContent = `Загрузка… ${done}/${total}`;
       }));
     }
 
-    function halfHtml(side, src, empty) {
-      if (empty) return `<div class="half ${side} empty"></div>`;
+    function halfHtml(side, src) {
       return `<div class="half ${side}"><img src="${src}" alt="" loading="eager" decoding="async"></div>`;
     }
 
     function bookRatio() {
-      if (bookEl.classList.contains('single-mode')) return 210 / 297;
+      if (bookEl.classList.contains('single-mode') || bookEl.classList.contains('card-mode')) return 60 / 85;
       return 420 / 297;
     }
 
@@ -257,12 +394,32 @@
       const ratio = bookRatio();
       let w = maxW;
       let h = w / ratio;
-      if (h > maxH) {
-        h = maxH;
-        w = h * ratio;
-      }
+      if (h > maxH) { h = maxH; w = h * ratio; }
       bookEl.style.width = `${Math.floor(w)}px`;
       bookEl.style.height = `${Math.floor(h)}px`;
+    }
+
+    function applyZoomTransform() {
+      zoomImg.style.transform = `translate(calc(-50% + ${zoomPanX}px), calc(-50% + ${zoomPanY}px)) scale(${zoomScale})`;
+    }
+
+    function openZoom() {
+      const src = currentZoomSrc();
+      zoomTitle.textContent = mode === 'cards'
+        ? `Карточка ${index + 1} · ${cardSide === 'front' ? 'лицо' : 'оборот'}`
+        : 'Увеличение';
+      zoomImg.src = src;
+      zoomScale = mode === 'cards' ? 1.8 : 1.2;
+      zoomPanX = 0;
+      zoomPanY = 0;
+      applyZoomTransform();
+      zoomOverlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeZoom() {
+      zoomOverlay.classList.remove('open');
+      document.body.style.overflow = '';
     }
 
     function renderSpread(src) {
@@ -271,16 +428,20 @@
       fitBook();
     }
 
+    function renderCard() {
+      bookEl.className = 'book card-mode';
+      bookEl.innerHTML = `<img class="card-img" src="${currentCardSrc()}" alt="" decoding="async">`;
+      fitBook();
+    }
+
     function renderBookPair(pair) {
       const urls = modes.pages.urls;
       if (pair.single != null) {
         bookEl.className = 'book single-mode';
-        bookEl.innerHTML = halfHtml('left', urls[pair.single], false);
+        bookEl.innerHTML = halfHtml('left', urls[pair.single]);
       } else {
         bookEl.className = 'book page-mode';
-        bookEl.innerHTML =
-          halfHtml('left', urls[pair.left], false) +
-          halfHtml('right', urls[pair.right], false);
+        bookEl.innerHTML = halfHtml('left', urls[pair.left]) + halfHtml('right', urls[pair.right]);
       }
       fitBook();
     }
@@ -288,18 +449,16 @@
     function renderCurrent() {
       bookEl.classList.add('turning');
       const cfg = modes[mode];
-      if (cfg.type === 'spread') {
-        renderSpread(cfg.items[index]);
-      } else {
-        renderBookPair(cfg.pairs[index]);
-      }
+      if (cfg.type === 'spread') renderSpread(cfg.items[index]);
+      else if (cfg.type === 'card') renderCard();
+      else renderBookPair(cfg.pairs[index]);
       requestAnimationFrame(() => bookEl.classList.remove('turning'));
       updateNav();
     }
 
     function updateNav() {
       const cfg = modes[mode];
-      const total = cfg.type === 'spread' ? cfg.items.length : cfg.pairs.length;
+      const total = cfg.type === 'book' ? cfg.pairs.length : (cfg.type === 'card' ? cfg.count : cfg.items.length);
       const n = index + 1;
       const pair = cfg.type === 'book' ? cfg.pairs[index] : null;
       let detail = `${n} / ${total} · ${cfg.label}`;
@@ -308,13 +467,20 @@
         else detail += ` · стр. ${pair.left + 1} и ${pair.right + 1}`;
       }
       counterEl.textContent = detail;
+
+      const cardsActive = mode === 'cards';
+      cardSideEl.classList.toggle('visible', cardsActive);
+      mainEl.classList.toggle('cards-mode', cardsActive);
+      zoomOpenBtn.classList.toggle('visible', cardsActive);
+      hintEl.textContent = cardsActive ? 'Свайп · 🔍 лупа · двойной тап' : 'Свайп или тап по краю';
+
       prevBtn.disabled = index <= 0;
       nextBtn.disabled = index >= total - 1;
     }
 
     function go(delta) {
       const cfg = modes[mode];
-      const total = cfg.type === 'spread' ? cfg.items.length : cfg.pairs.length;
+      const total = cfg.type === 'book' ? cfg.pairs.length : (cfg.type === 'card' ? cfg.count : cfg.items.length);
       const next = index + delta;
       if (next < 0 || next >= total) return;
       index = next;
@@ -326,7 +492,10 @@
       index = 0;
       tabs.forEach((btn) => btn.classList.toggle('active', btn.dataset.mode === mode));
       loadingEl.classList.remove('hidden');
-      const urls = mode === 'pages' ? albumPages : modes[mode].items;
+      let urls;
+      if (mode === 'pages') urls = albumPages;
+      else if (mode === 'cards') urls = cardFronts.concat(cardBacks);
+      else urls = modes[mode].items;
       await preloadAll(urls);
       loadingEl.classList.add('hidden');
       renderCurrent();
@@ -338,17 +507,80 @@
       if (btn.dataset.mode !== mode) setMode(btn.dataset.mode);
     }));
 
+    cardSideBtns.forEach((btn) => btn.addEventListener('click', () => {
+      cardSide = btn.dataset.side;
+      cardSideBtns.forEach((b) => b.classList.toggle('active', b === btn));
+      if (mode === 'cards') renderCurrent();
+    }));
+
+    zoomOpenBtn.addEventListener('click', openZoom);
+    document.getElementById('zoom-close').addEventListener('click', closeZoom);
+    document.getElementById('zoom-in').addEventListener('click', () => {
+      zoomScale = Math.min(zoomScale + 0.35, 6);
+      applyZoomTransform();
+    });
+    document.getElementById('zoom-out').addEventListener('click', () => {
+      zoomScale = Math.max(zoomScale - 0.35, 0.6);
+      applyZoomTransform();
+    });
+    document.getElementById('zoom-reset').addEventListener('click', () => {
+      zoomScale = mode === 'cards' ? 1.8 : 1.2;
+      zoomPanX = 0;
+      zoomPanY = 0;
+      applyZoomTransform();
+    });
+
+    zoomStage.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        pinchStartDist = Math.hypot(dx, dy);
+        pinchStartScale = zoomScale;
+      } else if (e.touches.length === 1) {
+        dragStart = { x: e.touches[0].clientX - zoomPanX, y: e.touches[0].clientY - zoomPanY };
+      }
+    }, { passive: true });
+
+    zoomStage.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const dist = Math.hypot(dx, dy);
+        zoomScale = Math.min(6, Math.max(0.6, pinchStartScale * (dist / pinchStartDist)));
+        applyZoomTransform();
+      } else if (e.touches.length === 1 && dragStart) {
+        zoomPanX = e.touches[0].clientX - dragStart.x;
+        zoomPanY = e.touches[0].clientY - dragStart.y;
+        applyZoomTransform();
+      }
+    }, { passive: true });
+
+    zoomStage.addEventListener('touchend', () => { dragStart = null; });
+
+    let lastTap = 0;
+    bookEl.addEventListener('click', () => {
+      if (mode !== 'cards') return;
+      const now = Date.now();
+      if (now - lastTap < 320) openZoom();
+      lastTap = now;
+    });
+
     window.addEventListener('keydown', (e) => {
+      if (zoomOverlay.classList.contains('open')) {
+        if (e.key === 'Escape') closeZoom();
+        return;
+      }
       if (e.key === 'ArrowLeft') go(-1);
       if (e.key === 'ArrowRight') go(1);
     });
 
     let touchX = null;
     mainEl.addEventListener('touchstart', (e) => {
+      if (zoomOverlay.classList.contains('open')) return;
       touchX = e.changedTouches[0].clientX;
     }, { passive: true });
     mainEl.addEventListener('touchend', (e) => {
-      if (touchX == null) return;
+      if (zoomOverlay.classList.contains('open') || touchX == null) return;
       const dx = e.changedTouches[0].clientX - touchX;
       if (Math.abs(dx) > 42) go(dx < 0 ? 1 : -1);
       touchX = null;
