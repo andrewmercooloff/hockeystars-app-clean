@@ -72,6 +72,13 @@
 
     .book.spread-mode { aspect-ratio: 420 / 297; height: min(calc(100dvh - 130px), 100%); width: auto; }
     .book.page-mode  { aspect-ratio: 420 / 297; height: min(calc(100dvh - 130px), 100%); width: auto; }
+    .book.single-mode {
+      aspect-ratio: 210 / 297;
+      height: min(calc(100dvh - 130px), 100%);
+      width: auto;
+    }
+    .book.single-mode .half { flex: 1 1 100%; border: none; }
+    .book.single-mode .half img { object-fit: contain; background: #0d1520; }
 
     .half {
       flex: 1 1 50%;
