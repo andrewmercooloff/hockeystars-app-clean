@@ -58,41 +58,29 @@ ${cardCss(size)}
   background:linear-gradient(90deg,color-mix(in srgb,var(--primary) 92%,#fff),color-mix(in srgb,var(--secondary) 80%,var(--primary)));opacity:.08;}
 
 /* facts / glossary / profile pages */
-/* inner pages: full-width orange header bar, white title + black subtitle */
-.page.ice > .hdr,.team .hdr{
-  position:absolute;left:0;right:0;top:${bleed}mm;min-height:26mm;
-  padding:4.5mm ${bleed + 10}mm 4mm;
-  display:flex;align-items:center;flex-wrap:wrap;gap:2mm 8mm;
-  background:linear-gradient(180deg,var(--secondary) 0%,color-mix(in srgb,var(--secondary) 78%,#000) 100%);
-  box-shadow:0 1.5mm 4mm rgba(0,0,0,.22);z-index:2;}
-.page.ice > .hdr .title,.team .hdr .title{color:#fff;text-shadow:0 .5mm 0 rgba(0,0,0,.42);}
-.page.ice > .hdr .title::after,.team .hdr .title::after{background:linear-gradient(90deg,#111 0 58%,rgba(0,0,0,.55) 58%);height:1.6mm;}
-.page.ice > .hdr .sub,.team .hdr .sub{
-  font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;
-  font-size:3.5mm;letter-spacing:.12em;color:#111;background:#fff;
-  padding:1.2mm 3.5mm;border-radius:1mm;box-shadow:0 .4mm 1.2mm rgba(0,0,0,.18);margin:0;}
-.page.ice > .hdr .sticks,.team .hdr .sticks{filter:brightness(0) invert(1);opacity:.95;}
+.facts .hdr,.glossary .hdr,.profile .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
 .facts .hdr .title,.glossary .hdr .title,.profile .hdr .title{font-size:8.5mm;}
+.facts .hdr .sub,.glossary .hdr .sub,.profile .hdr .sub{font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:3.6mm;letter-spacing:.14em;color:var(--secondary);margin-top:2.5mm;}
 .facts .goal{position:absolute;right:${bleed + 12}mm;top:${bleed + 8}mm;width:40mm;height:26mm;opacity:.6;}
-.facts .fgrid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 56}mm;bottom:${bleed + 16}mm;display:grid;grid-template-columns:1fr 1fr;gap:6mm 8mm;grid-auto-rows:1fr;}
+.facts .fgrid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 44}mm;bottom:${bleed + 16}mm;display:grid;grid-template-columns:1fr 1fr;gap:6mm 8mm;grid-auto-rows:1fr;}
 .facts .f{position:relative;display:flex;align-items:center;padding:0 5mm;gap:5mm;background:rgba(255,255,255,.88);border-left:1.4mm solid var(--secondary);padding:4mm 5mm 4mm 4mm;box-shadow:0 1mm 3mm rgba(20,40,70,.08);}
 .facts .f .pk{position:relative;flex:0 0 30mm;height:19mm;display:flex;align-items:center;justify-content:center;}
 .facts .f .pk svg{position:absolute;inset:0;width:100%;height:100%;}
 .facts .f .pk b{position:relative;top:-3px;font-family:'Unbounded';font-weight:800;font-size:5.4mm;color:#fff;line-height:1;}
 .facts .f p{font-size:3.5mm;line-height:1.3;color:#1b2940;}
 .glossary .sticks{position:absolute;right:${bleed + 12}mm;top:${bleed + 8}mm;width:26mm;height:26mm;opacity:.8;}
-.glossary .ggrid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 56}mm;bottom:${bleed + 16}mm;display:grid;grid-template-columns:1fr 1fr;gap:4mm 8mm;align-content:space-between;}
+.glossary .ggrid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 44}mm;bottom:${bleed + 16}mm;display:grid;grid-template-columns:1fr 1fr;gap:4mm 8mm;align-content:space-between;}
 .glossary .g{background:linear-gradient(135deg,var(--primary),var(--dark));color:#fff;padding:3mm 5mm;transform:skewX(-6deg);border-left:1.4mm solid var(--secondary);}
 .glossary .g.alt{background:linear-gradient(135deg,var(--secondary),color-mix(in srgb,var(--secondary) 70%,#000));border-left-color:#fff;}
 .glossary .g b{display:block;font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:4.6mm;letter-spacing:.04em;transform:skewX(6deg);}
 .glossary .g span{display:block;font-size:3.3mm;line-height:1.3;margin-top:1mm;color:rgba(255,255,255,.88);transform:skewX(6deg);}
-.profile .photo{position:absolute;right:${bleed + 12}mm;top:${bleed + 54}mm;width:${size.w}mm;height:${size.h}mm;}
+.profile .photo{position:absolute;right:${bleed + 12}mm;top:${bleed + 42}mm;width:${size.w}mm;height:${size.h}mm;}
 .profile .photo .frame{position:absolute;inset:0;border:.5mm dashed var(--primary);background:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-size:3.6mm;color:var(--primary);}
-.profile .fields{position:absolute;left:${bleed + 10}mm;right:${bleed + 12 + size.w + 10}mm;top:${bleed + 54}mm;}
+.profile .fields{position:absolute;left:${bleed + 10}mm;right:${bleed + 12 + size.w + 10}mm;top:${bleed + 42}mm;}
 .profile .fld{display:flex;align-items:flex-end;gap:3mm;height:12.5mm;}
 .profile .fld b{font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:3.6mm;color:var(--dark);white-space:nowrap;padding-bottom:1mm;}
 .profile .fld span{flex:1;border-bottom:.4mm solid var(--secondary);height:8mm;}
-.profile .goals{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 184}mm;}
+.profile .goals{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 172}mm;}
 .profile .goals h5{font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:6.5mm;color:var(--dark);margin-bottom:4mm;}
 .profile .goal{display:flex;align-items:center;gap:4mm;margin-bottom:6mm;}
 .profile .goal i{flex:1;border-bottom:.4mm solid var(--primary);height:8mm;}
@@ -126,11 +114,19 @@ ${cardCss(size)}
 .autographs .box .puck{position:absolute;right:2mm;top:2mm;width:6mm;height:3.6mm;opacity:.85;}
 .gallery .hdr .sticks,.autographs .hdr .sticks,.history .hdr .sticks{width:14mm;height:14mm;vertical-align:-3mm;margin-left:3mm;}
 
-/* section title (default dark; overridden to white on orange .hdr) */
+/* section headers: slight skew + orange slash under title */
+.page.ice > .hdr,.team .hdr{z-index:2;transform:skewX(-5deg);transform-origin:left top;}
+.page.ice > .hdr > *,.team .hdr > *{transform:skewX(5deg);}
+.page.ice > .hdr::after,.team .hdr::after{
+  content:"";position:absolute;left:-6mm;right:-18mm;bottom:-2.2mm;height:2.8mm;
+  background:linear-gradient(90deg,var(--secondary) 0 62%,var(--primary) 62%);
+  transform:skewX(-24deg);box-shadow:0 .7mm 2mm color-mix(in srgb,var(--secondary) 32%,transparent);
+  border-radius:.4mm;pointer-events:none;z-index:-1;}
 .title{position:relative;display:inline-block;font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:10mm;line-height:1;color:var(--dark);
-  padding:2mm 0 1.5mm;}
-.title::after{content:"";position:absolute;left:0;right:-6mm;bottom:0;height:2mm;background:linear-gradient(90deg,var(--secondary) 0 60%,var(--primary) 60%);
-  transform:skewX(-30deg);}
+  padding:2mm 0 2.5mm;}
+.title::after{content:"";position:absolute;left:0;width:72%;bottom:.4mm;height:1.1mm;
+  background:linear-gradient(90deg,color-mix(in srgb,var(--secondary) 92%,#fff),var(--secondary));
+  transform:skewX(-32deg);opacity:.55;}
 
 /* ---------- COVER ---------- */
 .cover{background:var(--dark);}
@@ -180,7 +176,8 @@ ${cardCss(size)}
 .cover .teamname small{display:block;font-size:5mm;font-weight:600;letter-spacing:.12em;opacity:.95;margin-top:1.5mm;}
 
 /* ---------- INTRO ---------- */
-.intro .lead{position:absolute;left:${bleed + 30}mm;right:${bleed + 14}mm;top:${bleed + 58}mm;font-size:4.2mm;line-height:1.35;color:#1b2940;}
+.intro .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
+.intro .lead{position:absolute;left:${bleed + 30}mm;right:${bleed + 14}mm;top:${bleed + 46}mm;font-size:4.2mm;line-height:1.35;color:#1b2940;}
 .intro .lead b{color:var(--secondary);}
 .intro .sample{position:absolute;left:${bleed + 12}mm;top:${bleed + 92}mm;transform-origin:top left;transform:scale(1);
   box-shadow:0 2mm 5mm rgba(0,0,0,.25);border-radius:1mm;}
@@ -202,20 +199,19 @@ ${cardCss(size)}
 
 /* ---------- TEAM ---------- */
 .team .orn.br{right:-60mm;bottom:-40mm;width:170mm;height:40mm;}
-.team .hdr{justify-content:space-between;}
-.team .hdr .logo{width:22mm;height:22mm;display:flex;align-items:center;justify-content:center;flex:none;
-  background:#fff;border-radius:50%;padding:1.5mm;box-shadow:0 .5mm 1.5mm rgba(0,0,0,.2);}
+.team .hdr{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 9}mm;height:22mm;display:flex;align-items:center;justify-content:space-between;}
+.team .hdr .logo{width:22mm;height:22mm;display:flex;align-items:center;justify-content:center;}
 .team .hdr .logo img{max-width:100%;max-height:100%;object-fit:contain;}
-.team .hdr .title{font-size:10mm;flex:1 1 auto;}
-.team .hdr .sub{text-align:right;}
+.team .hdr .title{font-size:10mm;}
+.team .hdr .sub{font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:3.6mm;letter-spacing:.14em;color:var(--secondary);text-align:right;margin-top:2mm;}
 .team .grid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${(bleed + gridTop(size)).toFixed(1)}mm;display:grid;
   grid-template-columns:repeat(${SLOT_COLS},${size.w}mm);justify-content:space-between;row-gap:${gridGap(size).toFixed(1)}mm;}
 .cell{position:relative;width:${size.w}mm;}
 .cell .cap{height:${CAPTION_H}mm;padding-top:1.6mm;text-align:center;}
-.team.dense .hdr{min-height:20mm;padding-top:3mm;padding-bottom:3mm;}
+.team.dense .hdr{top:${bleed + 5}mm;height:16mm;}
 .team.dense .hdr .logo{width:16mm;height:16mm;}
 .team.dense .hdr .title{font-size:8mm;}
-.team.dense .hdr .sub{font-size:3mm;}
+.team.dense .hdr .sub{font-size:3mm;margin-top:1mm;}
 .team.dense .cell .cap{position:absolute;left:0;right:0;bottom:0;height:auto;padding:1.4mm 2mm 1.6mm;background:rgba(255,255,255,.9);border-top:.3mm solid color-mix(in srgb,var(--primary) 25%,transparent);}
 .team.dense .cell .cap .n{font-size:3.4mm;}
 .team.dense .cell .cap .p{font-size:2.2mm;margin-top:.4mm;}
@@ -242,7 +238,8 @@ ${cardCss(size)}
 
 /* ---------- HISTORY ---------- */
 .history .orn.br{right:-60mm;bottom:-40mm;width:170mm;height:40mm;}
-.history .tl{position:absolute;left:${bleed + 12}mm;top:${bleed + 56}mm;width:126mm;}
+.history .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
+.history .tl{position:absolute;left:${bleed + 12}mm;top:${bleed + 44}mm;width:126mm;}
 .history .tl::before{content:"";position:absolute;left:5.2mm;top:2mm;bottom:8mm;width:1.2mm;background:linear-gradient(180deg,var(--primary),var(--secondary));border-radius:1mm;}
 .history .item{position:relative;padding-left:16mm;margin-bottom:7mm;}
 .history .item:last-child{margin-bottom:0;}
@@ -253,7 +250,7 @@ ${cardCss(size)}
 .history .item .yr span{display:inline-block;transform:skewX(10deg);}
 .history .item h4{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:5.4mm;line-height:1.05;color:var(--dark);margin-bottom:1.2mm;}
 .history .item p{font-size:3.7mm;line-height:1.35;color:#1b2940;white-space:pre-line;}
-.history .facts{position:absolute;right:${bleed + 10}mm;top:${bleed + 56}mm;width:44mm;background:#fff;border:.5mm solid var(--primary);border-radius:2mm;padding:4mm 3mm;
+.history .facts{position:absolute;right:${bleed + 10}mm;top:${bleed + 44}mm;width:44mm;background:#fff;border:.5mm solid var(--primary);border-radius:2mm;padding:4mm 3mm;
   box-shadow:0 1.5mm 4mm color-mix(in srgb,var(--primary) 12%,transparent);}
 .history .facts h5{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:4.6mm;color:var(--dark);text-align:center;line-height:1.05;margin-bottom:3mm;
   padding-bottom:2mm;border-bottom:.5mm solid var(--secondary);}
@@ -267,27 +264,31 @@ ${cardCss(size)}
 .history .hphoto img{width:100%;height:100%;object-fit:cover;}
 
 /* ---------- STATS ---------- */
-.stats .note{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 52}mm;font-size:3.8mm;color:#1b2940;line-height:1.35;}
-.stats table{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 68}mm;width:calc(100% - ${(bleed + 10) * 2}mm);border-collapse:collapse;font-size:3.6mm;}
+.stats .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
+.stats .note{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 40}mm;font-size:3.8mm;color:#1b2940;line-height:1.35;}
+.stats table{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 56}mm;width:calc(100% - ${(bleed + 10) * 2}mm);border-collapse:collapse;font-size:3.6mm;}
 .stats th{font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:3.4mm;color:#fff;background:var(--primary);padding:2.4mm 2mm;text-align:left;}
 .stats td{border-bottom:.3mm solid color-mix(in srgb,var(--primary) 25%,transparent);height:9.6mm;padding:0 2mm;color:#7b8798;}
 .stats td.i{width:9mm;text-align:center;font-family:'Fira Sans Extra Condensed';font-weight:600;color:var(--secondary);}
 .stats tr:nth-child(even) td{background:rgba(238,243,249,.7);}
 
 /* ---------- NOTES ---------- */
-.notes .lines{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 58}mm;}
+.notes .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
+.notes .lines{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 46}mm;}
 .notes .line{height:10.5mm;border-bottom:.3mm solid color-mix(in srgb,var(--primary) 28%,transparent);}
 
 /* ---------- AUTOGRAPHS ---------- */
-.autographs .note{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 52}mm;font-size:3.8mm;color:#1b2940;line-height:1.35;}
-.autographs .grid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 66}mm;display:grid;grid-template-columns:repeat(3,1fr);gap:5mm 6mm;}
+.autographs .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
+.autographs .note{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 40}mm;font-size:3.8mm;color:#1b2940;line-height:1.35;}
+.autographs .grid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 54}mm;display:grid;grid-template-columns:repeat(3,1fr);gap:5mm 6mm;}
 .autographs .box{height:var(--boxh,33mm);border:.35mm solid color-mix(in srgb,var(--primary) 30%,transparent);border-radius:1.5mm;position:relative;background:rgba(255,255,255,.75);}
 .autographs .box .n{position:absolute;left:3mm;right:3mm;bottom:2.4mm;font-family:'Fira Sans Extra Condensed';font-weight:600;font-size:3.3mm;text-transform:uppercase;color:var(--dark);
   border-top:.3mm solid var(--secondary);padding-top:1.2mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .autographs .box .n span{color:var(--secondary);margin-right:1mm;}
 
 /* ---------- GALLERY ---------- */
-.gallery .grid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 52}mm;bottom:${bleed + 16}mm;display:grid;gap:4mm;
+.gallery .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
+.gallery .grid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 40}mm;bottom:${bleed + 16}mm;display:grid;gap:4mm;
   grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(6,1fr);}
 .gallery .ph{position:relative;overflow:hidden;border-radius:1.5mm;background:#c9d5e3;box-shadow:0 1mm 3mm rgba(0,0,0,.18);}
 .gallery .ph img{width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block;}
@@ -295,10 +296,11 @@ ${cardCss(size)}
   background:linear-gradient(180deg,transparent,rgba(0,0,0,.6));}
 
 /* ---------- QUOTES ---------- */
-.quotes .hdr .sticks{width:14mm;height:14mm;vertical-align:-3mm;margin-left:auto;}
+.quotes .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
+.quotes .hdr .sticks{width:14mm;height:14mm;vertical-align:-3mm;margin-left:3mm;}
 .quotes .hdr .title{font-size:8mm;}
 .quotes .goal{position:absolute;right:${bleed + 12}mm;bottom:${bleed + 4}mm;width:34mm;height:22mm;opacity:.5;}
-.quotes .qgrid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 54}mm;bottom:${bleed + 16}mm;display:grid;grid-template-columns:1fr 1fr;gap:5mm 6mm;align-content:space-between;}
+.quotes .qgrid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 42}mm;bottom:${bleed + 16}mm;display:grid;grid-template-columns:1fr 1fr;gap:5mm 6mm;align-content:space-between;}
 .quotes .qp{position:relative;background:linear-gradient(135deg,var(--primary),var(--dark));color:#fff;padding:5mm 6mm 5mm 7mm;transform:rotate(-1.2deg) skewX(-3deg);
   box-shadow:0 1.2mm 3mm rgba(0,0,0,.25);border-left:1.4mm solid var(--secondary);}
 .quotes .qp.odd{transform:rotate(1deg) skewX(-3deg);border-left-color:var(--accent);}
@@ -423,6 +425,7 @@ function introPage(data, pageNo) {
   const bigSize = Math.min(34, (170 / Math.max(6, bigName.length)) * 1.75);
   return `<section class="page intro ice">
     ${deco(data)}
+    <div class="orn tr"></div>
     <div class="hdr"><div class="title">Альбом</div></div>
     <div class="lead">${intro.replace(/\n/g, '<br>')}</div>
     <div class="sample">${sample ? cardFront(sample, data) : ''}</div>
@@ -476,7 +479,7 @@ function historyPage(data, pageNo) {
   return `<section class="page history ice">
     ${deco(data)}
     <div class="orn br" style="opacity:.95"></div>
-    <div class="hdr"><div class="title">${esc(title)}</div>${sticksSvg('#fff', data.colors.secondary, '#fff')}</div>
+    <div class="hdr"><div class="title">${esc(title)}</div>${sticksSvg(data.colors.primary, data.colors.secondary, data.colors.dark)}</div>
     <div class="tl">${items
       .map(
         (it, i) => `<div class="item"><div class="dot">${i + 1}</div>
@@ -517,7 +520,7 @@ function quotesPage(data, pageNo) {
     ${deco(data)}
     <div class="orn br" style="opacity:.9"></div>
     ${goalSvg(data.colors.secondary, `color-mix(in srgb,${data.colors.primary} 45%,transparent)`)}
-    <div class="hdr"><div class="title">Фразы великих хоккеистов</div>${sticksSvg('#fff', data.colors.secondary, '#fff')}</div>
+    <div class="hdr"><div class="title">Фразы великих хоккеистов</div>${sticksSvg(data.colors.primary, data.colors.secondary, data.colors.dark)}</div>
     <div class="qgrid">${plates}</div>
     <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
   </section>`;
@@ -538,6 +541,7 @@ function factsPage(data, pageNo) {
   const list = (data.team.facts?.length ? data.team.facts : DEFAULT_FACTS).slice(0, 8);
   return `<section class="page facts ice">
     ${deco(data)}
+    <div class="orn tr"></div>
     <div class="hdr"><div class="title">Знаешь ли ты?</div><div class="sub">Интересные факты о хоккее</div></div>
     <div class="fgrid">${list
       .map((f, i) => `<div class="f"><div class="pk">${puckSvg(i % 2 ? data.colors.secondary : data.colors.dark, 'rgba(255,255,255,.55)')}<b style="font-size:${f.v.length > 6 ? 4 : f.v.length > 4 ? 4.8 : 5.4}mm">${esc(f.v)}</b></div><p>${esc(f.t)}</p></div>`)
@@ -571,7 +575,7 @@ function glossaryPage(data, pageNo) {
   return `<section class="page glossary ice">
     ${deco(data)}
     <div class="orn br" style="opacity:.9"></div>
-    <div class="hdr"><div class="title">Хоккейный словарик</div><div class="sub">Говори как профи</div>${sticksSvg('#fff', data.colors.secondary, '#fff')}</div>
+    <div class="hdr"><div class="title">Хоккейный словарик</div><div class="sub">Говори как профи</div>${sticksSvg(data.colors.primary, data.colors.secondary, data.colors.dark)}</div>
     <div class="ggrid">${list.map(([w, d], i) => `<div class="g ${i % 3 === 1 ? 'alt' : ''}"><b>${esc(w)}</b><span>${esc(d)}</span></div>`).join('')}</div>
     <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
   </section>`;
@@ -585,6 +589,7 @@ function profilePage(data, pageNo) {
   const t = data.team;
   return `<section class="page profile ice">
     ${deco(data)}
+    <div class="orn tr"></div>
     <div class="hdr"><div class="title">Моя анкета</div><div class="sub">${esc(t.shortName || t.name)} · сезон ${esc(t.season)}</div></div>
     <div class="photo"><div class="frame"><span>Моё фото</span></div><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i></div>
     <div class="fields">${fields.map((f) => `<div class="fld"><b>${esc(f)}</b><span></span></div>`).join('')}</div>
@@ -629,7 +634,7 @@ function autographsPage(data, pageNo, cards) {
   return `<section class="page autographs ice">
     ${deco(data)}
     <div class="orn br" style="opacity:.9"></div>
-    <div class="hdr"><div class="title">Автографы</div>${sticksSvg('#fff', data.colors.secondary, '#fff')}</div>
+    <div class="hdr"><div class="title">Автографы</div>${sticksSvg(data.colors.primary, data.colors.secondary, data.colors.dark)}</div>
     <div class="note">Собери подписи всей команды: попроси каждого игрока и тренера расписаться в своей ячейке.</div>
     <div class="grid" style="--boxh:${boxH.toFixed(1)}mm">${boxes}</div>
     <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
@@ -691,7 +696,7 @@ function galleryPage(data, pageNo, tiles, title) {
   return `<section class="page gallery ice">
     ${deco(data)}
     <div class="orn br" style="opacity:.9"></div>
-    <div class="hdr"><div class="title">${esc(title || 'Жизнь команды')}</div>${sticksSvg('#fff', data.colors.secondary, '#fff')}</div>
+    <div class="hdr"><div class="title">${esc(title || 'Жизнь команды')}</div>${sticksSvg(data.colors.primary, data.colors.secondary, data.colors.dark)}</div>
     <div class="grid">${html}</div>
     <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
   </section>`;
