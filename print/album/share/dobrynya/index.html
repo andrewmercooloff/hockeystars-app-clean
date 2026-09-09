@@ -215,6 +215,7 @@
       background: rgba(255,255,255,.1);
       color: #fff; font-size: 22px; cursor: pointer;
     }
+    .zoom-controls button:disabled { opacity: .35; cursor: default; }
 
     @media (min-width: 520px) { .cards-grid { grid-template-columns: repeat(4, 1fr); } }
     @media (min-width: 820px) { .cards-grid { grid-template-columns: repeat(6, 1fr); } }
@@ -256,7 +257,7 @@
 
   <footer>
     <span class="counter" id="counter">—</span>
-    <span id="hint">Нажмите для увеличения</span>
+    <span id="hint">Нажмите для увеличения · колёсико или ± чтобы менять масштаб</span>
   </footer>
 
   <div class="error-box" id="error">
@@ -282,7 +283,7 @@
 
   <script>
     (function () {
-      const REV = '13a3294';
+      const REV = '21373ae';
       const RAW = 'https://raw.githubusercontent.com/andrewmercooloff/hockeystars-app-clean/cursor/hockey-card-album-generator-a9a3/print/album';
       const IMG = (file) => RAW + '/print-ready/dobrynya/pages/' + file + '?v=' + REV;
 
@@ -334,8 +335,14 @@
       const zoomTitle = document.getElementById('zoom-title');
       const errorBox = document.getElementById('error');
 
+      const ZOOM_MIN = 0.3;
+      const ZOOM_MAX = 6;
+      const ZOOM_STEP = 0.35;
       let zoomScale = 1, zoomPanX = 0, zoomPanY = 0;
-      let pinchStartDist = 0, pinchStartScale = 1, dragStart = null;
+      let pinchStartDist = 0, pinchStartScale = 1, pinchCenter = null, dragStart = null, lastTap = 0;
+      const zoomInBtn = document.getElementById('zoom-in');
+      const zoomOutBtn = document.getElementById('zoom-out');
+      const zoomResetBtn = document.getElementById('zoom-reset');
 
       function showError(msg) {
         loadingEl.classList.add('hidden');
@@ -397,8 +404,33 @@
         bookEl.style.height = Math.floor(h) + 'px';
       }
 
+      function clampZoom(scale) {
+        return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, scale));
+      }
+
       function applyZoomTransform() {
         zoomImg.style.transform = 'translate(calc(-50% + ' + zoomPanX + 'px), calc(-50% + ' + zoomPanY + 'px)) scale(' + zoomScale + ')';
+        if (zoomInBtn) zoomInBtn.disabled = zoomScale >= ZOOM_MAX - 0.01;
+        if (zoomOutBtn) zoomOutBtn.disabled = zoomScale <= ZOOM_MIN + 0.01;
+      }
+
+      function zoomAt(clientX, clientY, nextScale) {
+        var rect = zoomStage.getBoundingClientRect();
+        var cx = clientX - rect.left - rect.width / 2;
+        var cy = clientY - rect.top - rect.height / 2;
+        var clamped = clampZoom(nextScale);
+        var ratio = clamped / zoomScale;
+        zoomPanX = cx - ratio * (cx - zoomPanX);
+        zoomPanY = cy - ratio * (cy - zoomPanY);
+        zoomScale = clamped;
+        applyZoomTransform();
+      }
+
+      function resetZoom() {
+        zoomScale = 1;
+        zoomPanX = 0;
+        zoomPanY = 0;
+        applyZoomTransform();
       }
 
       function openZoom(cardIndex) {
@@ -406,10 +438,7 @@
         zoomTitle.textContent = mode === 'cards'
           ? 'Карточка ' + (index + 1) + ' · ' + (cardSide === 'front' ? 'лицо' : 'оборот')
           : 'Страницы ' + (index + 1);
-        zoomImg.onload = function () {
-          zoomScale = 1; zoomPanX = 0; zoomPanY = 0;
-          applyZoomTransform();
-        };
+        zoomImg.onload = function () { resetZoom(); };
         zoomImg.src = currentZoomSrc();
         zoomOverlay.classList.add('open');
       }
@@ -519,14 +548,27 @@
       });
 
       document.getElementById('zoom-close').addEventListener('click', closeZoom);
-      document.getElementById('zoom-in').addEventListener('click', function () {
-        zoomScale = Math.min(zoomScale + 0.35, 5); applyZoomTransform();
+      zoomInBtn.addEventListener('click', function () {
+        var rect = zoomStage.getBoundingClientRect();
+        zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, zoomScale + ZOOM_STEP);
       });
-      document.getElementById('zoom-out').addEventListener('click', function () {
-        zoomScale = Math.max(zoomScale - 0.35, 0.5); applyZoomTransform();
+      zoomOutBtn.addEventListener('click', function () {
+        var rect = zoomStage.getBoundingClientRect();
+        zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, zoomScale - ZOOM_STEP);
       });
-      document.getElementById('zoom-reset').addEventListener('click', function () {
-        zoomScale = 1; zoomPanX = 0; zoomPanY = 0; applyZoomTransform();
+      zoomResetBtn.addEventListener('click', resetZoom);
+
+      zoomStage.addEventListener('wheel', function (e) {
+        if (!zoomOverlay.classList.contains('open')) return;
+        e.preventDefault();
+        var delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
+        zoomAt(e.clientX, e.clientY, zoomScale + delta);
+      }, { passive: false });
+
+      zoomStage.addEventListener('dblclick', function (e) {
+        e.preventDefault();
+        if (zoomScale > 1.05) resetZoom();
+        else zoomAt(e.clientX, e.clientY, 2.5);
       });
 
       zoomStage.addEventListener('touchstart', function (e) {
@@ -535,6 +577,11 @@
           var dy = e.touches[0].clientY - e.touches[1].clientY;
           pinchStartDist = Math.hypot(dx, dy) || 1;
           pinchStartScale = zoomScale;
+          pinchCenter = {
+            x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+            y: (e.touches[0].clientY + e.touches[1].clientY) / 2,
+          };
+          dragStart = null;
         } else if (e.touches.length === 1) {
           dragStart = { x: e.touches[0].clientX - zoomPanX, y: e.touches[0].clientY - zoomPanY };
         }
@@ -542,22 +589,61 @@
 
       zoomStage.addEventListener('touchmove', function (e) {
         if (e.touches.length === 2) {
+          e.preventDefault();
           var dx = e.touches[0].clientX - e.touches[1].clientX;
           var dy = e.touches[0].clientY - e.touches[1].clientY;
-          zoomScale = Math.min(5, Math.max(0.5, pinchStartScale * (Math.hypot(dx, dy) / pinchStartDist)));
+          var dist = Math.hypot(dx, dy) || 1;
+          var next = clampZoom(pinchStartScale * (dist / pinchStartDist));
+          var cx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+          var cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+          if (pinchCenter) {
+            var rect = zoomStage.getBoundingClientRect();
+            var px = cx - rect.left - rect.width / 2;
+            var py = cy - rect.top - rect.height / 2;
+            var ratio = next / zoomScale;
+            zoomPanX = px - ratio * (px - zoomPanX);
+            zoomPanY = py - ratio * (py - zoomPanY);
+          }
+          zoomScale = next;
           applyZoomTransform();
         } else if (e.touches.length === 1 && dragStart) {
           zoomPanX = e.touches[0].clientX - dragStart.x;
           zoomPanY = e.touches[0].clientY - dragStart.y;
           applyZoomTransform();
         }
-      }, { passive: true });
+      }, { passive: false });
 
-      zoomStage.addEventListener('touchend', function () { dragStart = null; });
+      zoomStage.addEventListener('touchend', function (e) {
+        if (e.touches.length < 2) {
+          pinchStartDist = 0;
+          pinchCenter = null;
+        }
+        if (e.touches.length === 0) dragStart = null;
+        if (e.changedTouches.length === 1 && e.touches.length === 0) {
+          var now = Date.now();
+          if (now - lastTap < 280) {
+            if (zoomScale > 1.05) resetZoom();
+            else {
+              var t = e.changedTouches[0];
+              zoomAt(t.clientX, t.clientY, 2.5);
+            }
+            lastTap = 0;
+          } else {
+            lastTap = now;
+          }
+        }
+      });
 
       window.addEventListener('keydown', function (e) {
         if (zoomOverlay.classList.contains('open')) {
           if (e.key === 'Escape') closeZoom();
+          else if (e.key === '+' || e.key === '=') {
+            var rect = zoomStage.getBoundingClientRect();
+            zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, zoomScale + ZOOM_STEP);
+          } else if (e.key === '-' || e.key === '_') {
+            var rect2 = zoomStage.getBoundingClientRect();
+            zoomAt(rect2.left + rect2.width / 2, rect2.top + rect2.height / 2, zoomScale - ZOOM_STEP);
+          } else if (e.key === '0') resetZoom();
           return;
         }
         if (e.key === 'ArrowLeft') go(-1);
