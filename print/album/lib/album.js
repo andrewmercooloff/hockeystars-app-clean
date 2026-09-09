@@ -82,22 +82,23 @@ ${cardCss(size)}
 .glossary .g.alt{background:linear-gradient(135deg,var(--secondary),color-mix(in srgb,var(--secondary) 70%,#000));border-left-color:#fff;}
 .glossary .g b{display:block;font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:4.6mm;letter-spacing:.04em;transform:skewX(6deg);}
 .glossary .g span{display:block;font-size:3.3mm;line-height:1.3;margin-top:1mm;color:rgba(255,255,255,.88);transform:skewX(6deg);}
-.page.profile{background:#fff;}
-.page.profile .photo{position:absolute;right:${bleed + 12}mm;top:${bleed + 42}mm;width:${size.w}mm;height:${size.h}mm;}
-.page.profile .photo .frame{position:absolute;inset:0;border:.5mm dashed color-mix(in srgb,var(--primary) 45%,#ccc);background:#fff;display:flex;align-items:center;justify-content:center;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-size:3.6mm;color:var(--primary);}
-.page.profile .fields{position:absolute;left:${bleed + 10}mm;right:${bleed + 12 + size.w + 10}mm;top:${bleed + 42}mm;}
+.page.profile .writepad{position:absolute;left:${bleed + 8}mm;right:${bleed + 8}mm;top:${bleed + 40}mm;bottom:${bleed + 12}mm;z-index:1;
+  background:linear-gradient(180deg,rgba(255,255,255,.94) 0%,rgba(255,255,255,.9) 100%);border-radius:2.5mm;
+  box-shadow:0 .8mm 2.5mm rgba(20,40,70,.07);border:.3mm solid rgba(255,255,255,.85);}
+.page.profile .photo{position:absolute;right:${bleed + 12}mm;top:${bleed + 42}mm;width:${size.w}mm;height:${size.h}mm;z-index:2;}
+.page.profile .photo .frame{position:absolute;inset:0;border:.5mm dashed color-mix(in srgb,var(--primary) 45%,#bbb);background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-size:3.6mm;color:var(--primary);}
+.page.profile .fields{position:absolute;left:${bleed + 10}mm;right:${bleed + 12 + size.w + 10}mm;top:${bleed + 42}mm;z-index:2;}
 .page.profile .fld{display:flex;align-items:flex-end;gap:3mm;height:12.5mm;}
 .page.profile .fld b{font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:3.6mm;color:var(--dark);white-space:nowrap;padding-bottom:1mm;}
-.page.profile .fld span{flex:1;border-bottom:.35mm solid #c8cdd6;height:8mm;}
-.page.profile .goals{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 172}mm;}
-.page.profile .goal i{border-bottom-color:#c8cdd6;}
-.page.profile .orn.tr{display:none;}
-.profile .goals h5{font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:6.5mm;color:var(--dark);margin-bottom:4mm;}
-.profile .goal{display:flex;align-items:center;gap:4mm;margin-bottom:6mm;}
-.profile .goal i{flex:1;border-bottom:.4mm solid var(--primary);height:8mm;}
-.profile .goal .pucknum{position:relative;width:14mm;height:9mm;flex:0 0 14mm;display:flex;align-items:center;justify-content:center;}
-.profile .goal .pucknum svg{position:absolute;inset:0;width:100%;height:100%;}
-.profile .goal .pucknum b{position:relative;color:#fff;font-family:'Fira Sans Extra Condensed';font-weight:700;font-size:4.6mm;}
+.page.profile .fld span{flex:1;border-bottom:.35mm solid color-mix(in srgb,var(--secondary) 55%,#c8cdd6);height:8mm;}
+.page.profile .goals{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 172}mm;z-index:2;}
+.page.profile .goals h5{font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:6.5mm;color:var(--dark);margin-bottom:4mm;}
+.page.profile .goal{display:flex;align-items:center;gap:4mm;margin-bottom:6mm;}
+.page.profile .goal i{flex:1;border-bottom:.35mm solid color-mix(in srgb,var(--primary) 35%,#c8cdd6);height:8mm;}
+.page.profile .goal .pucknum{position:relative;width:14mm;height:9mm;flex:0 0 14mm;display:flex;align-items:center;justify-content:center;}
+.page.profile .goal .pucknum svg{position:absolute;inset:0;width:100%;height:100%;}
+.page.profile .goal .pucknum b{position:relative;color:#fff;font-family:'Fira Sans Extra Condensed';font-weight:700;font-size:4.6mm;}
+.page.profile .hdr{z-index:2;}
 
 /* corner ornaments: torn diagonal bands */
 .orn{position:absolute;pointer-events:none;}
@@ -623,8 +624,10 @@ function profilePage(data, pageNo) {
     'Меня зовут', 'Мой номер', 'Моя позиция', 'Хват', 'Любимый игрок', 'Любимая команда', 'Моя мечта', 'Лучший момент сезона', 'Мой девиз',
   ];
   const t = data.team;
-  return `<section class="page profile">
+  return `<section class="page profile ice">
+    ${deco(data)}
     <div class="orn tr"></div>
+    <div class="writepad"></div>
     <div class="hdr"><div class="title">Моя анкета</div><div class="sub">${esc(t.shortName || t.name)} · сезон ${esc(t.season)}</div></div>
     <div class="photo"><div class="frame"><span>Моё фото</span></div><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i></div>
     <div class="fields">${fields.map((f) => `<div class="fld"><b>${esc(f)}</b><span></span></div>`).join('')}</div>
