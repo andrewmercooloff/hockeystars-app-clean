@@ -64,7 +64,7 @@ ${cardCss(size)}
 .facts .f{position:relative;display:flex;align-items:center;padding:0 5mm;gap:5mm;background:rgba(255,255,255,.88);border-left:1.4mm solid var(--secondary);padding:4mm 5mm 4mm 4mm;box-shadow:0 1mm 3mm rgba(20,40,70,.08);}
 .facts .f .pk{position:relative;flex:0 0 30mm;height:19mm;display:flex;align-items:center;justify-content:center;}
 .facts .f .pk svg{position:absolute;inset:0;width:100%;height:100%;}
-.facts .f .pk b{position:relative;font-family:'Russo One';font-weight:400;font-size:5.4mm;color:#fff;line-height:1;}
+.facts .f .pk b{position:relative;top:-3px;font-family:'Russo One';font-weight:400;font-size:5.4mm;color:#fff;line-height:1;}
 .facts .f p{font-size:3.5mm;line-height:1.3;color:#1b2940;}
 .glossary .sticks{position:absolute;right:${bleed + 12}mm;top:${bleed + 8}mm;width:26mm;height:26mm;opacity:.8;}
 .glossary .ggrid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 44}mm;bottom:${bleed + 16}mm;display:grid;grid-template-columns:1fr 1fr;gap:4mm 8mm;align-content:space-between;}
