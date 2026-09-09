@@ -79,6 +79,20 @@ async function main() {
   post('impose', albumPdf, path.join(outDir, `${slug}-album-A3-spreads.pdf`), [String(PAGE.bleed)]);
   post('light', albumPdf, path.join(outDir, `${slug}-album-preview.pdf`));
   post('light', cardsPdf, path.join(outDir, `${slug}-cards-preview.pdf`));
+
+  const shareHtml = path.join(__dirname, 'share', slug, 'index.html');
+  if (fs.existsSync(shareHtml)) {
+    try {
+      const branch = execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { encoding: 'utf8' }).trim();
+      const remote = execFileSync('git', ['remote', 'get-url', 'origin'], { encoding: 'utf8' }).trim();
+      const m = remote.match(/github\.com[:/](.+?)(?:\.git)?$/);
+      if (m) {
+        const repoPath = m[1];
+        const rel = path.relative(path.join(__dirname, '..', '..'), shareHtml).split(path.sep).join('/');
+        console.log(`\n🔗 Ссылка для клиента (перелистывание):\n   https://cdn.jsdelivr.net/gh/${repoPath}@${branch}/${rel}`);
+      }
+    } catch (_) { /* not a git repo — skip */ }
+  }
 }
 
 main().catch((e) => {

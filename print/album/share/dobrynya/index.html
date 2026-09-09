@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>HK «Дobrynya» — альбом 2026–2027</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0a1628;
+      --panel: #111f36;
+      --accent: #f58220;
+      --text: #eef3fb;
+      --muted: #8fa3c0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+    body { display: flex; flex-direction: column; min-height: 100dvh; }
+
+    header {
+      flex: 0 0 auto;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 10px 16px; background: var(--panel); border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    header h1 { font-size: 15px; font-weight: 600; line-height: 1.25; }
+    header p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .tabs { display: flex; gap: 6px; }
+    .tabs button {
+      border: 1px solid rgba(255,255,255,.15); background: transparent; color: var(--text);
+      padding: 6px 12px; border-radius: 999px; font-size: 13px; cursor: pointer;
+    }
+    .tabs button.active { background: var(--accent); border-color: var(--accent); color: #111; font-weight: 600; }
+
+    main { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; padding: 8px; }
+    .viewer { width: min(100%, 1200px); height: 100%; display: flex; align-items: center; justify-content: center; }
+    .spread {
+      max-width: 100%; max-height: calc(100dvh - 120px); width: auto; height: auto;
+      object-fit: contain; border-radius: 4px; box-shadow: 0 12px 40px rgba(0,0,0,.45);
+      user-select: none; -webkit-user-drag: none;
+    }
+
+    .nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 44px; height: 64px; border: none; border-radius: 8px;
+      background: rgba(17,31,54,.85); color: #fff; font-size: 28px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(6px); transition: background .15s;
+    }
+    .nav:hover { background: rgba(245,130,32,.9); color: #111; }
+    .nav:disabled { opacity: .25; cursor: default; pointer-events: none; }
+    .nav.prev { left: 8px; }
+    .nav.next { right: 8px; }
+
+    footer {
+      flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: var(--panel);
+      border-top: 1px solid rgba(255,255,255,.08); font-size: 13px; color: var(--muted);
+    }
+    .counter { color: var(--text); font-weight: 600; }
+    .hint { font-size: 12px; }
+
+    @media (max-width: 640px) {
+      header { flex-wrap: wrap; }
+      .nav { width: 36px; height: 52px; font-size: 22px; }
+      .hint { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>HK «Дobrynya» — альбом сезона 2026–2027</h1>
+      <p>16 страниц · 8 разворотов · предпросмотр для согласования</p>
+    </div>
+    <div class="tabs" role="tablist">
+      <button type="button" class="active" data-mode="spreads" role="tab" aria-selected="true">Журнал</button>
+      <button type="button" data-mode="pages" role="tab" aria-selected="false">Страницы</button>
+      <button type="button" data-mode="cards" role="tab" aria-selected="false">Карточки</button>
+    </div>
+  </header>
+
+  <main>
+    <button type="button" class="nav prev" id="prev" aria-label="Назад">‹</button>
+    <div class="viewer">
+      <img class="spread" id="frame" alt="" draggable="false">
+    </div>
+    <button type="button" class="nav next" id="next" aria-label="Вперёд">›</button>
+  </main>
+
+  <footer>
+    <span class="counter" id="counter">1 / 8</span>
+    <span class="hint">← → или свайп · колёсико мыши</span>
+  </footer>
+
+  <script>
+    const BASE = '../../print-ready/dobrynya/pages/';
+    const sets = {
+      spreads: Array.from({ length: 8 }, (_, i) => ({
+        src: `${BASE}spread-${String(i + 1).padStart(2, '0')}.jpg`,
+        alt: `Разворот ${i + 1} из 8`,
+      })),
+      pages: Array.from({ length: 16 }, (_, i) => ({
+        src: `${BASE}album-${String(i + 1).padStart(2, '0')}.jpg`,
+        alt: `Страница ${i + 1} из 16`,
+      })),
+      cards: [
+        { src: `${BASE}cards-all-fronts.jpg`, alt: 'Все карточки — лицевая сторона' },
+        { src: `${BASE}cards-all-backs.jpg`, alt: 'Все карточки — оборотная сторона' },
+      ],
+    };
+
+    let mode = 'spreads';
+    let index = 0;
+    const frame = document.getElementById('frame');
+    const counter = document.getElementById('counter');
+    const prev = document.getElementById('prev');
+    const next = document.getElementById('next');
+    const tabs = document.querySelectorAll('.tabs button');
+
+    function list() { return sets[mode]; }
+
+    function render() {
+      const items = list();
+      const item = items[index];
+      frame.src = item.src;
+      frame.alt = item.alt;
+      counter.textContent = `${index + 1} / ${items.length}`;
+      prev.disabled = index === 0;
+      next.disabled = index === items.length - 1;
+    }
+
+    function go(delta) {
+      const items = list();
+      index = Math.max(0, Math.min(items.length - 1, index + delta));
+      render();
+    }
+
+    function setMode(nextMode) {
+      mode = nextMode;
+      index = 0;
+      tabs.forEach((btn) => {
+        const on = btn.dataset.mode === mode;
+        btn.classList.toggle('active', on);
+        btn.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      render();
+    }
+
+    prev.addEventListener('click', () => go(-1));
+    next.addEventListener('click', () => go(1));
+    tabs.forEach((btn) => btn.addEventListener('click', () => setMode(btn.dataset.mode)));
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') go(-1);
+      if (e.key === 'ArrowRight') go(1);
+    });
+
+    let touchX = null;
+    frame.addEventListener('touchstart', (e) => { touchX = e.changedTouches[0].clientX; }, { passive: true });
+    frame.addEventListener('touchend', (e) => {
+      if (touchX == null) return;
+      const dx = e.changedTouches[0].clientX - touchX;
+      if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+      touchX = null;
+    }, { passive: true });
+
+    main.addEventListener('wheel', (e) => {
+      if (Math.abs(e.deltaY) < 8) return;
+      e.preventDefault();
+      go(e.deltaY > 0 ? 1 : -1);
+    }, { passive: false });
+
+    render();
+  </script>
+</body>
+</html>
