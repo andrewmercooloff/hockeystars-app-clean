@@ -1,3 +1,4 @@
+import { useIsFocused } from '@react-navigation/native';
 import React, { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import Animated, {
@@ -25,7 +26,12 @@ const MAX_SCALE = 1.38;
  * На слабых устройствах не рендерится.
  */
 const LeaderShine: React.FC<LeaderShineProps> = ({ size, color, delayMs = 0 }) => {
-  const animate = getPerformanceLevel() !== 'low';
+  const enabled = getPerformanceLevel() !== 'low';
+  // The rink stays mounted behind other tabs, so an endless loop here would keep
+  // ticking on the UI thread for nothing. Pause it instead of unmounting the rings:
+  // remounting them would repaint a bordered rounded view from scratch.
+  const focused = useIsFocused();
+  const animate = enabled && focused;
   const progress = useSharedValue(0);
   const progress2 = useSharedValue(0);
 
@@ -70,7 +76,7 @@ const LeaderShine: React.FC<LeaderShineProps> = ({ size, color, delayMs = 0 }) =
     };
   });
 
-  if (!animate) return null;
+  if (!enabled) return null;
 
   const ring = {
     width: size,

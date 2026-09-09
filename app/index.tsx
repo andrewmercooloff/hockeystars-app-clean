@@ -3,7 +3,6 @@ import { View, StyleSheet, Dimensions, Image as RNImage, TouchableOpacity, Platf
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image as ExpoImage } from 'expo-image';
 import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useIsFocused } from '@react-navigation/native';
 import Animated, { Easing as ReEasing, makeMutable, useAnimatedStyle, useSharedValue, withDelay, withTiming, runOnJS, type SharedValue } from 'react-native-reanimated';
 
 /**
@@ -56,7 +55,7 @@ import { navigateToPlayerProfile } from '../utils/navigateToPlayer';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getPerformanceLevel, isLowEndAndroid, startupPhysicsDeferMs, startupRenderGraceMs } from '../utils/devicePerformance';
 import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
-import { useWebPathname } from '../hooks/useWebOnly';
+import { useWebIsFocused, useWebPathname } from '../hooks/useWebOnly';
 import PuckGame from '../components/PuckGame';
 import HockeyStarQuizGame from '../components/HockeyStarQuizGame';
 import CachedBackground from '../components/CachedBackground';
@@ -2159,7 +2158,7 @@ export default function HomeScreen() {
   const { language } = useLanguage();
   const { setCurrentScreen, currentScreen } = useScreenContext();
   const params = useLocalSearchParams();
-  const isFocused = useIsFocused();
+  const isFocused = useWebIsFocused();
   const pathname = useWebPathname();
   const performanceLevel = useMemo(() => getPerformanceLevel(), []);
   const isDesktopLayout = useIsDesktopLayout();
@@ -3293,12 +3292,17 @@ export default function HomeScreen() {
   // Анимация запущена если есть шайбы
   const isRunning = puckPositions.length > 0;
 
-  // Web: render the rink only on /feed when this tab is focused — prevents the puck
-  // layer from blocking touches on deep-linked player profiles (promo site → player).
+  // Web: render the rink only on /feed while focused — an inactive scene would sit
+  // on top of deep-linked player profiles and swallow touches.
+  //
+  // Native: stay mounted when the tab blurs. Unmounting made the whole puck layer
+  // repaint on every return, and those first frames are where the grey stripes come
+  // from (iOS paints backgrounds/borders before their corner radii land). Physics is
+  // already parked by `currentScreen`, so a blurred rink costs nothing.
   const isWebHomeRoute =
     Platform.OS === 'web' &&
     (pathname === '/feed' || pathname === '/' || pathname === '');
-  if (!isFocused || (Platform.OS === 'web' && !isWebHomeRoute)) {
+  if (Platform.OS === 'web' && (!isFocused || !isWebHomeRoute)) {
     return null;
   }
 
