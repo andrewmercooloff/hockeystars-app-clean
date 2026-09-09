@@ -21,7 +21,7 @@ number;surname;name;position;role;height;weight;grip;birthdate;photo;type;ribbon
 25;Жежера;Даниил;Нападающий;А;136;26;;;1262;player;
 36;Гурьянов;Игорь;Нападающий;К;148;43;;;1187;player;
 51;Кормановский;Владимир;Нападающий;;130;27;;;1291;player;
-;Команда;Добрыня-2017;Сезон 2026-2027;;;;;;team-card;team;;;;team-card
+;Команда;Добрыня-2017;Сезон 2026-2027;;;;;;team-card;team;;25;;team-card
 ;Ледовая арена;Купчино;Наш дом;;;;;;arena;club;Арена;;;arena-back
 ;Наши победы;;Играем, чтобы побеждать;;;;;;cup;club;Победы
 ;Перед матчем;;Раздевалка · настрой на игру;;;;;;locker;club;Команда
@@ -29,9 +29,10 @@ number;surname;name;position;role;height;weight;grip;birthdate;photo;type;ribbon
 ;Тренировка;;Работаем каждый день;;;;;;life1-front;club;Жизнь команды;;;life1-back
 ;На природе;;Хоккей начинается на земле;;;;;;life2-front;club;Жизнь команды;25;;life2-back
 ;Сборы;;Вместе — сильнее;;;;;;life3-front;club;Жизнь команды;;;life3-back
-;Команда — семья;;Вместе на льду и вне его;;;;;;life4-front;club;Жизнь команды;;;life4-back
+;Команда — семья;;Вместе на льду и вне его;;;;;;life4-front;club;Жизнь команды;55;;life4-back
 ;На турнире;;Играем, чтобы побеждать;;;;;;life5-front;club;Жизнь команды;;;life5-back
 ;После матча;;Эмоции, которые остаются;;;;;;life6-front;club;Жизнь команды;15;;life6-back
 ;Вне льда;;Отдыхаем тоже вместе;;;;;;life7-front;club;Жизнь команды;;;life7-back
 ;Дружба;;Хоккей — это про людей;;;;;;life8-front;club;Жизнь команды;15;;life8-back
-;На выезде;;Едем за победой;;;;;;life9-front;club;Жизнь команды;;;life-away-back
+;На выезде;;Едем за победой;;;;;;life9-front;club;Жизнь команды;25;;life-away-back
+

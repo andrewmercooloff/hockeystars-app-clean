@@ -70,9 +70,16 @@ function cardCss(size) {
 .card.back.person .head .t{display:none;}
 .card.back.person .head .yr{font-family:'Fira Sans Extra Condensed';font-weight:600;font-size:${mm(2)};letter-spacing:.08em;color:var(--dark);text-align:center;width:${mm(16)};margin-top:${mm(-0.2)};}
 .card.back.team:not(.person) .photo img,.card.back.club:not(.person) .photo img{width:100%;height:100%;left:0;top:0;object-fit:cover;object-position:center 35%;}
-/* left fade under the logo: portrait backs + club/life cards (not the full-width team group photo) */
-.card.back.person:not(.team) .photo::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(243,245,248,.96) 0%,rgba(243,245,248,.82) 14%,rgba(243,245,248,.45) 28%,rgba(243,245,248,0) 46%);}
-.card.back.club.person .photo img{left:${(B + 21 * s).toFixed(2)}mm !important;width:calc(100% - ${(21 * s).toFixed(2)}mm) !important;height:100% !important;top:0 !important;object-fit:cover;}
+/* player/coach portrait backs: left fade under the logo zone */
+.card.back.person:not(.team):not(.club) .photo::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(243,245,248,.96) 0%,rgba(243,245,248,.82) 14%,rgba(243,245,248,.45) 28%,rgba(243,245,248,0) 46%);}
+/* club/team life cards: full-width photo, compact logo floated over it (left or right) */
+.card.back.club.person .photo img,.card.back.team.person .photo img{left:0 !important;width:100% !important;height:100% !important;top:0 !important;object-fit:cover;}
+.card.back.club.person .head,.card.back.team.person .head{top:${(B + 1.2 * s).toFixed(2)}mm;gap:${mm(0.35)};}
+.card.back.club.person .head img,.card.back.team.person .head img{width:${mm(8)};height:${mm(8)};}
+.card.back.club.person .head .yr,.card.back.team.person .head .yr{width:${mm(8)};font-size:${mm(1.65)};margin-top:${mm(-0.3)};}
+.card.back.club.person .head.lo-left,.card.back.team.person .head.lo-left{left:${pad}mm;right:auto;}
+.card.back.club.person .head.lo-right,.card.back.team.person .head.lo-right{right:${pad}mm;left:auto;}
+.card.back.club.person .head::before,.card.back.team.person .head::before{content:"";position:absolute;inset:-0.8mm -1.2mm;background:rgba(255,255,255,.78);border-radius:1.2mm;z-index:-1;}
 .card.back.team:not(.person) .photo::after,.card.back.club:not(.person) .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,color-mix(in srgb,var(--primary) 92%,transparent) 0%,color-mix(in srgb,var(--primary) 70%,transparent) 22%,rgba(0,0,0,0) 45%),linear-gradient(180deg,rgba(0,0,0,0) 80%,var(--primary) 100%);}
 .card.back .band{position:absolute;left:-10mm;right:-10mm;height:${mm(7)};transform:rotate(-8deg);}
 .card.back .band.top{top:${(B + 41.5 * s).toFixed(2)}mm;height:${mm(4)};background:var(--secondary);opacity:.95;}
@@ -174,6 +181,13 @@ function backPhotoLeft(card, size) {
   return size.bleed + size.w * 0.66 - (card.focus / 100) * imgW;
 }
 
+// Club/team backs: if the subject sits on the left, float the logo to the right so it does not cover faces.
+function backLogoSide(card) {
+  if (card.logoSide === 'left' || card.logoSide === 'right') return card.logoSide;
+  if (card.type === 'club' || card.type === 'team') return card.focus < 42 ? 'right' : 'left';
+  return 'left';
+}
+
 function cardBack(card, data) {
   const t = data.team;
   const total = data.cards.length;
@@ -192,11 +206,14 @@ function cardBack(card, data) {
   const scale = data.cardSize.w / 63.5;
   const nameSize = `${(5.4 * scale * Math.min(1, 16 / Math.max(longest, 1))).toFixed(2)}mm`;
   const light = Boolean(card.photoBack) && (person || Boolean(card.photo2Aspect));
+  const logoSide = backLogoSide(card);
+  const wideBack = card.type === 'club' || card.type === 'team';
+  const backPos = card.focus === 50 ? (wideBack ? 'center' : '40') : `${card.focus}%`;
   return `<div class="card back ${card.type}${light ? ' person' : ''}">
     <div class="bg"></div>
-    ${card.hasPhoto ? `<div class="photo"><img src="${card.photoBack || card.photo}" style="${card.photoBack && card.type === 'team' ? 'left:0;top:0;width:100%;height:100%;object-fit:cover;object-position:center center' : card.photoBack && card.type === 'club' ? `object-position:center ${card.focus === 50 ? 40 : card.focus}%` : card.photoBack ? `left:${backPhotoLeft(card, data.cardSize).toFixed(2)}mm;height:${(backPhotoH(data.cardSize) * card.zoom).toFixed(2)}mm;top:${(backPhotoH(data.cardSize) * (1 - card.zoom) * 0.3).toFixed(2)}mm` : ''}"></div>` : ''}
+    ${card.hasPhoto ? `<div class="photo"><img src="${card.photoBack || card.photo}" style="${card.photoBack && wideBack ? `object-position:center ${backPos}` : card.photoBack ? `left:${backPhotoLeft(card, data.cardSize).toFixed(2)}mm;height:${(backPhotoH(data.cardSize) * card.zoom).toFixed(2)}mm;top:${(backPhotoH(data.cardSize) * (1 - card.zoom) * 0.3).toFixed(2)}mm` : ''}"></div>` : ''}
     <div class="band top"></div><div class="band top2"></div>
-    <div class="head">${logo}${light ? `<div class="yr">${esc(t.season)}</div>` : ''}<div class="t">${esc(t.name)}<small>${esc(t.city || '')}${t.city ? '<br>' : ''}Сезон ${esc(t.season)}</small></div></div>
+    <div class="head lo-${logoSide}">${logo}${light ? `<div class="yr">${esc(t.season)}</div>` : ''}<div class="t">${esc(t.name)}<small>${esc(t.city || '')}${t.city ? '<br>' : ''}Сезон ${esc(t.season)}</small></div></div>
     ${card.number ? `<div class="bignum">${esc(card.number)}</div>` : ''}
     <div class="who">
       <div class="nm" style="font-size:${nameSize}">${card.number ? `<span>#${esc(card.number)}${card.role ? `<sup>${esc(card.role)}</sup>` : ''}</span>` : ''}${esc(card.surname).toUpperCase()}<br>${esc(card.name).toUpperCase()}</div>
