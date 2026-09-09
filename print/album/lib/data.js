@@ -193,7 +193,7 @@ async function loadTeam(teamDir, cacheDir) {
       photoSmall: photoPath ? await prepareImage(photoPath, photoCache, 500) : placeholderPhoto(number, colors.primary),
       // optional second photo for the back (column photo2 / оборот); people get the faded close-up of the main photo
       photoBack: (row.photo2 || row['оборот'])
-        ? await backCloseup(findPhoto(photosDir, { photo: row.photo2 || row['оборот'] }), photoCache, 1, 900, type === 'player' || type === 'coach' || type === 'legend')
+        ? await backCloseup(findPhoto(photosDir, { photo: row.photo2 || row['оборот'] }), photoCache, 1, 900, type === 'player' || type === 'coach' || type === 'legend', type === 'club' || type === 'team')
         : photoPath && (type === 'player' || type === 'coach' || type === 'legend') ? await backCloseup(photoPath, photoCache) : null,
       hasPhoto: Boolean(photoPath),
       photo2Aspect: (row.photo2 || row['оборот']) ? await imageAspect(findPhoto(photosDir, { photo: row.photo2 || row['оборот'] })) : null,

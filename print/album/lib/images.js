@@ -123,10 +123,10 @@ async function imageAspect(urlOrPath) {
 
 // Close-up for the card back: top `cropFrac` of the photo, alpha fade baked into the pixels (left / right / bottom)
 // so no CSS masks or blend modes are needed — those get dropped by some PDF viewers (iOS Preview).
-async function backCloseup(srcPath, cacheDir, cropFrac = 1, widthPx = 900, sideFade = true) {
+async function backCloseup(srcPath, cacheDir, cropFrac = 1, widthPx = 900, sideFade = true, noFade = false) {
   if (!sharp) return null;
   const stat = fs.statSync(srcPath);
-  const key = crypto.createHash('md5').update(`${srcPath}|${stat.size}|${stat.mtimeMs}|back3|${cropFrac}|${widthPx}|${sideFade}`).digest('hex').slice(0, 12);
+  const key = crypto.createHash('md5').update(`${srcPath}|${stat.size}|${stat.mtimeMs}|back3|${cropFrac}|${widthPx}|${sideFade}|${noFade}`).digest('hex').slice(0, 12);
   const outPath = path.join(cacheDir, `${path.basename(srcPath, path.extname(srcPath))}-${key}-back.png`);
   if (!fs.existsSync(outPath)) {
     fs.mkdirSync(cacheDir, { recursive: true });
@@ -135,7 +135,7 @@ async function backCloseup(srcPath, cacheDir, cropFrac = 1, widthPx = 900, sideF
     const swap = m.orientation >= 5;
     const W = swap ? m.height : m.width;
     const H = swap ? m.width : m.height;
-    const cropH = Math.max(1, Math.round(Math.min(H, W * 1.15) * cropFrac));
+    const cropH = noFade ? H : Math.max(1, Math.round(Math.min(H, W * 1.15) * cropFrac));
     const outH = Math.round((cropH / W) * widthPx);
     const mask = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${widthPx}" height="${outH}">
       <defs>
@@ -148,7 +148,7 @@ async function backCloseup(srcPath, cacheDir, cropFrac = 1, widthPx = 900, sideF
       .extract({ left: 0, top: 0, width: W, height: cropH })
       .resize({ width: widthPx, height: outH })
       .ensureAlpha()
-      .composite([{ input: mask, blend: 'dest-in' }])
+      .composite(noFade ? [] : [{ input: mask, blend: 'dest-in' }])
       .png({ compressionLevel: 9 })
       .toFile(outPath);
   }
