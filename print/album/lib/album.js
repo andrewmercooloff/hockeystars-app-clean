@@ -57,7 +57,7 @@ ${cardCss(size)}
 
 /* facts / glossary / profile pages */
 .facts .hdr,.glossary .hdr,.profile .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
-.facts .hdr .title,.glossary .hdr .title,.profile .hdr .title{font-size:11mm;}
+.facts .hdr .title,.glossary .hdr .title,.profile .hdr .title{font-size:8.5mm;}
 .facts .hdr .sub,.glossary .hdr .sub,.profile .hdr .sub{font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:3.6mm;letter-spacing:.14em;color:var(--secondary);margin-top:2.5mm;}
 .facts .goal{position:absolute;right:${bleed + 12}mm;top:${bleed + 8}mm;width:40mm;height:26mm;opacity:.6;}
 .facts .fgrid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 44}mm;bottom:${bleed + 16}mm;display:grid;grid-template-columns:1fr 1fr;gap:6mm 8mm;grid-auto-rows:1fr;}
@@ -113,7 +113,7 @@ ${cardCss(size)}
 .gallery .hdr .sticks,.autographs .hdr .sticks,.history .hdr .sticks{width:14mm;height:14mm;vertical-align:-3mm;margin-left:3mm;}
 
 /* section title */
-.title{position:relative;display:inline-block;font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:13mm;line-height:1;color:var(--dark);
+.title{position:relative;display:inline-block;font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:10mm;line-height:1;color:var(--dark);
   padding:2mm 0;}
 .title::after{content:"";position:absolute;left:0;right:-6mm;bottom:-1mm;height:2mm;background:linear-gradient(90deg,var(--secondary) 0 60%,var(--primary) 60%);
   transform:skewX(-30deg);}
@@ -121,8 +121,8 @@ ${cardCss(size)}
 /* ---------- COVER ---------- */
 .cover{background:var(--dark);}
 .cover .photo{position:absolute;inset:0;}
-.cover .photo img{width:100%;height:100%;object-fit:cover;object-position:center 30%;}
-.cover .photo .grad{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,26,58,.15) 0%,rgba(7,26,58,0) 30%,rgba(7,26,58,.15) 65%,rgba(7,26,58,.75) 100%);}
+.cover .photo img{width:100%;height:100%;object-fit:contain;object-position:center 40%;}
+.cover .photo .grad{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,26,58,.78) 0%,rgba(7,26,58,.45) 22%,rgba(7,26,58,0) 38%,rgba(7,26,58,0) 62%,rgba(7,26,58,.55) 82%,rgba(7,26,58,.9) 100%);}
 /* Landscape team photo: full-width panel under the title block so nobody is cropped off the sides. */
 .cover .photo.panel{inset:auto;left:0;right:0;top:${bleed + 84}mm;clip-path:polygon(0 5mm,100% 0,100% 100%,0 100%);
   box-shadow:0 -2mm 6mm rgba(0,0,0,.25);}
@@ -192,7 +192,7 @@ ${cardCss(size)}
 .team .hdr{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 9}mm;height:22mm;display:flex;align-items:center;justify-content:space-between;}
 .team .hdr .logo{width:22mm;height:22mm;display:flex;align-items:center;justify-content:center;}
 .team .hdr .logo img{max-width:100%;max-height:100%;object-fit:contain;}
-.team .hdr .title{font-size:13mm;}
+.team .hdr .title{font-size:10mm;}
 .team .hdr .sub{font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:3.6mm;letter-spacing:.14em;color:var(--secondary);text-align:right;margin-top:2mm;}
 .team .grid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${(bleed + gridTop(size)).toFixed(1)}mm;display:grid;
   grid-template-columns:repeat(${SLOT_COLS},${size.w}mm);justify-content:space-between;row-gap:${gridGap(size).toFixed(1)}mm;}
@@ -200,7 +200,7 @@ ${cardCss(size)}
 .cell .cap{height:${CAPTION_H}mm;padding-top:1.6mm;text-align:center;}
 .team.dense .hdr{top:${bleed + 5}mm;height:16mm;}
 .team.dense .hdr .logo{width:16mm;height:16mm;}
-.team.dense .hdr .title{font-size:9.5mm;}
+.team.dense .hdr .title{font-size:8mm;}
 .team.dense .hdr .sub{font-size:3mm;margin-top:1mm;}
 .team.dense .cell .cap{position:absolute;left:0;right:0;bottom:0;height:auto;padding:1.4mm 2mm 1.6mm;background:rgba(255,255,255,.9);border-top:.3mm solid color-mix(in srgb,var(--primary) 25%,transparent);}
 .team.dense .cell .cap .n{font-size:3.4mm;}
@@ -288,7 +288,7 @@ ${cardCss(size)}
 /* ---------- QUOTES ---------- */
 .quotes .hdr{position:absolute;left:${bleed + 10}mm;top:${bleed + 12}mm;}
 .quotes .hdr .sticks{width:14mm;height:14mm;vertical-align:-3mm;margin-left:3mm;}
-.quotes .hdr .title{font-size:9.5mm;}
+.quotes .hdr .title{font-size:8mm;}
 .quotes .goal{position:absolute;right:${bleed + 12}mm;bottom:${bleed + 4}mm;width:34mm;height:22mm;opacity:.5;}
 .quotes .qgrid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 42}mm;bottom:${bleed + 16}mm;display:grid;grid-template-columns:1fr 1fr;gap:5mm 6mm;align-content:space-between;}
 .quotes .qp{position:relative;background:linear-gradient(135deg,var(--primary),var(--dark));color:#fff;padding:5mm 6mm 5mm 7mm;transform:rotate(-1.2deg) skewX(-3deg);
@@ -530,7 +530,7 @@ function factsPage(data, pageNo) {
     <div class="orn tr"></div>
     <div class="hdr"><div class="title">Знаешь ли ты?</div><div class="sub">Интересные факты о хоккее</div></div>
     <div class="fgrid">${list
-      .map((f, i) => `<div class="f"><div class="pk">${puckSvg(i % 2 ? data.colors.secondary : data.colors.dark, 'rgba(255,255,255,.55)')}<b>${esc(f.v)}</b></div><p>${esc(f.t)}</p></div>`)
+      .map((f, i) => `<div class="f"><div class="pk">${puckSvg(i % 2 ? data.colors.secondary : data.colors.dark, 'rgba(255,255,255,.55)')}<b style="font-size:${f.v.length > 6 ? 4 : f.v.length > 4 ? 4.8 : 5.4}mm">${esc(f.v)}</b></div><p>${esc(f.t)}</p></div>`)
       .join('')}</div>
     ${goalSvg(data.colors.secondary, `color-mix(in srgb,${data.colors.primary} 45%,transparent)`)}
     <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
