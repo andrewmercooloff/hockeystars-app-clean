@@ -83,13 +83,11 @@ async function main() {
   const shareHtml = path.join(__dirname, 'share', slug, 'index.html');
   if (fs.existsSync(shareHtml)) {
     try {
-      const branch = execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { encoding: 'utf8' }).trim();
       const remote = execFileSync('git', ['remote', 'get-url', 'origin'], { encoding: 'utf8' }).trim();
       const m = remote.match(/github\.com[:/](.+?)(?:\.git)?$/);
       if (m) {
-        const repoPath = m[1];
-        const rel = path.relative(path.join(__dirname, '..', '..'), shareHtml).split(path.sep).join('/');
-        console.log(`\n🔗 Ссылка для клиента (перелистывание):\n   https://cdn.jsdelivr.net/gh/${repoPath}@${branch}/${rel}`);
+        const [owner, repo] = m[1].split('/');
+        console.log(`\n🔗 Ссылка для клиента (перелистывание):\n   https://${owner}.github.io/${repo}/${slug}/`);
       }
     } catch (_) { /* not a git repo — skip */ }
   }

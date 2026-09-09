@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
   <meta name="robots" content="noindex, nofollow">
   <title>HK «Дobrynya» — альбом 2026–2027</title>
   <style>
@@ -15,163 +15,253 @@
       --muted: #8fa3c0;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
     body { display: flex; flex-direction: column; min-height: 100dvh; }
 
     header {
       flex: 0 0 auto;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
       padding: 10px 16px; background: var(--panel); border-bottom: 1px solid rgba(255,255,255,.08);
+      z-index: 2;
     }
     header h1 { font-size: 15px; font-weight: 600; line-height: 1.25; }
     header p { font-size: 12px; color: var(--muted); margin-top: 2px; }
-    .tabs { display: flex; gap: 6px; }
+    .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
     .tabs button {
       border: 1px solid rgba(255,255,255,.15); background: transparent; color: var(--text);
       padding: 6px 12px; border-radius: 999px; font-size: 13px; cursor: pointer;
     }
     .tabs button.active { background: var(--accent); border-color: var(--accent); color: #111; font-weight: 600; }
 
-    main { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; padding: 8px; }
-    .viewer { width: min(100%, 1200px); height: 100%; display: flex; align-items: center; justify-content: center; }
-    .spread {
-      max-width: 100%; max-height: calc(100dvh - 120px); width: auto; height: auto;
-      object-fit: contain; border-radius: 4px; box-shadow: 0 12px 40px rgba(0,0,0,.45);
-      user-select: none; -webkit-user-drag: none;
+    main {
+      flex: 1 1 auto;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 8px;
+    }
+
+    #book-wrap {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #book {
+      box-shadow: 0 16px 48px rgba(0,0,0,.55);
     }
 
     .nav {
       position: absolute; top: 50%; transform: translateY(-50%);
       width: 44px; height: 64px; border: none; border-radius: 8px;
-      background: rgba(17,31,54,.85); color: #fff; font-size: 28px; cursor: pointer;
+      background: rgba(17,31,54,.88); color: #fff; font-size: 28px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      backdrop-filter: blur(6px); transition: background .15s;
+      backdrop-filter: blur(6px); z-index: 3;
     }
-    .nav:hover { background: rgba(245,130,32,.9); color: #111; }
-    .nav:disabled { opacity: .25; cursor: default; pointer-events: none; }
+    .nav:active { background: rgba(245,130,32,.95); color: #111; }
+    .nav:disabled { opacity: .2; pointer-events: none; }
     .nav.prev { left: 8px; }
     .nav.next { right: 8px; }
 
     footer {
-      flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: var(--panel);
-      border-top: 1px solid rgba(255,255,255,.08); font-size: 13px; color: var(--muted);
+      flex: 0 0 auto;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+      background: var(--panel); border-top: 1px solid rgba(255,255,255,.08);
+      font-size: 13px; color: var(--muted); z-index: 2;
     }
     .counter { color: var(--text); font-weight: 600; }
-    .hint { font-size: 12px; }
+
+    .loading {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: rgba(10,22,40,.75); font-size: 14px; z-index: 4;
+    }
+    .loading.hidden { display: none; }
 
     @media (max-width: 640px) {
       header { flex-wrap: wrap; }
       .nav { width: 36px; height: 52px; font-size: 22px; }
-      .hint { display: none; }
     }
   </style>
 </head>
 <body>
   <header>
     <div>
-      <h1>HK «Дobrynya» — альбом сезона 2026–2027</h1>
-      <p>16 страниц · 8 разворотов · предпросмотр для согласования</p>
+      <h1>HK «Дobrynya» — альбом 2026–2027</h1>
+      <p>Листайте пальцем или нажимайте на край страницы</p>
     </div>
     <div class="tabs" role="tablist">
-      <button type="button" class="active" data-mode="spreads" role="tab" aria-selected="true">Журнал</button>
-      <button type="button" data-mode="pages" role="tab" aria-selected="false">Страницы</button>
-      <button type="button" data-mode="cards" role="tab" aria-selected="false">Карточки</button>
+      <button type="button" class="active" data-mode="spreads" role="tab">Развороты</button>
+      <button type="button" data-mode="pages" role="tab">Страницы</button>
+      <button type="button" data-mode="cards" role="tab">Карточки</button>
     </div>
   </header>
 
   <main>
+    <div class="loading" id="loading">Загрузка альбома…</div>
     <button type="button" class="nav prev" id="prev" aria-label="Назад">‹</button>
-    <div class="viewer">
-      <img class="spread" id="frame" alt="" draggable="false">
-    </div>
+    <div id="book-wrap"><div id="book"></div></div>
     <button type="button" class="nav next" id="next" aria-label="Вперёд">›</button>
   </main>
 
   <footer>
-    <span class="counter" id="counter">1 / 8</span>
-    <span class="hint">← → или свайп · колёсико мыши</span>
+    <span class="counter" id="counter">—</span>
+    <span id="hint">Свайп или тап по краю</span>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
   <script>
-    const BASE = '../../print-ready/dobrynya/pages/';
+    const REPO = 'andrewmercooloff/hockeystars-app-clean';
+    const BRANCH = 'cursor/hockey-card-album-generator-a9a3';
+    const IMG = (file) =>
+      `https://cdn.jsdelivr.net/gh/${REPO}@${encodeURIComponent(BRANCH)}/print/album/print-ready/dobrynya/pages/${file}`;
+
     const sets = {
-      spreads: Array.from({ length: 8 }, (_, i) => ({
-        src: `${BASE}spread-${String(i + 1).padStart(2, '0')}.jpg`,
-        alt: `Разворот ${i + 1} из 8`,
-      })),
-      pages: Array.from({ length: 16 }, (_, i) => ({
-        src: `${BASE}album-${String(i + 1).padStart(2, '0')}.jpg`,
-        alt: `Страница ${i + 1} из 16`,
-      })),
-      cards: [
-        { src: `${BASE}cards-all-fronts.jpg`, alt: 'Все карточки — лицевая сторона' },
-        { src: `${BASE}cards-all-backs.jpg`, alt: 'Все карточки — оборотная сторона' },
-      ],
+      spreads: {
+        label: 'разворот',
+        pages: Array.from({ length: 8 }, (_, i) => IMG(`spread-${String(i + 1).padStart(2, '0')}.jpg`)),
+        ratio: 420 / 297,
+      },
+      pages: {
+        label: 'страница',
+        pages: Array.from({ length: 16 }, (_, i) => IMG(`album-${String(i + 1).padStart(2, '0')}.jpg`)),
+        ratio: 210 / 297,
+      },
+      cards: {
+        label: 'лист',
+        pages: [IMG('cards-all-fronts.jpg'), IMG('cards-all-backs.jpg')],
+        ratio: 1.2,
+      },
     };
 
     let mode = 'spreads';
-    let index = 0;
-    const frame = document.getElementById('frame');
-    const counter = document.getElementById('counter');
-    const prev = document.getElementById('prev');
-    const next = document.getElementById('next');
+    let flip = null;
+    const bookEl = document.getElementById('book');
+    const loadingEl = document.getElementById('loading');
+    const counterEl = document.getElementById('counter');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
     const tabs = document.querySelectorAll('.tabs button');
 
-    function list() { return sets[mode]; }
-
-    function render() {
-      const items = list();
-      const item = items[index];
-      frame.src = item.src;
-      frame.alt = item.alt;
-      counter.textContent = `${index + 1} / ${items.length}`;
-      prev.disabled = index === 0;
-      next.disabled = index === items.length - 1;
+    function bookSize(ratio) {
+      const wrap = document.getElementById('book-wrap');
+      const pad = 24;
+      const maxW = wrap.clientWidth - pad;
+      const maxH = wrap.clientHeight - pad;
+      let w, h;
+      if (maxW / maxH > ratio) {
+        h = maxH;
+        w = h * ratio;
+      } else {
+        w = maxW;
+        h = w / ratio;
+      }
+      return { width: Math.floor(w), height: Math.floor(h) };
     }
 
-    function go(delta) {
-      const items = list();
-      index = Math.max(0, Math.min(items.length - 1, index + delta));
-      render();
+    function preload(urls) {
+      return Promise.all(urls.map((src) => new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(src);
+        img.onerror = () => reject(new Error(src));
+        img.src = src;
+      })));
     }
 
-    function setMode(nextMode) {
+    function updateNav() {
+      if (!flip) return;
+      const idx = flip.getCurrentPageIndex();
+      const total = flip.getPageCount();
+      const cfg = sets[mode];
+      counterEl.textContent = `${idx + 1} / ${total} · ${cfg.label}`;
+      prevBtn.disabled = idx <= 0;
+      nextBtn.disabled = idx >= total - 1;
+    }
+
+    function destroyFlip() {
+      if (flip) {
+        flip.destroy();
+        flip = null;
+      }
+      bookEl.innerHTML = '';
+    }
+
+    async function buildFlip(nextMode) {
       mode = nextMode;
-      index = 0;
-      tabs.forEach((btn) => {
-        const on = btn.dataset.mode === mode;
-        btn.classList.toggle('active', on);
-        btn.setAttribute('aria-selected', on ? 'true' : 'false');
+      tabs.forEach((btn) => btn.classList.toggle('active', btn.dataset.mode === mode));
+      destroyFlip();
+      loadingEl.classList.remove('hidden');
+
+      const cfg = sets[mode];
+      try {
+        await preload(cfg.pages);
+      } catch (e) {
+        loadingEl.textContent = 'Не удалось загрузить изображения. Проверьте интернет.';
+        return;
+      }
+
+      const { width, height } = bookSize(cfg.ratio);
+      flip = new St.PageFlip(bookEl, {
+        width,
+        height,
+        size: 'fixed',
+        minWidth: 220,
+        maxWidth: 2000,
+        minHeight: 300,
+        maxHeight: 2000,
+        maxShadowOpacity: 0.45,
+        showCover: false,
+        mobileScrollSupport: false,
+        usePortrait: mode === 'pages',
+        drawShadow: true,
+        flippingTime: 700,
+        useMouseEvents: true,
+        swipeDistance: 30,
+        clickEventForward: false,
       });
-      render();
+
+      flip.loadFromImages(cfg.pages);
+      flip.on('flip', updateNav);
+      flip.on('init', () => {
+        loadingEl.classList.add('hidden');
+        updateNav();
+      });
+
+      loadingEl.classList.add('hidden');
+      updateNav();
     }
 
-    prev.addEventListener('click', () => go(-1));
-    next.addEventListener('click', () => go(1));
-    tabs.forEach((btn) => btn.addEventListener('click', () => setMode(btn.dataset.mode)));
+    prevBtn.addEventListener('click', () => flip && flip.flipPrev());
+    nextBtn.addEventListener('click', () => flip && flip.flipNext());
+    tabs.forEach((btn) => btn.addEventListener('click', () => {
+      if (btn.dataset.mode !== mode) buildFlip(btn.dataset.mode);
+    }));
 
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') go(-1);
-      if (e.key === 'ArrowRight') go(1);
+      if (!flip) return;
+      if (e.key === 'ArrowLeft') flip.flipPrev();
+      if (e.key === 'ArrowRight') flip.flipNext();
     });
 
-    let touchX = null;
-    frame.addEventListener('touchstart', (e) => { touchX = e.changedTouches[0].clientX; }, { passive: true });
-    frame.addEventListener('touchend', (e) => {
-      if (touchX == null) return;
-      const dx = e.changedTouches[0].clientX - touchX;
-      if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
-      touchX = null;
-    }, { passive: true });
+    window.addEventListener('resize', () => {
+      if (!flip) return;
+      const cfg = sets[mode];
+      const { width, height } = bookSize(cfg.ratio);
+      flip.update({ width, height });
+    });
 
-    main.addEventListener('wheel', (e) => {
-      if (Math.abs(e.deltaY) < 8) return;
-      e.preventDefault();
-      go(e.deltaY > 0 ? 1 : -1);
-    }, { passive: false });
-
-    render();
+    buildFlip('spreads');
   </script>
 </body>
 </html>
