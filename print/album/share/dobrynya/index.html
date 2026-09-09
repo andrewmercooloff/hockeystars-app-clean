@@ -216,12 +216,20 @@
     .zoom-toolbar span { font-size: 14px; }
     .zoom-toolbar button { border: none; background: transparent; color: #fff; font-size: 28px; cursor: pointer; }
     .zoom-stage { flex: 1 1 auto; overflow: hidden; touch-action: none; position: relative; }
-    .zoom-stage img {
+    .zoom-frame {
       position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%) scale(1);
       transform-origin: center center;
-      user-select: none; max-height: 92vh; width: auto; height: auto;
+      display: flex; align-items: stretch;
+      max-height: 92vh; max-width: 96vw;
+      user-select: none;
     }
+    .zoom-frame .zoom-half { flex: none; height: 92vh; overflow: hidden; background: #0d1520; }
+    .zoom-frame.single .zoom-half { width: calc(92vh * 210 / 297); }
+    .zoom-frame.spread .zoom-half { width: calc(92vh * 210 / 297); }
+    .zoom-frame.spread .zoom-half.left { border-right: 1px solid rgba(255,255,255,.12); }
+    .zoom-frame img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .zoom-frame .zoom-half.hidden { display: none; }
     .zoom-controls {
       flex: 0 0 auto;
       display: flex; justify-content: center; gap: 16px;
@@ -300,7 +308,10 @@
       <button type="button" id="zoom-close" aria-label="Закрыть">×</button>
     </div>
     <div class="zoom-stage" id="zoom-stage">
-      <img id="zoom-img" alt="">
+      <div class="zoom-frame single" id="zoom-frame">
+        <div class="zoom-half left" id="zoom-half-l"><img id="zoom-img-l" alt=""></div>
+        <div class="zoom-half right hidden" id="zoom-half-r"><img id="zoom-img-r" alt=""></div>
+      </div>
     </div>
     <div class="zoom-controls">
       <button type="button" id="zoom-out">−</button>
@@ -358,7 +369,11 @@
       const cardSideEl = document.getElementById('card-side');
       const cardSideBtns = document.querySelectorAll('.card-side button');
       const zoomOverlay = document.getElementById('zoom');
-      const zoomImg = document.getElementById('zoom-img');
+      const zoomFrame = document.getElementById('zoom-frame');
+      const zoomHalfL = document.getElementById('zoom-half-l');
+      const zoomHalfR = document.getElementById('zoom-half-r');
+      const zoomImgL = document.getElementById('zoom-img-l');
+      const zoomImgR = document.getElementById('zoom-img-r');
       const zoomStage = document.getElementById('zoom-stage');
       const zoomTitle = document.getElementById('zoom-title');
       const errorBox = document.getElementById('error');
@@ -380,12 +395,11 @@
 
       function cardList() { return cardSide === 'front' ? cardFronts : cardBacks; }
 
-      function currentZoomSrc() {
-        const cfg = modes[mode];
-        if (cfg.type === 'grid') return cardList()[index];
-        const pair = cfg.pairs[index];
-        if (pair.single != null) return cfg.urls[pair.single];
-        return cfg.urls[pair.right];
+      function currentZoomPair() {
+        if (mode === 'cards') return { single: cardList()[index] };
+        var pair = modes.pages.pairs[index];
+        if (pair.single != null) return { single: modes.pages.urls[pair.single] };
+        return { left: modes.pages.urls[pair.left], right: modes.pages.urls[pair.right] };
       }
 
       function loadImage(src) {
@@ -437,7 +451,7 @@
       }
 
       function applyZoomTransform() {
-        zoomImg.style.transform = 'translate(calc(-50% + ' + zoomPanX + 'px), calc(-50% + ' + zoomPanY + 'px)) scale(' + zoomScale + ')';
+        zoomFrame.style.transform = 'translate(calc(-50% + ' + zoomPanX + 'px), calc(-50% + ' + zoomPanY + 'px)) scale(' + zoomScale + ')';
         if (zoomInBtn) zoomInBtn.disabled = zoomScale >= ZOOM_MAX - 0.01;
         if (zoomOutBtn) zoomOutBtn.disabled = zoomScale <= ZOOM_MIN + 0.01;
       }
@@ -463,11 +477,38 @@
 
       function openZoom(cardIndex) {
         if (cardIndex != null) index = cardIndex;
-        zoomTitle.textContent = mode === 'cards'
-          ? 'Карточка ' + (index + 1) + ' · ' + (cardSide === 'front' ? 'лицо' : 'оборот')
-          : 'Страницы ' + (index + 1);
-        zoomImg.onload = function () { resetZoom(); };
-        zoomImg.src = currentZoomSrc();
+        if (mode === 'cards') {
+          zoomTitle.textContent = 'Карточка ' + (index + 1) + ' · ' + (cardSide === 'front' ? 'лицо' : 'оборот');
+        } else {
+          var pair = modes.pages.pairs[index];
+          zoomTitle.textContent = pair.single != null
+            ? 'Страница ' + (pair.single + 1)
+            : 'Разворот · стр. ' + (pair.left + 1) + ' и ' + (pair.right + 1);
+        }
+        var content = currentZoomPair();
+        var waiting = 0;
+        function onReady() {
+          waiting -= 1;
+          if (waiting <= 0) resetZoom();
+        }
+        if (content.single) {
+          zoomFrame.className = 'zoom-frame single';
+          zoomHalfR.classList.add('hidden');
+          waiting = 1;
+          zoomImgL.onload = onReady;
+          zoomImgL.onerror = onReady;
+          zoomImgL.src = content.single;
+        } else {
+          zoomFrame.className = 'zoom-frame spread';
+          zoomHalfR.classList.remove('hidden');
+          waiting = 2;
+          zoomImgL.onload = onReady;
+          zoomImgR.onload = onReady;
+          zoomImgL.onerror = onReady;
+          zoomImgR.onerror = onReady;
+          zoomImgL.src = content.left;
+          zoomImgR.src = content.right;
+        }
         zoomOverlay.classList.add('open');
       }
 
