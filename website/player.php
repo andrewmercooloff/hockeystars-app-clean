@@ -95,7 +95,7 @@ $birthYear = $player ? hs_player_birth_year($player) : null;
 $positionLabel = $player ? hs_localize_player_position($player['position'] ?? null, $lang) : '';
 $teamLabel = $player ? hs_player_seo_team($player, $lang) : '';
 $isEn = $lang === 'en';
-$playersDirUrl = '/players.php?lang=' . $seoLang . ($birthYear ? '&year=' . $birthYear : '');
+$playersDirUrl = '/search?lang=' . $seoLang . ($birthYear ? '&year=' . $birthYear : '');
 $breadcrumbLd = $player ? json_encode([
     '@context' => 'https://schema.org',
     '@type' => 'BreadcrumbList',
@@ -152,7 +152,7 @@ $ogLocale = $ogLocales[$lang] ?? 'ru_RU';
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="shortcut icon" href="/favicon.ico">
     <meta name="theme-color" content="#050008">
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/styles.css?v=20260909">
     <style>
         .profile-seo-card {
             max-width: 720px;

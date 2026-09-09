@@ -39,7 +39,7 @@ $t = $lang === 'en'
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow">
     <title><?php echo htmlspecialchars($t['title'], ENT_QUOTES, 'UTF-8'); ?></title>
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/styles.css?v=20260909">
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { margin: 0; min-height: 100vh; overflow-x: hidden; }

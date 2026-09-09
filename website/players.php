@@ -1,6 +1,6 @@
 <?php
 /**
- * Публичный каталог игроков: /players.php?lang=ru&year=2012&page=2
+ * Публичный каталог игроков: /search?lang=ru&year=2012&page=2
  *
  * Зачем: страницы игроков раньше были доступны Google только из sitemap — ни одна
  * HTML-страница сайта на них не ссылалась («сироты»), поэтому их почти не индексировали.
@@ -79,10 +79,10 @@ if (is_array($yearsRows)) {
 krsort($yearCounts);
 
 $base = rtrim(HS_SITE_URL, '/');
-$selfPath = '/players.php?lang=' . $lang . ($year ? '&year=' . $year : '') . ($page > 1 ? '&page=' . $page : '');
+$selfPath = '/search?lang=' . $lang . ($year ? '&year=' . $year : '') . ($page > 1 ? '&page=' . $page : '');
 $canonicalUrl = $base . $selfPath;
-$altRu = $base . '/players.php?lang=ru' . ($year ? '&year=' . $year : '') . ($page > 1 ? '&page=' . $page : '');
-$altEn = $base . '/players.php?lang=en' . ($year ? '&year=' . $year : '') . ($page > 1 ? '&page=' . $page : '');
+$altRu = $base . '/search?lang=ru' . ($year ? '&year=' . $year : '') . ($page > 1 ? '&page=' . $page : '');
+$altEn = $base . '/search?lang=en' . ($year ? '&year=' . $year : '') . ($page > 1 ? '&page=' . $page : '');
 
 if ($isEn) {
     $title = $year
@@ -134,10 +134,10 @@ header('Cache-Control: public, max-age=900');
     <link rel="alternate" hreflang="en" href="<?php echo htmlspecialchars($altEn, ENT_QUOTES, 'UTF-8'); ?>">
     <link rel="alternate" hreflang="x-default" href="<?php echo htmlspecialchars($altRu, ENT_QUOTES, 'UTF-8'); ?>">
     <?php if ($page > 1): ?>
-    <link rel="prev" href="<?php echo htmlspecialchars($base . '/players.php?lang=' . $lang . ($year ? '&year=' . $year : '') . ($page > 2 ? '&page=' . ($page - 1) : ''), ENT_QUOTES, 'UTF-8'); ?>">
+    <link rel="prev" href="<?php echo htmlspecialchars($base . '/search?lang=' . $lang . ($year ? '&year=' . $year : '') . ($page > 2 ? '&page=' . ($page - 1) : ''), ENT_QUOTES, 'UTF-8'); ?>">
     <?php endif; ?>
     <?php if ($page < $totalPages): ?>
-    <link rel="next" href="<?php echo htmlspecialchars($base . '/players.php?lang=' . $lang . ($year ? '&year=' . $year : '') . '&page=' . ($page + 1), ENT_QUOTES, 'UTF-8'); ?>">
+    <link rel="next" href="<?php echo htmlspecialchars($base . '/search?lang=' . $lang . ($year ? '&year=' . $year : '') . '&page=' . ($page + 1), ENT_QUOTES, 'UTF-8'); ?>">
     <?php endif; ?>
     <meta name="robots" content="index, follow">
     <meta property="og:type" content="website">
@@ -149,7 +149,7 @@ header('Cache-Control: public, max-age=900');
     <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
     <link rel="shortcut icon" href="/favicon.ico">
     <meta name="theme-color" content="#0c0c10">
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/styles.css?v=20260909">
     <style>
         .dir-wrap { max-width: 1040px; margin: 36px auto 24px; padding: 0 4px; }
         .dir-title { text-align: center; margin-bottom: 8px; }
@@ -200,9 +200,9 @@ header('Cache-Control: public, max-age=900');
 
                 <?php if ($yearCounts): ?>
                 <nav class="years" aria-label="<?php echo $isEn ? 'Birth year' : 'Год рождения'; ?>">
-                    <a class="year-chip<?php echo $year === 0 ? ' active' : ''; ?>" href="/players.php?lang=<?php echo $lang; ?>"><?php echo $isEn ? 'All' : 'Все'; ?></a>
+                    <a class="year-chip<?php echo $year === 0 ? ' active' : ''; ?>" href="/search?lang=<?php echo $lang; ?>"><?php echo $isEn ? 'All' : 'Все'; ?></a>
                     <?php foreach ($yearCounts as $y => $cnt): ?>
-                    <a class="year-chip<?php echo $year === $y ? ' active' : ''; ?>" href="/players.php?lang=<?php echo $lang; ?>&amp;year=<?php echo $y; ?>"><?php echo $y; ?><small><?php echo $cnt; ?></small></a>
+                    <a class="year-chip<?php echo $year === $y ? ' active' : ''; ?>" href="/search?lang=<?php echo $lang; ?>&amp;year=<?php echo $y; ?>"><?php echo $y; ?><small><?php echo $cnt; ?></small></a>
                     <?php endforeach; ?>
                 </nav>
                 <?php endif; ?>
@@ -232,11 +232,11 @@ header('Cache-Control: public, max-age=900');
                 <?php if ($totalPages > 1): ?>
                 <nav class="pager" aria-label="pagination">
                     <?php if ($page > 1): ?>
-                    <a href="/players.php?lang=<?php echo $lang; ?><?php echo $year ? '&amp;year=' . $year : ''; ?><?php echo $page > 2 ? '&amp;page=' . ($page - 1) : ''; ?>">← <?php echo $isEn ? 'Previous' : 'Назад'; ?></a>
+                    <a href="/search?lang=<?php echo $lang; ?><?php echo $year ? '&amp;year=' . $year : ''; ?><?php echo $page > 2 ? '&amp;page=' . ($page - 1) : ''; ?>">← <?php echo $isEn ? 'Previous' : 'Назад'; ?></a>
                     <?php endif; ?>
                     <span><?php echo $page; ?> / <?php echo $totalPages; ?></span>
                     <?php if ($page < $totalPages): ?>
-                    <a href="/players.php?lang=<?php echo $lang; ?><?php echo $year ? '&amp;year=' . $year : ''; ?>&amp;page=<?php echo $page + 1; ?>"><?php echo $isEn ? 'Next' : 'Дальше'; ?> →</a>
+                    <a href="/search?lang=<?php echo $lang; ?><?php echo $year ? '&amp;year=' . $year : ''; ?>&amp;page=<?php echo $page + 1; ?>"><?php echo $isEn ? 'Next' : 'Дальше'; ?> →</a>
                     <?php endif; ?>
                 </nav>
                 <?php endif; ?>

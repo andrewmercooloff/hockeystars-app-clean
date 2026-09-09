@@ -501,6 +501,11 @@ export default function SearchScreen() {
   const { t, language } = useLanguage();
   const { setCurrentScreen } = useScreenContext();
   const { currentUser, isUserLoading } = useUser();
+  // Веб-версия: поиск открыт без регистрации (как и гостевой профиль игрока),
+  // чтобы люди и поисковики видели каталог игроков. Гость видит только публичные профили.
+  const isGuestWeb = Platform.OS === 'web' && currentUser === null;
+  const canBrowse = !!currentUser || isGuestWeb;
+  const isAdmin = currentUser?.status === 'admin';
   const isDesktop = useIsDesktopLayout();
   const playersListRef = useRef<FlatList<ScoutListRow>>(null);
   const lastSearchRefreshAtRef = useRef(0);
@@ -613,7 +618,7 @@ export default function SearchScreen() {
         forceGilroyFont();
         
         // Используем пользователя из UserContext
-        if (!currentUser) {
+        if (!canBrowse) {
           // Не вызываем router.replace здесь, так как это может вызвать ошибку навигации
           // Вместо этого просто возвращаемся
           return;
@@ -621,7 +626,7 @@ export default function SearchScreen() {
 
         // Админам нужен сетевой свежий список (в т.ч. скрытые); остальным достаточно кеша loadPlayers при открытии
         const filterForSearch = (allPlayers: Player[]): Player[] => {
-          if (currentUser.status === 'admin') {
+          if (isAdmin) {
             return allPlayers;
           }
           return allPlayers.filter(player =>
@@ -653,7 +658,7 @@ export default function SearchScreen() {
           });
         };
 
-        const allPlayers = await loadPlayers(currentUser.status === 'admin', {
+        const allPlayers = await loadPlayers(isAdmin, {
           onUpdated: (fresh) => {
             void applyActivityRatingsToPlayers(fresh).then(() => applySearchPlayers(fresh));
           },
@@ -673,7 +678,7 @@ export default function SearchScreen() {
     };
 
     // Запускаем загрузку только если currentUser определен и не null
-    if (currentUser !== undefined && currentUser !== null) {
+    if (canBrowse) {
       loadData();
     }
   }, [router, currentUser]);
@@ -691,7 +696,7 @@ export default function SearchScreen() {
   useFocusEffect(
     useCallback(() => {
       setCurrentScreen('search');
-      if (!currentUser) {
+      if (!canBrowse) {
         return () => {
           setCurrentScreen(null, 'search');
         };
@@ -708,7 +713,7 @@ export default function SearchScreen() {
       const refreshData = async () => {
           try {
             const filterForSearch = (allPlayers: Player[]): Player[] => {
-              if (currentUser.status === 'admin') return allPlayers;
+              if (isAdmin) return allPlayers;
               return allPlayers.filter(player =>
                 player.status === 'player' ||
                 player.status === 'admin' ||
@@ -755,12 +760,10 @@ export default function SearchScreen() {
   );
 
   useEffect(() => {
-    if (!currentUser) return;
-
-    const isAdmin = currentUser.status === 'admin';
+    if (!canBrowse) return;
 
     const channel = supabase
-      .channel(`players-realtime-search-${currentUser.id}`)
+      .channel(`players-realtime-search-${currentUser?.id ?? 'guest'}`)
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'players' },
@@ -1561,7 +1564,7 @@ export default function SearchScreen() {
 
   // Показываем загрузку пока проверяем авторизацию
   // Если пользователь не авторизован, показываем загрузку или перенаправляем
-  if (!currentUser) {
+  if (!canBrowse) {
     if (currentUser === null) {
       // Пользователь явно не авторизован, перенаправляем
       return null;

@@ -16,7 +16,6 @@ Allow: /*/player/
 Disallow: /feed
 Disallow: /messages
 Disallow: /notifications
-Disallow: /search
 Disallow: /exercises
 Disallow: /chat/
 Disallow: /admin
@@ -32,9 +31,9 @@ Disallow: /_debug
 Disallow: /_sitemap
 Disallow: /+not-found
 
-# Public player directory (PHP + query string, so it must be allowed explicitly)
-Allow: /players.php
-Allow: /players.php?
+# Public player directory (query string, so it must be allowed explicitly)
+Allow: /search
+Allow: /search?
 Allow: /sitemap.xml
 Allow: /sitemap-static.xml
 Allow: /sitemap-players.xml

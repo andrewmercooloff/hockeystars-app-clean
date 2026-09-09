@@ -1259,8 +1259,8 @@ body {
 
 /* =====================================================================
    2026 design refresh — тот же язык, что в приложении:
-   почти чёрный лёд, красные звёзды-паттерн, карточки на полупрозрачном
-   белом с красноватой кромкой, красные «пилюли» кнопок.
+   карточки на полупрозрачном белом с красноватой кромкой, красные «пилюли»
+   кнопок. Фон (лёд + шайбы) намеренно оставлен прежним.
    Переопределяет базовые стили выше; структура HTML не менялась.
    ===================================================================== */
 :root {
@@ -1272,49 +1272,6 @@ body {
     --hs-card: rgba(255, 255, 255, 0.06);
     --hs-card-hover: rgba(255, 255, 255, 0.09);
     --hs-chrome: rgba(6, 4, 8, 0.92);
-}
-
-body {
-    background-color: var(--hs-bg-1);
-}
-
-/* Фон: градиент + повторяющиеся звёзды + два красных свечения (как на главной в приложении) */
-.background-overlay {
-    background-image: linear-gradient(180deg, var(--hs-bg-0) 0%, var(--hs-bg-1) 55%, var(--hs-bg-2) 100%);
-    background-size: cover;
-    background-attachment: fixed;
-}
-
-.background-overlay::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url('star.png');
-    background-repeat: repeat;
-    background-size: 190px 190px;
-    opacity: 0.11;
-    animation: none;
-}
-
-.background-overlay::after {
-    background:
-        radial-gradient(520px 520px at 8% 42%, rgba(180, 20, 40, 0.16), transparent 70%),
-        radial-gradient(640px 420px at 96% 96%, rgba(250, 47, 64, 0.16), transparent 70%),
-        linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0) 22%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, 0.55) 100%);
-    background-size: auto;
-    animation: none;
-}
-
-/* Шайбы: чёрный диск с тёмной кромкой, без блеска */
-.puck {
-    background: #000000;
-    border: 1.5px solid #26262b;
-    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
-    opacity: 0.55;
-}
-
-.puck::before {
-    border-color: rgba(255, 255, 255, 0.06);
 }
 
 /* Шапка и подвал */

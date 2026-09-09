@@ -1886,7 +1886,8 @@ export default function RootLayout() {
           name="search"
           listeners={({ navigation }) => ({
             tabPress: (e: any) => {
-              if (!currentUser) {
+              // На вебе поиск доступен гостям (публичный каталог игроков)
+              if (!currentUser && Platform.OS !== 'web') {
                 e.preventDefault();
                 router.replace('/login');
                 return;
