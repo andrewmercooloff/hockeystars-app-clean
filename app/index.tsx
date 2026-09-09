@@ -1687,12 +1687,13 @@ const DustFlake = React.memo(({ slot }: { slot: DustSlot }) => {
     if (p >= 1 || slot.strength.value <= 0) {
       return { opacity: 0, transform: [{ translateX: -9999 }] };
     }
-    const w = slot.size.value * 0.56;
-    const h = slot.size.value * 0.26;
+    // h — поперёк хода шайбы: это и есть ширина следа (пятно повёрнуто по вектору скорости).
+    const w = slot.size.value * 0.6;
+    const h = slot.size.value * 0.34;
     const life = 1 - p;
     const spread = 0.85 + p * 0.55;
     return {
-      opacity: slot.strength.value * 0.34 * life * life * Math.min(1, p * 6 + 0.35),
+      opacity: slot.strength.value * 0.44 * life * life * Math.min(1, p * 6 + 0.35),
       width: w,
       height: h,
       borderRadius: h / 2,
