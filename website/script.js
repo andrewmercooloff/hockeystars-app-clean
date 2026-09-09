@@ -14,6 +14,10 @@ const translations = {
         'forWhom.scouts.text': 'Отбирайте перспективных игроков со всего мира, смотрите видео-подборки и связывайтесь напрямую.',
         'forWhom.shops.title': 'Для хоккейных мастерских и магазинов:',
         'forWhom.shops.text': 'Заявите о себе, рассказывайте о своих услугах, стимулируйте продажи, предоставляя скидки.',
+        'friends.title': 'Твои друзья уже здесь:',
+        'smartbanner.title': 'HockeyStars',
+        'smartbanner.text': 'Открой приложение — профили, друзья и скауты рядом',
+        'smartbanner.cta': 'Скачать',
         'features.title': 'Основные возможности',
         'features.profiles.title': 'Профили игроков',
         'features.profiles.text': 'Создавайте детальные профили с информацией о позиции, статистике, командах и достижениях',
@@ -168,6 +172,10 @@ const translations = {
         'forWhom.scouts.text': 'Select promising players from around the world, watch video compilations and contact directly.',
         'forWhom.shops.title': 'For hockey workshops and stores:',
         'forWhom.shops.text': 'Make yourself known, talk about your services, stimulate sales by providing discounts.',
+        'friends.title': 'Your friends are already here:',
+        'smartbanner.title': 'HockeyStars',
+        'smartbanner.text': 'Get the app — profiles, friends and scouts in one place',
+        'smartbanner.cta': 'Get',
         'features.title': 'Key Features',
         'features.profiles.title': 'Player Profiles',
         'features.profiles.text': 'Create detailed profiles with information about position, statistics, teams and achievements',
@@ -510,6 +518,9 @@ function setLanguage(lang) {
     if (twitterDescription && translations[lang] && translations[lang]['page.description']) {
         twitterDescription.setAttribute('content', translations[lang]['page.description']);
     }
+
+    updateFriendsProfileLinks();
+    updateSmartBannerCopy();
 }
 
 function getTranslationValue(key, fallback) {
@@ -715,7 +726,7 @@ class PuckPhysics {
         this.animationId = null;
         this.isRunning = false;
         this.repulsionForce = 0.5; // Force of repulsion when pucks collide (increased)
-        this.minDistance = 120; // Minimum distance between pucks (diameter = 120px, so they touch side by side)
+        this.minDistance = 120; // updated in init() from actual puck size
     }
 
     init() {
@@ -729,7 +740,7 @@ class PuckPhysics {
         // Initialize each puck with position and velocity
         puckElements.forEach((puck, index) => {
             const rect = puck.getBoundingClientRect();
-            const radius = 60; // Half of puck width (120px / 2)
+            const radius = Math.max(20, rect.width / 2 || 60);
             
             // Random starting side: 0 = left, 1 = right, 2 = top, 3 = bottom
             const side = Math.floor(Math.random() * 4);
@@ -777,6 +788,10 @@ class PuckPhysics {
                 originalSpeed: speed
             });
         });
+
+        if (this.pucks.length) {
+            this.minDistance = this.pucks[0].radius * 2;
+        }
 
         this.start();
     }
@@ -907,6 +922,160 @@ class PuckPhysics {
 // Initialize puck physics
 let puckPhysics = null;
 
+const HS_API = 'https://api.hockey-stars.com';
+const HS_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM';
+const HS_APP_STORE = 'https://apps.apple.com/app/id6753738837';
+const HS_PLAY_STORE = 'https://play.google.com/store/apps/details?id=by.hockeystars.app';
+const HS_SMART_BANNER_KEY = 'hockeystars-smart-banner-dismissed';
+
+const HS_SLUG_MAP = {
+    а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y',
+    к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f',
+    х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya',
+};
+
+function slugifyPlayerName(input) {
+    const lower = String(input || '').trim().toLowerCase();
+    let out = '';
+    for (const ch of lower) {
+        if (HS_SLUG_MAP[ch] !== undefined) out += HS_SLUG_MAP[ch];
+        else if (/[a-z0-9]/.test(ch)) out += ch;
+        else if (/[\s_.\-\/\\]+/.test(ch)) out += '-';
+    }
+    out = out.replace(/-+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+    return out || 'player';
+}
+
+function playerProfilePath(playerId, name, lang) {
+    const code = (lang === 'en' || lang === 'ru') ? lang : (currentLanguage === 'en' ? 'en' : 'ru');
+    let slug = slugifyPlayerName(name);
+    if (!slug || slug === 'player') slug = playerId;
+    return `/${code}/player/${encodeURIComponent(slug)}`;
+}
+
+function resolvePlayerAvatarUrl(avatar) {
+    if (!avatar || typeof avatar !== 'string') return '';
+    const value = avatar.trim();
+    if (!value) return '';
+    if (/^https?:\/\//i.test(value)) return value;
+    return `${HS_API}/storage/v1/object/public/${value.replace(/^\//, '')}`;
+}
+
+function updateFriendsProfileLinks() {
+    document.querySelectorAll('#friends-grid .friends-avatar[data-player-id]').forEach((link) => {
+        const id = link.getAttribute('data-player-id');
+        const name = link.getAttribute('data-player-name') || '';
+        if (!id) return;
+        link.href = playerProfilePath(id, name, currentLanguage);
+    });
+}
+
+async function loadFriendsAvatars() {
+    const grid = document.getElementById('friends-grid');
+    if (!grid) return;
+
+    const url = `${HS_API}/rest/v1/players?select=id,name,avatar&is_hidden=eq.false&avatar=not.is.null&order=updated_at.desc&limit=200`;
+
+    try {
+        const response = await fetch(url, {
+            headers: {
+                apikey: HS_ANON_KEY,
+                Authorization: `Bearer ${HS_ANON_KEY}`,
+                Accept: 'application/json',
+            },
+        });
+        if (!response.ok) throw new Error(`friends fetch ${response.status}`);
+        const rows = await response.json();
+        if (!Array.isArray(rows) || !rows.length) return;
+
+        const fragment = document.createDocumentFragment();
+        const seen = new Set();
+
+        rows.forEach((row) => {
+            const name = String(row.name || '').trim();
+            if (name.toUpperCase() === 'ADMIN') return;
+            const src = resolvePlayerAvatarUrl(row.avatar);
+            if (!src || seen.has(src)) return;
+            seen.add(src);
+
+            const link = document.createElement('a');
+            link.className = 'friends-avatar';
+            link.href = playerProfilePath(row.id, name, currentLanguage);
+            link.setAttribute('role', 'listitem');
+            link.setAttribute('data-player-id', row.id);
+            link.setAttribute('data-player-name', name);
+            link.setAttribute('aria-label', name || 'Player');
+            link.title = name;
+
+            const img = document.createElement('img');
+            img.src = src;
+            img.alt = name || '';
+            img.loading = 'lazy';
+            img.decoding = 'async';
+            img.referrerPolicy = 'no-referrer';
+            img.addEventListener('error', () => {
+                link.classList.add('is-empty');
+                img.remove();
+            });
+
+            link.appendChild(img);
+            fragment.appendChild(link);
+        });
+
+        grid.appendChild(fragment);
+    } catch (error) {
+        console.warn('Friends avatars failed', error);
+    }
+}
+
+function detectMobilePlatform() {
+    const ua = navigator.userAgent || '';
+    if (/iPhone|iPad|iPod/i.test(ua)) return 'ios';
+    if (/Android/i.test(ua)) return 'android';
+    if ((navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
+    return 'other';
+}
+
+function updateSmartBannerCopy() {
+    const banner = document.getElementById('app-smart-banner');
+    if (!banner) return;
+    const title = banner.querySelector('[data-i18n="smartbanner.title"]');
+    const text = banner.querySelector('[data-i18n="smartbanner.text"]');
+    const cta = banner.querySelector('[data-i18n="smartbanner.cta"]');
+    if (title) title.textContent = getTranslationValue('smartbanner.title', 'HockeyStars');
+    if (text) text.textContent = getTranslationValue('smartbanner.text', '');
+    if (cta) cta.textContent = getTranslationValue('smartbanner.cta', 'Get');
+}
+
+function initSmartAppBanner() {
+    const banner = document.getElementById('app-smart-banner');
+    if (!banner) return;
+
+    // Only meaningful on phones/tablets
+    if (!window.matchMedia('(max-width: 900px)').matches) return;
+    if (localStorage.getItem(HS_SMART_BANNER_KEY) === '1') return;
+
+    const platform = detectMobilePlatform();
+    const cta = banner.querySelector('.app-smart-banner__cta');
+    if (cta) {
+        cta.href = platform === 'android' ? HS_PLAY_STORE : HS_APP_STORE;
+    }
+
+    updateSmartBannerCopy();
+    banner.classList.add('is-ready');
+
+    const closeBtn = banner.querySelector('.app-smart-banner__close');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            banner.classList.remove('is-visible');
+            localStorage.setItem(HS_SMART_BANNER_KEY, '1');
+            setTimeout(() => banner.remove(), 400);
+        });
+    }
+
+    setTimeout(() => banner.classList.add('is-visible'), 1400);
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     const normalizedPath = normalizePathname(window.location.pathname);
@@ -971,7 +1140,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Load avatars for pucks (uses placeholder avatars by default)
     loadPuckAvatars();
-    
+
+    // Wall of real player avatars
+    loadFriendsAvatars();
+
+    // Sticky “get the app” prompt on phones
+    initSmartAppBanner();
+
     // Initialize puck physics system
     puckPhysics = new PuckPhysics();
     puckPhysics.init();
