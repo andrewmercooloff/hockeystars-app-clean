@@ -192,7 +192,7 @@ const Puck: React.FC<PuckProps> = ({
       
       <PuckTouchable
         {...(webTapProps ?? { onPress, scaleTo: 0.92 })}
-        style={[styles.puckTouchable, Platform.OS === 'web' && ({ cursor: 'pointer' } as any)]}
+        style={PUCK_TOUCHABLE_STYLE}
       >
         {leaderRank != null ? (
           <>
@@ -454,5 +454,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+/** Stable reference: an inline array here would re-render PressableScale on every puck render. */
+const PUCK_TOUCHABLE_STYLE =
+  Platform.OS === 'web'
+    ? [styles.puckTouchable, { cursor: 'pointer' } as any]
+    : styles.puckTouchable;
 
 export default Puck; 

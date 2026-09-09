@@ -74,10 +74,13 @@ export default function WebProfileTouchFix() {
     apply();
     const timers = [80, 250, 700, 1500, 3000].map((ms) => window.setTimeout(apply, ms));
 
-    // Scenes are added/removed as tabs mount, so keep re-checking — but coalesce
-    // into one rAF pass, otherwise our own style writes retrigger the observer.
+    // Scenes are added/removed while the profile boots, so re-check for a few
+    // seconds — coalesced into one rAF pass, otherwise our own style writes
+    // retrigger the observer. Then stop: leaving it attached would force a
+    // layout on every image that finishes loading further down the profile.
     const observer = new MutationObserver(schedule);
     observer.observe(document.body, { childList: true, subtree: true });
+    timers.push(window.setTimeout(() => observer.disconnect(), 5000));
 
     return () => {
       cancelled = true;
