@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState, useCallback, useMe
 import { View, StyleSheet, Dimensions, Image as RNImage, TouchableOpacity, Platform, Vibration, AppState, AppStateStatus, InteractionManager } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image as ExpoImage } from 'expo-image';
-import { useRouter, useFocusEffect, useLocalSearchParams, usePathname } from 'expo-router';
+import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useIsFocused } from '@react-navigation/native';
 import Animated, { Easing as ReEasing, makeMutable, useAnimatedStyle, useSharedValue, withDelay, withTiming, runOnJS, type SharedValue } from 'react-native-reanimated';
 
@@ -56,6 +56,7 @@ import { navigateToPlayerProfile } from '../utils/navigateToPlayer';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getPerformanceLevel, isLowEndAndroid, startupPhysicsDeferMs, startupRenderGraceMs } from '../utils/devicePerformance';
 import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
+import { useWebPathname } from '../hooks/useWebOnly';
 import PuckGame from '../components/PuckGame';
 import HockeyStarQuizGame from '../components/HockeyStarQuizGame';
 import CachedBackground from '../components/CachedBackground';
@@ -2159,7 +2160,7 @@ export default function HomeScreen() {
   const { setCurrentScreen, currentScreen } = useScreenContext();
   const params = useLocalSearchParams();
   const isFocused = useIsFocused();
-  const pathname = usePathname();
+  const pathname = useWebPathname();
   const performanceLevel = useMemo(() => getPerformanceLevel(), []);
   const isDesktopLayout = useIsDesktopLayout();
   // Desktop: physics on (pucks move), drag off (no grab with mouse)

@@ -4,20 +4,6 @@ import { Platform } from 'react-native';
 
 const PROFILE_PATH = /\/player\//;
 
-function findProfileScrollRoot(): HTMLElement | null {
-  const byId = document.getElementById('hs-profile-scroll');
-  if (byId) return byId;
-
-  // Fallback while the slug is still resolving and the tagged ScrollView has not mounted.
-  for (const el of Array.from(document.querySelectorAll<HTMLElement>('div'))) {
-    const s = getComputedStyle(el);
-    if (s.overflowY !== 'auto' || !s.touchAction.includes('pan-y')) continue;
-    const r = el.getBoundingClientRect();
-    if (r.width > 200 && r.height > 300) return el;
-  }
-  return null;
-}
-
 /**
  * RN-web bottom tabs render every screen as a full-size absolutely positioned
  * sibling. On a cold deep link to /ru/player/… the home tab keeps a scene on top
@@ -45,7 +31,7 @@ export default function WebProfileTouchFix() {
     const apply = () => {
       frame = 0;
       if (cancelled) return;
-      const scrollRoot = findProfileScrollRoot();
+      const scrollRoot = document.getElementById('hs-profile-scroll');
       if (!scrollRoot) return;
 
       const vw = window.innerWidth;
