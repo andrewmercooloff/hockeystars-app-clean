@@ -4,9 +4,22 @@ const { rinkSvg, puckSvg, sticksSvg, goalSvg, scratchesSvg, historyIconSvg } = r
 
 const HISTORY_ICONS = ['start', 'school', 'arena', 'heart', 'rise'];
 
-function factPuckHtml(data, i) {
-  const src = i % 2 ? data.assets.puckOrange || data.assets.puck : data.assets.puckBlack || data.assets.puck;
-  return src ? `<img class="puck-photo" src="${src}" alt="">` : puckSvg(i % 2 ? data.colors.secondary : data.colors.dark, 'rgba(255,255,255,.55)');
+function puckFactFontSize(text) {
+  const len = String(text).length;
+  if (len > 6) return 3.6;
+  if (len > 4) return 4.1;
+  return 4.7;
+}
+
+function puckLabelHtml(data, text, opts = {}) {
+  const { orange = false, black = false, index = 0, fontSize } = opts;
+  const useOrange = orange || (!black && index % 2 === 1);
+  const src = useOrange ? data.assets.puckOrange || data.assets.puck : data.assets.puckBlack || data.assets.puck;
+  const puck = src
+    ? `<img class="puck-photo" src="${src}" alt="">`
+    : puckSvg(useOrange ? data.colors.secondary : data.colors.dark, 'rgba(255,255,255,.55)');
+  const fs = fontSize ?? puckFactFontSize(text);
+  return `<span class="puck-label">${puck}<b style="font-size:${fs}mm">${esc(String(text))}</b></span>`;
 }
 
 const PAGE = { w: 210, h: 297, bleed: 3 };
@@ -71,11 +84,8 @@ ${cardCss(size)}
 .facts .goal{position:absolute;right:${bleed + 12}mm;top:${bleed + 8}mm;width:40mm;height:26mm;opacity:.6;}
 .facts .fgrid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 44}mm;bottom:${bleed + 16}mm;display:grid;grid-template-columns:1fr 1fr;gap:6mm 8mm;grid-auto-rows:1fr;}
 .facts .f{position:relative;display:flex;align-items:center;padding:0 5mm;gap:5mm;background:rgba(255,255,255,.88);border-left:1.4mm solid var(--secondary);padding:4mm 5mm 4mm 4mm;box-shadow:0 1mm 3mm rgba(20,40,70,.08);}
-.facts .f .pk{position:relative;flex:0 0 30mm;height:19mm;display:flex;align-items:center;justify-content:center;}
-.facts .f .pk svg{position:absolute;inset:0;width:100%;height:100%;}
-.facts .f .pk .puck-photo{position:absolute;inset:-1.5mm -2mm;width:calc(100% + 4mm);height:calc(100% + 3mm);object-fit:contain;filter:drop-shadow(0 .8mm 1.5mm rgba(0,0,0,.22));}
-.facts .f .pk b{position:relative;top:-3px;font-family:'Unbounded';font-weight:800;font-size:5.4mm;color:#fff;line-height:1;
-  text-shadow:0 .3mm .8mm rgba(0,0,0,.75),0 0 .4mm rgba(0,0,0,.45);}
+.facts .f .pk{position:relative;flex:0 0 30mm;height:19mm;}
+.facts .f .pk .puck-label{width:100%;height:100%;}
 .facts .f p{font-size:3.5mm;line-height:1.3;color:#1b2940;}
 .glossary .ggrid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 44}mm;bottom:${bleed + 16}mm;display:grid;grid-template-columns:1fr 1fr;gap:4mm 8mm;align-content:space-between;}
 .glossary .g{background:linear-gradient(135deg,var(--primary),var(--dark));color:#fff;padding:3mm 5mm;transform:skewX(-6deg);border-left:1.4mm solid var(--secondary);}
@@ -95,9 +105,8 @@ ${cardCss(size)}
 .page.profile .goals h5{font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:6.5mm;color:var(--dark);margin-bottom:4mm;}
 .page.profile .goal{display:flex;align-items:center;gap:4mm;margin-bottom:6mm;}
 .page.profile .goal i{flex:1;border-bottom:.35mm solid color-mix(in srgb,var(--primary) 35%,#c8cdd6);height:8mm;}
-.page.profile .goal .pucknum{position:relative;width:14mm;height:9mm;flex:0 0 14mm;display:flex;align-items:center;justify-content:center;}
-.page.profile .goal .pucknum svg{position:absolute;inset:0;width:100%;height:100%;}
-.page.profile .goal .pucknum b{position:relative;color:#fff;font-family:'Fira Sans Extra Condensed';font-weight:700;font-size:4.6mm;}
+.page.profile .goal .pucknum{position:relative;width:13mm;height:13mm;flex:0 0 13mm;}
+.page.profile .goal .pucknum .puck-label{width:100%;height:100%;}
 .page.profile .hdr{z-index:2;}
 
 /* corner ornaments: torn diagonal bands */
@@ -116,9 +125,14 @@ ${cardCss(size)}
 .team .deco .rink{left:auto;right:-30mm;bottom:-40mm;width:230mm;height:153mm;transform:scaleX(-1);opacity:.2 !important;}
 .cover .deco .rink{left:auto;right:-60mm;bottom:auto;top:-30mm;width:260mm;height:173mm;transform:rotate(90deg);}
 .cover .season .sticks{width:7mm;height:7mm;vertical-align:-1.4mm;margin-right:2mm;}
-.pucknum{display:inline-flex;align-items:center;justify-content:center;position:relative;width:12mm;height:8mm;flex:none;}
+.puck-label{position:relative;display:inline-flex;align-items:center;justify-content:center;}
+.puck-label .puck-photo{position:absolute;inset:-10% -12%;width:124%;height:118%;object-fit:contain;filter:drop-shadow(0 .6mm 1.2mm rgba(0,0,0,.2));}
+.puck-label svg.puck{position:absolute;inset:0;width:100%;height:100%;}
+.puck-label b{position:absolute;left:50%;top:33%;transform:translate(-50%,-50%);color:#fff;font-family:'Unbounded';font-weight:800;line-height:1;white-space:nowrap;
+  text-shadow:0 .3mm .8mm rgba(0,0,0,.78),0 0 .35mm rgba(0,0,0,.4);pointer-events:none;}
+.pucknum{display:inline-flex;align-items:center;justify-content:center;position:relative;flex:none;}
 .pucknum .puck{position:absolute;inset:0;width:100%;height:100%;}
-.pucknum b{position:relative;color:#fff;font-family:'Fira Sans Extra Condensed';font-weight:700;font-size:4.2mm;line-height:1;margin-top:-1.2mm;}
+.pucknum:not(:has(.puck-label)) b{position:relative;color:#fff;font-family:'Fira Sans Extra Condensed';font-weight:700;font-size:4.2mm;line-height:1;margin-top:-1.2mm;}
 .hdr .count{display:inline-flex;align-items:center;gap:2mm;background:var(--dark);color:#fff;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;
   font-size:3.6mm;letter-spacing:.08em;padding:1.4mm 3.5mm 1.4mm 2.5mm;border-radius:6mm;margin-top:2mm;}
 .hdr .count .puck{width:6mm;height:3.6mm;}
@@ -190,8 +204,8 @@ ${cardCss(size)}
 .intro .how h3{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:7.5mm;color:var(--dark);margin-bottom:5mm;}
 .intro .step{display:flex;align-items:flex-start;gap:3mm;margin-bottom:6mm;font-size:4mm;line-height:1.35;color:#1b2940;}
 .intro .step .pucknum{width:13mm;height:13mm;margin-top:-1mm;flex:none;}
-.intro .step .pucknum .puck-photo{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 .5mm 1mm rgba(0,0,0,.18));}
-.intro .step .pucknum b{text-shadow:0 .25mm .7mm rgba(0,0,0,.75);}
+.intro .step .pucknum .puck-label{width:100%;height:100%;}
+.intro .step .pucknum .puck-label b{font-family:'Fira Sans Extra Condensed';font-weight:700;}
 .intro .bottom{position:absolute;left:0;right:0;bottom:0;height:120mm;}
 .intro .bigname{position:absolute;left:${bleed + 6}mm;right:${bleed + 6}mm;top:14mm;font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;
   font-size:34mm;line-height:.95;color:transparent;-webkit-text-stroke:.9mm var(--secondary);text-align:center;white-space:nowrap;letter-spacing:.02em;}
@@ -252,7 +266,10 @@ ${cardCss(size)}
 .history .tl{position:absolute;left:${bleed + 12}mm;top:${bleed + 44}mm;right:${bleed + 58}mm;}
 .history .tl::before{content:"";position:absolute;left:5.2mm;top:2mm;bottom:8mm;width:1.2mm;background:linear-gradient(180deg,var(--primary),var(--secondary));border-radius:1mm;}
 .history .item-wrap{margin-bottom:5.5mm;}
-.history .item-wrap:last-child{margin-bottom:0;}
+.history .tl-finale{position:relative;height:14mm;margin-top:4mm;}
+.history .tl-finale .dot.logo{position:absolute;left:0;top:0;width:11.6mm;height:11.6mm;background:#fff;padding:1.1mm;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;border:1mm solid #fff;box-shadow:0 0 0 .6mm var(--primary),0 1mm 3mm rgba(0,0,0,.14);}
+.history .tl-finale .dot.logo img{width:100%;height:100%;object-fit:contain;}
 .history .item{position:relative;padding-left:16mm;}
 .history .item .dot{position:absolute;left:0;top:0;width:11.6mm;height:11.6mm;border-radius:50%;background:var(--dark);color:#fff;
   display:flex;align-items:center;justify-content:center;border:1mm solid #fff;box-shadow:0 0 0 .6mm var(--primary),inset 0 -.8mm 0 rgba(0,0,0,.35);}
@@ -462,7 +479,7 @@ function introPage(data, pageNo) {
     <div class="lead">${intro.replace(/\n/g, '<br>')}</div>
     <div class="sample">${sample ? cardFront(sample, data) : ''}</div>
     <div class="how"><h3>Как это работает:</h3>
-      ${steps.map((s, i) => `<div class="step"><span class="pucknum">${factPuckHtml(data, i)}<b>${i + 1}</b></span><div>${s}</div></div>`).join('')}
+      ${steps.map((s, i) => `<div class="step"><span class="pucknum">${puckLabelHtml(data, i + 1, { index: i, fontSize: 4.2 })}</span><div>${s}</div></div>`).join('')}
     </div>
     <div class="bottom">
       <div class="bigname" style="font-size:${bigSize.toFixed(1)}mm">${esc(bigName)}</div>
@@ -524,7 +541,7 @@ function historyPage(data, pageNo) {
         ${it.years ? `<div class="yr"><span>${esc(it.years)}</span></div>` : ''}
         <h4>${esc(it.title)}</h4><p>${esc(it.text)}</p></div></div>`;
       })
-      .join('')}</div>
+      .join('')}${data.assets.logo ? `<div class="tl-finale"><div class="dot logo"><img src="${data.assets.logo}" alt=""></div></div>` : ''}</div>
     ${
       facts.length || arenaPhotos
         ? `<div class="history-side">${facts.length ? `<div class="facts"><div class="facts-cap">${logo}<h5>${esc(h.factsTitle || 'Цифры успеха')}</h5></div><div class="facts-panel">${facts
@@ -581,7 +598,7 @@ function factsPage(data, pageNo) {
     <div class="orn tr"></div>
     <div class="hdr"><div class="title">Знаешь ли ты?</div><div class="sub">Интересные факты о хоккее</div></div>
     <div class="fgrid">${list
-      .map((f, i) => `<div class="f"><div class="pk">${factPuckHtml(data, i)}<b style="font-size:${f.v.length > 6 ? 4 : f.v.length > 4 ? 4.8 : 5.4}mm">${esc(f.v)}</b></div><p>${esc(f.t)}</p></div>`)
+      .map((f, i) => `<div class="f"><div class="pk">${puckLabelHtml(data, f.v, { index: i, fontSize: puckFactFontSize(f.v) })}</div><p>${esc(f.t)}</p></div>`)
       .join('')}</div>
     ${goalSvg(data.colors.secondary, `color-mix(in srgb,${data.colors.primary} 45%,transparent)`)}
     <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
@@ -631,7 +648,7 @@ function profilePage(data, pageNo) {
     <div class="hdr"><div class="title">Моя анкета</div><div class="sub">${esc(t.shortName || t.name)} · сезон ${esc(t.season)}</div></div>
     <div class="photo"><div class="frame"><span>Моё фото</span></div><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i></div>
     <div class="fields">${fields.map((f) => `<div class="fld"><b>${esc(f)}</b><span></span></div>`).join('')}</div>
-    <div class="goals"><h5>Мои цели на сезон</h5>${[1, 2, 3].map((n) => `<div class="goal"><span class="pucknum">${puckSvg(data.colors.secondary, 'rgba(255,255,255,.5)')}<b>${n}</b></span><i></i></div>`).join('')}</div>
+    <div class="goals"><h5>Мои цели на сезон</h5>${[1, 2, 3].map((n) => `<div class="goal"><span class="pucknum">${puckLabelHtml(data, n, { orange: true, fontSize: 4.4 })}</span><i></i></div>`).join('')}</div>
     <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
   </section>`;
 }
