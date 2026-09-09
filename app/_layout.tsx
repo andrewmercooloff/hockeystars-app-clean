@@ -334,7 +334,6 @@ const UserSync = React.memo(({
 
 export default function RootLayout() {
   useOtaUpdates();
-  const deferSecondaryTabs = React.useMemo(() => isLowEndAndroid(), []);
   const router = useRouter();
   const pathname = usePathname();
   const isDesktopLayout = useIsDesktopLayout();
@@ -1835,7 +1834,7 @@ export default function RootLayout() {
             },
           })}
           options={{
-            lazy: deferSecondaryTabs,
+            lazy: true,
             tabBarLabel: ({ focused }) => <TabBarLabel labelKey="tabs.chat" focused={focused} />,
             tabBarIcon: ({ size, focused }) => {
               const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
@@ -1889,7 +1888,7 @@ export default function RootLayout() {
             },
           })}
           options={{
-            lazy: deferSecondaryTabs,
+            lazy: true,
             tabBarLabel: ({ focused }) => <TabBarLabel labelKey="tabs.feed" focused={focused} />,
             tabBarIcon: NotificationsTabIcon,
           }}
@@ -1909,7 +1908,7 @@ export default function RootLayout() {
             },
           })}
           options={{
-            lazy: deferSecondaryTabs,
+            lazy: true,
             tabBarLabel: ({ focused }) => <TabBarLabel labelKey="tabs.scout" focused={focused} />,
             tabBarIcon: ({ size, focused }) => {
               const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
@@ -1931,7 +1930,7 @@ export default function RootLayout() {
             },
           })}
           options={{
-            lazy: deferSecondaryTabs,
+            lazy: true,
             tabBarLabel: ({ focused }) => <TabBarLabel labelKey="tabs.skills" focused={focused} />,
             tabBarIcon: ({ size, focused }) => {
               const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
