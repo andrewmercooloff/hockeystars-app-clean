@@ -8300,15 +8300,6 @@ export default function PlayerProfile() {
               <View style={styles.videoModalOverlayTouchable} />
             </TouchableWithoutFeedback>
           )}
-          <TouchableOpacity
-            style={videoExpanded ? styles.videoFullscreenCloseButton : styles.videoModalCloseButton}
-            onPress={videoExpanded ? () => setVideoExpanded(false) : closeVideoModal}
-            hitSlop={12}
-            accessibilityRole="button"
-            accessibilityLabel={t('common.close') !== 'common.close' ? t('common.close') : 'Close'}
-          >
-            <Ionicons name="close" size={videoExpanded ? 26 : 24} color="#fff" />
-          </TouchableOpacity>
           {selectedVideo && (
             videoExpanded ? (
               <View style={styles.videoFullscreenPlayer}>
@@ -8330,6 +8321,7 @@ export default function PlayerProfile() {
                     timeCode={selectedVideo.timeCode}
                     autoPlay
                     layoutMode="modal"
+                    onClose={closeVideoModal}
                     onRequestFullscreen={() => setVideoExpanded(true)}
                     fullscreenButtonLabel={videoFullscreenLabel}
                   />
@@ -9941,27 +9933,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  videoFullscreenCloseButton: {
-    position: 'absolute',
-    top: 50,
-    right: 20,
-    zIndex: 1001,
-    backgroundColor: 'rgba(22, 22, 26, 0.78)',
-    borderRadius: 20,
-    padding: 8,
-  },
   videoFullscreenPlayer: {
     flex: 1,
     width: '100%',
-  },
-  videoModalCloseButton: {
-    position: 'absolute',
-    top: 30,
-    right: 20,
-    zIndex: 1001,
-    backgroundColor: 'rgba(22, 22, 26, 0.78)',
-    borderRadius: 20,
-    padding: 8,
   },
   floatingEditButton: {
     position: 'absolute',

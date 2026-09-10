@@ -668,12 +668,6 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
               <View style={styles.modalBackdrop} />
             </TouchableWithoutFeedback>
           )}
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={videoExpanded ? () => setVideoExpanded(false) : closeModal}
-          >
-            <Ionicons name="close" size={24} color="#fff" />
-          </TouchableOpacity>
           {selectedVideo && (
             videoExpanded ? (
               <View style={styles.fullscreenPlayerWrap}>
@@ -694,6 +688,7 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
                   timeCode={selectedVideo.timeCode}
                   autoPlay
                   layoutMode="modal"
+                  onClose={closeModal}
                   onRequestFullscreen={() => setVideoExpanded(true)}
                   fullscreenButtonLabel={videoFullscreenLabel}
                 />
@@ -782,15 +777,6 @@ const styles = StyleSheet.create({
   fullscreenPlayerWrap: {
     flex: 1,
     width: '100%',
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 20,
-    right: 10,
-    zIndex: 1000,
-    backgroundColor: 'rgba(22, 22, 26, 0.78)',
-    borderRadius: 20,
-    padding: 8,
   },
   carouselIndicator: {
     flexDirection: 'row',
