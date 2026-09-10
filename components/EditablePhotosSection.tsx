@@ -1,8 +1,9 @@
 import * as ImagePicker from 'expo-image-picker';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Alert,
     Dimensions,
+    Image as RNImage,
     Platform,
     ScrollView,
     StyleProp,
@@ -23,10 +24,11 @@ import HorizontalScrollWithArrows from './HorizontalScrollWithArrows';
 import LikeButton from './LikeButton';
 import { generatePhotoContentId } from '../utils/likesService';
 import { addActivityPoints } from '../services/activityService';
-import { getPhotoTileSize } from '../utils/mediaTileSize';
+import { getPhotoTileSize, widthForAspectHeight } from '../utils/mediaTileSize';
 
 const { width: screenWidth } = Dimensions.get('window');
 const { width: PHOTO_TILE_WIDTH, height: PHOTO_TILE_HEIGHT } = getPhotoTileSize(screenWidth);
+const PHOTO_TILE_MAX_WIDTH = Math.max(PHOTO_TILE_WIDTH, Math.round(screenWidth * 0.62));
 
 function ViewModePhoto({
   photo,
@@ -42,18 +44,44 @@ function ViewModePhoto({
   onPress: (index: number) => void;
 }) {
   const contentId = generatePhotoContentId(photo);
+  const [aspectRatio, setAspectRatio] = useState(4 / 3);
+
+  useEffect(() => {
+    let cancelled = false;
+    RNImage.getSize(
+      photo,
+      (width, height) => {
+        if (!cancelled && width > 0 && height > 0) {
+          setAspectRatio(width / height);
+        }
+      },
+      () => {
+        if (!cancelled) setAspectRatio(4 / 3);
+      }
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [photo]);
+
+  const tileWidth = widthForAspectHeight(
+    aspectRatio,
+    PHOTO_TILE_HEIGHT,
+    PHOTO_TILE_WIDTH,
+    PHOTO_TILE_MAX_WIDTH
+  );
 
   return (
     <View style={styles.photoContainer}>
       <TouchableOpacity
-        style={[styles.photoWrapper, { width: PHOTO_TILE_WIDTH, height: PHOTO_TILE_HEIGHT }]}
+        style={[styles.photoWrapper, { width: tileWidth, height: PHOTO_TILE_HEIGHT }]}
         onPress={() => onPress(index)}
         activeOpacity={0.8}
       >
         <CachedImage
           imageUrl={photo}
           style={styles.photoAdaptive}
-          resizeMode="cover"
+          resizeMode="contain"
         />
         {playerId ? (
           <View style={styles.photoLikeButtonContainer}>
@@ -753,6 +781,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.06)',
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.35)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   photoAdaptive: {
     width: '100%',
