@@ -2276,32 +2276,6 @@ export default function PlayerProfile() {
 
   const [pickingVideo, setPickingVideo] = useState(false);
 
-  const pickVideoFromLibrary = async (): Promise<ImagePicker.ImagePickerAsset | null> => {
-    try {
-      // Android 13+ — системный Photo Picker без READ_MEDIA_VIDEO; iOS и старый Android — запрос.
-      if (!(Platform.OS === 'android' && Platform.Version >= 33)) {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== 'granted') {
-          showCustomAlert(t('common.error'), 'Нет доступа к галерее с видео', 'error');
-          return null;
-        }
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['videos'],
-        videoMaxDuration: 20,
-        allowsEditing: false,
-      });
-
-      if (result.canceled || !result.assets?.[0]) return null;
-      return result.assets[0];
-    } catch (error) {
-      console.error('❌ Ошибка выбора видео из галереи:', error);
-      showCustomAlert(t('common.error'), 'Не удалось открыть галерею с видео', 'error');
-      return null;
-    }
-  };
-
   const uploadPickedVideo = async (asset: ImagePicker.ImagePickerAsset) => {
     if (!player) return;
     const tempId = Date.now();
@@ -2338,11 +2312,34 @@ export default function PlayerProfile() {
 
   const handleAddVideo = async () => {
     if (!player || pickingVideo) return;
-    if (!isEditing) handleStartEditing();
+    const enteringEditMode = !isEditing;
+    if (enteringEditMode) handleStartEditing();
     setPickingVideo(true);
     try {
-      const asset = await pickVideoFromLibrary();
-      if (asset) await uploadPickedVideo(asset);
+      // Дождаться монтирования UI редактирования — иначе iOS не находит currentViewController.
+      if (enteringEditMode) {
+        await new Promise<void>((resolve) => {
+          InteractionManager.runAfterInteractions(() => {
+            requestAnimationFrame(() => setTimeout(resolve, Platform.OS === 'ios' ? 200 : 0));
+          });
+        });
+      }
+      const { pickVideoFromLibrary } = await import('../../utils/pickVideoFromLibrary');
+      const outcome = await pickVideoFromLibrary(20);
+      if (outcome.status === 'picked') {
+        await uploadPickedVideo(outcome.asset);
+      } else if (outcome.status === 'permission_denied') {
+        showCustomAlert(t('common.error'), 'Нет доступа к галерее с видео', 'error');
+      } else if (outcome.status === 'too_long') {
+        showCustomAlert(
+          t('common.error'),
+          `Видео слишком длинное. Максимум ${outcome.maxSeconds} сек.`,
+          'error'
+        );
+      } else if (outcome.status === 'failed') {
+        console.error('❌ Ошибка выбора видео из галереи:', outcome.message);
+        showCustomAlert(t('common.error'), 'Не удалось открыть галерею с видео', 'error');
+      }
     } finally {
       setPickingVideo(false);
     }
