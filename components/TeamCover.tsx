@@ -1,23 +1,21 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { ImageBackground, StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../contexts/LanguageContext';
 import { usePlayerCoverUrl, useTeamLogoUrl } from '../hooks/useTeamAssetUrl';
-import {
-  isAssetKnownMissing,
-  isAssetWarmed,
-  markAssetMissing,
-  prefetchPlayerCover,
-  prefetchTeamLogo,
-} from '../utils/teamAssets';
+import { resolveAssetUrl } from '../utils/teamAssets';
 
 export type CoverTeam = { teamId: string; teamName: string };
+
+type AssetLayer = 'pending' | 'present' | 'missing';
 
 type Props = {
   playerId: string;
   team: CoverTeam | null;
+  /** Teams list finished loading — avoids stars → logo flash while teams are still fetching. */
+  teamsReady?: boolean;
   /** Owner or admin: can set / replace the custom cover. */
   canEditCover?: boolean;
   /** Admin: can upload the team emblem right from the profile. */
@@ -42,11 +40,6 @@ const STAR = 52;
 const STAR_PITCH_X = STAR * 2;
 const STAR_PITCH_Y = STAR * 1.15;
 
-/** Team emblem wallpaper: same rhythm, slightly denser. */
-const LOGO = 60;
-const LOGO_PITCH_X = LOGO * 1.9;
-const LOGO_PITCH_Y = LOGO * 1.1;
-
 type Tile = { x: number; y: number; key: string };
 
 /** Checkerboard grid: every other row shifted by half a pitch. */
@@ -67,11 +60,12 @@ const staggeredGrid = (width: number, height: number, size: number, pitchX: numb
 /**
  * Header band behind the avatar (no text). Priority: the player's own cover →
  * team emblem wallpaper → repeated team name → brand star wallpaper.
- * Layers are stacked so a 404 never leaves a hole.
+ * Fallback layers stay hidden until the higher-priority asset probe finishes.
  */
 const TeamCover: React.FC<Props> = ({
   playerId,
   team,
+  teamsReady = true,
   canEditCover = false,
   canEditTeamLogo = false,
   onPickCover,
@@ -89,56 +83,50 @@ const TeamCover: React.FC<Props> = ({
   const coverUrl = usePlayerCoverUrl(playerId, refreshKey);
   const logoUrl = useTeamLogoUrl(team?.teamId, refreshKey);
 
-  const [coverOk, setCoverOk] = useState<boolean | null>(() =>
-    isAssetKnownMissing(coverUrl) ? false : isAssetWarmed(coverUrl) ? true : null
-  );
-  const [logoOk, setLogoOk] = useState<boolean | null>(() =>
-    logoUrl && isAssetKnownMissing(logoUrl) ? false : logoUrl && isAssetWarmed(logoUrl) ? true : null
-  );
+  const [coverLayer, setCoverLayer] = useState<AssetLayer>('pending');
+  const [logoLayer, setLogoLayer] = useState<AssetLayer>('pending');
 
   useEffect(() => {
-    if (isAssetKnownMissing(coverUrl)) {
-      setCoverOk(false);
-      return;
-    }
-    if (isAssetWarmed(coverUrl)) {
-      setCoverOk(true);
-      return;
-    }
-    setCoverOk(null);
-    void prefetchPlayerCover(playerId);
-  }, [coverUrl, playerId]);
+    if (!coverUrl) return;
+    let cancelled = false;
+    setCoverLayer('pending');
+    void resolveAssetUrl(coverUrl).then((result) => {
+      if (!cancelled) setCoverLayer(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [coverUrl, refreshKey]);
+
   useEffect(() => {
+    if (coverLayer !== 'missing') {
+      setLogoLayer('pending');
+      return;
+    }
     if (!logoUrl) {
-      setLogoOk(null);
+      setLogoLayer('missing');
       return;
     }
-    if (isAssetKnownMissing(logoUrl)) {
-      setLogoOk(false);
-      return;
-    }
-    if (isAssetWarmed(logoUrl)) {
-      setLogoOk(true);
-      return;
-    }
-    setLogoOk(null);
-    void prefetchTeamLogo(team!.teamId);
-  }, [logoUrl, team]);
+    let cancelled = false;
+    setLogoLayer('pending');
+    void resolveAssetUrl(logoUrl).then((result) => {
+      if (!cancelled) setLogoLayer(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [coverLayer, logoUrl, refreshKey]);
 
-  const showLogoPattern = !!logoUrl && logoOk !== false;
-  const showTeamName = !!team && logoOk === false;
-  const showStars = !team;
+  const showCoverImage = !!coverUrl && coverLayer !== 'missing';
+  const showLogoPattern = coverLayer === 'missing' && logoLayer === 'present' && !!logoUrl;
+  const showTeamName = coverLayer === 'missing' && logoLayer === 'missing' && !!team && teamsReady;
+  const showStars = coverLayer === 'missing' && logoLayer === 'missing' && !team && teamsReady;
 
   const starTiles = useMemo(
     () => (showStars ? staggeredGrid(width, height, STAR, STAR_PITCH_X, STAR_PITCH_Y) : []),
     [showStars, width, height]
   );
-  const logoTiles = useMemo(
-    () => (showLogoPattern ? staggeredGrid(width, height, LOGO, LOGO_PITCH_X, LOGO_PITCH_Y) : []),
-    [showLogoPattern, width, height]
-  );
 
-  // Repeated club name: enough rows to fill the band, alternate rows offset by half a word.
   const nameRows = useMemo(() => {
     if (!showTeamName || !width) return [];
     const label = team!.teamName.toUpperCase();
@@ -151,6 +139,8 @@ const TeamCover: React.FC<Props> = ({
       text: Array.from({ length: repeats }, () => label).join('   '),
     }));
   }, [showTeamName, team, width, height]);
+
+  const hasCustomCover = coverLayer === 'present';
 
   return (
     <View
@@ -184,28 +174,16 @@ const TeamCover: React.FC<Props> = ({
       )}
 
       {showLogoPattern && (
-        <View style={StyleSheet.absoluteFill} pointerEvents="none">
-          {logoTiles.map((tile) => (
-            <Image
-              key={tile.key}
-              source={{ uri: logoUrl! }}
-              style={[styles.logoTile, { left: tile.x, top: tile.y }]}
-              contentFit="contain"
-              cachePolicy="memory-disk"
-              transition={0}
-              onError={() => {
-                markAssetMissing(logoUrl!);
-                setLogoOk(false);
-              }}
-              onLoad={() => setLogoOk(true)}
-            />
-          ))}
-        </View>
+        <ImageBackground
+          source={{ uri: logoUrl! }}
+          style={StyleSheet.absoluteFill}
+          imageStyle={styles.logoRepeatImage}
+          resizeMode="repeat"
+        />
       )}
 
       {showTeamName && (
         <>
-          {/* Wine-red wordmark rows: brand red pulled deep into the dark base, no "newsprint" white */}
           <View style={[StyleSheet.absoluteFill, { top: -NAME_LINE * 0.35 }]} pointerEvents="none">
             {nameRows.map((row, i) => (
               <Text
@@ -221,7 +199,6 @@ const TeamCover: React.FC<Props> = ({
               </Text>
             ))}
           </View>
-          {/* diagonal light: rows glow top-left and sink into the graphite toward bottom-right */}
           <LinearGradient
             colors={['rgba(250,47,64,0.10)', 'rgba(20,19,25,0)', 'rgba(15,14,18,0.55)']}
             locations={[0, 0.45, 1]}
@@ -233,24 +210,19 @@ const TeamCover: React.FC<Props> = ({
         </>
       )}
 
-      {coverOk !== false && (
+      {showCoverImage && (
         <Image
-          source={{ uri: coverUrl }}
+          source={{ uri: coverUrl! }}
           style={StyleSheet.absoluteFill}
           contentFit="cover"
           cachePolicy="memory-disk"
           priority="high"
           recyclingKey={`cover-${playerId}`}
           transition={0}
-          onError={() => {
-            markAssetMissing(coverUrl);
-            setCoverOk(false);
-          }}
-          onLoad={() => setCoverOk(true)}
+          onError={() => setCoverLayer('missing')}
         />
       )}
 
-      {/* keeps name / status / teams readable over a photo; wallpapers are subtle anyway */}
       <LinearGradient
         colors={['rgba(10,10,14,0.3)', 'rgba(10,10,14,0.12)', 'rgba(10,10,14,0.72)']}
         locations={[0, 0.4, 1]}
@@ -264,11 +236,11 @@ const TeamCover: React.FC<Props> = ({
             <TouchableOpacity style={styles.chip} onPress={onPickCover} activeOpacity={0.8}>
               <Ionicons name="pencil" size={13} color="#fff" />
               <Text style={styles.chipText}>
-                {coverOk ? t('profile.changeCover') : t('profile.cover')}
+                {hasCustomCover ? t('profile.changeCover') : t('profile.cover')}
               </Text>
             </TouchableOpacity>
           )}
-          {canEditCover && coverOk && onRemoveCover && (
+          {canEditCover && hasCustomCover && onRemoveCover && (
             <TouchableOpacity style={[styles.chip, styles.chipIcon]} onPress={onRemoveCover} activeOpacity={0.8}>
               <Ionicons name="trash-outline" size={13} color="#fff" />
             </TouchableOpacity>
@@ -277,7 +249,7 @@ const TeamCover: React.FC<Props> = ({
             <TouchableOpacity style={styles.chip} onPress={onPickTeamLogo} activeOpacity={0.8}>
               <Ionicons name="shield-outline" size={13} color="#fff" />
               <Text style={styles.chipText}>
-                {logoOk ? t('profile.teamLogo') : t('profile.uploadTeamLogo')}
+                {logoLayer === 'present' ? t('profile.teamLogo') : t('profile.uploadTeamLogo')}
               </Text>
             </TouchableOpacity>
           )}
@@ -288,7 +260,6 @@ const TeamCover: React.FC<Props> = ({
 };
 
 const NAME_FONT = 30;
-/** Deep wine on graphite; alternate rows a touch darker for a woven, non-flat texture. */
 const NAME_COLOR = 'rgba(250,47,64,0.30)';
 const NAME_COLOR_ALT = 'rgba(190,30,48,0.26)';
 const NAME_LINE = 38;
@@ -305,10 +276,7 @@ const styles = StyleSheet.create({
     height: STAR,
     opacity: 0.28,
   },
-  logoTile: {
-    position: 'absolute',
-    width: LOGO,
-    height: LOGO,
+  logoRepeatImage: {
     opacity: 0.26,
   },
   nameRow: {

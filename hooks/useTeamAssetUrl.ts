@@ -6,8 +6,8 @@ import {
 } from '../utils/teamAssets';
 
 /** Cover/logo URL after version + missing caches are hydrated (stable ?v= for prefetch/render). */
-export function usePlayerCoverUrl(playerId: string, refreshKey = 0): string {
-  const [url, setUrl] = useState(() => getPlayerCoverUrl(playerId));
+export function usePlayerCoverUrl(playerId: string, refreshKey = 0): string | null {
+  const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -23,7 +23,7 @@ export function usePlayerCoverUrl(playerId: string, refreshKey = 0): string {
 }
 
 export function useTeamLogoUrl(teamId: string | null | undefined, refreshKey = 0): string | null {
-  const [url, setUrl] = useState<string | null>(() => (teamId ? getTeamLogoUrl(teamId) : null));
+  const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!teamId) {

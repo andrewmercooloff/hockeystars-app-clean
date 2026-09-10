@@ -120,6 +120,14 @@ const warm = async (url: string): Promise<boolean> => {
 export const prefetchPlayerCover = (playerId: string) => warm(getPlayerCoverUrl(playerId));
 export const prefetchTeamLogo = (teamId: string) => warm(getTeamLogoUrl(teamId));
 
+export type AssetPresence = 'present' | 'missing';
+
+/** Probe storage once; warms disk cache on hit and remembers 404 on miss. */
+export const resolveAssetUrl = async (url: string): Promise<AssetPresence> => {
+  const ok = await warm(url);
+  return ok ? 'present' : 'missing';
+};
+
 const publicUrl = (fileName: string) => {
   const base = getStoragePublicUrl(BUCKET, fileName);
   const v = versions[fileName];

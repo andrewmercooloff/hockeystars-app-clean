@@ -556,6 +556,7 @@ export default function PlayerProfile() {
   const [galleryPhotos, setGalleryPhotos] = useState<string[]>([]);
   const initialPhotosUrlsRef = useRef<string[]>([]); // URL фото на момент открытия/загрузки профиля
   const [playerTeams, setPlayerTeams] = useState<PastTeam[]>([]);
+  const [teamsReady, setTeamsReady] = useState(false);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   // --- AI Analysis state (must be before resolvedAiAnalysis) ---
   const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
@@ -786,6 +787,7 @@ export default function PlayerProfile() {
       setEditData({});
       setPlayerTeams([]);
       setPastTeams([]);
+      setTeamsReady(false);
     }
     lastRoutePlayerIdRef.current = nid;
   }, [id]);
@@ -904,6 +906,7 @@ export default function PlayerProfile() {
       const pastTeamsFiltered = teams.filter(team => !team.isCurrent);
       setPlayerTeams(currentTeams);
       setPastTeams(pastTeamsFiltered);
+      setTeamsReady(true);
 
       // Устанавливаем друзей
       setFriends(friendsList);
@@ -1108,6 +1111,7 @@ export default function PlayerProfile() {
       const pastTeamsNow = teamsFromNetwork.filter(team => !team.isCurrent);
       setPlayerTeams(currentTeamsNow);
       setPastTeams(pastTeamsNow);
+      setTeamsReady(true);
 
       // Сохраняем в кеш состояния для мгновенного переключения
       setPlayersCache(prev => ({
@@ -1244,6 +1248,7 @@ export default function PlayerProfile() {
       setVideoFields([]);
       setPlayerTeams([]);
       setPastTeams([]);
+      setTeamsReady(false);
       setAiAnalysis(null);
       setLoading(true); // Показываем loading для нового профиля
       // Обновляем previousId сразу
@@ -1271,7 +1276,10 @@ export default function PlayerProfile() {
         if (currentLoadingIdRef.current !== normalizedId) return;
         setPlayerTeams(teams.filter((t) => t.isCurrent));
         setPastTeams(teams.filter((t) => !t.isCurrent));
-      }).catch(() => {});
+        setTeamsReady(true);
+      }).catch(() => {
+        if (currentLoadingIdRef.current === normalizedId) setTeamsReady(true);
+      });
       
       // Восстанавливаем друзей и статус дружбы из кеша
       if (friendsCache[normalizedId as string]) {
@@ -5166,6 +5174,7 @@ export default function PlayerProfile() {
                 <TeamCover
                   playerId={player.id}
                   team={coverTeam}
+                  teamsReady={teamsReady}
                   style={isDesktop ? styles.coverBandDesktop : styles.coverBand}
                   onMeasure={({ width: w, height: h }) => {
                     if (w > 0 && h > 0) setCoverAspect(w / h);
