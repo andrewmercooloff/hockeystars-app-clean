@@ -6960,7 +6960,7 @@ export default function PlayerProfile() {
                     {videoFields.map((video, index) => (
                       <View key={video.tempId ?? `${video.url}-${index}`} style={[styles.uploadedVideoItem, videoEditTileStyle]}>
                         {video.thumbUri ? (
-                          <Image source={{ uri: video.thumbUri }} style={styles.uploadedVideoThumb} resizeMode="cover" />
+                          <Image source={{ uri: video.thumbUri }} style={styles.uploadedVideoThumb} resizeMode="contain" />
                         ) : video.url ? (
                           <View style={styles.uploadedVideoThumb}>
                             <DirectVideoThumbnail videoUrl={video.url} />
@@ -10165,6 +10165,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#2a2430',
     overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   uploadedVideoThumb: {
     ...StyleSheet.absoluteFillObject,

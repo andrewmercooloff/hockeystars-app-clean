@@ -18,7 +18,7 @@ import LikeButton from './LikeButton';
 import HorizontalScrollWithArrows from './HorizontalScrollWithArrows';
 import { generateVideoContentId } from '../utils/likesService';
 import { getVideoThumbnailUrl } from '../utils/videoUrls';
-import { getVideoTileSize } from '../utils/mediaTileSize';
+import { getVideoTileHeight, widthForAspectHeight } from '../utils/mediaTileSize';
 import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
 import { rewriteSupabasePublicUrl } from '../utils/supabase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -155,7 +155,13 @@ function captureWebVideoFrame(videoUrl: string): Promise<string | null> {
 }
 
 /** Thumbnail для прямых mp4 — серверное `_thumb.jpg`, на web fallback кадр из video. */
-export const DirectVideoThumbnail = React.memo(function DirectVideoThumbnail({ videoUrl }: { videoUrl: string }) {
+export const DirectVideoThumbnail = React.memo(function DirectVideoThumbnail({
+  videoUrl,
+  onAspectRatio,
+}: {
+  videoUrl: string;
+  onAspectRatio?: (ratio: number) => void;
+}) {
   const resolvedUrl = rewriteSupabasePublicUrl(videoUrl) || videoUrl;
   const serverThumb = getVideoThumbnailUrl(resolvedUrl);
   const [serverThumbFailed, setServerThumbFailed] = React.useState(false);
@@ -225,10 +231,16 @@ export const DirectVideoThumbnail = React.memo(function DirectVideoThumbnail({ v
       <ExpoImage
         source={{ uri: displayUri }}
         style={StyleSheet.absoluteFillObject}
-        contentFit="cover"
+        contentFit="contain"
         cachePolicy="memory-disk"
         transition={150}
         onError={handleImageError}
+        onLoad={(event) => {
+          const { width, height } = event.source;
+          if (width > 0 && height > 0) {
+            onAspectRatio?.(width / height);
+          }
+        }}
       />
     );
   }
@@ -240,7 +252,13 @@ export const DirectVideoThumbnail = React.memo(function DirectVideoThumbnail({ v
   );
 });
 
-export const VideoPreviewThumbnail = React.memo(function VideoPreviewThumbnail({ videoUrl }: { videoUrl: string }) {
+export const VideoPreviewThumbnail = React.memo(function VideoPreviewThumbnail({
+  videoUrl,
+  onAspectRatio,
+}: {
+  videoUrl: string;
+  onAspectRatio?: (ratio: number) => void;
+}) {
   const [vkThumbnailUrl, setVkThumbnailUrl] = React.useState<string | null>(null);
   const [vkThumbnailError, setVkThumbnailError] = React.useState(false);
 
@@ -359,7 +377,7 @@ export const VideoPreviewThumbnail = React.memo(function VideoPreviewThumbnail({
   }, [vkVideoId, videoUrl, vkThumbnailUrl, vkThumbnailError]);
 
   if (!isYouTubeUrl(videoUrl) && !isVkUrl(videoUrl)) {
-    return <DirectVideoThumbnail videoUrl={videoUrl} />;
+    return <DirectVideoThumbnail videoUrl={videoUrl} onAspectRatio={onAspectRatio} />;
   }
 
   if (isYouTubeUrl(videoUrl) && youtubeVideoId) {
@@ -389,11 +407,17 @@ export const VideoPreviewThumbnail = React.memo(function VideoPreviewThumbnail({
       <ExpoImage
         source={{ uri: currentThumbnail }}
         style={StyleSheet.absoluteFillObject}
-        contentFit="cover"
+        contentFit="contain"
         cachePolicy="memory-disk"
         transition={100}
         onError={handleError}
-        onLoad={handleLoad}
+        onLoad={(event) => {
+          handleLoad();
+          const { width, height } = event.source;
+          if (width > 0 && height > 0) {
+            onAspectRatio?.(width / height);
+          }
+        }}
       />
     );
   }
@@ -405,9 +429,15 @@ export const VideoPreviewThumbnail = React.memo(function VideoPreviewThumbnail({
           <ExpoImage
             source={{ uri: vkThumbnailUrl }}
             style={StyleSheet.absoluteFillObject}
-            contentFit="cover"
+            contentFit="contain"
             cachePolicy="memory-disk"
             onError={() => setVkThumbnailError(true)}
+            onLoad={(event) => {
+              const { width, height } = event.source;
+              if (width > 0 && height > 0) {
+                onAspectRatio?.(width / height);
+              }
+            }}
           />
           <View style={styles.vkPlayOverlay}>
             <Ionicons name="play-circle" size={48} color="#fff" />
@@ -462,8 +492,8 @@ type VideoCarouselCardProps = {
   video: { url: string; timeCode?: string };
   playerId?: string;
   effectiveRefreshTrigger: number;
-  cardWidth: number;
   cardHeight: number;
+  cardMaxWidth: number;
   onPress: (video: { url: string; timeCode?: string }) => void;
 };
 
@@ -471,18 +501,21 @@ const VideoCarouselCard = React.memo(function VideoCarouselCard({
   video,
   playerId,
   effectiveRefreshTrigger,
-  cardWidth,
   cardHeight,
+  cardMaxWidth,
   onPress,
 }: VideoCarouselCardProps) {
   const contentId = generateVideoContentId(video.url, video.timeCode);
+  const [aspectRatio, setAspectRatio] = useState(16 / 9);
+  const cardWidth = widthForAspectHeight(aspectRatio, cardHeight, 100, cardMaxWidth);
+
   return (
     <TouchableOpacity
       style={[styles.videoCard, { width: cardWidth, height: cardHeight }]}
       onPress={() => onPress(video)}
       activeOpacity={0.85}
     >
-      <VideoPreviewThumbnail videoUrl={video.url} />
+      <VideoPreviewThumbnail videoUrl={video.url} onAspectRatio={setAspectRatio} />
       <View style={styles.playButton}>
         <Ionicons name="play-circle" size={40} color="#fa2f40" />
       </View>
@@ -509,9 +542,14 @@ const VideoCarouselCard = React.memo(function VideoCarouselCard({
 export default function VideoCarousel({ videos, onVideoPress, playerId, externalRefreshTrigger = 0 }: VideoCarouselProps) {
   const { t } = useLanguage();
   const isDesktop = useIsDesktopLayout();
-  const { width: cardWidth, height: cardHeight } = useMemo(
-    () => getVideoTileSize(screenWidth, isDesktop),
-    [isDesktop],
+  const cardHeight = useMemo(() => getVideoTileHeight(screenWidth, isDesktop), [isDesktop]);
+  const cardMaxWidth = useMemo(
+    () => Math.min(Math.round(screenWidth * 0.82), 360),
+    [screenWidth]
+  );
+  const scrollStep = useMemo(
+    () => widthForAspectHeight(16 / 9, cardHeight, 100, cardMaxWidth) + 16,
+    [cardHeight, cardMaxWidth]
   );
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -576,11 +614,10 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
     <View style={styles.container}>
       <HorizontalScrollWithArrows
         contentContainerStyle={styles.scrollContainer}
-        scrollStep={cardWidth + 16}
+        scrollStep={scrollStep}
         onScroll={(event) => {
           const contentOffset = event.nativeEvent.contentOffset.x;
-          const step = cardWidth + 16;
-          setCurrentIndex(Math.round(contentOffset / step));
+          setCurrentIndex(Math.round(contentOffset / scrollStep));
         }}
         scrollEventThrottle={16}
         removeClippedSubviews={true}
@@ -592,8 +629,8 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
             video={video}
             playerId={playerId}
             effectiveRefreshTrigger={effectiveRefreshTrigger}
-            cardWidth={cardWidth}
             cardHeight={cardHeight}
+            cardMaxWidth={cardMaxWidth}
             onPress={handleVideoPress}
           />
         ))}
@@ -655,6 +692,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(250, 47, 64, 0.2)',
     overflow: 'hidden',
     position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   thumbnail: {
     width: '100%',
