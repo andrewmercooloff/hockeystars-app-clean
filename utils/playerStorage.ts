@@ -1126,6 +1126,68 @@ export const getPlayerTeamsAsPastTeams = async (playerId: string): Promise<PastT
   }
 };
 
+const TEAMS_MEMORY_TTL_MS = 10 * 60 * 1000;
+
+/** In-memory teams for instant profile header (same TTL as getPlayerTeams). */
+export function peekPlayerTeamsSync(playerId: string): PastTeam[] | null {
+  const memCached = teamsMemoryCache.get(playerId);
+  if (!memCached || Date.now() - memCached.timestamp >= TEAMS_MEMORY_TTL_MS) {
+    return null;
+  }
+  return memCached.teams.map(convertPlayerTeamToPastTeam);
+}
+
+export function splitPastTeams(teams: PastTeam[]): { current: PastTeam[]; past: PastTeam[] } {
+  return {
+    current: teams.filter((t) => t.isCurrent),
+    past: teams.filter((t) => !t.isCurrent),
+  };
+}
+
+/** Teams embedded on a cached Player row (home/search list). */
+export function pastTeamsFromPlayerRecord(player: Player | null | undefined): PastTeam[] | null {
+  if (!player?.teams?.length) return null;
+  return player.teams.map(convertPlayerTeamToPastTeam);
+}
+
+/** Sync hydrate: memory cache, then player.teams from list/bootstrap cache. */
+export function getInstantProfileTeams(
+  playerId: string,
+  player?: Player | null
+): { current: PastTeam[]; past: PastTeam[]; all: PastTeam[] } | null {
+  const fromMem = peekPlayerTeamsSync(playerId);
+  if (fromMem?.length) {
+    const split = splitPastTeams(fromMem);
+    return { ...split, all: fromMem };
+  }
+  const fromPlayer = pastTeamsFromPlayerRecord(player);
+  if (fromPlayer?.length) {
+    seedPlayerTeamsBootstrapCache(
+      playerId,
+      player!.teams!.map((t) => ({
+        teamId: t.teamId,
+        teamName: t.teamName,
+        teamNameRu: t.teamNameRu,
+        teamType: t.teamType,
+        teamCountry: t.teamCountry,
+        teamCity: t.teamCity,
+        isPrimary: t.isPrimary,
+        joinedDate: t.joinedDate,
+        startYear: t.startYear,
+        endYear: t.endYear,
+        teamOrder: t.teamOrder,
+      }))
+    );
+    const split = splitPastTeams(fromPlayer);
+    return { ...split, all: fromPlayer };
+  }
+  return null;
+}
+
+export const prefetchPlayerTeams = (playerId: string) => {
+  void getPlayerTeamsAsPastTeams(playerId);
+};
+
 // Синхронизация команд игрока с базой данных через Edge Function (обходит RLS)
 export const syncPlayerTeams = async (playerId: string, currentTeams: PastTeam[], pastTeams: PastTeam[]): Promise<boolean> => {
   try {
@@ -1701,6 +1763,7 @@ export const clearAllFriendsCache = async (): Promise<void> => {
 // Очистка кеша команд при изменении команд игрока
 export const clearTeamsCache = async (playerId: string): Promise<void> => {
   try {
+    teamsMemoryCache.delete(playerId);
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
     const cacheKey = `teams_${playerId}`;
     await AsyncStorage.removeItem(cacheKey);

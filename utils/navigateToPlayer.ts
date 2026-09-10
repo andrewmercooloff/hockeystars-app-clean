@@ -5,6 +5,7 @@ import {
   normalizeSeoLanguage,
   type SeoLanguage,
 } from './playerSeoPath';
+import { prefetchPlayerTeams } from './playerStorage';
 import { prefetchPlayerCover } from './teamAssets';
 import { pushBrowserUrlThenReplace } from './webHistory';
 
@@ -109,6 +110,7 @@ export function navigateToPlayerProfile(router: RouterLike, opts: NavigateToPlay
   if (!id) return;
 
   void prefetchPlayerCover(id);
+  prefetchPlayerTeams(id);
 
   const navParams = pickNavParams(rest as Record<string, unknown>);
   const path = buildPlayerPath(id, name, normalizeSeoLanguage(lang || 'ru'));

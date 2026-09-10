@@ -91,7 +91,7 @@ import * as VideoThumbnails from 'expo-video-thumbnails';
 import VideoPlayer from '../../components/VideoPlayer';
 import LikeButton from '../../components/LikeButton';
 import { generateVideoContentId } from '../../utils/likesService';
-import { acceptFriendRequest, Achievement, ALL_PLAYERS_LIST_CACHE_KEYS, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, clearPlayerMemoryCache, clearAllPlayersCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getCachedPlayerSync, peekCachedPlayerSync, getFriends, getFriendshipStatus, getPlayerById, getPlayerTeamsAsPastTeams, isGoalkeeperPosition, loadCurrentUser, logoutUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutChanges, notifyFriendsAboutCover, notifyFriendsAboutPhysicalData, notifyFriendsAboutPhotos, notifyFriendsAboutVideos, notifyFriendsAboutScoutReport, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
+import { acceptFriendRequest, Achievement, ALL_PLAYERS_LIST_CACHE_KEYS, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, clearPlayerMemoryCache, clearAllPlayersCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getCachedPlayerSync, getInstantProfileTeams, peekCachedPlayerSync, getFriends, getFriendshipStatus, getPlayerById, getPlayerTeamsAsPastTeams, isGoalkeeperPosition, loadCurrentUser, logoutUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutChanges, notifyFriendsAboutCover, notifyFriendsAboutPhysicalData, notifyFriendsAboutPhotos, notifyFriendsAboutVideos, notifyFriendsAboutScoutReport, PastTeam, Player, prefetchPlayerTeams, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
 import { dataCache, CACHE_KEYS } from '../../utils/DataCache';
 import { getSupabaseFunctionUrl, supabase, supabaseAnonKey, supabaseFetch } from '../../utils/supabase';
 import { createPlayerManually } from '../../utils/playerStorage';
@@ -839,8 +839,18 @@ export default function PlayerProfile() {
     }
   };
 
+  /** Sync hydrate teams from memory / list cache — no AsyncStorage round-trip. */
+  const applyProfileTeamsInstant = (playerId: string, player?: Player | null): PastTeam[] | undefined => {
+    const instant = getInstantProfileTeams(playerId, player);
+    if (!instant) return undefined;
+    setPlayerTeams(instant.current);
+    setPastTeams(instant.past);
+    setTeamsReady(true);
+    return instant.all;
+  };
+
   // Функция для загрузки дополнительных данных в фоне
-  // ОПТИМИЗИРОВАНО: Все запросы выполняются ПАРАЛЛЕЛЬНО для максимальной скорости
+  // ОПТИМИЗИРОВАНО: команды показываем сразу; друзья/дружба не блокируют команды
   const loadAdditionalData = async (playerData: Player, userData: Player | null, preloadedTeams?: PastTeam[]) => {
     try {
       // Проверяем, что ID не изменился перед загрузкой дополнительных данных
@@ -869,15 +879,22 @@ export default function PlayerProfile() {
               return [];
             });
 
+      void teamsPromise.then((teams) => {
+        const checkId = Array.isArray(id) ? id[0] : id;
+        if (checkId !== playerData.id || currentLoadingIdRef.current !== playerData.id) return;
+        setPlayerTeams(teams.filter((team) => team.isCurrent));
+        setPastTeams(teams.filter((team) => !team.isCurrent));
+        setTeamsReady(true);
+      });
+
       const promises: Promise<any>[] = [
-        teamsPromise,
         getFriends(playerData.id).catch(err => {
           console.error('Ошибка загрузки друзей:', err);
           return [];
-        })
+        }),
       ];
       
-      // 3. Статус дружбы (только если смотрим чужой профиль)
+      // Статус дружбы (только если смотрим чужой профиль)
       if (userData && playerData.id !== userData.id) {
         promises.push(
           getFriendshipStatus(userData.id, playerData.id).catch(err => {
@@ -887,7 +904,6 @@ export default function PlayerProfile() {
         );
       }
 
-      // Выполняем ВСЕ запросы ОДНОВРЕМЕННО
       const results = await Promise.all(promises);
       
       // Проверяем ID после загрузки
@@ -897,17 +913,8 @@ export default function PlayerProfile() {
         return;
       }
 
-      // Распаковываем результаты
-      const teams = results[0] as PastTeam[];
-      const friendsList = results[1] as Player[];
-      const friendsStatus = results[2] as 'friends' | 'sent_request' | 'received_request' | 'none' | 'pending' | undefined;
-
-      // Устанавливаем команды
-      const currentTeams = teams.filter(team => team.isCurrent);
-      const pastTeamsFiltered = teams.filter(team => !team.isCurrent);
-      setPlayerTeams(currentTeams);
-      setPastTeams(pastTeamsFiltered);
-      setTeamsReady(true);
+      const friendsList = results[0] as Player[];
+      const friendsStatus = results[1] as 'friends' | 'sent_request' | 'received_request' | 'none' | 'pending' | undefined;
 
       // Устанавливаем друзей
       setFriends(friendsList);
@@ -972,6 +979,8 @@ export default function PlayerProfile() {
         clearPlayerMemoryCache(normalizedId as string);
       }
 
+      prefetchPlayerTeams(normalizedId as string);
+
       // Web: дождаться early bootstrap (уже стартовал в <head>), чтобы сразу показать шапку
       if (Platform.OS === 'web' && routeParam && !forceRefreshProfile) {
         try {
@@ -991,11 +1000,13 @@ export default function PlayerProfile() {
         setPlayer(cachedPlayer);
         setAiAnalysis(cachedPlayer.aiAnalysis ?? null);
         setLoading(false); // Убираем индикатор загрузки для кешированных данных
-        
+
+        const preloadedTeams = applyProfileTeamsInstant(normalizedId as string, cachedPlayer);
         // Команды/друзья — сразу (не ждём loadCurrentUser — он раньше задерживал команды)
-        loadAdditionalData(cachedPlayer, currentUserLoadRef.current);
+        loadAdditionalData(cachedPlayer, currentUserLoadRef.current, preloadedTeams);
         void loadCurrentUser().then(setCurrentUser);
       } else {
+        applyProfileTeamsInstant(normalizedId as string);
         // Если кешированных данных нет, показываем индикатор загрузки
         setLoading(true);
       }
@@ -1271,16 +1282,9 @@ export default function PlayerProfile() {
       setPlayer(cachedPlayer);
       setAiAnalysis(cachedPlayer.aiAnalysis ?? null);
       setLoading(false);
-      
-      // Команды из bootstrap/memory — без ожидания сети
-      void getPlayerTeamsAsPastTeams(normalizedId as string).then((teams) => {
-        if (currentLoadingIdRef.current !== normalizedId) return;
-        setPlayerTeams(teams.filter((t) => t.isCurrent));
-        setPastTeams(teams.filter((t) => !t.isCurrent));
-        setTeamsReady(true);
-      }).catch(() => {
-        if (currentLoadingIdRef.current === normalizedId) setTeamsReady(true);
-      });
+
+      // Команды из memory / player.teams в списке — синхронно, без AsyncStorage
+      applyProfileTeamsInstant(normalizedId as string, cachedPlayer);
       
       // Восстанавливаем друзей и статус дружбы из кеша
       if (friendsCache[normalizedId as string]) {
@@ -1321,6 +1325,9 @@ export default function PlayerProfile() {
       
       // Устанавливаем текущий загружаемый ID
       currentLoadingIdRef.current = normalizedId;
+
+      prefetchPlayerTeams(normalizedId as string);
+      applyProfileTeamsInstant(normalizedId as string);
       
       // Если состояние еще не очищено (не было смены id), показываем loading
       if (!idChanged) {
