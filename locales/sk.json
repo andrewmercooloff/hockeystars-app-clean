@@ -28,7 +28,11 @@
     "left": "Vľavo",
     "right": "Správne",
     "offline": "Bez pripojenia",
-    "and": "a"
+    "and": "a",
+    "info": "Informácia",
+    "continue": "Pokračovať",
+    "retry": "Skúsiť znova",
+    "warning": "Upozornenie"
   },
   "winger": "Krídelník",
   "center": "Stred dopredu",
@@ -56,7 +60,9 @@
   },
   "achievementNotification": {
     "added": "pridané",
-    "oneAchievement": "nový úspech"
+    "oneAchievement": "nový úspech",
+    "multipleAchievements": "{count} nových úspechov",
+    "received": "získal"
   },
   "friendshipNotification": {
     "title": "Nové priateľstvo",
@@ -201,7 +207,9 @@
       "saveError": "Cvičenie nie je možné označiť ako dokončené",
       "generalError": "Pri ukladaní sa vyskytla chyba",
       "times": "raz",
-      "timesPlural": "krát"
+      "timesPlural": "krát",
+      "loginRequired": "Prihláste sa, aby ste mohli plniť cvičenia",
+      "title": "Cvičenie"
     },
     "difficulty": {
       "Начинающий": "Začiatok",
@@ -3092,7 +3100,8 @@
       "Intermediate": "Stredný",
       "Advanced": "Pokročilý",
       "Easy": "Ľahký"
-    }
+    },
+    "timesPlural": "krát"
   },
   "items": {
     "autograph": "autogram",
@@ -3186,7 +3195,13 @@
     "errorProcessFriendRequest": "Nie je možné spracovať vašu žiadosť o priateľstvo.",
     "errorProcessRequest": "Vašu žiadosť sa nepodarilo spracovať",
     "errorSendMessage": "Odoslanie správy zlyhalo",
-    "phoneOrEmailPlaceholderShort": "+421… alebo email"
+    "phoneOrEmailPlaceholderShort": "+421… alebo email",
+    "email": "E-mail",
+    "errorSwitchingToEmail": "Nepodarilo sa prepnúť na prihlásenie e-mailom",
+    "smsRateLimited": "Kód bol na toto číslo odoslaný menej ako minútu dozadu. Zadajte ho alebo po skončení odpočtu požiadajte o nový.",
+    "smsServerUnreachable": "Server HockeyStars nie je dostupný. Skontrolujte pripojenie (VPN môže blokovať) a klepnite na „Odoslať znova“.",
+    "smsEmailOnly": "Pre USA a Kanadu sa prihláste e-mailom.",
+    "smsProviderFailed": "Operátor SMS neprijal. Skontrolujte číslo alebo to skúste o minútu."
   },
   "profile": {
     "addFriend": "Pridať ako priateľa",
@@ -3472,7 +3487,34 @@
     "city": "Mesto",
     "addAddress": "Pridať adresu",
     "addressesHint": "Môžete zadať viacero adries",
-    "previousSeason": "Previous season"
+    "previousSeason": "Previous season",
+    "cover": "Obálka",
+    "changeCover": "Zmeniť obálku",
+    "removeCover": "Odstrániť obálku",
+    "teamLogo": "Logo tímu",
+    "uploadTeamLogo": "Nahrať logo",
+    "coverUpdated": "Obálka aktualizovaná",
+    "teamLogoUpdated": "Logo tímu aktualizované",
+    "coverUploadFailed": "Obrázok sa nepodarilo nahrať",
+    "scoutPrivacyNote": "Ostatní používatelia neuvidia vašu fotku ani meno – ste pre nich „Skaut“.",
+    "positionCover": "Umiestnite obálku",
+    "positionCoverHint": "Posúvajte jedným prstom, približujte dvoma, kým výrez nesedí",
+    "allTime": "Celkovo",
+    "seasonsCount": "{count} sez.",
+    "currentSeasonHint": "Aktuálna sezóna",
+    "fullScreen": "Celá obrazovka",
+    "heightWithUnit": "Výška (cm)",
+    "individualTraining": "Individuálne tréningy",
+    "noPermission": "Bez prístupu ku galérii",
+    "playerNumber": "Číslo hráča",
+    "playerNumberPlaceholder": "Číslo na drese",
+    "savedToGallery": "Uložené do galérie",
+    "selectBirthDate": "Vyberte dátum narodenia",
+    "shareError": "Chyba pri vytváraní obrázka",
+    "skateServices": "Služby",
+    "weightWithUnit": "Váha (kg)",
+    "videoUploaded": "Video bolo pridané do profilu",
+    "videoUploadSaveReminder": "Video nahrané. Klepnite na «Uložiť», aby zostalo v profile."
   },
   "register": {
     "title": "Registrácia",
@@ -3523,7 +3565,32 @@
     "fillRequiredFields": "Prosím vyplňte všetky povinné polia",
     "fillAllFields": "Prosím vyplňte všetky polia",
     "phoneFormatError": "Prosím zadajte platné telefónne číslo s kódom krajiny (napr. +1234567890)",
-    "parentEmailFormatError": "Prosím zadajte platný email rodiča"
+    "parentEmailFormatError": "Prosím zadajte platný email rodiča",
+    "scoutPrivacyNote": "Fotku a meno skauta ostatní nevidia – zobrazujete sa ako „Skaut“.",
+    "emailFormatError": "Zadajte platnú e-mailovú adresu",
+    "registrationFailed": "Registrácia sa nepodarila",
+    "detailsHint": "Nepovinné: číslo, držanie hokejky, výška a váha pomáhajú skautom a priateľom vás nájsť. Môžete ich doplniť neskôr v profile.",
+    "skipForNow": "Preskočiť",
+    "parentEmailSendFailed": "E-mail rodičovi sa nepodarilo odoslať. Skontrolujte adresu a skúste to neskôr.",
+    "step": {
+      "contact": "Krok 1 · Kontakt",
+      "code": "Krok 2 · Potvrdenie",
+      "profile": "Krok 1 · Profil",
+      "details": "Krok 2 · Údaje hráča"
+    },
+    "currentTeam": "Súčasný tím",
+    "currentTeamHint": "Cez tím sa prepájajú spoluhráči, titulná fotka a stránka tímu. Začnite písať a nájdeme existujúci.",
+    "teamPlaceholder": "napr. Dinamo Minsk 2012",
+    "teamWillBeCreated": "Taký tím ešte nie je — vytvoríme ho za vás.",
+    "consentByContinuing": "Klepnutím na „Pokračovať“ prijímate",
+    "haveAccount": "Už máte účet?",
+    "signIn": "Prihlásiť sa",
+    "entryTitle": "Na ľad",
+    "entrySubtitle": "Zadajte telefónne číslo. Prihlásime vás alebo vytvoríme účet.",
+    "codeSubtitle": "Zadajte kód zo správy",
+    "whoAreYou": "Kto ste?",
+    "useEmailInstead": "Použiť e-mail",
+    "usePhoneInstead": "Použiť telefónne číslo"
   },
   "navigation": {
     "home": "Domov",
@@ -3582,7 +3649,12 @@
     "errorCreatingUser": "Používateľa sa nepodarilo vytvoriť",
     "fillRequiredFields": "Vyplňte všetky povinné polia.",
     "enterValidPhone": "Zadajte platné telefónne číslo s kódom krajiny.",
-    "requiredForPlayers": "Pre hráčov a hviezdy je povinné uviesť dátum narodenia a pozíciu"
+    "requiredForPlayers": "Pre hráčov a hviezdy je povinné uviesť dátum narodenia a pozíciu",
+    "adminPanel": "Panel správcu",
+    "login": "Prihlásiť",
+    "loginAsUserConfirm": "Naozaj sa chcete prihlásiť ako {name}?",
+    "loginAsUserError": "Prihlásenie ako používateľ zlyhalo",
+    "loginAsUserSuccess": "Ste prihlásení ako {name}"
   },
   "museum": {
     "title": "múzeum",
@@ -3763,7 +3835,8 @@
   "settings": {
     "title": "Nastavenia",
     "language": "Jazyk",
-    "selectLanguage": "Vyberte jazyk"
+    "selectLanguage": "Vyberte jazyk",
+    "autoLanguage": "Auto"
   },
   "search": {
     "title": "Hľadať",
@@ -3787,9 +3860,13 @@
     "topBySV": "Top podľa SV%",
     "shareRating": "Zdieľať rebríček",
     "shareRatingFooter": "hockeystars.com",
+    "shareRatingSeason": "Sezóna {season}",
     "ratingPointsLabel": "bodov",
     "allCountries": "Všetky krajiny",
-    "allYears": "Všetky roky"
+    "allYears": "Všetky roky",
+    "filters": "Filtre",
+    "shareNewcomers": "Zdieľať nováčikov",
+    "shareNewcomersCount": "{count} hráčov"
   },
   "messages": {
     "title": "Správy",
@@ -3804,7 +3881,8 @@
     "massSend": "Hromadné posielanie",
     "recipients": "Príjemcovia",
     "typeMessage": "Zadajte správu...",
-    "send": "Odoslať"
+    "send": "Odoslať",
+    "searchHistoryLoading": "Hľadáme v histórii správ…"
   },
   "notifications": {
     "title": "Upozornenia",
@@ -3921,7 +3999,9 @@
     "noFriendsToForward": "Žiadni priatelia na preposlanie",
     "messageForwarded": "Správa preposlaná",
     "forwardedTo": "Preposlané",
-    "forwardError": "Preposlanie zlyhalo"
+    "forwardError": "Preposlanie zlyhalo",
+    "user": "Používateľ",
+    "you": "Vy"
   },
   "createUser": {
     "title": "Vytvorenie používateľa",
@@ -4068,7 +4148,24 @@
     "seconds": "sek",
     "times": "raz",
     "sprint": "Beh na 100 metrov",
-    "_cache_clear": "2024-01-16-9"
+    "_cache_clear": "2024-01-16-9",
+    "customGift": "Požiadať o darček",
+    "deleteGiftConfirm": "Naozaj chcete tento darček odstrániť?",
+    "errorGiftAlreadyExists": "Hráč {playerName} už tento darček má.\n\nVyberte iný darček alebo vytvorte nový.",
+    "errorGiftNotDeleted": "Darček nebol odstránený",
+    "errorGiftNotFound": "Darček sa nenašiel",
+    "errorPermissionDenied": "Nemáte oprávnenie odstrániť tento darček",
+    "errorSelectOrCreate": "Vyberte darček alebo vytvorte nový",
+    "errorSendingGift": "Darček sa nepodarilo odoslať",
+    "fromAdmin": "Admin",
+    "fromStar": "od {starName}",
+    "giftReceived": "Darček prijatý!",
+    "giftReceivedFromAdmin": "Dostali ste darček od administrátora: {giftName}",
+    "giftReceivedFromAdminPush": "Dostali ste darček od administrátora: {giftName}",
+    "giftReceivedFromStar": "Dostali ste darček od {starName}: {giftName}",
+    "giftReceivedFromStarPush": "Dostali ste darček od {starName}: {giftName}",
+    "giftReceivedPush": "🎁 Darček prijatý!",
+    "successGiftSent": "Darček odoslaný hráčovi {playerName}!"
   },
   "TEMP_DELETE_ME": {
     "title": "Normy",
@@ -4239,7 +4336,13 @@
     "deleteError": "Chyba",
     "deleteErrorMessage": "Nepodarilo sa zmazať záznam",
     "speedExceedsLimit": "Rýchlosť presahuje 120 km/h, meranie sa nepočíta",
-    "needMicrophone": "Vyžaduje sa prístup k mikrofónu"
+    "needMicrophone": "Vyžaduje sa prístup k mikrofónu",
+    "micPosition": {
+      "label": "Kde leží telefón",
+      "shooter": "Pri strelcovi",
+      "middle": "V strede",
+      "target": "Pri mantineli"
+    }
   },
   "logout": "VÝCHOD",
   "logoutConfirm": "Odhláste sa zo svojho profilu",
@@ -4284,5 +4387,36 @@
     "scanQr": "Naskenujte telefónom — otvorí sa App Store alebo Google Play",
     "appStoreCta": "Stiahnuť z App Store",
     "playStoreCta": "Stiahnuť z Google Play"
-  }
+  },
+  "videoNotification": {
+    "fullScreen": "Celá obrazovka",
+    "added": "pridal",
+    "multipleVideos": "{count} nových videí",
+    "oneVideo": "nové video"
+  },
+  "coverNotification": {
+    "title": "Nová titulná fotka",
+    "changed": "aktualizoval titulnú fotku profilu"
+  },
+  "ota": {
+    "resurfacing": "Upravujeme ľad…",
+    "updating": "Inštalujeme aktualizáciu",
+    "updated": "Čerstvý ľad — aplikácia aktualizovaná"
+  },
+  "avatarNotification": {
+    "changed": "zmenil avatar"
+  },
+  "cm": "cm",
+  "height": "výška",
+  "kg": "kg",
+  "referral": {
+    "leaderboard": "Najlepší pozývajúci",
+    "noInvites": "Zatiaľ nikto nepozval priateľov",
+    "points": "bodov"
+  },
+  "statsNotification": {
+    "physicalData": "fyzické údaje",
+    "updated": "aktualizoval"
+  },
+  "weight": "váha"
 }

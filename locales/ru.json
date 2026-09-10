@@ -30,7 +30,10 @@
     "rejectRequestConfirm": "Вы уверены, что хотите отклонить этот запрос?",
     "left": "Левый",
     "right": "Правый",
-    "offline": "Нет соединения"
+    "offline": "Нет соединения",
+    "info": "Информация",
+    "continue": "Продолжить",
+    "warning": "Внимание"
   },
   "winger": "Крайний нападающий",
   "center": "Центральный нападающий",
@@ -71,11 +74,16 @@
     "oneVideo": "новое видео",
     "multipleVideos": "{count} новых видео",
     "video": "видео",
-    "videos": "видео"
+    "videos": "видео",
+    "fullScreen": "На весь экран"
   },
   "avatarNotification": {
     "title": "Новый аватар",
     "changed": "изменил свой аватар"
+  },
+  "coverNotification": {
+    "title": "Новая обложка",
+    "changed": "обновил обложку профиля"
   },
   "puckSpeedNotification": {
     "title": "Новый рекорд скорости",
@@ -249,7 +257,9 @@
       "saveError": "Не удалось отметить упражнение как выполненное",
       "generalError": "Произошла ошибка при сохранении",
       "times": "раз",
-      "timesPlural": "раза"
+      "timesPlural": "раза",
+      "loginRequired": "Войдите, чтобы выполнять упражнения",
+      "title": "Упражнение"
     },
     "difficulty": {
       "Начинающий": "Начинающий",
@@ -2916,7 +2926,8 @@
         "difficulty": "Начинающий",
         "duration": "10 мин"
       }
-    }
+    },
+    "timesPlural": "раз"
   },
   "items": {
     "autograph": "автограф",
@@ -3010,7 +3021,13 @@
     "errorProcessFriendRequest": "Не удалось обработать запрос в друзья",
     "errorProcessRequest": "Не удалось обработать запрос",
     "errorSendMessage": "Не удалось отправить сообщение",
-    "phoneOrEmailPlaceholderShort": "+48… или email"
+    "phoneOrEmailPlaceholderShort": "+48… или email",
+    "email": "Email",
+    "errorSwitchingToEmail": "Не удалось переключиться на вход по email",
+    "smsRateLimited": "Код на этот номер уже отправлен меньше минуты назад. Введите его или запросите новый, когда закончится таймер.",
+    "smsServerUnreachable": "Нет связи с сервером HockeyStars. Проверьте интернет (VPN может блокировать) и нажмите «Отправить снова».",
+    "smsEmailOnly": "Для США и Канады вход по email.",
+    "smsProviderFailed": "Оператор не принял SMS. Проверьте номер или попробуйте через минуту."
   },
   "profile": {
     "addFriend": "Добавить в друзья",
@@ -3323,7 +3340,24 @@
     "city": "Город",
     "addAddress": "Добавить адрес",
     "addressesHint": "Можно указать несколько адресов",
-    "previousSeason": "Прошлый сезон"
+    "previousSeason": "Прошлый сезон",
+    "cover": "Обложка",
+    "changeCover": "Сменить обложку",
+    "removeCover": "Убрать обложку",
+    "teamLogo": "Лого команды",
+    "uploadTeamLogo": "Загрузить лого",
+    "coverUpdated": "Обложка обновлена",
+    "teamLogoUpdated": "Логотип команды обновлён",
+    "coverUploadFailed": "Не удалось загрузить изображение",
+    "scoutPrivacyNote": "Ваше фото и имя не увидят другие пользователи — для них вы «Скаут».",
+    "positionCover": "Расположите обложку",
+    "positionCoverHint": "Двигайте пальцем и растягивайте двумя, чтобы кадр лёг в шапку",
+    "allTime": "За всё время",
+    "seasonsCount": "{count} сез.",
+    "currentSeasonHint": "Текущий сезон",
+    "fullScreen": "На весь экран",
+    "videoUploaded": "Видео добавлено в профиль",
+    "videoUploadSaveReminder": "Видео загружено. Нажмите «Сохранить», чтобы закрепить его в профиле."
   },
   "register": {
     "title": "Регистрация",
@@ -3374,7 +3408,32 @@
     "fillRequiredFields": "Пожалуйста, заполните все обязательные поля",
     "fillAllFields": "Пожалуйста, заполните все поля",
     "phoneFormatError": "Пожалуйста, введите корректный номер телефона с кодом страны (например: +1234567890)",
-    "parentEmailFormatError": "Пожалуйста, введите корректный email родителя"
+    "parentEmailFormatError": "Пожалуйста, введите корректный email родителя",
+    "scoutPrivacyNote": "Фото и имя скаута не видят другие пользователи — вы отображаетесь как «Скаут».",
+    "emailFormatError": "Введите корректный email",
+    "registrationFailed": "Ошибка регистрации",
+    "detailsHint": "Необязательно: номер, хват, рост и вес помогают скаутам и друзьям найти вас. Их можно заполнить позже в профиле.",
+    "skipForNow": "Пропустить",
+    "parentEmailSendFailed": "Не удалось отправить письмо родителю. Проверьте адрес и попробуйте позже.",
+    "step": {
+      "contact": "Шаг 1 · Контакт",
+      "code": "Шаг 2 · Подтверждение",
+      "profile": "Шаг 1 · Профиль",
+      "details": "Шаг 2 · Данные игрока"
+    },
+    "currentTeam": "Текущая команда",
+    "currentTeamHint": "Через команду находятся одноклубники, обложка и страница команды. Начните вводить название — подскажем существующую.",
+    "teamPlaceholder": "например, Динамо Минск 2012",
+    "teamWillBeCreated": "Такой команды ещё нет — создадим её для вас.",
+    "consentByContinuing": "Нажимая «Продолжить», вы принимаете",
+    "haveAccount": "Уже есть аккаунт?",
+    "signIn": "Войти",
+    "entryTitle": "Выход на лёд",
+    "entrySubtitle": "Введите номер телефона — войдём в аккаунт или создадим новый.",
+    "codeSubtitle": "Введите код из сообщения",
+    "whoAreYou": "Кто вы?",
+    "useEmailInstead": "Войти по email",
+    "usePhoneInstead": "Войти по номеру телефона"
   },
   "navigation": {
     "home": "Главная",
@@ -3439,7 +3498,8 @@
     "errorCreatingUser": "Не удалось создать пользователя",
     "fillRequiredFields": "Пожалуйста, заполните все обязательные поля",
     "enterValidPhone": "Пожалуйста, введите корректный номер телефона с кодом страны",
-    "requiredForPlayers": "Для игроков и звезд обязательно указать дату рождения и позицию"
+    "requiredForPlayers": "Для игроков и звезд обязательно указать дату рождения и позицию",
+    "adminPanel": "Панель администратора"
   },
   "adminGifts": {
     "title": "Управление подарками",
@@ -3665,9 +3725,13 @@
     "topBySV": "Топ по SV%",
     "shareRating": "Поделиться рейтингом",
     "shareRatingFooter": "hockeystars.com",
+    "shareRatingSeason": "Сезон {season}",
     "ratingPointsLabel": "очков",
     "allCountries": "Все страны",
-    "allYears": "Все года"
+    "allYears": "Все года",
+    "filters": "Фильтры",
+    "shareNewcomers": "Выгрузить новичков",
+    "shareNewcomersCount": "{count} игроков"
   },
   "messages": {
     "title": "Сообщения",
@@ -3682,7 +3746,8 @@
     "massSend": "Массовая отправка",
     "recipients": "Получатели",
     "typeMessage": "Введите сообщение...",
-    "send": "Отправить"
+    "send": "Отправить",
+    "searchHistoryLoading": "Ищем в истории сообщений…"
   },
   "notifications": {
     "title": "Уведомления",
@@ -4208,7 +4273,13 @@
     "processing": "Обработка...",
     "analyzingVideo": "Анализ видео...",
     "analyzingDetails": "Отслеживание движения шайбы и вычисление скорости",
-    "note": "Примечание: Для более точных результатов убедитесь, что шайба хорошо видна на контрастном фоне (белый или синтетический лед)."
+    "note": "Примечание: Для более точных результатов убедитесь, что шайба хорошо видна на контрастном фоне (белый или синтетический лед).",
+    "micPosition": {
+      "label": "Где лежит телефон",
+      "shooter": "У игрока",
+      "middle": "Посередине",
+      "target": "У борта"
+    }
   },
   "logout": "Выйти",
   "logoutConfirm": "Выход из профиля",
@@ -4250,5 +4321,10 @@
     "scanQr": "Наведите камеру телефона — откроется App Store или Google Play",
     "appStoreCta": "Скачать в App Store",
     "playStoreCta": "Скачать в Google Play"
+  },
+  "ota": {
+    "resurfacing": "Заливаем лёд…",
+    "updating": "Устанавливаем обновление",
+    "updated": "Лёд залит — приложение обновлено"
   }
 }

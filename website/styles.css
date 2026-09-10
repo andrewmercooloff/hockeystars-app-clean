@@ -16,12 +16,15 @@
 
 :root {
     --color-primary: #fa2f40;
+    --color-primary-soft: rgba(250, 47, 64, 0.14);
     --color-bg-dark: #050008;
     --color-bg-black: #000000;
     --color-text-white: #ffffff;
-    --color-text-gray: #cccccc;
-    --color-text-light: #aaaaaa;
-    --color-border: rgba(255, 255, 255, 0.1);
+    --color-text-gray: #d4d0d6;
+    --color-text-light: #a8a2ab;
+    --color-border: rgba(255, 255, 255, 0.12);
+    --glass: rgba(8, 2, 12, 0.55);
+    --glass-strong: rgba(5, 0, 8, 0.72);
 }
 
 * {
@@ -35,7 +38,7 @@ html {
 }
 
 body {
-    font-family: 'Gilroy', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Gilroy', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background-color: #000000;
     color: var(--color-text-white);
     line-height: 1.6;
@@ -44,60 +47,61 @@ body {
     min-height: 100vh;
 }
 
+/* Ice rink: real <img> inside fixed viewport — avoids iOS
+   background-attachment:fixed zoom/pixelation bug */
 .background-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    background-color: #0a0610;
+}
+
+.background-ice {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
-    background-image: url('led.jpg');
-    background-image: image-set(
-        url('led.webp') type('image/webp'),
-        url('led.jpg') type('image/jpeg')
-    );
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    z-index: 0;
+    object-fit: cover;
+    object-position: center 42%;
+    /* Prefer crisp downscale; avoid nearest-neighbor blowups */
+    image-rendering: auto;
+    -webkit-user-select: none;
+    user-select: none;
+    transform: translateZ(0);
 }
 
 .background-overlay::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* Iridescent wash: burgundy / plum / soft slate — ice texture stays visible */
-    background: -webkit-linear-gradient(
-        90deg,
-        rgba(90, 18, 38, 0.62),
-        rgba(18, 10, 32, 0.58),
-        rgba(58, 22, 62, 0.6),
-        rgba(28, 42, 58, 0.48)
-    );
-    background: linear-gradient(
-        80deg,
-        rgba(90, 18, 38, 0.62),
-        rgba(18, 10, 32, 0.58),
-        rgba(58, 22, 62, 0.6),
-        rgba(28, 42, 58, 0.48)
-    );
-    background-size: 220% 220%;
-    animation: gradientShift 14s ease infinite;
+    inset: 0;
+    /* Dark stylish veil over ice — texture stays, page reads deep/cinematic */
+    background:
+        radial-gradient(ellipse 70% 45% at 50% 8%, rgba(250, 47, 64, 0.28), transparent 62%),
+        radial-gradient(ellipse 90% 70% at 50% 100%, rgba(0, 0, 0, 0.72), transparent 55%),
+        linear-gradient(
+            165deg,
+            rgba(4, 0, 8, 0.78) 0%,
+            rgba(28, 4, 16, 0.72) 22%,
+            rgba(10, 2, 18, 0.68) 48%,
+            rgba(18, 6, 28, 0.74) 72%,
+            rgba(2, 0, 6, 0.82) 100%
+        ),
+        linear-gradient(
+            105deg,
+            rgba(60, 8, 22, 0.45) 0%,
+            rgba(8, 4, 16, 0.35) 40%,
+            rgba(32, 10, 42, 0.42) 70%,
+            rgba(6, 14, 28, 0.38) 100%
+        );
+    background-size: 100% 100%, 100% 100%, 100% 100%, 240% 240%;
+    animation: gradientShift 18s ease-in-out infinite;
 }
 
 @keyframes gradientShift {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
+    0%, 100% { background-position: center, center, center, 0% 40%; }
+    50% { background-position: center, center, center, 100% 60%; }
 }
 
 /* Animated Pucks */
@@ -205,10 +209,11 @@ body {
 
 /* Header */
 .header {
-    background: rgba(5, 0, 8, 0.85);
-    backdrop-filter: blur(15px);
-    border-bottom: 1px solid var(--color-border);
-    padding: 20px 0;
+    background: rgba(5, 0, 8, 0.45);
+    backdrop-filter: blur(18px) saturate(1.2);
+    -webkit-backdrop-filter: blur(18px) saturate(1.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 16px 0;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -303,120 +308,202 @@ body {
 
 /* Main */
 .main {
-    padding: 60px 0 100px;
+    padding: 40px 0 100px;
     position: relative;
     z-index: 10;
 }
 
-/* Hero */
+/* Hero — one composition: brand, line, support, CTAs */
 .hero {
     text-align: center;
-    padding: 80px 0 60px;
-    max-width: 900px;
+    padding: clamp(48px, 12vh, 110px) 0 clamp(40px, 8vh, 72px);
+    max-width: 820px;
     margin: 0 auto;
+    min-height: min(78vh, 720px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .hero-logo-container {
-    margin-bottom: 30px;
+    margin-bottom: 28px;
     display: flex;
     justify-content: center;
     align-items: center;
+    animation: heroRise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .hero-logo {
-    max-width: 500px;
+    max-width: min(520px, 86vw);
     width: 100%;
     height: auto;
     object-fit: contain;
-    filter: drop-shadow(0 4px 20px rgba(250, 47, 64, 0.3));
-    animation: logoGlow 3s ease-in-out infinite;
+    filter: drop-shadow(0 8px 28px rgba(250, 47, 64, 0.35));
+    animation: logoGlow 3.4s ease-in-out infinite;
 }
 
 @keyframes logoGlow {
     0%, 100% {
-        filter: drop-shadow(0 4px 20px rgba(250, 47, 64, 0.3));
+        filter: drop-shadow(0 6px 22px rgba(250, 47, 64, 0.28));
     }
     50% {
-        filter: drop-shadow(0 4px 30px rgba(250, 47, 64, 0.5));
+        filter: drop-shadow(0 10px 36px rgba(250, 47, 64, 0.48));
+    }
+}
+
+@keyframes heroRise {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
 .hero-subtitle {
-    font-size: 32px;
-    font-weight: 600;
-    color: #fa2f40;
-    margin-bottom: 20px;
+    font-size: clamp(22px, 4.2vw, 34px);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 14px;
     font-family: 'Gilroy', sans-serif;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    text-wrap: balance;
+    animation: heroRise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
 }
 
 .hero-description {
-    font-size: 22px;
+    font-size: clamp(15px, 2.4vw, 19px);
     color: var(--color-text-gray);
-    line-height: 1.2;
+    line-height: 1.45;
     font-family: 'Gilroy', sans-serif;
     font-weight: 400;
-    /* text-transform: uppercase; */
+    max-width: 34em;
+    margin: 0 auto 28px;
+    animation: heroRise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.14s both;
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+}
+
+.hero-cta {
+    --cta-radius: 14px;
+    --cta-gap: 10px;
+    --cta-width: min(100%, 360px);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--cta-gap);
+    width: var(--cta-width);
+    margin: 0 auto;
+    animation: heroRise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
 }
 
 .hero-download-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: nowrap;
-    margin-bottom: 18px;
-    margin-top: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--cta-gap);
+    margin: 0;
+    width: 100%;
 }
 
 .hero-download-buttons .download-btn {
-    min-width: 160px;
-    max-width: 180px;
-    padding: 12px 20px;
-    flex: 0 1 auto;
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+    height: 56px;
+    padding: 8px 12px;
+    flex: none;
+    box-sizing: border-box;
+    border-radius: var(--cta-radius);
+    background:
+        linear-gradient(180deg, rgba(250, 47, 64, 0.14), rgba(250, 47, 64, 0.04)),
+        rgba(8, 2, 12, 0.82);
+    border: 1px solid rgba(250, 47, 64, 0.42);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    justify-content: center;
+    gap: 10px;
+    color: #fff;
+    transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.hero-download-buttons .download-btn:hover {
+    border-color: rgba(250, 47, 64, 0.75);
+    background:
+        linear-gradient(180deg, rgba(250, 47, 64, 0.28), rgba(250, 47, 64, 0.1)),
+        rgba(12, 4, 18, 0.92);
+    transform: translateY(-2px);
+    box-shadow:
+        0 12px 26px rgba(250, 47, 64, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .hero-download-buttons .download-btn svg {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    color: #fa2f40;
+}
+
+.hero-download-buttons .download-btn-text {
+    align-items: flex-start;
+    text-align: left;
+    gap: 0;
 }
 
 .hero-download-buttons .download-btn-name {
-    font-size: 18px;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
 }
 
 .hero-download-buttons .download-btn-coming-soon {
-    font-size: 9px;
-    margin-top: 2px;
+    font-size: 8px;
+    margin-top: 1px;
 }
 
 .hero-download-buttons .download-btn-label {
-    font-size: 11px;
+    font-size: 9px;
+    opacity: 0.8;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: rgba(255, 210, 214, 0.9);
 }
 
 .hero-login-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 280px;
-    max-width: 420px;
     width: 100%;
-    margin: 0 auto 28px;
-    padding: 18px 32px;
-    border-radius: 16px;
+    min-width: 0;
+    max-width: none;
+    height: 56px;
+    margin: 0;
+    padding: 0 24px;
+    border-radius: var(--cta-radius);
     background: #fa2f40;
     color: #fff !important;
     text-decoration: none !important;
     font-family: 'Gilroy', sans-serif;
     font-weight: 700;
-    font-size: 22px;
-    letter-spacing: 0.02em;
-    box-shadow: 0 10px 28px rgba(250, 47, 64, 0.35);
+    font-size: 17px;
+    letter-spacing: 0.03em;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 28px rgba(250, 47, 64, 0.38);
     transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
 .hero-login-btn:hover {
     background: #e02838;
-    transform: translateY(-1px);
-    box-shadow: 0 14px 32px rgba(250, 47, 64, 0.45);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(250, 47, 64, 0.48);
 }
 
 /* Features */
@@ -428,24 +515,25 @@ body {
 .for-whom-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 30px;
+    gap: 22px;
     max-width: 1000px;
     margin: 0 auto;
 }
 
 .for-whom-card {
-    background: rgba(5, 0, 8, 0.6);
-    border: 2px solid rgba(250, 47, 64, 0.2);
-    border-radius: 20px;
-    padding: 35px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(10px);
+    background: rgba(5, 0, 8, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    padding: 28px 26px;
+    transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .for-whom-card:hover {
-    border-color: rgba(250, 47, 64, 0.5);
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(250, 47, 64, 0.2);
+    border-color: rgba(250, 47, 64, 0.45);
+    background: rgba(5, 0, 8, 0.58);
+    transform: translateY(-3px);
 }
 
 .for-whom-title {
@@ -482,6 +570,57 @@ body {
     font-weight: 400;
 }
 
+/* Friends wall — 20 avatars per row, no captions */
+.friends {
+    padding: 56px 0 72px;
+}
+
+.friends-title {
+    margin-bottom: 28px;
+}
+
+.friends-grid {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: clamp(6px, 0.8vw, 12px);
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 4px;
+}
+
+.friends-avatar {
+    aspect-ratio: 1;
+    width: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.friends-avatar:hover {
+    transform: translateY(-2px) scale(1.04);
+    border-color: rgba(250, 47, 64, 0.65);
+    box-shadow: 0 8px 18px rgba(250, 47, 64, 0.25);
+}
+
+.friends-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.friends-avatar.is-empty {
+    background:
+        radial-gradient(circle at 35% 30%, rgba(250, 47, 64, 0.35), transparent 55%),
+        rgba(20, 8, 24, 0.9);
+}
+
 .features {
     padding: 80px 0;
 }
@@ -498,9 +637,12 @@ body {
 
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
     margin-top: 40px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .feature-card {
@@ -834,32 +976,73 @@ body {
 
 /* Responsive */
 @media (max-width: 768px) {
+    /* Critical: keep ice in viewport bounds — never fixed-attachment CSS bg */
+    .background-ice {
+        object-fit: cover;
+        object-position: center 38%;
+        /* Soften residual upscale without looking blurry-soft */
+        filter: contrast(1.04) saturate(0.98);
+    }
+
+    .background-overlay::after {
+        background:
+            radial-gradient(ellipse 80% 42% at 50% 6%, rgba(250, 47, 64, 0.26), transparent 58%),
+            radial-gradient(ellipse 100% 65% at 50% 110%, rgba(0, 0, 0, 0.78), transparent 52%),
+            linear-gradient(
+                168deg,
+                rgba(4, 0, 8, 0.8) 0%,
+                rgba(24, 4, 14, 0.74) 28%,
+                rgba(10, 2, 18, 0.7) 55%,
+                rgba(2, 0, 6, 0.84) 100%
+            );
+        animation: none;
+        background-size: auto;
+    }
+
+    .hero {
+        min-height: auto;
+        padding: 36px 0 28px;
+        justify-content: flex-start;
+    }
+
+    .hero-logo-container {
+        margin-bottom: 20px;
+    }
+
     .hero-logo {
-        max-width: 280px;
+        max-width: min(300px, 78vw);
     }
 
     .hero-subtitle {
-        font-size: 24px;
+        font-size: 22px;
+        margin-bottom: 10px;
     }
 
     .hero-description {
-        font-size: 14px;
+        font-size: 15px;
+        margin-bottom: 22px;
+        line-height: 1.4;
+    }
+
+    .hero-cta {
+        --cta-width: min(100%, 340px);
+        --cta-gap: 8px;
+        --cta-radius: 12px;
     }
 
     .hero-download-buttons {
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-bottom: 30px;
-        justify-content: center;
-        align-items: center;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--cta-gap);
+        width: 100%;
     }
 
     .hero-download-buttons .download-btn {
-        min-width: 140px;
-        max-width: 160px;
-        width: auto;
-        padding: 10px 16px;
-        flex: 0 0 auto;
+        min-width: 0;
+        max-width: none;
+        width: 100%;
+        height: 52px;
+        padding: 8px 10px;
+        flex: none;
     }
     
     .hero-download-buttons .download-btn svg {
@@ -868,24 +1051,25 @@ body {
     }
     
     .hero-download-buttons .download-btn-name {
-        font-size: 16px;
+        font-size: 13px;
     }
     
     .hero-download-buttons .download-btn-label {
-        font-size: 10px;
+        font-size: 8px;
     }
     
     .hero-download-buttons .download-btn-coming-soon {
-        font-size: 8px;
+        font-size: 7px;
         margin-top: 1px;
     }
 
     .hero-login-btn {
+        width: 100%;
         min-width: 0;
-        width: min(100%, 360px);
-        padding: 16px 24px;
-        font-size: 18px;
-        margin-bottom: 22px;
+        max-width: none;
+        height: 52px;
+        padding: 0 18px;
+        font-size: 16px;
     }
 
     .section-title {
@@ -893,7 +1077,30 @@ body {
     }
 
     .features-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-top: 24px;
+    }
+
+    .feature-card {
+        padding: 18px 12px;
+        border-radius: 14px;
+    }
+
+    .feature-icon {
+        width: 40px;
+        height: 40px;
+        margin-bottom: 12px;
+    }
+
+    .feature-title {
+        font-size: 15px;
+        margin-bottom: 8px;
+    }
+
+    .feature-text {
+        font-size: 12px;
+        line-height: 1.4;
     }
 
     .download-buttons {
@@ -967,34 +1174,41 @@ body {
 
 @media (max-width: 480px) {
     .hero {
-        padding: 40px 0 30px;
+        padding: 28px 0 24px;
     }
 
     .hero-logo {
-        max-width: 640px;
+        max-width: min(260px, 82vw);
     }
 
     .hero-subtitle {
         font-size: 20px;
-        /* text-shadow: 0px 0px 9px #00000082; */
-        text-transform: uppercase;
+        text-transform: none;
+        letter-spacing: -0.01em;
+    }
+
+    .hero-description {
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    .hero-cta {
+        --cta-width: min(100%, 320px);
+        --cta-radius: 12px;
     }
 
     .hero-download-buttons {
-        margin-bottom: 25px;
-        margin-top: 15px;
-        gap: 10px;
-        justify-content: center;
-        align-items: center;
-        flex-wrap: wrap;
+        gap: var(--cta-gap);
+        width: 100%;
     }
 
     .hero-download-buttons .download-btn {
-        min-width: 130px;
-        max-width: 150px;
-        width: auto;
-        padding: 10px 14px;
-        flex: 0 0 auto;
+        min-width: 0;
+        max-width: none;
+        width: 100%;
+        height: 50px;
+        padding: 7px 8px;
+        flex: none;
     }
 
     .hero-download-buttons .download-btn svg {
@@ -1003,11 +1217,11 @@ body {
     }
 
     .hero-download-buttons .download-btn-name {
-        font-size: 14px;
+        font-size: 12px;
     }
     
     .hero-download-buttons .download-btn-label {
-        font-size: 9px;
+        font-size: 8px;
     }
     
     .hero-download-buttons .download-btn-coming-soon {
@@ -1016,11 +1230,13 @@ body {
     }
 
     .hero-login-btn {
-        width: min(100%, 320px);
-        padding: 14px 20px;
-        font-size: 17px;
-        margin-bottom: 18px;
-        border-radius: 14px;
+        width: 100%;
+        min-width: 0;
+        max-width: none;
+        height: 50px;
+        padding: 0 16px;
+        font-size: 15px;
+        border-radius: var(--cta-radius);
     }
     
     .header-content {
@@ -1048,20 +1264,42 @@ body {
     }
 
     .for-whom-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
     }
 
     .for-whom-card {
-        padding: 25px;
+        padding: 14px 12px;
     }
 
     .for-whom-title {
-        font-size: 20px;
+        font-size: 14px;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .for-whom-icon {
+        width: 20px;
+        height: 20px;
     }
 
     .for-whom-text {
-        font-size: 16px;
+        font-size: 12px;
+        line-height: 1.45;
+    }
+
+    .friends {
+        padding: 36px 0 48px;
+    }
+
+    .friends-title {
+        font-size: 26px;
+        margin-bottom: 18px;
+    }
+
+    .friends-grid {
+        grid-template-columns: repeat(10, minmax(0, 1fr));
+        gap: 5px;
     }
 
     .features {
@@ -1254,5 +1492,112 @@ body {
 
     .modal-content h2 {
         font-size: 24px;
+    }
+}
+
+/* Mobile smart app download banner */
+.app-smart-banner {
+    display: none;
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    z-index: 10050;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 12px 12px 14px;
+    border-radius: 16px;
+    background:
+        linear-gradient(135deg, rgba(250, 47, 64, 0.22), rgba(8, 2, 14, 0.94) 42%),
+        rgba(5, 0, 8, 0.94);
+    border: 1px solid rgba(250, 47, 64, 0.45);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    color: #fff;
+    transform: translateY(120%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+}
+
+.app-smart-banner.is-visible {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.app-smart-banner__icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: #111;
+}
+
+.app-smart-banner__copy {
+    flex: 1;
+    min-width: 0;
+}
+
+.app-smart-banner__title {
+    display: block;
+    font-family: 'Gilroy', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+}
+
+.app-smart-banner__text {
+    display: block;
+    margin-top: 3px;
+    font-size: 12px;
+    line-height: 1.3;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.app-smart-banner__cta {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 999px;
+    background: #fa2f40;
+    color: #fff !important;
+    text-decoration: none !important;
+    font-family: 'Gilroy', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    border: none;
+    box-shadow: 0 8px 18px rgba(250, 47, 64, 0.35);
+}
+
+.app-smart-banner__close {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+@media (max-width: 900px) {
+    .app-smart-banner.is-ready {
+        display: flex;
+    }
+}
+
+@media (min-width: 901px) {
+    .app-smart-banner {
+        display: none !important;
     }
 }

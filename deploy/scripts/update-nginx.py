@@ -1,9 +1,16 @@
 """Upload updated nginx config to VPS and reload."""
-import paramiko, sys, pathlib
+import os
+import sys
+import pathlib
+import paramiko
 
 VPS_IP = "5.42.123.84"
 VPS_USER = "root"
-VPS_PASS = "REDACTED_VPS_PASSWORD"
+VPS_PASS = os.environ.get("VPS_PASS", "").strip()
+if not VPS_PASS:
+    print("Set VPS_PASS environment variable", file=sys.stderr)
+    sys.exit(1)
+
 CONF_PATH = pathlib.Path(__file__).parent.parent / "nginx" / "api.hockey-stars.com.conf"
 REMOTE_PATH = "/etc/nginx/sites-available/api.hockey-stars.com"
 ENABLED_LINK = "/etc/nginx/sites-enabled/api.hockey-stars.com"

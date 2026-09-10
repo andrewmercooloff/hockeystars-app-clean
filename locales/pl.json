@@ -30,7 +30,10 @@
     "left": "Lewy",
     "right": "Prawidłowy",
     "offline": "Brak połączenia",
-    "and": "i"
+    "and": "i",
+    "info": "Informacja",
+    "continue": "Dalej",
+    "warning": "Uwaga"
   },
   "winger": "Skrzydłowy",
   "center": "Środkowy napastnik",
@@ -211,7 +214,9 @@
       "saveError": "Nie można oznaczyć ćwiczenia jako ukończonego",
       "generalError": "Wystąpił błąd podczas zapisywania",
       "times": "raz",
-      "timesPlural": "czasy"
+      "timesPlural": "czasy",
+      "loginRequired": "Zaloguj się, aby wykonywać ćwiczenia",
+      "title": "Ćwiczenie"
     },
     "difficulty": {
       "Начинающий": "Początek",
@@ -2877,7 +2882,8 @@
       "Начинающий": "Początkujący",
       "Средний": "Średni",
       "Продвинутый": "Zaawansowany"
-    }
+    },
+    "timesPlural": "razy"
   },
   "items": {
     "autograph": "autograf",
@@ -2971,7 +2977,13 @@
     "errorProcessFriendRequest": "Nie można przetworzyć prośby o dodanie do znajomych.",
     "errorProcessRequest": "Nie udało się przetworzyć Twojego żądania",
     "errorSendMessage": "Nie udało się wysłać wiadomości",
-    "phoneOrEmailPlaceholderShort": "+48… lub email"
+    "phoneOrEmailPlaceholderShort": "+48… lub email",
+    "email": "E-mail",
+    "errorSwitchingToEmail": "Nie udało się przełączyć na logowanie e-mailem",
+    "smsRateLimited": "Kod na ten numer został wysłany mniej niż minutę temu. Wpisz go lub poproś o nowy po zakończeniu odliczania.",
+    "smsServerUnreachable": "Brak połączenia z serwerem HockeyStars. Sprawdź internet (VPN może blokować) i naciśnij „Wyślij ponownie”.",
+    "smsEmailOnly": "Dla USA i Kanady logowanie przez e-mail.",
+    "smsProviderFailed": "Operator nie przyjął SMS-a. Sprawdź numer lub spróbuj za minutę."
   },
   "profile": {
     "addFriend": "Dodaj jako znajomego",
@@ -3274,7 +3286,30 @@
     "city": "Miasto",
     "addAddress": "Dodaj adres",
     "addressesHint": "Możesz podać kilka adresów",
-    "previousSeason": "Previous season"
+    "previousSeason": "Previous season",
+    "cover": "Okładka",
+    "changeCover": "Zmień okładkę",
+    "removeCover": "Usuń okładkę",
+    "teamLogo": "Logo drużyny",
+    "uploadTeamLogo": "Wgraj logo",
+    "coverUpdated": "Okładka zaktualizowana",
+    "teamLogoUpdated": "Logo drużyny zaktualizowane",
+    "coverUploadFailed": "Nie udało się wgrać obrazu",
+    "scoutPrivacyNote": "Inni użytkownicy nie zobaczą Twojego zdjęcia ani imienia — dla nich jesteś „Skautem”.",
+    "positionCover": "Ustaw okładkę",
+    "positionCoverHint": "Przesuwaj jednym palcem, powiększaj dwoma, aż kadr będzie pasować",
+    "allTime": "Łącznie",
+    "seasonsCount": "{count} sez.",
+    "currentSeasonHint": "Bieżący sezon",
+    "fullScreen": "Pełny ekran",
+    "heightWithUnit": "Wzrost (cm)",
+    "playerNumber": "Numer gracza",
+    "playerNumberPlaceholder": "Numer na koszulce",
+    "selectBirthDate": "Wybierz datę urodzenia",
+    "skateServices": "Usługi",
+    "weightWithUnit": "Waga (kg)",
+    "videoUploaded": "Wideo dodano do profilu",
+    "videoUploadSaveReminder": "Wideo wgrane. Naciśnij «Zapisz», aby zachować je w profilu."
   },
   "register": {
     "title": "Rejestracja",
@@ -3325,7 +3360,32 @@
     "fillRequiredFields": "Proszę wypełnić wszystkie wymagane pola",
     "fillAllFields": "Proszę wypełnić wszystkie pola",
     "phoneFormatError": "Proszę wprowadzić prawidłowy numer telefonu z kodem kraju (np. +1234567890)",
-    "parentEmailFormatError": "Proszę wprowadzić prawidłowy email rodzica"
+    "parentEmailFormatError": "Proszę wprowadzić prawidłowy email rodzica",
+    "scoutPrivacyNote": "Zdjęcie i imię skauta nie są widoczne dla innych — wyświetlasz się jako „Skaut”.",
+    "emailFormatError": "Podaj poprawny adres e-mail",
+    "registrationFailed": "Rejestracja nie powiodła się",
+    "detailsHint": "Opcjonalnie: numer, chwyt, wzrost i waga pomagają skautom i znajomym Cię znaleźć. Możesz je uzupełnić później w profilu.",
+    "skipForNow": "Pomiń",
+    "parentEmailSendFailed": "Nie udało się wysłać e-maila do rodzica. Sprawdź adres i spróbuj później.",
+    "step": {
+      "contact": "Krok 1 · Kontakt",
+      "code": "Krok 2 · Potwierdzenie",
+      "profile": "Krok 1 · Profil",
+      "details": "Krok 2 · Dane zawodnika"
+    },
+    "currentTeam": "Obecna drużyna",
+    "currentTeamHint": "Przez drużynę łączą się koledzy z zespołu, zdjęcie w tle i strona drużyny. Zacznij pisać, aby znaleźć istniejącą.",
+    "teamPlaceholder": "np. Dinamo Mińsk 2012",
+    "teamWillBeCreated": "Takiej drużyny jeszcze nie ma — utworzymy ją dla Ciebie.",
+    "consentByContinuing": "Naciskając „Dalej”, akceptujesz",
+    "haveAccount": "Masz już konto?",
+    "signIn": "Zaloguj się",
+    "entryTitle": "Wyjście na lód",
+    "entrySubtitle": "Wpisz numer telefonu. Zalogujemy Cię lub utworzymy konto.",
+    "codeSubtitle": "Wpisz kod z wiadomości",
+    "whoAreYou": "Kim jesteś?",
+    "useEmailInstead": "Użyj adresu e-mail",
+    "usePhoneInstead": "Użyj numeru telefonu"
   },
   "navigation": {
     "home": "Dom",
@@ -3384,7 +3444,12 @@
     "errorCreatingUser": "Nie udało się utworzyć użytkownika",
     "fillRequiredFields": "Proszę wypełnić wszystkie wymagane pola.",
     "enterValidPhone": "Proszę podać prawidłowy numer telefonu wraz z kodem kraju.",
-    "requiredForPlayers": "W przypadku zawodników i gwiazd obowiązkowe jest podanie daty urodzenia i stanowiska"
+    "requiredForPlayers": "W przypadku zawodników i gwiazd obowiązkowe jest podanie daty urodzenia i stanowiska",
+    "adminPanel": "Panel administratora",
+    "login": "Zaloguj",
+    "loginAsUserConfirm": "Czy na pewno chcesz zalogować się jako {name}?",
+    "loginAsUserError": "Nie udało się zalogować jako użytkownik",
+    "loginAsUserSuccess": "Jesteś zalogowany jako {name}"
   },
   "museum": {
     "title": "Muzeum",
@@ -3591,9 +3656,13 @@
     "topBySV": "Top SV%",
     "shareRating": "Udostępnij ranking",
     "shareRatingFooter": "hockeystars.com",
+    "shareRatingSeason": "Sezon {season}",
     "ratingPointsLabel": "punktów",
     "allCountries": "Wszystkie kraje",
-    "allYears": "Wszystkie lata"
+    "allYears": "Wszystkie lata",
+    "filters": "Filtry",
+    "shareNewcomers": "Udostępnij nowych",
+    "shareNewcomersCount": "{count} graczy"
   },
   "messages": {
     "title": "Wiadomości",
@@ -3608,7 +3677,8 @@
     "massSend": "Wysyłanie masowe",
     "recipients": "Odbiorcy",
     "typeMessage": "Wpisz wiadomość...",
-    "send": "Wyślij"
+    "send": "Wyślij",
+    "searchHistoryLoading": "Szukamy w historii wiadomości…"
   },
   "notifications": {
     "title": "Powiadomienia",
@@ -3731,7 +3801,9 @@
     "noFriendsToForward": "Brak znajomych do przesłania",
     "messageForwarded": "Wiadomość przesłana",
     "forwardedTo": "Przesłano",
-    "forwardError": "Nie udało się przesłać"
+    "forwardError": "Nie udało się przesłać",
+    "user": "Użytkownik",
+    "you": "Ty"
   },
   "createUser": {
     "title": "Tworzenie użytkownika",
@@ -3895,7 +3967,8 @@
     "giftReceivedFromStar": "Otrzymałeś prezent od {starName}: {giftName}",
     "giftReceivedPush": "🎁 Otrzymano prezent!",
     "giftReceivedFromAdminPush": "Otrzymałeś prezent od administratora: {giftName}",
-    "giftReceivedFromStarPush": "Otrzymałeś prezent od {starName}: {giftName}"
+    "giftReceivedFromStarPush": "Otrzymałeś prezent od {starName}: {giftName}",
+    "customGift": "Poproś o prezent"
   },
   "TEMP_DELETE_ME": {
     "title": "Standardy",
@@ -4066,7 +4139,13 @@
     "deleteError": "Błąd",
     "deleteErrorMessage": "Nie udało się usunąć rekordu",
     "speedExceedsLimit": "Prędkość przekracza 120 km/h, pomiar nie jest liczony",
-    "needMicrophone": "Wymagany dostęp do mikrofonu"
+    "needMicrophone": "Wymagany dostęp do mikrofonu",
+    "micPosition": {
+      "label": "Gdzie leży telefon",
+      "shooter": "Przy strzelcu",
+      "middle": "Pośrodku",
+      "target": "Przy bandzie"
+    }
   },
   "logout": "Wyjście",
   "logoutConfirm": "Wyloguj się ze swojego profilu",
@@ -4081,10 +4160,15 @@
     "oneVideo": "nowe wideo",
     "multipleVideos": "{count} nowych wideo",
     "video": "wideo",
-    "videos": "wideo"
+    "videos": "wideo",
+    "fullScreen": "Pełny ekran"
   },
   "avatarNotification": {
     "changed": "zmienił awatar"
+  },
+  "coverNotification": {
+    "title": "Nowe zdjęcie w tle",
+    "changed": "zaktualizował zdjęcie w tle profilu"
   },
   "puckSpeedNotification": {
     "title": "Nowy rekord prędkości",
@@ -4136,5 +4220,15 @@
     "scanQr": "Zeskanuj telefonem — otworzy się App Store lub Google Play",
     "appStoreCta": "Pobierz z App Store",
     "playStoreCta": "Pobierz z Google Play"
+  },
+  "ota": {
+    "resurfacing": "Odnawiamy lód…",
+    "updating": "Instalujemy aktualizację",
+    "updated": "Świeży lód — aplikacja zaktualizowana"
+  },
+  "referral": {
+    "leaderboard": "Najlepsi zapraszający",
+    "noInvites": "Nikt jeszcze nie zaprosił znajomych",
+    "points": "punktów"
   }
 }

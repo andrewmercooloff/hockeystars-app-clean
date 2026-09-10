@@ -4,7 +4,13 @@ interface ScreenContextType {
   isMainScreen: boolean;
   setIsMainScreen: (isMain: boolean) => void;
   currentScreen: string | null;
-  setCurrentScreen: (screen: string | null) => void;
+  /**
+   * Set the active screen. Passing `null` releases ownership, but only if the
+   * caller still owns it — a screen's blur cleanup may run *after* the next
+   * screen's focus (e.g. `router.replace('/')` from a profile), and must not
+   * wipe out the freshly focused 'home' (that froze the pucks).
+   */
+  setCurrentScreen: (screen: string | null, releasing?: string) => void;
 }
 
 const ScreenContext = createContext<ScreenContextType | undefined>(undefined);
@@ -23,7 +29,15 @@ interface ScreenProviderProps {
 
 export const ScreenProvider: React.FC<ScreenProviderProps> = ({ children }) => {
   const [isMainScreen, setIsMainScreen] = useState(false);
-  const [currentScreen, setCurrentScreen] = useState<string | null>(null);
+  const [currentScreen, setCurrentScreenState] = useState<string | null>(null);
+
+  const setCurrentScreen = React.useCallback((screen: string | null, releasing?: string) => {
+    if (screen === null && releasing) {
+      setCurrentScreenState((prev) => (prev === releasing ? null : prev));
+      return;
+    }
+    setCurrentScreenState(screen);
+  }, []);
 
   // Логируем изменения состояния экрана для отладки
   React.useEffect(() => {
@@ -34,7 +48,7 @@ export const ScreenProvider: React.FC<ScreenProviderProps> = ({ children }) => {
 
   const value = useMemo(
     () => ({ isMainScreen, setIsMainScreen, currentScreen, setCurrentScreen }),
-    [isMainScreen, currentScreen]
+    [isMainScreen, currentScreen, setCurrentScreen]
   );
 
   return (

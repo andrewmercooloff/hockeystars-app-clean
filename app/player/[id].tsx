@@ -48,6 +48,18 @@ import AchievementsSection from '../../components/AchievementsSection';
 import ActivityRating from '../../components/ActivityRating';
 import SeasonStatsHeader from '../../components/SeasonStatsHeader';
 import PreviousSeasonStatsSection from '../../components/PreviousSeasonStatsSection';
+import AllTimeStatsSection from '../../components/AllTimeStatsSection';
+import TeamCover from '../../components/TeamCover';
+import CoverPositionModal, { type CoverSource } from '../../components/CoverPositionModal';
+import {
+  getCachedCoverState,
+  prefetchPlayerCover,
+  prefetchTeamLogo,
+  removePlayerCover,
+  teamAssetsReady,
+  uploadPlayerCover,
+  uploadTeamLogo,
+} from '../../utils/teamAssets';
 import { buildSeasonStatsForSave, playerHasArchivedSeasonStats } from '../../utils/seasonStats';
 import CurrentTeamsSection from '../../components/CurrentTeamsSection';
 import CustomAlert from '../../components/CustomAlert';
@@ -67,6 +79,7 @@ import StarGiftModal from '../../components/StarGiftModal';
 import AdminGiftModal from '../../components/AdminGiftModal';
 import CachedAvatar from '../../components/CachedAvatar';
 import LoadingCenter from '../../components/LoadingCenter';
+import { birthDateToLocalDate } from '../../utils/birthDate';
 import { ICE_BACKGROUND } from '../../utils/iceBackground';
 import { useAvatarCache } from '../../utils/AvatarCache';
 import AIAnalysisCard, { AIAnalysis } from '../../components/AIAnalysisCard';
@@ -78,7 +91,7 @@ import * as VideoThumbnails from 'expo-video-thumbnails';
 import VideoPlayer from '../../components/VideoPlayer';
 import LikeButton from '../../components/LikeButton';
 import { generateVideoContentId } from '../../utils/likesService';
-import { acceptFriendRequest, Achievement, ALL_PLAYERS_LIST_CACHE_KEYS, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, clearPlayerMemoryCache, clearAllPlayersCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getCachedPlayerSync, peekCachedPlayerSync, getFriends, getFriendshipStatus, getPlayerById, getPlayerTeamsAsPastTeams, isGoalkeeperPosition, loadCurrentUser, logoutUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutChanges, notifyFriendsAboutPhysicalData, notifyFriendsAboutPhotos, notifyFriendsAboutVideos, notifyFriendsAboutScoutReport, PastTeam, Player, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
+import { acceptFriendRequest, Achievement, ALL_PLAYERS_LIST_CACHE_KEYS, calculateHockeyExperience, cancelFriendRequest, clearPlayerCache, clearPlayerMemoryCache, clearAllPlayersCache, declineFriendRequest, debugFriendship, deletePlayer, deletePuckSpeedRecord, getCachedPlayerSync, getInstantProfileTeams, peekCachedPlayerSync, getFriends, getFriendshipStatus, getPlayerById, getPlayerTeamsAsPastTeams, isGoalkeeperPosition, loadCurrentUser, logoutUser, notifyFriendsAboutAchievements, notifyFriendsAboutAvatarChange, notifyFriendsAboutChanges, notifyFriendsAboutCover, notifyFriendsAboutPhysicalData, notifyFriendsAboutPhotos, notifyFriendsAboutVideos, notifyFriendsAboutScoutReport, PastTeam, Player, prefetchPlayerTeams, removeFriend, saveCurrentUser, sendFriendRequest, updatePlayer, blockUser, unblockUser, isUserBlocked } from '../../utils/playerStorage';
 import { dataCache, CACHE_KEYS } from '../../utils/DataCache';
 import { getSupabaseFunctionUrl, supabase, supabaseAnonKey, supabaseFetch } from '../../utils/supabase';
 import { createPlayerManually } from '../../utils/playerStorage';
@@ -97,6 +110,7 @@ import {
   readProfileNavParams,
   type ProfileNavParams,
 } from '../../utils/navigateToPlayer';
+import { goHome } from '../../utils/webHome';
 
 const iceBg = ICE_BACKGROUND;
 
@@ -195,6 +209,31 @@ const VIDEO_EDIT_GRID_COLUMNS = 3;
 const VIDEO_EDIT_GRID_GAP = 10;
 // scroll padding (20×2) + section padding (20×2) + section border (2×2)
 const VIDEO_EDIT_SECTION_INSET = 84;
+
+/** RN-web: TouchableWithoutFeedback around ScrollView content blocks finger scroll on iOS Safari. */
+function ProfileScrollWrap({
+  children,
+  isDesktop,
+}: {
+  children: React.ReactNode;
+  isDesktop: boolean;
+}) {
+  const wrapStyle = isDesktop ? styles.desktopContentWrap : undefined;
+  if (Platform.OS === 'web') {
+    return (
+      <View pointerEvents="box-none" style={wrapStyle}>
+        {children}
+      </View>
+    );
+  }
+  return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View pointerEvents="box-none" style={wrapStyle}>
+        {children}
+      </View>
+    </TouchableWithoutFeedback>
+  );
+}
 
 
 export default function PlayerProfile() {
@@ -454,7 +493,19 @@ export default function PlayerProfile() {
   const [friendLoading, setFriendLoading] = useState(false);
   const [friends, setFriends] = useState<Player[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
+  const [videoExpanded, setVideoExpanded] = useState(false);
   const [videoLikeRefreshTrigger, setVideoLikeRefreshTrigger] = useState(0);
+  const closeVideoModal = useCallback(() => {
+    setSelectedVideo(null);
+    setVideoExpanded(false);
+    setVideoLikeRefreshTrigger((prev) => prev + 1);
+  }, []);
+  const videoFullscreenLabel =
+    t('videoNotification.fullScreen') !== 'videoNotification.fullScreen'
+      ? t('videoNotification.fullScreen')
+      : t('profile.fullScreen') !== 'profile.fullScreen'
+        ? t('profile.fullScreen')
+        : 'Full screen';
   const [deleteSpeedRecordDate, setDeleteSpeedRecordDate] = useState<string | null>(null);
   const [isDeletingSpeedRecord, setIsDeletingSpeedRecord] = useState(false);
   const [alert, setAlert] = useState({
@@ -506,10 +557,15 @@ export default function PlayerProfile() {
   const [galleryPhotos, setGalleryPhotos] = useState<string[]>([]);
   const initialPhotosUrlsRef = useRef<string[]>([]); // URL фото на момент открытия/загрузки профиля
   const [playerTeams, setPlayerTeams] = useState<PastTeam[]>([]);
+  const [teamsReady, setTeamsReady] = useState(false);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   // --- AI Analysis state (must be before resolvedAiAnalysis) ---
   const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
   const [aiUsageCount, setAiUsageCount] = useState<number>(0);
+  // Лимит отчётов в месяц: 1 + 1 (заполненный профиль) + 1 за каждого приглашённого друга
+  const [aiUsageLimit, setAiUsageLimit] = useState<number>(1);
+  const [aiInvitedFriends, setAiInvitedFriends] = useState<number | undefined>(undefined);
+  const aiUsageFetchedForRef = useRef<string | null>(null);
   const [isGeneratingAnalysis, setIsGeneratingAnalysis] = useState(false);
   const [gameVideoLinks, setGameVideoLinks] = useState<string[]>(['']);
   const isOwner = currentUser && player && currentUser.id === player.id;
@@ -732,6 +788,7 @@ export default function PlayerProfile() {
       setEditData({});
       setPlayerTeams([]);
       setPastTeams([]);
+      setTeamsReady(false);
     }
     lastRoutePlayerIdRef.current = nid;
   }, [id]);
@@ -782,8 +839,18 @@ export default function PlayerProfile() {
     }
   };
 
+  /** Sync hydrate teams from memory / list cache — no AsyncStorage round-trip. */
+  const applyProfileTeamsInstant = (playerId: string, player?: Player | null): PastTeam[] | undefined => {
+    const instant = getInstantProfileTeams(playerId, player);
+    if (!instant) return undefined;
+    setPlayerTeams(instant.current);
+    setPastTeams(instant.past);
+    setTeamsReady(true);
+    return instant.all;
+  };
+
   // Функция для загрузки дополнительных данных в фоне
-  // ОПТИМИЗИРОВАНО: Все запросы выполняются ПАРАЛЛЕЛЬНО для максимальной скорости
+  // ОПТИМИЗИРОВАНО: команды показываем сразу; друзья/дружба не блокируют команды
   const loadAdditionalData = async (playerData: Player, userData: Player | null, preloadedTeams?: PastTeam[]) => {
     try {
       // Проверяем, что ID не изменился перед загрузкой дополнительных данных
@@ -812,15 +879,22 @@ export default function PlayerProfile() {
               return [];
             });
 
+      void teamsPromise.then((teams) => {
+        const checkId = Array.isArray(id) ? id[0] : id;
+        if (checkId !== playerData.id || currentLoadingIdRef.current !== playerData.id) return;
+        setPlayerTeams(teams.filter((team) => team.isCurrent));
+        setPastTeams(teams.filter((team) => !team.isCurrent));
+        setTeamsReady(true);
+      });
+
       const promises: Promise<any>[] = [
-        teamsPromise,
         getFriends(playerData.id).catch(err => {
           console.error('Ошибка загрузки друзей:', err);
           return [];
-        })
+        }),
       ];
       
-      // 3. Статус дружбы (только если смотрим чужой профиль)
+      // Статус дружбы (только если смотрим чужой профиль)
       if (userData && playerData.id !== userData.id) {
         promises.push(
           getFriendshipStatus(userData.id, playerData.id).catch(err => {
@@ -830,7 +904,6 @@ export default function PlayerProfile() {
         );
       }
 
-      // Выполняем ВСЕ запросы ОДНОВРЕМЕННО
       const results = await Promise.all(promises);
       
       // Проверяем ID после загрузки
@@ -840,16 +913,8 @@ export default function PlayerProfile() {
         return;
       }
 
-      // Распаковываем результаты
-      const teams = results[0] as PastTeam[];
-      const friendsList = results[1] as Player[];
-      const friendsStatus = results[2] as 'friends' | 'sent_request' | 'received_request' | 'none' | 'pending' | undefined;
-
-      // Устанавливаем команды
-      const currentTeams = teams.filter(team => team.isCurrent);
-      const pastTeamsFiltered = teams.filter(team => !team.isCurrent);
-      setPlayerTeams(currentTeams);
-      setPastTeams(pastTeamsFiltered);
+      const friendsList = results[0] as Player[];
+      const friendsStatus = results[1] as 'friends' | 'sent_request' | 'received_request' | 'none' | 'pending' | undefined;
 
       // Устанавливаем друзей
       setFriends(friendsList);
@@ -914,6 +979,8 @@ export default function PlayerProfile() {
         clearPlayerMemoryCache(normalizedId as string);
       }
 
+      prefetchPlayerTeams(normalizedId as string);
+
       // Web: дождаться early bootstrap (уже стартовал в <head>), чтобы сразу показать шапку
       if (Platform.OS === 'web' && routeParam && !forceRefreshProfile) {
         try {
@@ -933,11 +1000,13 @@ export default function PlayerProfile() {
         setPlayer(cachedPlayer);
         setAiAnalysis(cachedPlayer.aiAnalysis ?? null);
         setLoading(false); // Убираем индикатор загрузки для кешированных данных
-        
+
+        const preloadedTeams = applyProfileTeamsInstant(normalizedId as string, cachedPlayer);
         // Команды/друзья — сразу (не ждём loadCurrentUser — он раньше задерживал команды)
-        loadAdditionalData(cachedPlayer, currentUserLoadRef.current);
+        loadAdditionalData(cachedPlayer, currentUserLoadRef.current, preloadedTeams);
         void loadCurrentUser().then(setCurrentUser);
       } else {
+        applyProfileTeamsInstant(normalizedId as string);
         // Если кешированных данных нет, показываем индикатор загрузки
         setLoading(true);
       }
@@ -949,18 +1018,8 @@ export default function PlayerProfile() {
         return;
       }
       
-      // На web bootstrap уже стартовал в <head> — лишняя задержка только вредит
-      if (Platform.OS !== 'web') {
-        await new Promise(resolve => setTimeout(resolve, 50));
-      }
-      
-      // Проверяем еще раз после задержки
-      const checkId = Array.isArray(id) ? id[0] : id;
-      if (checkId !== normalizedId || currentLoadingIdRef.current !== normalizedId) {
-        console.log('⚠️ ID изменился после задержки, отменяем:', normalizedId, '->', checkId, 'currentLoadingId:', currentLoadingIdRef.current);
-        return;
-      }
-      
+      // Без искусственной паузы: смена id во время загрузки отсекается по currentLoadingIdRef ниже
+
       // Профиль + команды сразу; currentUser не блокирует первый paint
       const [playerData, teamsFromNetwork] = await Promise.all([
         getPlayerById(normalizedId as string, { skipCache: forceRefreshProfile }),
@@ -1014,7 +1073,7 @@ export default function PlayerProfile() {
             console.log('⚠️ Текущий пользователь не найден в базе, очищаем данные и редиректим');
             await dataCache.remove(CACHE_KEYS.USER_PROFILE);
             setGlobalCurrentUser(null);
-            router.replace('/');
+            goHome(router);
             void logoutUser().catch(() => undefined);
             return;
           }
@@ -1050,8 +1109,8 @@ export default function PlayerProfile() {
       }
 
       if (forceRefreshProfile && finalPlayerData.avatar) {
-        const { updateAvatarGlobally } = await import('../../utils/AvatarCache');
-        await updateAvatarGlobally(finalPlayerData.id, finalPlayerData.avatar);
+        const { ensureAvatarCached } = await import('../../utils/AvatarCache');
+        await ensureAvatarCached(finalPlayerData.id, finalPlayerData.avatar);
       }
       
       // Сразу устанавливаем основные данные для быстрого отображения
@@ -1064,6 +1123,7 @@ export default function PlayerProfile() {
       const pastTeamsNow = teamsFromNetwork.filter(team => !team.isCurrent);
       setPlayerTeams(currentTeamsNow);
       setPastTeams(pastTeamsNow);
+      setTeamsReady(true);
 
       // Сохраняем в кеш состояния для мгновенного переключения
       setPlayersCache(prev => ({
@@ -1094,14 +1154,14 @@ export default function PlayerProfile() {
           setSkateServices([]); // Устанавливаем пустой массив
         }
         
-        // Инициализируем видео поля сразу
-        if (finalPlayerData?.favoriteGoals) {
+        // Инициализируем видео поля — не затираем активную загрузку / черновик в режиме редактирования
+        if (finalPlayerData?.favoriteGoals && !isEditingRef.current) {
           const goals = finalPlayerData.favoriteGoals.split('\n').filter(goal => goal.trim());
-          const videoData = goals.map(goal => {
-            const { url, hours, minutes, seconds } = parseVideoUrl(goal);
-            return { url, hours: hours || '0', minutes: minutes || '0', seconds: seconds || '0' };
+          const videoData = goals.map((goal) => {
+            const { url } = parseVideoUrl(goal);
+            return { url };
           });
-          setVideoFields(videoData.length > 0 ? videoData : [{ url: '', hours: '0', minutes: '0', seconds: '0' }]);
+          setVideoFields(videoData);
         }
         
         // Инициализируем достижения сразу
@@ -1200,6 +1260,7 @@ export default function PlayerProfile() {
       setVideoFields([]);
       setPlayerTeams([]);
       setPastTeams([]);
+      setTeamsReady(false);
       setAiAnalysis(null);
       setLoading(true); // Показываем loading для нового профиля
       // Обновляем previousId сразу
@@ -1221,13 +1282,9 @@ export default function PlayerProfile() {
       setPlayer(cachedPlayer);
       setAiAnalysis(cachedPlayer.aiAnalysis ?? null);
       setLoading(false);
-      
-      // Команды из bootstrap/memory — без ожидания сети
-      void getPlayerTeamsAsPastTeams(normalizedId as string).then((teams) => {
-        if (currentLoadingIdRef.current !== normalizedId) return;
-        setPlayerTeams(teams.filter((t) => t.isCurrent));
-        setPastTeams(teams.filter((t) => !t.isCurrent));
-      }).catch(() => {});
+
+      // Команды из memory / player.teams в списке — синхронно, без AsyncStorage
+      applyProfileTeamsInstant(normalizedId as string, cachedPlayer);
       
       // Восстанавливаем друзей и статус дружбы из кеша
       if (friendsCache[normalizedId as string]) {
@@ -1268,6 +1325,9 @@ export default function PlayerProfile() {
       
       // Устанавливаем текущий загружаемый ID
       currentLoadingIdRef.current = normalizedId;
+
+      prefetchPlayerTeams(normalizedId as string);
+      applyProfileTeamsInstant(normalizedId as string);
       
       // Если состояние еще не очищено (не было смены id), показываем loading
       if (!idChanged) {
@@ -1730,9 +1790,11 @@ export default function PlayerProfile() {
           
           console.log('✅ Профиль обновлен через Realtime');
           setPlayer(updatedPlayer);
-          if (updatedPlayer.avatar && updatedPlayer.avatar !== player.avatar) {
-            const { updateAvatarGlobally } = await import('../../utils/AvatarCache');
-            await updateAvatarGlobally(player.id, updatedPlayer.avatar);
+          if (updatedPlayer.avatar) {
+            const { isSameAvatarFile, updateAvatarGlobally } = await import('../../utils/AvatarCache');
+            if (!isSameAvatarFile(updatedPlayer.avatar, player.avatar)) {
+              await updateAvatarGlobally(player.id, updatedPlayer.avatar);
+            }
           }
 
           // Обновляем кеш состояния
@@ -1837,8 +1899,9 @@ export default function PlayerProfile() {
       }
 
       return () => {
-        setCurrentScreen(null);
+        setCurrentScreen(null, 'player');
         setSelectedVideo(null);
+        setVideoExpanded(false);
       };
     }, [id])
   );
@@ -2206,6 +2269,223 @@ export default function PlayerProfile() {
     );
   };
 
+  // ---- Обложка профиля / логотип команды (файлы в бакете avatars, без колонок в БД) ----
+  const [coverRefresh, setCoverRefresh] = useState(0);
+  const [coverSource, setCoverSource] = useState<CoverSource | null>(null);
+  const [coverAspect, setCoverAspect] = useState(3.2);
+  const coverTeam = useMemo(() => {
+    const primary = playerTeams[0];
+    if (!primary) return null;
+    const key = `teams.${primary.teamName}`;
+    const translated = t(key);
+    const name = translated === key || translated.startsWith('teams.') ? primary.teamName : translated;
+    return { teamId: primary.id, teamName: name };
+  }, [playerTeams, t]);
+
+  // Греем обложку сразу по id из маршрута — параллельно с загрузкой профиля,
+  // а эмблему — как только известна команда. 404 запоминается, фолбэк не ждёт сеть.
+  useEffect(() => {
+    const pid = Array.isArray(routeIdParam) ? routeIdParam[0] : routeIdParam;
+    if (!pid) return;
+    void teamAssetsReady().then(() => {
+      const id = String(pid);
+      void prefetchPlayerCover(id);
+      const cachedTeamId = getCachedCoverState(id)?.teamId;
+      if (cachedTeamId) void prefetchTeamLogo(cachedTeamId);
+    });
+  }, [routeIdParam]);
+  useEffect(() => {
+    if (coverTeam) void prefetchTeamLogo(coverTeam.teamId);
+  }, [coverTeam?.teamId]);
+
+  const pickAssetImage = async (aspect?: [number, number]): Promise<CoverSource | null> => {
+    if (!(Platform.OS === 'android' && Platform.Version >= 33)) {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        showCustomAlert(t('common.error'), 'Нет доступа к галерее', 'error');
+        return null;
+      }
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: !!aspect,
+      aspect,
+      quality: 0.9,
+    });
+    if (result.canceled || !result.assets[0]) return null;
+    const a = result.assets[0];
+    return { uri: a.uri, width: a.width || 1, height: a.height || 1 };
+  };
+
+  const [pickingVideo, setPickingVideo] = useState(false);
+  const videoPickInFlightRef = useRef(false);
+
+  const uploadPickedVideo = async (asset: ImagePicker.ImagePickerAsset) => {
+    if (!player) return;
+    const tempId = Date.now();
+    // Сразу показываем плитку загрузки — превью и upload не должны блокировать UI.
+    setVideoFields((prev) => [{ url: '', uploading: true, tempId }, ...prev]);
+
+    const thumbPromise = VideoThumbnails.getThumbnailAsync(asset.uri, { time: 500 })
+      .then((thumb) => {
+        setVideoFields((prev) =>
+          prev.map((v) => (v.tempId === tempId ? { ...v, thumbUri: thumb.uri } : v))
+        );
+        return thumb.uri;
+      })
+      .catch(() => undefined);
+
+    const { uploadVideoToStorage } = await import('../../utils/uploadImage');
+    const thumbUri = await Promise.race([
+      thumbPromise,
+      new Promise<string | undefined>((resolve) => setTimeout(() => resolve(undefined), 2500)),
+    ]);
+    const { url: uploadedUrl, error: uploadError } = await uploadVideoToStorage(
+      asset.uri,
+      player.id,
+      undefined,
+      thumbUri
+    );
+    if (uploadedUrl) {
+      let goalsText = '';
+      setVideoFields((prev) => {
+        const updated = prev.map((v) =>
+          v.tempId === tempId ? { url: uploadedUrl, uploading: false, thumbUri: v.thumbUri ?? thumbUri } : v
+        );
+        goalsText = sortVideoUrlsNewestFirst(
+          updated.filter((v) => v.url.trim() && !v.uploading).map((v) => v.url.trim())
+        ).join('\n');
+        return updated;
+      });
+
+      try {
+        const saved = await updatePlayer(player.id, { favoriteGoals: goalsText });
+        if (saved) {
+          setPlayer(saved);
+          setEditData((prev) => ({ ...prev, favoriteGoals: goalsText }));
+        }
+      } catch (saveError) {
+        console.error('❌ Видео загружено, но не сохранено в профиль:', saveError);
+        showCustomAlert(
+          t('common.warning'),
+          t('profile.videoUploadSaveReminder'),
+          'warning'
+        );
+        return;
+      }
+
+      showCustomAlert(t('common.success'), t('profile.videoUploaded'), 'success');
+    } else {
+      setVideoFields((prev) => prev.filter((v) => v.tempId !== tempId));
+      showCustomAlert(
+        'Ошибка',
+        uploadError || 'Не удалось загрузить видео. Проверьте интернет и попробуйте снова.',
+        'error'
+      );
+    }
+  };
+
+  const handleAddVideo = async () => {
+    if (!player || pickingVideo || videoPickInFlightRef.current) return;
+    videoPickInFlightRef.current = true;
+    const enteringEditMode = !isEditing;
+    if (enteringEditMode) handleStartEditing();
+    setPickingVideo(true);
+    try {
+      // Дождаться монтирования UI редактирования — иначе iOS не находит currentViewController.
+      if (enteringEditMode) {
+        await new Promise<void>((resolve) => {
+          InteractionManager.runAfterInteractions(() => {
+            requestAnimationFrame(() => setTimeout(resolve, Platform.OS === 'ios' ? 200 : 0));
+          });
+        });
+      }
+      const { pickVideoFromLibrary } = await import('../../utils/pickVideoFromLibrary');
+      const outcome = await pickVideoFromLibrary(20);
+      if (outcome.status === 'picked') {
+        await uploadPickedVideo(outcome.asset);
+      } else if (outcome.status === 'permission_denied') {
+        showCustomAlert(t('common.error'), 'Нет доступа к галерее с видео', 'error');
+      } else if (outcome.status === 'too_long') {
+        showCustomAlert(
+          t('common.error'),
+          `Видео слишком длинное. Максимум ${outcome.maxSeconds} сек.`,
+          'error'
+        );
+      } else if (outcome.status === 'failed') {
+        console.error('❌ Ошибка выбора видео из галереи:', outcome.message);
+        showCustomAlert(t('common.error'), 'Не удалось открыть галерею с видео', 'error');
+      }
+    } finally {
+      videoPickInFlightRef.current = false;
+      setPickingVideo(false);
+    }
+  };
+
+  // Фото выбирается без системного кропа: пользователь сам двигает кадр в CoverPositionModal.
+  const handlePickCover = async () => {
+    if (!player) return;
+    try {
+      const asset = await pickAssetImage();
+      if (!asset) return;
+      setCoverSource(asset);
+    } catch (e) {
+      console.error('cover pick', e);
+      showCustomAlert(t('common.error'), t('profile.coverUploadFailed'), 'error');
+    }
+  };
+
+  const handleConfirmCover = async (croppedUri: string) => {
+    if (!player) return;
+    try {
+      const url = await uploadPlayerCover(croppedUri, player.id);
+      if (!url) {
+        showCustomAlert(t('common.error'), t('profile.coverUploadFailed'), 'error');
+        return;
+      }
+      setCoverRefresh((n) => n + 1);
+      if (currentUser?.id === player.id) {
+        void notifyFriendsAboutCover(player.id, player.name, url);
+      }
+    } catch (e) {
+      console.error('cover upload', e);
+      showCustomAlert(t('common.error'), t('profile.coverUploadFailed'), 'error');
+    } finally {
+      setCoverSource(null);
+    }
+  };
+
+  const handleRemoveCover = () => {
+    if (!player) return;
+    showCustomAlert(
+      t('profile.removeCover'),
+      '',
+      'warning',
+      async () => {
+        const ok = await removePlayerCover(player.id);
+        if (ok) setCoverRefresh((n) => n + 1);
+      },
+      true
+    );
+  };
+
+  const handlePickTeamLogo = async () => {
+    if (!coverTeam) return;
+    try {
+      const asset = await pickAssetImage();
+      if (!asset) return;
+      const url = await uploadTeamLogo(asset.uri, coverTeam.teamId);
+      if (!url) {
+        showCustomAlert(t('common.error'), t('profile.coverUploadFailed'), 'error');
+        return;
+      }
+      setCoverRefresh((n) => n + 1);
+      showCustomAlert(t('common.success'), t('profile.teamLogoUpdated'), 'success');
+    } catch (e) {
+      console.error('team logo upload', e);
+      showCustomAlert(t('common.error'), t('profile.coverUploadFailed'), 'error');
+    }
+  };
+
   const pickFromGallery = async () => {
     try {
       // На Android 13+ (API 33+) используем Photo Picker без разрешений
@@ -2393,6 +2673,34 @@ export default function PlayerProfile() {
     return { complete: missing.length === 0, missing };
   };
 
+  // Актуальный счётчик и лимит отчётов для владельца профиля
+  useEffect(() => {
+    if (!player || !currentUser || currentUser.id !== player.id) return;
+    if (aiUsageFetchedForRef.current === player.id) return;
+    aiUsageFetchedForRef.current = player.id;
+    (async () => {
+      try {
+        const response = await supabaseFetch(getSupabaseFunctionUrl('generate-ai-analysis'), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${supabaseAnonKey}`,
+            apikey: supabaseAnonKey,
+          },
+          body: JSON.stringify({ player_id: player.id, action: 'get_usage' }),
+        });
+        const data = await response.json();
+        if (response.ok && typeof data?.count === 'number') {
+          setAiUsageCount(data.count);
+          if (typeof data.limit === 'number') setAiUsageLimit(data.limit);
+          if (typeof data.invited_friends === 'number') setAiInvitedFriends(data.invited_friends);
+        }
+      } catch {
+        /* сеть недоступна — оставляем значения по умолчанию */
+      }
+    })();
+  }, [player?.id, currentUser?.id]);
+
   const handleGenerateAnalysis = async () => {
     if (!player || !currentUser || currentUser.id !== player.id) return;
     if (isGeneratingAnalysis) return;
@@ -2419,7 +2727,9 @@ export default function PlayerProfile() {
       const data = await response.json();
 
       if (response.status === 429) {
-        showCustomAlert('Limit Reached', data.message || 'You have used all 5 analyses for this month.', 'info');
+        if (typeof data.limit === 'number') setAiUsageLimit(data.limit);
+        if (typeof data.count === 'number') setAiUsageCount(data.count);
+        showCustomAlert(t('common.info') || 'Info', data.message || 'You have used all analyses for this month.', 'info');
         return;
       }
 
@@ -2438,6 +2748,8 @@ export default function PlayerProfile() {
       };
       setAiAnalysis(newAnalysis);
       setAiUsageCount(data.count || aiUsageCount + 1);
+      if (typeof data.limit === 'number') setAiUsageLimit(data.limit);
+      if (typeof data.invited_friends === 'number') setAiInvitedFriends(data.invited_friends);
 
       const vids = gameVideoLinks.filter(v => v.trim() !== '');
       if (vids.length > 0) {
@@ -2541,20 +2853,8 @@ export default function PlayerProfile() {
 
   const showBirthDatePickerModal = () => {
     // Устанавливаем текущую дату рождения или сегодняшнюю дату
-    if (editData.birthDate || player?.birthDate) {
-      const dateStr = editData.birthDate || player?.birthDate || '';
-      const parts = dateStr.split('.');
-      if (parts.length === 3) {
-        const day = parseInt(parts[0]);
-        const month = parseInt(parts[1]) - 1; // Месяцы в JS начинаются с 0
-        const year = parseInt(parts[2]);
-        setSelectedBirthDate(new Date(year, month, day));
-      } else {
-        setSelectedBirthDate(new Date());
-      }
-    } else {
-      setSelectedBirthDate(new Date());
-    }
+    // Поддерживаем оба формата: DD.MM.YYYY (форма) и YYYY-MM-DD (из БД)
+    setSelectedBirthDate(birthDateToLocalDate(editData.birthDate || player?.birthDate));
     setShowBirthDatePicker(true);
   };
 
@@ -3575,13 +3875,14 @@ export default function PlayerProfile() {
         const { uploadImageToStorage } = await import('../../utils/uploadImage');
         const uploadedUrl = await uploadImageToStorage(avatarUrl, `avatar_${player.id}.jpg`);
         if (uploadedUrl) {
-          avatarUrl = uploadedUrl;
+          // Файл перезаписывается под тем же именем, поэтому в БД кладём URL с версией:
+          // иначе у других пользователей (и у CDN) навсегда остаётся старая картинка —
+          // realtime не видит изменения, а дисковый кеш expo-image ключуется по URL.
+          avatarUrl = `${uploadedUrl.split('?')[0]}?v=${Date.now()}`;
           avatarWasUpdated = true;
           
-          // КРИТИЧНО: Обновляем аватар ГЛОБАЛЬНО во всех компонентах
-          // forceNotify=true гарантирует перезагрузку даже если URL тот же (файл перезаписан)
           const { updateAvatarGlobally } = await import('../../utils/AvatarCache');
-          await updateAvatarGlobally(player.id, uploadedUrl);
+          await updateAvatarGlobally(player.id, avatarUrl);
           console.log('✅ Аватар обновлён глобально через updateAvatarGlobally');
         } else {
           console.error('❌ Не удалось загрузить аватар в Storage');
@@ -3707,11 +4008,10 @@ export default function PlayerProfile() {
           isCurrent: false
         }));
         
-        // Проверяем изменились ли команды
-        const currentTeamsEqual = JSON.stringify(savedCurrentTeams.sort((a, b) => a.id.localeCompare(b.id))) === 
-                                   JSON.stringify(currentTeamsForCompare.sort((a, b) => a.id.localeCompare(b.id)));
-        const pastTeamsEqual = JSON.stringify(savedPastTeams.sort((a, b) => a.id.localeCompare(b.id))) === 
-                               JSON.stringify(pastTeamsForCompare.sort((a, b) => a.id.localeCompare(b.id)));
+        // Сравниваем С УЧЁТОМ ПОРЯДКА: сохранённые команды приходят по team_order,
+        // а смена порядка — тоже изменение, которое надо синхронизировать.
+        const currentTeamsEqual = JSON.stringify(savedCurrentTeams) === JSON.stringify(currentTeamsForCompare);
+        const pastTeamsEqual = JSON.stringify(savedPastTeams) === JSON.stringify(pastTeamsForCompare);
         
         teamsChanged = !currentTeamsEqual || !pastTeamsEqual;
         
@@ -4338,7 +4638,7 @@ export default function PlayerProfile() {
               t('common.success') || t('success'), 
               t('profile.userDeleted', { name: player.name }),
               'success',
-              () => router.push({ pathname: '/', params: { refresh: String(Date.now()) } })
+              () => goHome(router, { refresh: String(Date.now()) })
             );
         } else {
           showCustomAlert(
@@ -4447,14 +4747,14 @@ export default function PlayerProfile() {
           // пользователя обратно через refreshUser.
           await dataCache.remove(CACHE_KEYS.USER_PROFILE);
           setGlobalCurrentUser(null);
-          router.replace('/');
+          goHome(router);
           void logoutUser().catch((err) =>
             console.warn('⚠️ Ошибка при сетевом выходе (не критично):', err)
           );
         } catch (error) {
           console.error('❌ Ошибка при выходе:', error);
           setGlobalCurrentUser(null);
-          router.replace('/');
+          goHome(router);
         }
       },
       onCancel: () => {
@@ -4520,7 +4820,7 @@ export default function PlayerProfile() {
           () => {
             // Переходим на главный экран - useFocusEffect автоматически обновит данные
             // так как с момента последнего обновления прошло >2 секунд
-            router.replace('/');
+            goHome(router);
           }
         );
       } else {
@@ -4557,7 +4857,7 @@ export default function PlayerProfile() {
             console.error('❌ Ошибка при выходе:', error);
           }
         }
-        router.replace('/');
+        goHome(router);
       }, 5000);
       
       setPlayerNotFoundTimeout(timeout);
@@ -4613,12 +4913,12 @@ export default function PlayerProfile() {
                     try {
                       await dataCache.remove(CACHE_KEYS.USER_PROFILE);
                       setGlobalCurrentUser(null);
-                      router.replace('/');
+                      goHome(router);
                       void logoutUser().catch(() => undefined);
                     } catch (error) {
                       console.error('❌ Ошибка при выходе:', error);
                       setGlobalCurrentUser(null);
-                      router.replace('/');
+                      goHome(router);
                     }
                   }}
                 >
@@ -4627,7 +4927,7 @@ export default function PlayerProfile() {
               )}
               <TouchableOpacity
                 style={[styles.button, { marginTop: 10, backgroundColor: 'rgba(255, 255, 255, 0.2)' }]}
-                onPress={() => router.replace('/')}
+                onPress={() => goHome(router)}
               >
                 <Text style={styles.buttonText}>На главную</Text>
               </TouchableOpacity>
@@ -4765,7 +5065,7 @@ export default function PlayerProfile() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
     >
-      <View style={styles.overlay}>
+      <View style={[styles.overlay, Platform.OS === 'web' && styles.overlayWeb]}>
           {/* Заголовок страницы с именем игрока */}
           {player && (
             <View style={[styles.pageHeader, isDesktop && styles.pageHeaderDesktop]}>
@@ -4791,9 +5091,14 @@ export default function PlayerProfile() {
                   } else if (returnToValue === 'search') {
                     // Возвращаемся в поиск
                     router.push('/search');
+                  } else if (returnToValue === 'marketing') {
+                    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+                      window.location.href = language === 'en' ? '/en' : '/';
+                    } else {
+                      goHome(router);
+                    }
                   } else if (returnToValue === 'home') {
-                    // Web home feed lives at /feed (marketing owns /)
-                    router.push(Platform.OS === 'web' ? '/feed' : '/');
+                    goHome(router);
                   } else if (returnToValue === 'player' && returnPlayerIdValue) {
                     // Возвращаемся в профиль другого игрока (из списка друзей)
                     navigateToPlayerProfile(router, {
@@ -4810,7 +5115,7 @@ export default function PlayerProfile() {
                         router.back();
                       } else {
                         // Если нет истории, переходим на главный экран
-                        router.replace(Platform.OS === 'web' ? '/feed' : '/');
+                        goHome(router);
                       }
                     } catch (error) {
                       // Если произошла ошибка, пробуем router.back()
@@ -4818,7 +5123,7 @@ export default function PlayerProfile() {
                       if (router.canGoBack()) {
                         router.back();
                       } else {
-                        router.replace('/');
+                        goHome(router);
                       }
                     }
                   }
@@ -4854,7 +5159,9 @@ export default function PlayerProfile() {
           )}
           
           <ScrollView 
-            ref={scrollViewRef} 
+            ref={scrollViewRef}
+            nativeID="hs-profile-scroll"
+            style={Platform.OS === 'web' ? styles.scrollViewWeb : undefined}
             contentContainerStyle={[styles.scrollContainer, isDesktop && styles.scrollContainerDesktop]}
             keyboardShouldPersistTaps="handled"
               keyboardDismissMode="on-drag"
@@ -4873,10 +5180,34 @@ export default function PlayerProfile() {
               }}
               scrollEventThrottle={16}
           >
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-              <View pointerEvents="box-none" style={isDesktop ? styles.desktopContentWrap : undefined}>
+            <ProfileScrollWrap isDesktop={isDesktop}>
             {/* Фото и основная информация */}
-            <View style={[styles.profileSection, isDesktop && styles.profileSectionDesktop]}>
+            <View style={[styles.profileSection, isDesktop ? [styles.profileSectionDesktop, styles.profileSectionDesktopWithCover] : styles.profileSectionWithCover]}>
+              {/* Клубная шапка за аватаром: свой ковер → эмблема команды → бренд */}
+              {player && (
+                <TeamCover
+                  playerId={player.id}
+                  team={coverTeam}
+                  teamsReady={teamsReady}
+                  style={isDesktop ? styles.coverBandDesktop : styles.coverBand}
+                  onMeasure={({ width: w, height: h }) => {
+                    if (w > 0 && h > 0) setCoverAspect(w / h);
+                  }}
+                  refreshKey={coverRefresh}
+                  canEditCover={!!isEditing && player.status !== 'scout' && (currentUser?.status === 'admin' || currentUser?.id === player.id)}
+                  canEditTeamLogo={!!isEditing && currentUser?.status === 'admin'}
+                  onPickCover={handlePickCover}
+                  onRemoveCover={handleRemoveCover}
+                  onPickTeamLogo={handlePickTeamLogo}
+                />
+              )}
+              <CoverPositionModal
+                visible={!!coverSource}
+                source={coverSource}
+                aspect={coverAspect}
+                onCancel={() => setCoverSource(null)}
+                onConfirm={handleConfirmCover}
+              />
               {/* Кнопка с 3 точками в правом верхнем углу профиля */}
               {/* Для чужих профилей: показывается всегда (кроме админов) */}
               {/* Для своего профиля: показывается только в режиме редактирования */}
@@ -5046,8 +5377,8 @@ export default function PlayerProfile() {
                 )}
               </View>
               
-              {/* Социальные ссылки */}
-              {!isEditing && (
+              {/* Социальные ссылки (скаут ничего своего не публикует) */}
+              {!isEditing && player.status !== 'scout' && (
                 <SocialLinks
                   instagram={player.instagram}
                   tiktok={player.tiktok}
@@ -5076,6 +5407,12 @@ export default function PlayerProfile() {
                    player.status === 'star' ? t('profile.star') : t('profile.player')}
                 </Text>
               </View>
+              {player.status === 'scout' && currentUser?.id === player.id && (
+                <View style={styles.scoutPrivacyNote}>
+                  <Ionicons name="eye-off-outline" size={14} color="rgba(255,255,255,0.55)" />
+                  <Text style={styles.scoutPrivacyNoteText}>{t('profile.scoutPrivacyNote')}</Text>
+                </View>
+              )}
               {playerTeams.length > 0 && (
                 <View style={[styles.playerTeamsContainer, isDesktop && styles.playerTeamsContainerDesktop]}>
                   {playerTeams.map((team, index) => {
@@ -5238,8 +5575,6 @@ export default function PlayerProfile() {
 
             </View>
 
-
-
             {/* Если пользователь заблокирован - показываем только основную информацию и сообщение */}
             {isUserBlockedState && currentUser && currentUser.id !== player.id ? (
               <SectionCard>
@@ -5282,6 +5617,13 @@ export default function PlayerProfile() {
                   >
                     <Ionicons name="settings-outline" size={20} color="#fff" />
                     <Text style={styles.adminPanelButtonText}>{t('admin.adminPanel') || 'Панель администратора'}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.adminPanelButton, styles.adminPanelButtonDark]}
+                    onPress={() => router.push('/_debug-connection' as any)}
+                  >
+                    <Ionicons name="pulse-outline" size={20} color="#fff" />
+                    <Text style={styles.adminPanelButtonText}>Диагностика сети</Text>
                   </TouchableOpacity>
                 </View>
               </SectionCard>
@@ -5623,6 +5965,7 @@ export default function PlayerProfile() {
                       statsGridStyle={styles.statsGrid}
                       statItemStyle={styles.statItem}
                     />
+                    {!isEditing && <AllTimeStatsSection player={player} isGoalkeeper={isGoalkeeper} />}
                     {mergeStatsWithPhysicalOnDesktop ? renderPhysicalDataBody({ compactTop: true }) : null}
                   </SectionCard>
                 ) : null;
@@ -5769,6 +6112,7 @@ export default function PlayerProfile() {
                       statsGridStyle={styles.statsGrid}
                       statItemStyle={styles.statItem}
                     />
+                    {!isEditing && <AllTimeStatsSection player={player} isGoalkeeper={isGoalkeeper} />}
                     {mergeStatsWithPhysicalOnDesktop ? renderPhysicalDataBody({ compactTop: true }) : null}
                   </SectionCard>
                 ) : null;
@@ -6343,7 +6687,7 @@ export default function PlayerProfile() {
               )}
 
             {/* Социальные сети */}
-              {isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id) && (
+              {isEditing && player.status !== 'scout' && (currentUser?.status === 'admin' || currentUser?.id === player.id) && (
                <SectionCard>
                  <Text style={styles.sectionTitle}>{t('editProfile.socialLinks')}</Text>
                  <View style={styles.infoGrid}>
@@ -6393,8 +6737,8 @@ export default function PlayerProfile() {
                </SectionCard>
             )}
 
-            {/* Секция команд - не показываем для магазинов, заточки коньков и администраторов */}
-            {player.status !== 'shop' && player.status !== 'skateSharpening' && player.status !== 'admin' && (() => {
+            {/* Секция команд - не показываем для магазинов, заточки коньков, администраторов и скаутов */}
+            {player.status !== 'shop' && player.status !== 'skateSharpening' && player.status !== 'admin' && player.status !== 'scout' && (() => {
               const isOwner = currentUser && currentUser.id === player.id;
               const isEditingMode = isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id);
               const hasTeams = playerTeams.length > 0 || pastTeams.length > 0;
@@ -6596,7 +6940,9 @@ export default function PlayerProfile() {
                       profileUrl={buildInviteLink(player.id, player.name)}
                       isOwner={!!isOwner}
                       usageCount={aiUsageCount}
-                      maxUsage={5}
+                      maxUsage={aiUsageLimit}
+                      invitedFriends={aiInvitedFriends}
+                      onInvite={shareProfile}
                       onGenerate={handleGenerateAnalysis}
                       onTogglePublic={handleToggleAnalysisPublic}
                       onTranslate={handleTranslateAnalysis}
@@ -6657,7 +7003,7 @@ export default function PlayerProfile() {
                     {videoFields.map((video, index) => (
                       <View key={video.tempId ?? `${video.url}-${index}`} style={[styles.uploadedVideoItem, videoEditTileStyle]}>
                         {video.thumbUri ? (
-                          <Image source={{ uri: video.thumbUri }} style={styles.uploadedVideoThumb} resizeMode="cover" />
+                          <Image source={{ uri: video.thumbUri }} style={styles.uploadedVideoThumb} resizeMode="contain" />
                         ) : video.url ? (
                           <View style={styles.uploadedVideoThumb}>
                             <DirectVideoThumbnail videoUrl={video.url} />
@@ -6690,51 +7036,18 @@ export default function PlayerProfile() {
                     ))}
                     {videoFields.length < 10 && (
                       <TouchableOpacity
-                        style={[styles.addVideoButton, videoEditTileStyle]}
-                        onPress={async () => {
-                          const ImagePicker = await import('expo-image-picker');
-                          const result = await ImagePicker.launchImageLibraryAsync({
-                            mediaTypes: 'videos' as any,
-                            videoMaxDuration: 20,
-                            quality: 0.5,
-                            allowsEditing: false,
-                          });
-                          if (result.canceled || !result.assets?.[0]) return;
-                          const asset = result.assets[0];
-                          const tempId = Date.now();
-                          let thumbUri: string | undefined;
-                          try {
-                            const thumb = await VideoThumbnails.getThumbnailAsync(asset.uri, { time: 500 });
-                            thumbUri = thumb.uri;
-                          } catch {
-                            // превью необязательно — останется плейсхолдер
-                          }
-                          setVideoFields(prev => [{ url: '', uploading: true, tempId, thumbUri }, ...prev]);
-                          const { uploadVideoToStorage } = await import('../../utils/uploadImage');
-                          const { url: uploadedUrl, error: uploadError } = await uploadVideoToStorage(
-                            asset.uri,
-                            player.id,
-                            undefined,
-                            thumbUri
-                          );
-                          if (uploadedUrl) {
-                            setVideoFields(prev =>
-                              prev.map(v =>
-                                v.tempId === tempId ? { url: uploadedUrl, uploading: false, thumbUri: v.thumbUri ?? thumbUri } : v
-                              )
-                            );
-                          } else {
-                            setVideoFields(prev => prev.filter(v => v.tempId !== tempId));
-                            showCustomAlert(
-                              'Ошибка',
-                              uploadError || 'Не удалось загрузить видео. Проверьте интернет и попробуйте снова.',
-                              'error'
-                            );
-                          }
-                        }}
+                        style={[styles.addVideoButton, videoEditTileStyle, pickingVideo && styles.addVideoButtonDisabled]}
+                        onPress={handleAddVideo}
+                        disabled={pickingVideo}
                       >
-                        <Ionicons name="add" size={32} color="#fa2f40" />
-                        <Text style={styles.addVideoButtonText}>{t('addMoreVideo')}</Text>
+                        {pickingVideo ? (
+                          <ActivityIndicator color="#fa2f40" size="small" />
+                        ) : (
+                          <>
+                            <Ionicons name="add" size={32} color="#fa2f40" />
+                            <Text style={styles.addVideoButtonText}>{t('addMoreVideo')}</Text>
+                          </>
+                        )}
                       </TouchableOpacity>
                     )}
                   </View>
@@ -6772,6 +7085,17 @@ export default function PlayerProfile() {
                 <View style={styles.emptySectionContainer}>
                   <Ionicons name="videocam-outline" size={48} color="#8a8a92" />
                   <Text style={styles.emptySectionText}>{t('profile.noVideosYet')}</Text>
+                  <TouchableOpacity
+                    style={[styles.addVideoEmptyButton, pickingVideo && styles.addVideoButtonDisabled]}
+                    onPress={handleAddVideo}
+                    disabled={pickingVideo}
+                  >
+                    {pickingVideo ? (
+                      <ActivityIndicator color="#fa2f40" size="small" />
+                    ) : (
+                      <Text style={styles.addVideoEmptyButtonText}>{t('addMoreVideo')}</Text>
+                    )}
+                  </TouchableOpacity>
                 </View>
               ) : null;
               
@@ -6793,10 +7117,12 @@ export default function PlayerProfile() {
 {/* Game videos are now inside AIAnalysisCard above */}
 
             {/* Фотографии - не показываем для звезд и администраторов, для магазинов и заточки коньков доступны всем */}
-            {player.status !== 'star' && player.status !== 'admin' && (() => {
+            {player.status !== 'star' && player.status !== 'admin' && player.status !== 'scout' && (() => {
               const isShopOrSkateSharpening = player.status === 'shop' || player.status === 'skateSharpening';
+              // Scouts evaluate players — full profile access without friendship
               const canSeePhotos = (currentUser && currentUser.id === player.id) || 
                                    (currentUser?.status === 'admin') ||
+                                   (currentUser?.status === 'scout') ||
                                    friendshipStatus === 'friends' ||
                                    isShopOrSkateSharpening;
               const isEditingPhotos = isEditing && (currentUser?.status === 'admin' || currentUser?.id === player.id);
@@ -7151,6 +7477,7 @@ export default function PlayerProfile() {
               (currentUser && currentUser.id === player.id) || 
               (currentUser?.status === 'admin') ||
               (currentUser?.status === 'star') ||
+              (currentUser?.status === 'scout') ||
               friendshipStatus === 'friends' ? (
                 // Показываем контейнер музея если:
                 // 1. Это владелец профиля, админ или звезда - всегда показываем
@@ -7459,7 +7786,7 @@ export default function PlayerProfile() {
                                     {
                                       text: 'OK',
                                       onPress: () => {
-                                        router.replace('/');
+                                        goHome(router);
                                       }
                                     }
                                   ]
@@ -7691,8 +8018,7 @@ export default function PlayerProfile() {
               </View>
             )}
 
-              </View>
-            </TouchableWithoutFeedback>
+            </ProfileScrollWrap>
           </ScrollView>
         </View>
       
@@ -7983,53 +8309,58 @@ export default function PlayerProfile() {
         </TouchableOpacity>
       )}
       
-      {/* Модальное окно для видео */}
+      {/* Модальное окно для видео (preview + fullscreen в одном Modal — iOS не показывает вложенные) */}
       <Modal
         visible={selectedVideo !== null}
         transparent={true}
         animationType="fade"
-        onRequestClose={() => {
-          setSelectedVideo(null);
-          setVideoLikeRefreshTrigger(prev => prev + 1);
-        }}
+        statusBarTranslucent
+        onRequestClose={videoExpanded ? () => setVideoExpanded(false) : closeVideoModal}
       >
-        <View style={styles.videoModalOverlay}>
-          <TouchableWithoutFeedback onPress={() => {
-            setSelectedVideo(null);
-            setVideoLikeRefreshTrigger(prev => prev + 1);
-          }}>
-            <View style={styles.videoModalOverlayTouchable} />
-          </TouchableWithoutFeedback>
-          <View style={styles.videoModalContainer} pointerEvents="box-none">
-            <TouchableOpacity
-              style={styles.videoModalCloseButton}
-              onPress={() => {
-                setSelectedVideo(null);
-                setVideoLikeRefreshTrigger(prev => prev + 1);
-              }}
-            >
-              <Ionicons name="close" size={24} color="#fff" />
-            </TouchableOpacity>
-            {selectedVideo && (
-              <View style={styles.videoModalContent}>
-              <VideoPlayer 
-                url={selectedVideo.url}
-                title={t('myMoment')}
-                timeCode={selectedVideo.timeCode}
-                autoPlay
-              />
-                {player && (
-                  <View style={styles.videoModalLikeButton}>
-                    <LikeButton
-                      playerId={player.id}
-                      contentId={generateVideoContentId(selectedVideo.url, selectedVideo.timeCode)}
-                      contentType="video"
-                    />
-                  </View>
-                )}
+        <View style={videoExpanded ? styles.videoFullscreenOverlay : styles.videoModalOverlay}>
+          {!videoExpanded && (
+            <TouchableWithoutFeedback onPress={closeVideoModal}>
+              <View style={styles.videoModalOverlayTouchable} />
+            </TouchableWithoutFeedback>
+          )}
+          {selectedVideo && (
+            videoExpanded ? (
+              <View style={styles.videoFullscreenPlayer}>
+                <VideoPlayer
+                  key={`${selectedVideo.url}-${selectedVideo.timeCode || ''}-fs`}
+                  url={selectedVideo.url}
+                  timeCode={selectedVideo.timeCode}
+                  autoPlay
+                  fullscreen
+                  onClose={() => setVideoExpanded(false)}
+                />
               </View>
-            )}
-          </View>
+            ) : (
+              <View style={styles.videoModalContainer} pointerEvents="box-none">
+                <View style={styles.videoModalContent}>
+                  <VideoPlayer
+                    url={selectedVideo.url}
+                    title={t('myMoment')}
+                    timeCode={selectedVideo.timeCode}
+                    autoPlay
+                    layoutMode="modal"
+                    onClose={closeVideoModal}
+                    onRequestFullscreen={() => setVideoExpanded(true)}
+                    fullscreenButtonLabel={videoFullscreenLabel}
+                  />
+                  {player && (
+                    <View style={styles.videoModalLikeButton}>
+                      <LikeButton
+                        playerId={player.id}
+                        contentId={generateVideoContentId(selectedVideo.url, selectedVideo.timeCode)}
+                        contentType="video"
+                      />
+                    </View>
+                  )}
+                </View>
+              </View>
+            )
+          )}
         </View>
       </Modal>
 
@@ -8480,6 +8811,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
   },
+  overlayWeb: {
+    minHeight: 0,
+  },
+  scrollViewWeb: {
+    flex: 1,
+    minHeight: 0,
+    touchAction: 'pan-y',
+    overflow: 'auto',
+    WebkitOverflowScrolling: 'touch',
+  } as ViewStyle,
   scrollContainer: {
     flexGrow: 1,
     paddingTop: 48, // Отступ для фиксированного заголовка
@@ -8779,6 +9120,34 @@ const styles = StyleSheet.create({
     marginTop: 20,
     position: 'relative',
   },
+  // Шапка — фон всего верхнего блока (аватар → имя → статус → команды → стаж):
+  // стартует у верха контента и уходит за края горизонтального паддинга 20.
+  profileSectionWithCover: {
+    marginTop: 8,
+    marginBottom: 18,
+    paddingTop: 16,
+    paddingBottom: 18,
+  },
+  coverBand: {
+    position: 'absolute',
+    top: -8,
+    bottom: 0,
+    left: -20,
+    right: -20,
+    borderBottomLeftRadius: 26,
+    borderBottomRightRadius: 26,
+  },
+  profileSectionDesktopWithCover: {
+    overflow: 'hidden',
+  },
+  coverBandDesktop: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    borderRadius: 24,
+  },
   avatarContainer: {
     position: 'relative',
     alignItems: 'center',
@@ -8923,6 +9292,22 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'Gilroy-Regular',
     color: '#fff',
+  },
+  scoutPrivacyNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 6,
+    paddingHorizontal: 24,
+    maxWidth: 360,
+  },
+  scoutPrivacyNoteText: {
+    flexShrink: 1,
+    fontFamily: 'Gilroy-Regular',
+    fontSize: 12,
+    lineHeight: 16,
+    color: 'rgba(255,255,255,0.55)',
+    textAlign: 'center',
   },
   playerTeamsContainer: {
     flexDirection: 'row',
@@ -9549,31 +9934,31 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   videoModalContainer: {
-    width: '90%',
-    maxHeight: '80%',
+    alignItems: 'center',
+    maxHeight: '85%',
     borderRadius: 12,
-    overflow: 'hidden',
     position: 'relative',
     zIndex: 1,
   },
   videoModalContent: {
-    width: '100%',
+    alignItems: 'center',
     position: 'relative',
   },
   videoModalLikeButton: {
     position: 'absolute',
-    bottom: 20,
-    right: 20,
+    top: 12,
+    left: 12,
     zIndex: 1000,
   },
-  videoModalCloseButton: {
-    position: 'absolute',
-    top: 30,
-    right: 20,
-    zIndex: 1001,
-    backgroundColor: 'rgba(22, 22, 26, 0.78)',
-    borderRadius: 20,
-    padding: 8,
+  videoFullscreenOverlay: {
+    flex: 1,
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  videoFullscreenPlayer: {
+    flex: 1,
+    width: '100%',
   },
   floatingEditButton: {
     position: 'absolute',
@@ -9828,6 +10213,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#2a2430',
     overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   uploadedVideoThumb: {
     ...StyleSheet.absoluteFillObject,
@@ -9866,6 +10253,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 2,
     fontFamily: 'Gilroy-Regular',
+  },
+  addVideoButtonDisabled: {
+    opacity: 0.55,
+  },
+  addVideoEmptyButton: {
+    marginTop: 14,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#fa2f40',
+  },
+  addVideoEmptyButtonText: {
+    color: '#fa2f40',
+    fontSize: 14,
+    fontFamily: 'Gilroy-Bold',
   },
   videoUploadHint: {
     color: '#8a8a92',

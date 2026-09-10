@@ -3,7 +3,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as Localization from 'expo-localization';
 import { useRouter } from 'expo-router';
 import { COUNTRIES } from '../utils/constants';
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useUser } from '../contexts/UserContext';
 import ShopAddressesEditor from '../components/ShopAddressesEditor';
@@ -12,6 +12,7 @@ import {
     Dimensions,
     Image,
     Keyboard,
+    KeyboardAvoidingView,
     Linking,
     Platform,
     ScrollView,
@@ -23,13 +24,17 @@ import {
     View
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import CustomAlert from '../components/CustomAlert';
 import CachedBackground from '../components/CachedBackground';
-import { addPlayer, saveCurrentUser, Team, createPlayer, getPlayerByPhone, setInvitedBy } from '../utils/playerStorage';
+import { goHome } from '../utils/webHome';
+import { addPlayer, saveCurrentUser, Team, createPlayer, getPlayerByPhone, getPlayerByEmail, setInvitedBy, createTeam, addPlayerTeam, Player } from '../utils/playerStorage';
+import RegisterTeamPicker, { RegisterTeamValue } from '../components/RegisterTeamPicker';
 import { requiresParentalConsent, registerChildWithParentalConsent, calculateAge } from '../utils/parentalConsentService';
 import { uploadImageToStorage } from '../utils/uploadImage';
-import { sendVerificationSMS, verifyCode, verifySMSCode, saveVerificationCode, sendVerificationEmail } from '../utils/emailService';
+import { sendVerificationSMSDetailed, verifyCode, verifySMSCode, saveVerificationCode, sendVerificationEmail, normalizeVerificationContact, SmsSendResult } from '../utils/emailService';
 import { ICE_BACKGROUND } from '../utils/iceBackground';
+import { formatPickerDate } from '../utils/birthDate';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Функция для генерации UUID v4
@@ -56,6 +61,43 @@ const currentYear = new Date().getFullYear();
 const availableCoachYears = Array.from({ length: currentYear - 2006 }, (_, i) => currentYear - i);
 
 // Маппинг ISO кодов регионов на русские названия стран (ключи из COUNTRIES)
+// Код страны для автоподстановки в поле телефона
+const COUNTRY_DIAL_CODE: { [country: string]: string } = {
+  'Беларусь': '+375', 'Россия': '+7', 'Казахстан': '+7', 'Украина': '+380', 'Польша': '+48',
+  'Литва': '+370', 'Латвия': '+371', 'Эстония': '+372', 'Чехия': '+420', 'Словакия': '+421',
+  'Германия': '+49', 'Австрия': '+43', 'Швейцария': '+41', 'Финляндия': '+358', 'Швеция': '+46',
+  'Норвегия': '+47', 'Дания': '+45', 'Франция': '+33', 'Италия': '+39', 'Испания': '+34',
+  'Великобритания': '+44', 'Нидерланды': '+31', 'Бельгия': '+32', 'Венгрия': '+36', 'Словения': '+386',
+  'Хорватия': '+385', 'Турция': '+90', 'Израиль': '+972', 'Узбекистан': '+998', 'Китай': '+86',
+  'Япония': '+81', 'Южная Корея': '+82', 'Австралия': '+61', 'Новая Зеландия': '+64',
+};
+const DIAL_CODES = new Set(Object.values(COUNTRY_DIAL_CODE));
+
+// Часовой пояс устройства → страна (когда в локали нет региона, например просто "ru")
+const TIMEZONE_TO_COUNTRY: { [tz: string]: string } = {
+  'Europe/Minsk': 'Беларусь', 'Europe/Moscow': 'Россия', 'Europe/Kaliningrad': 'Россия', 'Europe/Samara': 'Россия',
+  'Asia/Yekaterinburg': 'Россия', 'Asia/Novosibirsk': 'Россия', 'Asia/Krasnoyarsk': 'Россия', 'Asia/Omsk': 'Россия',
+  'Asia/Irkutsk': 'Россия', 'Asia/Yakutsk': 'Россия', 'Asia/Vladivostok': 'Россия', 'Asia/Magadan': 'Россия',
+  'Europe/Kiev': 'Украина', 'Europe/Kyiv': 'Украина', 'Asia/Almaty': 'Казахстан', 'Asia/Aqtobe': 'Казахстан',
+  'Asia/Tashkent': 'Узбекистан', 'Europe/Warsaw': 'Польша', 'Europe/Vilnius': 'Литва', 'Europe/Riga': 'Латвия',
+  'Europe/Tallinn': 'Эстония', 'Europe/Prague': 'Чехия', 'Europe/Bratislava': 'Словакия', 'Europe/Helsinki': 'Финляндия',
+  'Europe/Stockholm': 'Швеция', 'Europe/Oslo': 'Норвегия', 'Europe/Copenhagen': 'Дания', 'Europe/Berlin': 'Германия',
+  'Europe/Vienna': 'Австрия', 'Europe/Zurich': 'Швейцария', 'Europe/Paris': 'Франция', 'Europe/Rome': 'Италия',
+  'Europe/Madrid': 'Испания', 'Europe/London': 'Великобритания', 'Europe/Amsterdam': 'Нидерланды',
+  'Europe/Brussels': 'Бельгия', 'Europe/Budapest': 'Венгрия', 'Europe/Ljubljana': 'Словения', 'Europe/Zagreb': 'Хорватия',
+  'Europe/Istanbul': 'Турция', 'Asia/Jerusalem': 'Израиль', 'Asia/Dubai': 'Объединенные Арабские Эмираты',
+  'Asia/Tokyo': 'Япония', 'Asia/Seoul': 'Южная Корея', 'Asia/Shanghai': 'Китай', 'Australia/Sydney': 'Австралия',
+  'Pacific/Auckland': 'Новая Зеландия',
+};
+
+// Язык интерфейса устройства → наиболее вероятная страна (последний, самый грубый сигнал)
+const LANGUAGE_TO_COUNTRY: { [lang: string]: string } = {
+  be: 'Беларусь', uk: 'Украина', kk: 'Казахстан', pl: 'Польша', cs: 'Чехия', sk: 'Словакия', lt: 'Литва', lv: 'Латвия',
+  et: 'Эстония', fi: 'Финляндия', sv: 'Швеция', nb: 'Норвегия', no: 'Норвегия', da: 'Дания', de: 'Германия',
+  fr: 'Франция', it: 'Италия', es: 'Испания', nl: 'Нидерланды', hu: 'Венгрия', sl: 'Словения', hr: 'Хорватия',
+  tr: 'Турция', he: 'Израиль', ja: 'Япония', ko: 'Южная Корея', zh: 'Китай', en: 'США',
+};
+
 const REGION_TO_COUNTRY: { [key: string]: string } = {
   'BY': 'Беларусь',
   'RU': 'Россия',
@@ -82,20 +124,40 @@ const REGION_TO_COUNTRY: { [key: string]: string } = {
   'NL': 'Нидерланды',
   'BE': 'Бельгия',
   'ES': 'Испания',
-  'PT': 'Португалия',
-  'GR': 'Греция',
   'TR': 'Турция',
   'IL': 'Израиль',
-  'AE': 'ОАЭ',
+  'AE': 'Объединенные Арабские Эмираты',
+  'SI': 'Словения', 'HR': 'Хорватия', 'HU': 'Венгрия', 'RO': 'Румыния', 'BG': 'Болгария', 'RS': 'Сербия',
+  'IS': 'Исландия', 'LU': 'Люксембург', 'UZ': 'Узбекистан', 'SG': 'Сингапур', 'HK': 'Гонконг', 'TW': 'Тайвань',
+  'IN': 'Индия', 'TH': 'Таиланд', 'MY': 'Малайзия', 'ZA': 'ЮАР',
   'CN': 'Китай',
   'JP': 'Япония',
   'KR': 'Южная Корея',
   'AU': 'Австралия',
   'NZ': 'Новая Зеландия',
-  'BR': 'Бразилия',
   'AR': 'Аргентина',
   'MX': 'Мексика',
 };
+
+function StepIndicator({ current, total, label }: { current: number; total: number; label: string }) {
+  return (
+    <View style={styles.stepIndicator}>
+      <View style={styles.stepDots}>
+        {Array.from({ length: total }).map((_, i) => (
+          <View
+            key={i}
+            style={[
+              styles.stepDot,
+              i < current && styles.stepDotDone,
+              i === current - 1 && styles.stepDotActive,
+            ]}
+          />
+        ))}
+      </View>
+      <Text style={styles.stepLabel}>{label}</Text>
+    </View>
+  );
+}
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -126,19 +188,83 @@ export default function RegisterScreen() {
     // Поле для родительского согласия (для детей < 13 лет)
     parentEmail: ''
   });
-  const [step, setStep] = useState<'form' | 'verification'>('form');
+  type RegisterStep = 'contact' | 'code' | 'profile' | 'details';
+  const [step, setStep] = useState<RegisterStep>('contact');
+  const [contactVerified, setContactVerified] = useState(false);
+  /** Найденный по контакту аккаунт: после кода — вход, а не регистрация */
+  const existingUserRef = useRef<Player | null | undefined>(undefined);
+
+  const normalizeContact = (contact: string): string =>
+    contact.includes('@') ? contact.trim().toLowerCase() : normalizeVerificationContact(contact);
+
+  const lookupExistingUser = async (contact: string): Promise<Player | null> => {
+    const key = normalizeContact(contact);
+    const isEmail = key.includes('@');
+    // Два прохода: сеть после выхода иногда подвисает, а null из фонового поиска
+    // нельзя путать с «аккаунта нет» — иначе существующий пользователь уходит в регистрацию.
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        return isEmail ? await getPlayerByEmail(key) : await getPlayerByPhone(key);
+      } catch (err) {
+        console.warn(`⚠️ lookupExistingUser attempt ${attempt + 1} failed:`, err);
+        if (attempt === 0) await new Promise((r) => setTimeout(r, 600));
+      }
+    }
+    return null;
+  };
+
+  const signInExisting = async (user: Player) => {
+    if (user.status === 'pending_verification') {
+      showAlert(
+        t('register.parentalConsentSent'),
+        t('register.parentalConsentSentMessage', { email: user.parentEmail || '' }),
+        'warning'
+      );
+      return;
+    }
+    await saveCurrentUser(user);
+    refreshUser(true);
+    showAlert(t('auth.welcomeBack'), t('auth.welcomeBackMessage', { name: user.name }), 'success', () => {
+      setAlert(prev => ({ ...prev, visible: false }));
+      setTimeout(() => goHome(router, { refresh: String(Date.now()) }), 100);
+    });
+  };
+
+  /** После подтверждения контакта: существующий аккаунт — вход, новый — заполнение профиля */
+  const proceedAfterContactVerified = async (contact: string) => {
+    setContactVerified(true);
+    const key = normalizeContact(contact);
+    // Всегда ищем заново после кода: фоновый prefetch мог вернуть null по таймауту/сети,
+    // и ref=null тогда ошибочно считался «новый пользователь».
+    const user = await lookupExistingUser(key);
+    existingUserRef.current = user;
+    if (user) {
+      await signInExisting(user);
+    } else {
+      setStep('profile');
+    }
+  };
+  const totalSteps = formData.status === 'player' ? 2 : 1;
+  const stepIndex = step === 'details' ? 2 : 1;
+  const stepLabel = t(`register.step.${step}`);
+  const isRegistrationStep = step === 'profile' || step === 'details';
   const [verificationCode, setVerificationCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
   const [canResend, setCanResend] = useState(false);
   const [selectedTeams, setSelectedTeams] = useState<Team[]>([]);
+  const [currentTeam, setCurrentTeam] = useState<RegisterTeamValue>({ team: null, name: '' });
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date(2008, 0, 1)); // 1 января 2008
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [countrySearchText, setCountrySearchText] = useState('');
   const [skateServices, setSkateServices] = useState<string[]>([]);
   const [coachYears, setCoachYears] = useState<number[]>([]);
-  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  // Согласие с правилами — по нажатию «Продолжить» (текст под кнопкой), без отдельного чекбокса
+  const agreedToTerms = true;
+  /** Первый шаг: телефон по умолчанию, email — по ссылке (или автоматически для США/Канады) */
+  const [contactMode, setContactMode] = useState<'phone' | 'email'>('phone');
+  const usesEmailContact = contactMode === 'email';
   const [showEmailInput, setShowEmailInput] = useState(false); // Показывать ли поле для ввода email
   const [emailInput, setEmailInput] = useState(''); // Поле для ввода email
   
@@ -146,71 +272,76 @@ export default function RegisterScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
   const codeInputRef = useRef<TextInput>(null);
   const emailInputRef = useRef<TextInput>(null);
-  
-  // Глобальный слушатель клавиатуры для прокрутки к полю ввода кода
+
   useEffect(() => {
-    if (step !== 'verification') return;
-    
-    const keyboardWillShowListener = Keyboard.addListener(
+    scrollViewRef.current?.scrollTo({ y: 0, animated: false });
+  }, [step]);
+  
+  // Любое поле в фокусе должно оказаться над клавиатурой: на каждом показе клавиатуры
+  // находим текущий фокусный TextInput и докручиваем ScrollView так, чтобы он был виден.
+  const keyboardHeightRef = useRef(0);
+  const scrollOffsetRef = useRef(0);
+  const scrollFocusedInputIntoView = useCallback(() => {
+    const focused = TextInput.State.currentlyFocusedInput?.();
+    const scroll = scrollViewRef.current;
+    if (!focused || !scroll) return;
+    const keyboardHeight = keyboardHeightRef.current;
+    if (!keyboardHeight) return;
+    (focused as any).measureInWindow?.((_x: number, y: number, _w: number, h: number) => {
+      const windowHeight = Dimensions.get('window').height;
+      const visibleBottom = windowHeight - keyboardHeight - 16;
+      const inputBottom = y + h;
+      if (inputBottom > visibleBottom) {
+        scroll.scrollTo({ y: scrollOffsetRef.current + (inputBottom - visibleBottom) + 24, animated: true });
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    const show = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
       (e) => {
-        const keyboardHeight = e.endCoordinates?.height || 0;
-        setTimeout(() => {
-          if (codeInputRef.current && scrollViewRef.current) {
-            // Используем measureLayout для получения позиции относительно ScrollView
-            codeInputRef.current.measureLayout(
-              scrollViewRef.current as any,
-              (x, y, width, height) => {
-                const screenHeight = Dimensions.get('window').height;
-                const visibleArea = screenHeight - keyboardHeight;
-                const inputBottom = y + height;
-                const targetY = inputBottom - visibleArea + 130;
-                
-                if (targetY > 0) {
-                  scrollViewRef.current?.scrollTo({ 
-                    y: targetY, 
-                    animated: true 
-                  });
-                }
-              },
-              () => {
-                // Fallback: используем measure если measureLayout не работает
-                codeInputRef.current?.measure((x, y, width, height, pageX, pageY) => {
-                  const screenHeight = Dimensions.get('window').height;
-                  const visibleArea = screenHeight - keyboardHeight;
-                  const inputBottom = pageY + height;
-                  const scrollOffset = inputBottom - visibleArea + 130;
-                  
-                  if (scrollOffset > 0) {
-                    scrollViewRef.current?.scrollTo({ 
-                      y: scrollOffset, 
-                      animated: true 
-                    });
-                  }
-                });
-              }
-            );
-          }
-        }, Platform.OS === 'ios' ? 100 : 300);
+        keyboardHeightRef.current = e.endCoordinates?.height || 0;
+        setTimeout(scrollFocusedInputIntoView, Platform.OS === 'ios' ? 80 : 200);
       }
     );
-
+    const hide = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        keyboardHeightRef.current = 0;
+      }
+    );
     return () => {
-      keyboardWillShowListener.remove();
+      show.remove();
+      hide.remove();
     };
-  }, [step, showEmailInput]);
+  }, [scrollFocusedInputIntoView]);
   
   // Автоопределение страны по региону устройства при первой загрузке
   useEffect(() => {
     if (!formData.country) {
       try {
-        // Получаем регион устройства (например, 'BY', 'RU', 'US')
-        const deviceRegion = Localization.getLocales()[0]?.regionCode || '';
-        const detectedCountry = REGION_TO_COUNTRY[deviceRegion];
+        // Только настройки устройства, без геолокации.
+        // Часовой пояс — самый надёжный сигнал: локаль iOS отдаёт с учётом языка приложения
+        // (например en-US при русском регионе), а пояс всегда системный.
+        const locale = Localization.getLocales()[0];
+        const deviceRegion = (locale?.regionCode || '').toUpperCase();
+        const timeZone =
+          Localization.getCalendars()[0]?.timeZone ||
+          Intl.DateTimeFormat().resolvedOptions().timeZone ||
+          '';
+        const languageCode = (locale?.languageCode || '').toLowerCase();
+        const detectedCountry =
+          TIMEZONE_TO_COUNTRY[timeZone] ||
+          REGION_TO_COUNTRY[deviceRegion] ||
+          LANGUAGE_TO_COUNTRY[languageCode];
         
         if (detectedCountry && COUNTRIES.includes(detectedCountry)) {
-          console.log(`🌍 Автоопределена страна: ${detectedCountry} (регион: ${deviceRegion})`);
+          console.log(`🌍 Автоопределена страна: ${detectedCountry} (регион: ${deviceRegion || '—'}, tz: ${timeZone || '—'}, язык: ${languageCode || '—'})`);
           setFormData(prev => ({ ...prev, country: detectedCountry }));
+          if (detectedCountry === 'США' || detectedCountry === 'Канада') {
+            setContactMode('email');
+          }
         }
       } catch (error) {
         console.log('⚠️ Не удалось определить регион устройства:', error);
@@ -218,6 +349,17 @@ export default function RegisterScreen() {
     }
   }, []);
   
+  // Подставляем код страны в телефон, пока пользователь не начал вводить свой номер
+  useEffect(() => {
+    const code = COUNTRY_DIAL_CODE[formData.country];
+    if (!code) return;
+    setFormData(prev => {
+      const cur = prev.phone.trim();
+      if (cur === '' || DIAL_CODES.has(cur)) return { ...prev, phone: code };
+      return prev;
+    });
+  }, [formData.country]);
+
   // Фильтрация стран - ищем и по русскому названию, и по переведённому
   const filteredCountries = useMemo(() => {
     if (!countrySearchText.trim()) {
@@ -288,8 +430,8 @@ export default function RegisterScreen() {
   }, [resendTimer]);
 
   useEffect(() => {
-    if (verificationCode.length === 6) {
-      handleVerifyAndRegister();
+    if (verificationCode.length === 6 && step === 'code' && !loading) {
+      void handleVerifyCode();
     }
   }, [verificationCode]);
 
@@ -333,7 +475,7 @@ export default function RegisterScreen() {
     if (alert.type === 'success' && alert.title === t('register.welcome')) {
       setAlert(prev => ({ ...prev, visible: false }));
       setTimeout(() => {
-        router.push(Platform.OS === 'web' ? '/feed' : '/');
+        goHome(router);
       }, 100);
     } else {
       // Во всех остальных случаях просто закрываем алерт
@@ -439,14 +581,9 @@ export default function RegisterScreen() {
     if (Platform.OS === 'ios') {
       // На iOS календарь не закрывается автоматически
       if (date) {
-        // На iOS DateTimePicker может возвращать дату с проблемами часового пояса
-        // Создаем нормализованную дату сразу, используя UTC методы для чтения
-        // Это гарантирует правильные значения независимо от часового пояса
-        const year = date.getUTCFullYear();
-        const month = date.getUTCMonth();
-        const day = date.getUTCDate();
-        const normalizedDate = new Date(year, month, day, 12, 0, 0, 0);
-        setSelectedDate(normalizedDate);
+        // Пикер отдаёт локальную дату; читать её нужно локальными методами,
+        // иначе в поясах восточнее UTC 01.01.2019 превращается в 31.12.2018
+        setSelectedDate(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0, 0));
       }
     } else {
       // На Android календарь закрывается только при полном выборе
@@ -471,9 +608,31 @@ export default function RegisterScreen() {
   };
 
   // Отправка кода подтверждения
+  /** Понятное сообщение по коду ошибки сервера SMS */
+  const reportSmsFailure = (res: SmsSendResult) => {
+    if (res.error === 'rate') {
+      // Код уже отправлен меньше минуты назад — остаёмся на экране кода
+      showAlert(t('auth.codeSent'), t('auth.smsRateLimited'), 'info');
+      return;
+    }
+    if (res.error === 'network') {
+      showAlert(t('common.error'), t('auth.smsServerUnreachable'), 'warning');
+      return;
+    }
+    if (res.error === 'phone_format') {
+      showAlert(t('common.error'), t('register.phoneFormatError'), 'error');
+      return;
+    }
+    if (res.error === 'email_only') {
+      showAlert(t('common.error'), t('auth.smsEmailOnly'), 'error');
+      return;
+    }
+    showAlert(t('common.error'), t('auth.smsProviderFailed'), 'error');
+  };
+
   const handleSendCode = async () => {
     // Определяем, США/Канада или нет (используем в нескольких местах)
-    const isUSOrCanada = formData.country === 'США' || formData.country === 'Канада';
+    const isUSOrCanada = usesEmailContact;
     
     // Проверяем, что пользователь согласился с условиями
     if (!agreedToTerms) {
@@ -485,22 +644,10 @@ export default function RegisterScreen() {
     // Для США/Канады проверяем email, для остальных - телефон
     const hasContact = isUSOrCanada 
       ? (formData.email && formData.email.trim().length > 0)
-      : (formData.phone && formData.phone.trim().length > 0);
-    const hasName = formData.name && formData.name.trim().length > 0;
-    const hasStatus = !!formData.status;
-    const hasCountry = !!formData.country;
-    
-    if (!hasContact || !hasName || !hasStatus || !hasCountry) {
+      : (formData.phone && formData.phone.replace(/\D/g, '').length >= 8 && !DIAL_CODES.has(formData.phone.trim()));
+    if (!hasContact) {
       showAlert(t('common.error'), t('register.fillRequiredFields'), 'error');
       return;
-    }
-
-    // Валидация имени для игроков, звезд, тренеров и скаутов
-    if (formData.status !== 'shop' && formData.status !== 'skateSharpening') {
-      if (!validateName(formData.name)) {
-        showAlert(t('common.error'), t('register.nameError'), 'error');
-        return;
-      }
     }
 
     // Для США/Канады проверяем email, для остальных - телефон
@@ -522,27 +669,102 @@ export default function RegisterScreen() {
       }
     }
 
+    setLoading(true);
+
+    try {
+      // isUSOrCanada уже объявлена выше в начале функции
+      const contactValue = isUSOrCanada ? formData.email : formData.phone;
+      
+      // Проверяем, заканчивается ли номер на ###### (только для не-США/Канады)
+      const isBypassNumber = !isUSOrCanada && formData.phone.endsWith('######');
+      
+      if (isBypassNumber) {
+        console.log('🔓 Обнаружен bypass номер, пропускаем SMS подтверждение');
+        const bypassUser = await getPlayerByPhone(formData.phone.replace('######', ''), true);
+        existingUserRef.current = bypassUser ?? null;
+        if (bypassUser) {
+          await signInExisting(bypassUser);
+        } else {
+          setContactVerified(true);
+          setStep('profile');
+        }
+        return;
+      }
+
+      // Заранее узнаём, есть ли аккаунт (только если нашли — кладём в ref; null не кешируем)
+      existingUserRef.current = undefined;
+      void lookupExistingUser(contactValue).then((u) => {
+        if (u) existingUserRef.current = u;
+      });
+
+      // Для США/Канады отправляем email, для остальных - SMS через сервер
+      if (isUSOrCanada) {
+        // Email: генерируем код, сохраняем в БД, отправляем
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+        await saveVerificationCode(contactValue, verificationCode);
+        console.log('📧 США/Канада - отправляем код на email');
+        await sendVerificationEmail(formData.email, verificationCode);
+      } else {
+        // SMS: сразу показываем экран кода — ответ сервера может прийти позже SMS
+        console.log('📱 Отправляем код через сервер HockeyStars (фон)');
+        setStep('code');
+        setResendTimer(60);
+        setCanResend(false);
+        Keyboard.dismiss();
+
+        void sendVerificationSMSDetailed(formData.phone).then((res) => {
+          if (!res.ok) reportSmsFailure(res);
+        });
+        return;
+      }
+
+      setStep('code');
+      setResendTimer(60);
+      setCanResend(false);
+      Keyboard.dismiss();
+      
+    } catch (error) {
+      console.error('❌ Ошибка отправки кода:', error);
+      showAlert(t('common.error'), t('auth.errorSendingCodeGeneral'), 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Проверка обязательных полей профиля (шаг «Профиль»)
+  const validateProfile = (): boolean => {
+    const hasName = formData.name && formData.name.trim().length > 0;
+    if (!hasName || !formData.country) {
+      showAlert(t('common.error'), t('register.fillRequiredFields'), 'error');
+      return false;
+    }
+    if (formData.status !== 'shop' && formData.status !== 'skateSharpening') {
+      if (!validateName(formData.name)) {
+        showAlert(t('common.error'), t('register.nameError'), 'error');
+        return false;
+      }
+    }
     // Дополнительные проверки в зависимости от статуса
     if (formData.status === 'player' && (!formData.birthDate || !formData.position)) {
       showAlert(t('common.error'), t('register.fillAllFields'), 'error');
-      return;
+      return false;
     }
 
     if (formData.status === 'star' && (!formData.birthDate || !formData.position)) {
       showAlert(t('common.error'), t('register.fillAllFields'), 'error');
-      return;
+      return false;
     }
 
     // Проверка для тренера - обязательно выбрать хотя бы один год
     if (formData.status === 'coach' && coachYears.length === 0) {
       showAlert(t('common.error'), t('register.coachYearsRequired'), 'error');
-      return;
+      return false;
     }
 
     // Проверка аватара - обязателен для всех кроме скаута
     if (formData.status !== 'scout' && !formData.avatar) {
       showAlert(t('common.error'), t('register.photoRequired'), 'error');
-      return;
+      return false;
     }
 
     // Проверка возраста и родительского согласия для детей < 13 лет
@@ -556,80 +778,72 @@ export default function RegisterScreen() {
             t('register.parentalConsentMessage'),
             'warning'
           );
-          return;
+          return false;
         }
         // Проверяем формат email родителя
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(formData.parentEmail.trim())) {
           showAlert(t('common.error'), t('register.parentEmailFormatError'), 'error');
-          return;
+          return false;
         }
       }
     }
 
-    setLoading(true);
+    return true;
+  };
 
+  const handleProfileNext = () => {
+    if (!validateProfile()) return;
+    if (formData.status === 'player') {
+      setStep('details');
+    } else {
+      void handleRegister();
+    }
+  };
+
+  // Шаг «Код»: только проверяем код, регистрация — после заполнения профиля
+  const handleVerifyCode = async () => {
+    if (!verificationCode || verificationCode.length !== 6) {
+      showAlert(t('common.error'), t('auth.errorInvalidCode'), 'error');
+      return;
+    }
+    const isUSOrCanada = usesEmailContact;
+    const contactValue = (isUSOrCanada ? formData.email : formData.phone).replace(/\s/g, '');
+    if (verificationCode === '291019') {
+      setLoading(true);
+      try {
+        await proceedAfterContactVerified(contactValue);
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+    setLoading(true);
     try {
-      // isUSOrCanada уже объявлена выше в начале функции
-      const contactValue = isUSOrCanada ? formData.email : formData.phone;
-      
-      // Проверяем, заканчивается ли номер на ###### (только для не-США/Канады)
-      const isBypassNumber = !isUSOrCanada && formData.phone.endsWith('######');
-      
-      if (isBypassNumber) {
-        // Для номеров с суффиксом ###### пропускаем SMS и сразу переходим к регистрации
-        console.log('🔓 Обнаружен bypass номер, пропускаем SMS подтверждение');
-        showAlert(
-          'Режим разработчика', 
-          'Номер заканчивается на ######, SMS подтверждение пропущено', 
-          'success',
-          () => {
-            // Имитируем успешную верификацию и переходим к регистрации
-            setVerificationCode('123456');
-            setTimeout(() => handleVerifyAndRegister(), 100);
-          }
-        );
+      const result = contactValue.includes('@')
+        ? await verifyCode(contactValue, verificationCode)
+        : await verifySMSCode(contactValue, verificationCode);
+      if (!result.success) {
+        const msg = result.translationKey ? t(result.translationKey) : (result.message || t('auth.errorVerifyingCodeMessage'));
+        showAlert(t('common.error'), msg, 'error');
         return;
       }
-
-      // Для США/Канады отправляем email, для остальных - SMS через Twilio Verify
-      if (isUSOrCanada) {
-        // Email: генерируем код, сохраняем в БД, отправляем
-      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-      await saveVerificationCode(contactValue, verificationCode);
-        console.log('📧 США/Канада - отправляем код на email');
-        await sendVerificationEmail(formData.email, verificationCode);
-      } else {
-        // SMS: Twilio Verify сам генерирует и управляет кодами!
-        console.log('📱 Отправляем код через Twilio Verify API');
-        await sendVerificationSMS(formData.phone);
-      }
-      
-      setStep('verification');
-      
-      // Запускаем таймер для повторной отправки (60 секунд)
-      setResendTimer(60);
-      setCanResend(false);
-      
-      // Скрываем клавиатуру и показываем уведомление с задержкой
-      Keyboard.dismiss();
-      
-    } catch (error) {
-      console.error('❌ Ошибка отправки кода:', error);
-      showAlert(t('common.error'), t('auth.errorSendingCodeGeneral'), 'error');
+      await proceedAfterContactVerified(contactValue);
+    } catch (e) {
+      console.error('❌ Ошибка проверки кода:', e);
+      showAlert(t('common.error'), t('auth.errorVerifyingCodeMessage'), 'error');
     } finally {
       setLoading(false);
     }
   };
 
-  // Подтверждение кода и регистрация
   // Повторная отправка кода
   const handleResendCode = async () => {
     if (!canResend) return;
     
     setLoading(true);
     try {
-      const isUSOrCanada = formData.country === 'США' || formData.country === 'Канада';
+      const isUSOrCanada = usesEmailContact;
       
       // Для США/Канады отправляем email, для остальных - SMS через Twilio Verify
       if (isUSOrCanada) {
@@ -638,8 +852,11 @@ export default function RegisterScreen() {
         await saveVerificationCode(formData.email, verificationCode);
         await sendVerificationEmail(formData.email, verificationCode);
       } else {
-        // SMS: Twilio Verify сам генерирует и управляет кодами!
-        await sendVerificationSMS(formData.phone);
+        const res = await sendVerificationSMSDetailed(formData.phone);
+        if (!res.ok) {
+          reportSmsFailure(res);
+          return;
+        }
       }
       
       // Запускаем таймер снова
@@ -657,7 +874,7 @@ export default function RegisterScreen() {
 
   // Переключение на email, если SMS не пришло
   const handleSwitchToEmail = async () => {
-    const isUSOrCanada = formData.country === 'США' || formData.country === 'Канада';
+    const isUSOrCanada = usesEmailContact;
     
     // Для США/Канады уже используется email, не нужно переключаться
     if (isUSOrCanada) {
@@ -728,16 +945,17 @@ export default function RegisterScreen() {
     }
   };
 
-  const handleVerifyAndRegister = async () => {
-    if (!verificationCode || verificationCode.length !== 6) {
+  const handleRegister = async () => {
+    if (!contactVerified && (!verificationCode || verificationCode.length !== 6)) {
       showAlert(t('common.error'), t('auth.errorInvalidCode'), 'error');
       return;
     }
+    if (!validateProfile()) return;
 
     setLoading(true);
 
     try {
-      const isUSOrCanada = formData.country === 'США' || formData.country === 'Канада';
+      const isUSOrCanada = usesEmailContact;
       const contactValue = isUSOrCanada ? formData.email : formData.phone;
       const isBypassNumber = !isUSOrCanada && formData.phone.endsWith('######');
       const isAdminSecretCode = verificationCode === '291019';
@@ -745,7 +963,7 @@ export default function RegisterScreen() {
       // Определяем, это email или телефон (для выбора метода проверки)
       const isEmailContact = contactValue.includes('@');
       
-      if (!isBypassNumber && !isAdminSecretCode) {
+      if (!contactVerified && !isBypassNumber && !isAdminSecretCode) {
         // Для обычных проверяем код
         // Email через БД, SMS через Twilio Verify
         const verificationResult = isEmailContact 
@@ -817,6 +1035,9 @@ export default function RegisterScreen() {
           switch (consentResult.error) {
             case 'PHONE_ALREADY_EXISTS':
               errorMessage = t('auth.phoneAlreadyRegistered');
+              break;
+            case 'PARENT_EMAIL_SEND_FAILED':
+              errorMessage = t('register.parentEmailSendFailed');
               break;
             case 'PARENTAL_CONSENT_ERROR':
             case 'CONSENT_REQUEST_FAILED':
@@ -907,7 +1128,7 @@ export default function RegisterScreen() {
         status: formData.status || 'player', // Убеждаемся, что статус есть
         birthDate: formData.birthDate || '',
         country: formData.country,
-        team: formData.team || '',
+        team: currentTeam.name.trim() || formData.team || '',
         position: formData.position || '',
         grip: formData.grip || '',
         height: formData.height || '',
@@ -964,6 +1185,23 @@ export default function RegisterScreen() {
           avatar: newPlayer.avatar ? (newPlayer.avatar.substring(0, 50) + '...') : 'нет'
         });
       
+        // Текущая команда: находим/создаём и привязываем как основную
+        const teamName = currentTeam.name.trim();
+        if (teamName && (formData.status === 'player' || formData.status === 'star' || formData.status === 'coach')) {
+          try {
+            const team = currentTeam.team || await createTeam({
+              name: teamName,
+              type: 'club',
+              country: formData.country || undefined,
+            });
+            if (team) {
+              await addPlayerTeam(newPlayer.id, team.id, true, new Date().getFullYear());
+            }
+          } catch (teamError) {
+            console.warn('⚠️ Не удалось привязать команду при регистрации:', teamError);
+          }
+        }
+
         // 🎟️ Referral: если регистрация была после открытия профиля по ссылке/QR,
         // сохраняем invited_by (и очищаем ключ, чтобы не применилось повторно).
         try {
@@ -1007,7 +1245,7 @@ export default function RegisterScreen() {
           setAlert(prev => ({ ...prev, visible: false }));
           setTimeout(() => {
             // Переходим на главную с параметром refresh для обновления списка игроков
-            router.replace({ pathname: '/', params: { refresh: String(Date.now()) } });
+            goHome(router, { refresh: String(Date.now()) });
           }, 100);
         }
       );
@@ -1053,21 +1291,310 @@ export default function RegisterScreen() {
 
   return (
     <CachedBackground source={ICE_BACKGROUND} style={styles.container} resizeMode="cover" vignette={false}>
+      <BlurView intensity={28} tint="dark" style={StyleSheet.absoluteFill} />
+      <View style={styles.backdropTint} pointerEvents="none" />
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoider}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
       <ScrollView 
         ref={scrollViewRef}
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        onScroll={(e) => {
+          scrollOffsetRef.current = e.nativeEvent.contentOffset.y;
+        }}
+        scrollEventThrottle={32}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.formContainer}>
 
           
-          <Text style={styles.title}>{t('register.title')}</Text>
+          <Text style={styles.title}>{isRegistrationStep ? t('register.title') : t('register.entryTitle')}</Text>
+          {isRegistrationStep ? (
+            <StepIndicator current={stepIndex} total={totalSteps} label={stepLabel} />
+          ) : (
+            <Text style={styles.entrySubtitle}>
+              {step === 'contact' ? t('register.entrySubtitle') : t('register.codeSubtitle')}
+            </Text>
+          )}
+
+          {step === 'contact' && (
+          <>
+          {/* Телефон или Email — без выбора страны; код страны подставлен из настроек устройства */}
+          {usesEmailContact && (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>
+                Email
+                <Text style={{color: '#fa2f40'}}> *</Text>
+              </Text>
+              <TextInput
+                style={styles.input}
+                value={formData.email}
+                onChangeText={(text) => setFormData({...formData, email: text.trim()})}
+                placeholder="your.email@example.com"
+                placeholderTextColor="#888"
+                autoCapitalize="none"
+                autoComplete="email"
+                textContentType="emailAddress"
+                keyboardType="email-address"
+                autoCorrect={false}
+                selectTextOnFocus={true}
+                autoFocus={false}
+              />
+            </View>
+          )}
           
+          {!usesEmailContact && (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>
+                {t('register.phone')}
+                <Text style={{color: '#fa2f40'}}> *</Text>
+              </Text>
+              <TextInput
+                style={styles.input}
+                value={formData.phone}
+                onChangeText={(text) => {
+                  // Убираем все символы кроме + и цифр (пробелы, скобки, дефисы и т.д.)
+                  const digitsOnly = text.replace(/[^\d]/g, '');
+                  // Проверяем, был ли + в исходном тексте
+                  const hasPlus = text.includes('+');
+                  // Форматируем: если был +, ставим его в начало, затем только цифры
+                  const formatted = hasPlus ? '+' + digitsOnly : digitsOnly;
+                  setFormData({...formData, phone: formatted});
+                }}
+                placeholder={t('auth.phonePlaceholder')}
+                placeholderTextColor="#888"
+                autoCapitalize="none"
+                autoComplete="tel"
+                textContentType="telephoneNumber"
+                keyboardType="phone-pad"
+                autoCorrect={false}
+                selectTextOnFocus={true}
+                autoFocus={false}
+              />
+            </View>
+          )}
+
+          <TouchableOpacity
+            style={styles.contactModeLink}
+            onPress={() => setContactMode(usesEmailContact ? 'phone' : 'email')}
+            disabled={loading}
+          >
+            <Text style={styles.contactModeLinkText}>
+              {usesEmailContact ? t('register.usePhoneInstead') : t('register.useEmailInstead')}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.registerButton, loading && styles.registerButtonDisabled]}
+            onPress={handleSendCode}
+            disabled={loading}
+          >
+            <Ionicons name={loading ? "hourglass" : "arrow-forward"} size={20} color="#fff" />
+            <Text style={styles.registerButtonText}>{loading ? t('common.loading') : t('common.continue')}</Text>
+          </TouchableOpacity>
+          <Text style={styles.consentText}>
+            {t('register.consentByContinuing')}{' '}
+            <Text
+              style={styles.consentLink}
+              onPress={() => {
+                const langParam = language === 'ru' ? '?lang=ru' : '?lang=en';
+                Linking.openURL(`https://hockey-stars.com/rules.html${langParam}`);
+              }}
+            >
+              {t('register.termsLink')}
+            </Text>
+          </Text>
+          </>
+          )}
+
+          {step === 'code' && (
+          <>
+              {/* Кнопка "Не пришло сообщение?" - показываем только если не США/Канада и не показываем поле email */}
+              {!usesEmailContact && !showEmailInput && (
+                <TouchableOpacity 
+                  style={styles.didntReceiveButton}
+                  onPress={handleSwitchToEmail}
+                  disabled={loading}
+                >
+                  <Text style={styles.didntReceiveButtonText}>
+                    {t('auth.didntReceiveCode')}
+                  </Text>
+                </TouchableOpacity>
+              )}
+              
+              {/* Поле для ввода email, если переключились на email - показываем ПЕРЕД полем кода */}
+              {showEmailInput && (
+                <View style={styles.inputContainer}>
+                  <Text style={styles.label}>{t('auth.enterEmail')}</Text>
+                  <TextInput
+                    ref={emailInputRef}
+                    style={styles.input}
+                    value={emailInput}
+                    onChangeText={setEmailInput}
+                    placeholder={t('auth.emailPlaceholder')}
+                    placeholderTextColor="#888"
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    textContentType="emailAddress"
+                    keyboardType="email-address"
+                    autoCorrect={false}
+                    returnKeyType="done"
+                    blurOnSubmit={false}
+                    enablesReturnKeyAutomatically={true}
+                    onSubmitEditing={handleSendCodeToEmail}
+                    editable={!loading}
+                    selectTextOnFocus={false}
+                    autoFocus={true}
+                    onFocus={() => {
+                      // Прокрутка к полю email при фокусе
+                      setTimeout(() => {
+                        if (emailInputRef.current && scrollViewRef.current) {
+                          emailInputRef.current.measureLayout(
+                            scrollViewRef.current as any,
+                            (x, y, width, height) => {
+                              const screenHeight = Dimensions.get('window').height;
+                              const keyboardHeight = 300; // Примерная высота клавиатуры
+                              const visibleArea = screenHeight - keyboardHeight;
+                              const inputBottom = y + height;
+                              const targetY = inputBottom - visibleArea + 130;
+                              
+                              if (targetY > 0) {
+                                scrollViewRef.current?.scrollTo({ 
+                                  y: targetY, 
+                                  animated: true 
+                                });
+                              }
+                            },
+                            () => {
+                              // Fallback: используем measure если measureLayout не работает
+                              emailInputRef.current?.measure((x, y, width, height, pageX, pageY) => {
+                                const screenHeight = Dimensions.get('window').height;
+                                const keyboardHeight = 300;
+                                const visibleArea = screenHeight - keyboardHeight;
+                                const inputBottom = pageY + height;
+                                const scrollOffset = inputBottom - visibleArea + 130;
+                                
+                                if (scrollOffset > 0) {
+                                  scrollViewRef.current?.scrollTo({ 
+                                    y: scrollOffset, 
+                                    animated: true 
+                                  });
+                                }
+                              });
+                            }
+                          );
+                        }
+                      }, 300);
+                    }}
+                  />
+                  <TouchableOpacity 
+                    style={[styles.registerButton, styles.sendEmailButton, loading && styles.registerButtonDisabled]} 
+                    onPress={handleSendCodeToEmail}
+                    disabled={loading || !emailInput.trim()}
+                  >
+                    <Ionicons 
+                      name={loading ? "hourglass" : "mail"} 
+                      size={20} 
+                      color="#fff" 
+                    />
+                    <Text style={styles.registerButtonText}>
+                      {loading ? t('common.loading') : t('auth.sendToEmail')}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              
+              {/* Поле для ввода кода */}
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>{t('auth.code')}</Text>
+                <TextInput
+                  ref={codeInputRef}
+                  style={[styles.input, styles.codeInput]}
+                  value={verificationCode}
+                  onChangeText={(text) => {
+                    // Удаляем все нецифровые символы (включая буквы и спецсимволы) и ограничиваем до 6 цифр
+                    const cleaned = text.replace(/[^0-9]/g, '').slice(0, 6);
+                    setVerificationCode(cleaned);
+                  }}
+                  placeholder={t('auth.codePlaceholder')}
+                  placeholderTextColor="#888"
+                  keyboardType="number-pad"
+                  maxLength={6}
+                  autoComplete="one-time-code"
+                  textContentType="oneTimeCode"
+                  selectTextOnFocus={true}
+                  autoFocus={false}
+                  onFocus={() => {
+                    // Дополнительная прокрутка при фокусе
+                    setTimeout(() => {
+                      if (codeInputRef.current && scrollViewRef.current) {
+                        codeInputRef.current.measureLayout(
+                          scrollViewRef.current as any,
+                          (x, y, width, height) => {
+                            const screenHeight = Dimensions.get('window').height;
+                            const keyboardHeight = 300; // Примерная высота клавиатуры
+                            const visibleArea = screenHeight - keyboardHeight;
+                            const inputBottom = y + height;
+                            const targetY = inputBottom - visibleArea + 130;
+                            
+                            if (targetY > 0) {
+                              scrollViewRef.current?.scrollTo({ 
+                                y: targetY, 
+                                animated: true 
+                              });
+                            }
+                          },
+                          () => {}
+                        );
+                      }
+                    }, 300);
+                  }}
+                />
+                <Text style={styles.emailHint}>
+                  {t('auth.codeSent')}: {
+                    usesEmailContact ? formData.email : formData.phone
+                  }
+                </Text>
+                
+                {/* Кнопка повторной отправки */}
+                <TouchableOpacity 
+                  style={[styles.resendButton, (!canResend || loading || showEmailInput) && styles.resendButtonDisabled]} 
+                  onPress={handleResendCode}
+                  disabled={!canResend || loading || showEmailInput}
+                >
+                  <Text style={[styles.resendButtonText, (!canResend || loading || showEmailInput) && styles.resendButtonTextDisabled]}>
+                    {resendTimer > 0 ? `${t('auth.resendCode')} ${resendTimer}с` : t('auth.sendCode')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+          <TouchableOpacity
+            style={[styles.registerButton, loading && styles.registerButtonDisabled]}
+            onPress={handleVerifyCode}
+            disabled={loading}
+          >
+            <Ionicons name={loading ? "hourglass" : "checkmark-circle"} size={20} color="#fff" />
+            <Text style={styles.registerButtonText}>{loading ? t('common.loading') : t('common.continue')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.registerButton, styles.backButton]}
+            onPress={() => { setStep('contact'); setVerificationCode(''); }}
+            disabled={loading}
+          >
+            <Ionicons name="arrow-back" size={20} color="#fa2f40" />
+            <Text style={[styles.registerButtonText, styles.backButtonText]}>{t('common.back')}</Text>
+          </TouchableOpacity>
+          </>
+          )}
+
+          {step === 'profile' && (
+          <>
           {/* Статус */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>
-              {t('register.status')}
+              {t('register.whoAreYou')}
               <Text style={{color: '#fa2f40'}}> *</Text>
             </Text>
             <View style={styles.pickerContainer}>
@@ -1158,7 +1685,7 @@ export default function RegisterScreen() {
             </View>
           </View>
           
-          {/* Страна - ПЕРЕД телефоном/email */}
+          {/* Страна — спрашиваем только при регистрации нового аккаунта */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>
               {t('register.country')}
@@ -1174,65 +1701,7 @@ export default function RegisterScreen() {
               <Ionicons name="chevron-down" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
-          
-          {/* Телефон или Email (для США/Канады) - показываем только после выбора страны */}
-          {formData.country && (formData.country === 'США' || formData.country === 'Канада') && (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>
-                Email
-                <Text style={{color: '#fa2f40'}}> *</Text>
-              </Text>
-              <TextInput
-                style={styles.input}
-                value={formData.email}
-                onChangeText={(text) => setFormData({...formData, email: text.trim()})}
-                placeholder="your.email@example.com"
-                placeholderTextColor="#888"
-                autoCapitalize="none"
-                autoComplete="email"
-                textContentType="emailAddress"
-                keyboardType="email-address"
-                autoCorrect={false}
-                selectTextOnFocus={true}
-                autoFocus={false}
-              />
-            </View>
-          )}
-          
-          {formData.country && formData.country !== 'США' && formData.country !== 'Канада' && (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>
-                {t('register.phone')}
-                <Text style={{color: '#fa2f40'}}> *</Text>
-              </Text>
-              <TextInput
-                style={styles.input}
-                value={formData.phone}
-                onChangeText={(text) => {
-                  // Убираем все символы кроме + и цифр (пробелы, скобки, дефисы и т.д.)
-                  const digitsOnly = text.replace(/[^\d]/g, '');
-                  // Проверяем, был ли + в исходном тексте
-                  const hasPlus = text.includes('+');
-                  // Форматируем: если был +, ставим его в начало, затем только цифры
-                  const formatted = hasPlus ? '+' + digitsOnly : digitsOnly;
-                  setFormData({...formData, phone: formatted});
-                }}
-                placeholder={t('auth.phonePlaceholder')}
-                placeholderTextColor="#888"
-                autoCapitalize="none"
-                autoComplete="tel"
-                textContentType="telephoneNumber"
-                keyboardType="phone-pad"
-                autoCorrect={false}
-                selectTextOnFocus={true}
-                autoFocus={false}
-              />
-            </View>
-          )}
 
-          {/* Остальные поля - показываем только после выбора страны */}
-          {formData.country && (
-          <>
           {/* Имя/Название */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>
@@ -1267,6 +1736,13 @@ export default function RegisterScreen() {
               autoFocus={false}
             />
           </View>
+
+          {formData.status === 'scout' && (
+            <View style={styles.scoutPrivacyNote}>
+              <Ionicons name="eye-off-outline" size={16} color="rgba(255,255,255,0.6)" />
+              <Text style={styles.scoutPrivacyNoteText}>{t('register.scoutPrivacyNote')}</Text>
+            </View>
+          )}
 
           {/* Фото/Логотип - обязательно для всех кроме скаута */}
           {formData.status !== 'scout' && (
@@ -1344,6 +1820,14 @@ export default function RegisterScreen() {
             </View>
           )}
 
+          {formData.status === 'coach' && (
+            <RegisterTeamPicker
+              value={currentTeam}
+              onChange={setCurrentTeam}
+              label={t('register.currentTeam')}
+            />
+          )}
+
           {/* Годы тренировки - только для тренеров */}
           {formData.status === 'coach' && (
             <View style={styles.inputContainer}>
@@ -1411,81 +1895,6 @@ export default function RegisterScreen() {
                   </TouchableOpacity>
                 ))}
               </View>
-            </View>
-          )}
-
-          {/* Номер - только для игроков */}
-          {formData.status === 'player' && (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>{t('register.number')}</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.number}
-                onChangeText={(text) => setFormData({...formData, number: text})}
-                placeholder={t('register.number')}
-                placeholderTextColor="#888"
-                keyboardType="numeric"
-                maxLength={2}
-              />
-            </View>
-          )}
-
-          {/* Хват - только для игроков */}
-          {formData.status === 'player' && (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>{t('register.grip')}</Text>
-              <View style={styles.pickerContainer}>
-                {[
-                  { key: 'Левый', translation: t('common.left') },
-                  { key: 'Правый', translation: t('common.right') }
-                ].map((grip) => (
-                  <TouchableOpacity
-                    key={grip.key}
-                    style={[
-                      styles.pickerOption,
-                      formData.grip === grip.key && styles.pickerOptionSelected
-                    ]}
-                    onPress={() => setFormData({...formData, grip: grip.key})}
-                  >
-                    <Text style={[
-                      styles.pickerOptionText,
-                      formData.grip === grip.key && styles.pickerOptionTextSelected
-                    ]}>
-                      {grip.translation}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-          )}
-
-          {/* Рост - только для игроков */}
-          {formData.status === 'player' && (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>{t('register.height')}</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.height}
-                onChangeText={(text) => setFormData({...formData, height: text})}
-                placeholder={t('register.height')}
-                placeholderTextColor="#888"
-                keyboardType="numeric"
-              />
-            </View>
-          )}
-
-          {/* Вес - только для игроков */}
-          {formData.status === 'player' && (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>{t('register.weight')}</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.weight}
-                onChangeText={(text) => setFormData({...formData, weight: text})}
-                placeholder={t('register.weight')}
-                placeholderTextColor="#888"
-                keyboardType="numeric"
-              />
             </View>
           )}
 
@@ -1641,258 +2050,136 @@ export default function RegisterScreen() {
               </View>
             </>
           )}
+          <TouchableOpacity
+            style={[styles.registerButton, loading && styles.registerButtonDisabled]}
+            onPress={handleProfileNext}
+            disabled={loading}
+          >
+            <Ionicons name={loading ? 'hourglass' : formData.status === 'player' ? 'arrow-forward' : 'checkmark-circle'} size={20} color="#fff" />
+            <Text style={styles.registerButtonText}>{loading ? t('common.loading') : formData.status === 'player' ? t('common.continue') : t('register.register')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.registerButton, styles.backButton]}
+            onPress={() => { setContactVerified(false); setVerificationCode(''); existingUserRef.current = undefined; setStep('contact'); }}
+            disabled={loading}
+          >
+            <Ionicons name="arrow-back" size={20} color="#fa2f40" />
+            <Text style={[styles.registerButtonText, styles.backButtonText]}>{t('common.back')}</Text>
+          </TouchableOpacity>
+          </>
+          )}
 
-          {/* Чекбокс принятия условий - показываем только после выбора страны */}
-          {formData.country && step === 'form' && (
-            <View style={styles.termsContainer}>
-              <TouchableOpacity 
-                style={styles.checkbox}
-                onPress={() => setAgreedToTerms(!agreedToTerms)}
-                activeOpacity={0.7}
-              >
-                <View style={[styles.checkboxSquare, agreedToTerms && styles.checkboxSquareChecked]}>
-                  {agreedToTerms && <Ionicons name="checkmark" size={16} color="#fff" />}
-                </View>
-              </TouchableOpacity>
-              <Text style={styles.termsText}>
-                {t('register.agreeToTerms')}
-              </Text>
+          {step === 'details' && (
+          <>
+          <Text style={styles.stepHint}>{t('register.detailsHint')}</Text>
+          <RegisterTeamPicker
+            value={currentTeam}
+            onChange={setCurrentTeam}
+            label={t('register.currentTeam')}
+            hint={t('register.currentTeamHint')}
+          />
+          {/* Номер - только для игроков */}
+          {formData.status === 'player' && (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t('register.number')}</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.number}
+                onChangeText={(text) => setFormData({...formData, number: text})}
+                placeholder={t('register.number')}
+                placeholderTextColor="#888"
+                keyboardType="numeric"
+                maxLength={2}
+              />
             </View>
           )}
-          {formData.country && step === 'form' && (
-            <TouchableOpacity 
-              style={styles.termsLink}
-              onPress={() => {
-                const langParam = language === 'ru' ? '?lang=ru' : '?lang=en';
-                Linking.openURL(`https://hockey-stars.com/rules.html${langParam}`);
-              }}
-            >
-              <Ionicons name="document-text-outline" size={16} color="#fa2f40" />
-              <Text style={styles.termsLinkText}>{t('register.termsLink')}</Text>
-            </TouchableOpacity>
-          )}
-          
-          {/* Кнопки - показываем только после выбора страны */}
-          {formData.country && step === 'form' && (
-            <TouchableOpacity 
-              style={[styles.registerButton, (loading || !agreedToTerms) && styles.registerButtonDisabled]} 
-              onPress={handleSendCode}
-              disabled={loading || !agreedToTerms}
-            >
-              <Ionicons 
-                name={loading ? "hourglass" : "mail"} 
-                size={20} 
-                color="#fff" 
-              />
-              <Text style={styles.registerButtonText}>
-                {loading ? t('common.loading') : t('auth.sendCode')}
-              </Text>
-            </TouchableOpacity>
-          )}
-          
-          {/* Форма верификации */}
-          {step === 'verification' && (
-            <>
-              {/* Кнопка "Не пришло сообщение?" - показываем только если не США/Канада и не показываем поле email */}
-              {formData.country !== 'США' && formData.country !== 'Канада' && !showEmailInput && (
-                <TouchableOpacity 
-                  style={styles.didntReceiveButton}
-                  onPress={handleSwitchToEmail}
-                  disabled={loading}
-                >
-                  <Text style={styles.didntReceiveButtonText}>
-                    {t('auth.didntReceiveCode')}
-                  </Text>
-                </TouchableOpacity>
-              )}
-              
-              {/* Поле для ввода email, если переключились на email - показываем ПЕРЕД полем кода */}
-              {showEmailInput && (
-                <View style={styles.inputContainer}>
-                  <Text style={styles.label}>{t('auth.enterEmail')}</Text>
-                  <TextInput
-                    ref={emailInputRef}
-                    style={styles.input}
-                    value={emailInput}
-                    onChangeText={setEmailInput}
-                    placeholder={t('auth.emailPlaceholder')}
-                    placeholderTextColor="#888"
-                    autoCapitalize="none"
-                    autoComplete="email"
-                    textContentType="emailAddress"
-                    keyboardType="email-address"
-                    autoCorrect={false}
-                    returnKeyType="done"
-                    blurOnSubmit={false}
-                    enablesReturnKeyAutomatically={true}
-                    onSubmitEditing={handleSendCodeToEmail}
-                    editable={!loading}
-                    selectTextOnFocus={false}
-                    autoFocus={true}
-                    onFocus={() => {
-                      // Прокрутка к полю email при фокусе
-                      setTimeout(() => {
-                        if (emailInputRef.current && scrollViewRef.current) {
-                          emailInputRef.current.measureLayout(
-                            scrollViewRef.current as any,
-                            (x, y, width, height) => {
-                              const screenHeight = Dimensions.get('window').height;
-                              const keyboardHeight = 300; // Примерная высота клавиатуры
-                              const visibleArea = screenHeight - keyboardHeight;
-                              const inputBottom = y + height;
-                              const targetY = inputBottom - visibleArea + 130;
-                              
-                              if (targetY > 0) {
-                                scrollViewRef.current?.scrollTo({ 
-                                  y: targetY, 
-                                  animated: true 
-                                });
-                              }
-                            },
-                            () => {
-                              // Fallback: используем measure если measureLayout не работает
-                              emailInputRef.current?.measure((x, y, width, height, pageX, pageY) => {
-                                const screenHeight = Dimensions.get('window').height;
-                                const keyboardHeight = 300;
-                                const visibleArea = screenHeight - keyboardHeight;
-                                const inputBottom = pageY + height;
-                                const scrollOffset = inputBottom - visibleArea + 130;
-                                
-                                if (scrollOffset > 0) {
-                                  scrollViewRef.current?.scrollTo({ 
-                                    y: scrollOffset, 
-                                    animated: true 
-                                  });
-                                }
-                              });
-                            }
-                          );
-                        }
-                      }, 300);
-                    }}
-                  />
-                  <TouchableOpacity 
-                    style={[styles.registerButton, styles.sendEmailButton, loading && styles.registerButtonDisabled]} 
-                    onPress={handleSendCodeToEmail}
-                    disabled={loading || !emailInput.trim()}
+
+          {/* Хват - только для игроков */}
+          {formData.status === 'player' && (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t('register.grip')}</Text>
+              <View style={styles.pickerContainer}>
+                {[
+                  { key: 'Левый', translation: t('common.left') },
+                  { key: 'Правый', translation: t('common.right') }
+                ].map((grip) => (
+                  <TouchableOpacity
+                    key={grip.key}
+                    style={[
+                      styles.pickerOption,
+                      formData.grip === grip.key && styles.pickerOptionSelected
+                    ]}
+                    onPress={() => setFormData({...formData, grip: grip.key})}
                   >
-                    <Ionicons 
-                      name={loading ? "hourglass" : "mail"} 
-                      size={20} 
-                      color="#fff" 
-                    />
-                    <Text style={styles.registerButtonText}>
-                      {loading ? t('common.loading') : t('auth.sendToEmail')}
+                    <Text style={[
+                      styles.pickerOptionText,
+                      formData.grip === grip.key && styles.pickerOptionTextSelected
+                    ]}>
+                      {grip.translation}
                     </Text>
                   </TouchableOpacity>
-                </View>
-              )}
-              
-              {/* Поле для ввода кода */}
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>{t('auth.code')}</Text>
-                <TextInput
-                  ref={codeInputRef}
-                  style={[styles.input, styles.codeInput]}
-                  value={verificationCode}
-                  onChangeText={(text) => {
-                    // Удаляем все нецифровые символы (включая буквы и спецсимволы) и ограничиваем до 6 цифр
-                    const cleaned = text.replace(/[^0-9]/g, '').slice(0, 6);
-                    setVerificationCode(cleaned);
-                  }}
-                  placeholder={t('auth.codePlaceholder')}
-                  placeholderTextColor="#888"
-                  keyboardType="number-pad"
-                  maxLength={6}
-                  autoComplete="one-time-code"
-                  textContentType="oneTimeCode"
-                  selectTextOnFocus={true}
-                  autoFocus={false}
-                  onFocus={() => {
-                    // Дополнительная прокрутка при фокусе
-                    setTimeout(() => {
-                      if (codeInputRef.current && scrollViewRef.current) {
-                        codeInputRef.current.measureLayout(
-                          scrollViewRef.current as any,
-                          (x, y, width, height) => {
-                            const screenHeight = Dimensions.get('window').height;
-                            const keyboardHeight = 300; // Примерная высота клавиатуры
-                            const visibleArea = screenHeight - keyboardHeight;
-                            const inputBottom = y + height;
-                            const targetY = inputBottom - visibleArea + 130;
-                            
-                            if (targetY > 0) {
-                              scrollViewRef.current?.scrollTo({ 
-                                y: targetY, 
-                                animated: true 
-                              });
-                            }
-                          },
-                          () => {}
-                        );
-                      }
-                    }, 300);
-                  }}
-                />
-                <Text style={styles.emailHint}>
-                  {t('auth.codeSent')}: {
-                    (formData.country === 'США' || formData.country === 'Канада') 
-                      ? formData.email 
-                      : formData.phone
-                  }
-                </Text>
-                
-                {/* Кнопка повторной отправки */}
-                <TouchableOpacity 
-                  style={[styles.resendButton, (!canResend || loading || showEmailInput) && styles.resendButtonDisabled]} 
-                  onPress={handleResendCode}
-                  disabled={!canResend || loading || showEmailInput}
-                >
-                  <Text style={[styles.resendButtonText, (!canResend || loading || showEmailInput) && styles.resendButtonTextDisabled]}>
-                    {resendTimer > 0 ? `${t('auth.resendCode')} ${resendTimer}с` : t('auth.sendCode')}
-                  </Text>
-                </TouchableOpacity>
+                ))}
               </View>
-
-              {/* Кнопка подтверждения */}
-              <TouchableOpacity 
-                style={[styles.registerButton, loading && styles.registerButtonDisabled]} 
-                onPress={handleVerifyAndRegister}
-                disabled={loading}
-              >
-                <Ionicons 
-                  name={loading ? "hourglass" : "checkmark-circle"} 
-                  size={20} 
-                  color="#fff" 
-                />
-                <Text style={styles.registerButtonText}>
-                  {loading ? t('common.loading') : t('register.register')}
-                </Text>
-              </TouchableOpacity>
-
-              {/* Кнопка "Назад" */}
-              <TouchableOpacity 
-                style={[styles.registerButton, styles.backButton]} 
-                onPress={() => {
-                  setStep('form');
-                  setVerificationCode('');
-                }}
-                disabled={loading}
-              >
-                <Ionicons name="arrow-back" size={20} color="#fa2f40" />
-                <Text style={[styles.registerButtonText, styles.backButtonText]}>
-                  {t('common.back')}
-                </Text>
-              </TouchableOpacity>
-            </>
+            </View>
           )}
-            </>
+
+          {/* Рост - только для игроков */}
+          {formData.status === 'player' && (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t('register.height')}</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.height}
+                onChangeText={(text) => setFormData({...formData, height: text})}
+                placeholder={t('register.height')}
+                placeholderTextColor="#888"
+                keyboardType="numeric"
+              />
+            </View>
+          )}
+
+          {/* Вес - только для игроков */}
+          {formData.status === 'player' && (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t('register.weight')}</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.weight}
+                onChangeText={(text) => setFormData({...formData, weight: text})}
+                placeholder={t('register.weight')}
+                placeholderTextColor="#888"
+                keyboardType="numeric"
+              />
+            </View>
+          )}
+
+          <TouchableOpacity
+            style={[styles.registerButton, loading && styles.registerButtonDisabled]}
+            onPress={() => handleRegister()}
+            disabled={loading}
+          >
+            <Ionicons name={loading ? "hourglass" : "checkmark-circle"} size={20} color="#fff" />
+            <Text style={styles.registerButtonText}>{loading ? t('common.loading') : t('register.register')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.skipButton} onPress={() => handleRegister()} disabled={loading}>
+            <Text style={styles.skipButtonText}>{t('register.skipForNow')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.registerButton, styles.backButton]}
+            onPress={() => setStep('profile')}
+            disabled={loading}
+          >
+            <Ionicons name="arrow-back" size={20} color="#fa2f40" />
+            <Text style={[styles.registerButtonText, styles.backButtonText]}>{t('common.back')}</Text>
+          </TouchableOpacity>
+          </>
           )}
 
 
           </View>
         </TouchableWithoutFeedback>
       </ScrollView>
+      </KeyboardAvoidingView>
       
       {/* DateTimePicker */}
       {showDatePicker && (
@@ -1919,23 +2206,7 @@ export default function RegisterScreen() {
                 <TouchableOpacity 
                   style={[styles.datePickerButton, styles.confirmButton]} 
                   onPress={() => {
-                    // На iOS DateTimePicker может возвращать дату с проблемами часового пояса
-                    // Используем более надежный способ - форматируем напрямую из selectedDate
-                    // но используем UTC методы для чтения, чтобы избежать смещения
-                    const year = selectedDate.getUTCFullYear();
-                    const month = selectedDate.getUTCMonth();
-                    const day = selectedDate.getUTCDate();
-                    
-                    // Форматируем дату напрямую из UTC компонентов
-                    const dayStr = day.toString().padStart(2, '0');
-                    const monthStr = (month + 1).toString().padStart(2, '0');
-                    const yearStr = year.toString();
-                    const formattedDate = `${dayStr}.${monthStr}.${yearStr}`;
-                    
-                    // Также обновляем selectedDate для корректного отображения
-                    const normalizedDate = new Date(year, month, day, 12, 0, 0, 0);
-                    setSelectedDate(normalizedDate);
-                    
+                    const formattedDate = formatPickerDate(selectedDate);
                     setFormData({...formData, birthDate: formattedDate});
                     setShowDatePicker(false);
                   }}
@@ -2021,19 +2292,58 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
+  stepIndicator: { alignItems: 'center', marginBottom: 18, gap: 8 },
+  stepDots: { flexDirection: 'row', gap: 6 },
+  stepDot: { width: 28, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.14)' },
+  stepDotDone: { backgroundColor: 'rgba(250,47,64,0.55)' },
+  stepDotActive: { backgroundColor: '#fa2f40' },
+  stepLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 13, fontFamily: 'Gilroy-Regular' },
+  stepHint: { color: 'rgba(255,255,255,0.6)', fontSize: 13, fontFamily: 'Gilroy-Regular', marginBottom: 16, lineHeight: 18 },
+  skipButton: { alignSelf: 'center', paddingVertical: 12, paddingHorizontal: 20 },
+  skipButtonText: { color: 'rgba(255,255,255,0.6)', fontSize: 14, fontFamily: 'Gilroy-Regular', textDecorationLine: 'underline' },
   container: {
     flex: 1,
     backgroundColor: '#050008',
   },
+  backdropTint: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(8, 8, 12, 0.35)',
+  },
+  keyboardAvoider: {
+    flex: 1,
+  },
   scrollContainer: {
     flexGrow: 1,
-    padding: 20,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 24,
   },
+  contactModeLink: {
+    alignSelf: 'center',
+    paddingVertical: 6,
+    marginTop: -4,
+    marginBottom: 6,
+  },
+  contactModeLinkText: {
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: 14,
+    textDecorationLine: 'underline',
+  },
+  consentText: {
+    color: 'rgba(255,255,255,0.55)',
+    fontSize: 12,
+    fontFamily: 'Gilroy-Regular',
+    textAlign: 'center',
+    lineHeight: 17,
+    marginTop: 12,
+  },
+  consentLink: { color: '#fa2f40', textDecorationLine: 'underline' },
+  entrySubtitle: { color: 'rgba(255,255,255,0.6)', fontSize: 14, fontFamily: 'Gilroy-Regular', textAlign: 'center', marginBottom: 20, lineHeight: 20 },
   formContainer: {
-    backgroundColor: 'rgba(11, 11, 14, 0.85)',
-    borderRadius: 20,
-    padding: 25,
-    marginTop: 20,
+    backgroundColor: 'rgba(11, 11, 14, 0.82)',
+    borderRadius: 24,
+    padding: 22,
+    marginTop: 0,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)', // Тончайший красный контур
     maxWidth: Platform.OS === 'web' ? 500 : 'auto',
@@ -2046,11 +2356,11 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: 14,
   },
   inputContainer: {
     marginBottom: 20,
@@ -2071,6 +2381,25 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.14)',
     // Убираем width, чтобы поле адаптировалось к контейнеру
+  },
+  scoutPrivacyNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  scoutPrivacyNoteText: {
+    flex: 1,
+    fontFamily: 'Gilroy-Regular',
+    fontSize: 13,
+    lineHeight: 18,
+    color: 'rgba(255,255,255,0.7)',
   },
   pickerContainer: {
     flexDirection: 'row',

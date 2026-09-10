@@ -28,7 +28,11 @@
     "left": "Vasen",
     "right": "Oikein",
     "offline": "Ei yhteyttä",
-    "and": "ja"
+    "and": "ja",
+    "info": "Tiedote",
+    "continue": "Jatka",
+    "retry": "Yritä uudelleen",
+    "warning": "Huomio"
   },
   "winger": "Laituri",
   "center": "Keskushyökkääjä",
@@ -56,7 +60,9 @@
   },
   "achievementNotification": {
     "added": "lisätty",
-    "oneAchievement": "uusi saavutus"
+    "oneAchievement": "uusi saavutus",
+    "multipleAchievements": "{count} uutta saavutusta",
+    "received": "sai"
   },
   "friendshipNotification": {
     "title": "Uusi ystävyys",
@@ -201,7 +207,9 @@
       "saveError": "Harjoitusta ei voi merkitä suoritetuksi",
       "generalError": "Tallennettaessa tapahtui virhe",
       "times": "kerran",
-      "timesPlural": "kertaa"
+      "timesPlural": "kertaa",
+      "loginRequired": "Kirjaudu sisään suorittaaksesi harjoituksia",
+      "title": "Harjoitus"
     },
     "difficulty": {
       "Начинающий": "Alku",
@@ -3092,7 +3100,8 @@
       "Intermediate": "Keskitaso",
       "Advanced": "Edistynyt",
       "Easy": "Helppo"
-    }
+    },
+    "timesPlural": "kertaa"
   },
   "items": {
     "autograph": "nimikirjoitus",
@@ -3186,7 +3195,13 @@
     "errorProcessFriendRequest": "Ystäväpyyntöäsi ei voi käsitellä.",
     "errorProcessRequest": "Pyyntösi käsittely epäonnistui",
     "errorSendMessage": "Viestin lähettäminen epäonnistui",
-    "phoneOrEmailPlaceholderShort": "+358… tai sähköposti"
+    "phoneOrEmailPlaceholderShort": "+358… tai sähköposti",
+    "email": "Sähköposti",
+    "errorSwitchingToEmail": "Sähköpostikirjautumiseen vaihtaminen epäonnistui",
+    "smsRateLimited": "Tähän numeroon lähetettiin koodi alle minuutti sitten. Syötä se tai pyydä uusi ajastimen päätyttyä.",
+    "smsServerUnreachable": "HockeyStars-palvelimeen ei saada yhteyttä. Tarkista yhteys (VPN voi estää) ja napauta ”Lähetä uudelleen”.",
+    "smsEmailOnly": "USA:ssa ja Kanadassa kirjaudutaan sähköpostilla.",
+    "smsProviderFailed": "Operaattori ei hyväksynyt tekstiviestiä. Tarkista numero tai yritä minuutin kuluttua."
   },
   "profile": {
     "addFriend": "Lisää kaveriksi",
@@ -3472,7 +3487,34 @@
     "city": "Kaupunki",
     "addAddress": "Lisää osoite",
     "addressesHint": "Voit lisätä useita osoitteita",
-    "previousSeason": "Previous season"
+    "previousSeason": "Previous season",
+    "cover": "Kansikuva",
+    "changeCover": "Vaihda kansikuva",
+    "removeCover": "Poista kansikuva",
+    "teamLogo": "Joukkueen logo",
+    "uploadTeamLogo": "Lataa logo",
+    "coverUpdated": "Kansikuva päivitetty",
+    "teamLogoUpdated": "Joukkueen logo päivitetty",
+    "coverUploadFailed": "Kuvan lataus epäonnistui",
+    "scoutPrivacyNote": "Muut käyttäjät eivät näe kuvaasi tai nimeäsi – heille olet ”Kykyjenetsijä”.",
+    "positionCover": "Aseta kansikuva",
+    "positionCoverHint": "Siirrä yhdellä sormella, zoomaa nipistämällä, kunnes rajaus sopii",
+    "allTime": "Kaikki ajat",
+    "seasonsCount": "{count} kautta",
+    "currentSeasonHint": "Nykyinen kausi",
+    "fullScreen": "Koko näyttö",
+    "heightWithUnit": "Pituus (cm)",
+    "individualTraining": "Yksilöharjoittelu",
+    "noPermission": "Ei pääsyä galleriaan",
+    "playerNumber": "Pelaajan numero",
+    "playerNumberPlaceholder": "Numero pelipaidassa",
+    "savedToGallery": "Tallennettu galleriaan",
+    "selectBirthDate": "Valitse syntymäaika",
+    "shareError": "Virhe kuvan luonnissa",
+    "skateServices": "Palvelut",
+    "weightWithUnit": "Paino (kg)",
+    "videoUploaded": "Video lisätty profiiliin",
+    "videoUploadSaveReminder": "Video ladattu. Napauta «Tallenna», jotta se jää profiiliin."
   },
   "register": {
     "title": "Rekisteröinti",
@@ -3523,7 +3565,32 @@
     "fillRequiredFields": "Täytä kaikki pakolliset kentät",
     "fillAllFields": "Täytä kaikki kentät",
     "phoneFormatError": "Syötä kelvollinen puhelinnumero maakoodilla (esim. +1234567890)",
-    "parentEmailFormatError": "Syötä kelvollinen vanhemman sähköpostiosoite"
+    "parentEmailFormatError": "Syötä kelvollinen vanhemman sähköpostiosoite",
+    "scoutPrivacyNote": "Muut eivät näe kykyjenetsijän kuvaa tai nimeä – näyt nimellä ”Kykyjenetsijä”.",
+    "emailFormatError": "Syötä kelvollinen sähköpostiosoite",
+    "registrationFailed": "Rekisteröinti epäonnistui",
+    "detailsHint": "Valinnainen: numero, ote, pituus ja paino auttavat kykyjenetsijöitä ja kavereita löytämään sinut. Voit täyttää ne myöhemmin profiilissa.",
+    "skipForNow": "Ohita",
+    "parentEmailSendFailed": "Sähköpostin lähetys vanhemmalle epäonnistui. Tarkista osoite ja yritä myöhemmin.",
+    "step": {
+      "contact": "Vaihe 1 · Yhteystiedot",
+      "code": "Vaihe 2 · Vahvistus",
+      "profile": "Vaihe 1 · Profiili",
+      "details": "Vaihe 2 · Pelaajan tiedot"
+    },
+    "currentTeam": "Nykyinen joukkue",
+    "currentTeamHint": "Joukkueen kautta löytyvät joukkuekaverit, kansikuva ja joukkuesivu. Ala kirjoittaa löytääksesi olemassa olevan.",
+    "teamPlaceholder": "esim. Dinamo Minsk 2012",
+    "teamWillBeCreated": "Tätä joukkuetta ei vielä ole — luomme sen sinulle.",
+    "consentByContinuing": "Painamalla ”Jatka” hyväksyt",
+    "haveAccount": "Onko sinulla jo tili?",
+    "signIn": "Kirjaudu",
+    "entryTitle": "Jäälle",
+    "entrySubtitle": "Syötä puhelinnumerosi. Kirjaamme sinut sisään tai luomme tilin.",
+    "codeSubtitle": "Syötä viestin koodi",
+    "whoAreYou": "Kuka olet?",
+    "useEmailInstead": "Käytä sähköpostia",
+    "usePhoneInstead": "Käytä puhelinnumeroa"
   },
   "navigation": {
     "home": "Kotiin",
@@ -3582,7 +3649,12 @@
     "errorCreatingUser": "Käyttäjän luominen epäonnistui",
     "fillRequiredFields": "Täytä kaikki pakolliset kentät.",
     "enterValidPhone": "Anna kelvollinen puhelinnumero ja maakoodi.",
-    "requiredForPlayers": "Pelaajille ja tähdille on pakollista ilmoittaa syntymäaika ja paikka"
+    "requiredForPlayers": "Pelaajille ja tähdille on pakollista ilmoittaa syntymäaika ja paikka",
+    "adminPanel": "Hallintapaneeli",
+    "login": "Kirjaudu",
+    "loginAsUserConfirm": "Haluatko varmasti kirjautua käyttäjänä {name}?",
+    "loginAsUserError": "Kirjautuminen käyttäjänä epäonnistui",
+    "loginAsUserSuccess": "Olet nyt kirjautunut käyttäjänä {name}"
   },
   "museum": {
     "title": "Museo",
@@ -3763,7 +3835,8 @@
   "settings": {
     "title": "Asetukset",
     "language": "Kieli",
-    "selectLanguage": "Valitse kieli"
+    "selectLanguage": "Valitse kieli",
+    "autoLanguage": "Auto"
   },
   "search": {
     "title": "Haku",
@@ -3787,9 +3860,13 @@
     "topBySV": "Top SV%",
     "shareRating": "Jaa ranking",
     "shareRatingFooter": "hockeystars.com",
+    "shareRatingSeason": "Kausi {season}",
     "ratingPointsLabel": "pistettä",
     "allCountries": "Kaikki maat",
-    "allYears": "Kaikki vuodet"
+    "allYears": "Kaikki vuodet",
+    "filters": "Suodattimet",
+    "shareNewcomers": "Jaa tulokkaat",
+    "shareNewcomersCount": "{count} pelaajaa"
   },
   "messages": {
     "title": "Viestit",
@@ -3804,7 +3881,8 @@
     "massSend": "Massalähetys",
     "recipients": "Vastaanottajat",
     "typeMessage": "Kirjoita viesti...",
-    "send": "Lähetä"
+    "send": "Lähetä",
+    "searchHistoryLoading": "Haetaan viestihistoriasta…"
   },
   "notifications": {
     "title": "Ilmoitukset",
@@ -3919,7 +3997,9 @@
     "noFriendsToForward": "Ei kavereita välitettäväksi",
     "messageForwarded": "Viesti välitetty",
     "forwardedTo": "Välitetty",
-    "forwardError": "Välitys epäonnistui"
+    "forwardError": "Välitys epäonnistui",
+    "user": "Käyttäjä",
+    "you": "Sinä"
   },
   "createUser": {
     "title": "Käyttäjän luominen",
@@ -4066,7 +4146,24 @@
     "seconds": "sek",
     "times": "kerran",
     "sprint": "100 metrin juoksu",
-    "_cache_clear": "2024-01-16-9"
+    "_cache_clear": "2024-01-16-9",
+    "customGift": "Pyydä lahjaa",
+    "deleteGiftConfirm": "Haluatko varmasti poistaa tämän lahjan?",
+    "errorGiftAlreadyExists": "Pelaajalla {playerName} on jo tämä lahja.\n\nValitse toinen lahja tai luo uusi.",
+    "errorGiftNotDeleted": "Lahjaa ei poistettu",
+    "errorGiftNotFound": "Lahjaa ei löydy",
+    "errorPermissionDenied": "Sinulla ei ole oikeutta poistaa tätä lahjaa",
+    "errorSelectOrCreate": "Valitse lahja tai luo uusi",
+    "errorSendingGift": "Lahjan lähetys epäonnistui",
+    "fromAdmin": "Admin",
+    "fromStar": "lähettäjä {starName}",
+    "giftReceived": "Lahja vastaanotettu!",
+    "giftReceivedFromAdmin": "Sait lahjan adminilta: {giftName}",
+    "giftReceivedFromAdminPush": "Sait lahjan adminilta: {giftName}",
+    "giftReceivedFromStar": "Sait lahjan käyttäjältä {starName}: {giftName}",
+    "giftReceivedFromStarPush": "Sait lahjan käyttäjältä {starName}: {giftName}",
+    "giftReceivedPush": "🎁 Lahja vastaanotettu!",
+    "successGiftSent": "Lahja lähetetty pelaajalle {playerName}!"
   },
   "TEMP_DELETE_ME": {
     "title": "Standardit",
@@ -4237,7 +4334,13 @@
     "deleteError": "Virhe",
     "deleteErrorMessage": "Tietueen poistaminen epäonnistui",
     "speedExceedsLimit": "Nopeus ylittää 120 km/h, mittaus ei lasketa",
-    "needMicrophone": "Mikrofonin käyttöoikeus vaaditaan"
+    "needMicrophone": "Mikrofonin käyttöoikeus vaaditaan",
+    "micPosition": {
+      "label": "Missä puhelin on",
+      "shooter": "Laukojan vieressä",
+      "middle": "Keskellä",
+      "target": "Laidan vieressä"
+    }
   },
   "logout": "Poistu",
   "logoutConfirm": "Kirjaudu ulos profiilistasi",
@@ -4282,5 +4385,36 @@
     "scanQr": "Skannaa puhelimella — App Store tai Google Play avautuu",
     "appStoreCta": "Lataa App Storesta",
     "playStoreCta": "Lataa Google Playsta"
-  }
+  },
+  "videoNotification": {
+    "fullScreen": "Koko näyttö",
+    "added": "lisäsi",
+    "multipleVideos": "{count} uutta videota",
+    "oneVideo": "uusi video"
+  },
+  "coverNotification": {
+    "title": "Uusi kansikuva",
+    "changed": "päivitti profiilin kansikuvan"
+  },
+  "ota": {
+    "resurfacing": "Jäätä kunnostetaan…",
+    "updating": "Päivitystä asennetaan",
+    "updated": "Uusi jää — sovellus päivitetty"
+  },
+  "avatarNotification": {
+    "changed": "vaihtoi profiilikuvan"
+  },
+  "cm": "cm",
+  "height": "pituus",
+  "kg": "kg",
+  "referral": {
+    "leaderboard": "Parhaat kutsujat",
+    "noInvites": "Kukaan ei ole vielä kutsunut kavereita",
+    "points": "pistettä"
+  },
+  "statsNotification": {
+    "physicalData": "fyysiset tiedot",
+    "updated": "päivitti"
+  },
+  "weight": "paino"
 }

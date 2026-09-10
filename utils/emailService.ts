@@ -319,53 +319,110 @@ const dispatchVerificationSms = async (
   }
 };
 
-export const sendVerificationSMS = async (phoneNumber: string, _code?: string): Promise<boolean> => {
+/** OTA-safe path: SMS secrets live on hockey-stars.com, not in the binary. */
+const APP_SMS_OTP_URL = 'https://hockey-stars.com/api/app-send-code.php';
+/**
+ * Тот же PHP-скрипт на api-домене: у части операторов запросы к apex-домену не доходят
+ * (в логах nginx телефон ходит на api.hockey-stars.com, но не на hockey-stars.com).
+ */
+const APP_SMS_OTP_FALLBACK_URL = 'https://api.hockey-stars.com/otp/app-send-code.php';
+const APP_SMS_TIMEOUT_MS = 12000;
+
+const withTimeout = async <T,>(promise: Promise<T>, ms: number, label: string): Promise<T> => {
+  let timer: ReturnType<typeof setTimeout> | undefined;
   try {
-    console.log('📱 Отправляем код подтверждения на:', phoneNumber);
-
-    const code = _code || generateVerificationCode();
-    const { sendSMSViaProvider, getCountryFromPhone, takeNotificore2faAuthId, isNotificore2faConfigured } =
-      await import('./smsService');
-    const country = getCountryFromPhone(phoneNumber);
-
-    // Notificore 2FA: код генерирует провайдер — нужен синхронный ответ API
-    if (country === 'RU' && isNotificore2faConfigured()) {
-      const smsSuccess = await sendSMSViaProvider(phoneNumber, code);
-      if (smsSuccess) {
-        const notificore2faAuthId = takeNotificore2faAuthId();
-        if (notificore2faAuthId) {
-          rememberNotificore2faAuth(phoneNumber, notificore2faAuthId);
-          const saved = await saveVerificationCode(phoneNumber, `2FA:${notificore2faAuthId}`);
-          if (!saved) {
-            console.warn(
-              '⚠️ 2FA auth id не сохранился в БД (ALTER code VARCHAR(64)) — проверка через кэш приложения'
-            );
-          }
-        } else {
-          console.warn('⚠️ Notificore 2FA без auth id — сохраняем локальный код (проверка может не сработать)');
-          await saveVerificationCode(phoneNumber, code);
-        }
-        console.log('✅ Код отправлен успешно (Notificore 2FA)');
-        return true;
-      }
-      console.log('⚠️ Notificore 2FA не сработал для России, Twilio ОТКЛЮЧЕН. Показываем код только в консоли.');
-      return await sendSMSFallback(phoneNumber, code);
-    }
-
-    // Быстрый путь: сохраняем код в БД и сразу показываем экран ввода; SMS — в фоне
-    const saved = await saveVerificationCode(phoneNumber, code);
-    if (!saved) {
-      console.error('❌ Не удалось сохранить код в БД');
-      return false;
-    }
-
-    void dispatchVerificationSms(phoneNumber, code, country);
-    console.log('✅ Код сохранён, SMS отправляется в фоне');
-    return true;
-  } catch (error) {
-    console.error('❌ Ошибка отправки:', error);
-    return await sendSMSFallback(phoneNumber, _code || '------');
+    return await Promise.race([
+      promise,
+      new Promise<T>((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`${label}_timeout`)), ms);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
   }
+};
+
+export type SmsSendResult = {
+  ok: boolean;
+  /** 'rate' — код уже отправлен недавно; 'network' — сервер недоступен; иначе код ошибки сервера */
+  error?: 'rate' | 'network' | 'sms' | 'phone_format' | 'email_only' | string;
+  message?: string;
+  status?: number;
+};
+
+const sendVerificationSmsViaServer = async (
+  phoneNumber: string,
+  url: string = APP_SMS_OTP_URL
+): Promise<SmsSendResult> => {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), APP_SMS_TIMEOUT_MS);
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ phone: phoneNumber }),
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+    const data = await response.json().catch(() => null);
+    if (response.ok && data?.success) {
+      console.log('✅ SMS отправлен через сервер HockeyStars:', data.channel || 'ok');
+      return { ok: true };
+    }
+    console.warn('⚠️ Сервер SMS не принял запрос:', response.status, data?.error || data?.message);
+    return {
+      ok: false,
+      error: data?.error || (response.status === 429 ? 'rate' : 'sms'),
+      message: data?.message,
+      status: response.status,
+    };
+  } catch (error) {
+    const aborted =
+      error instanceof Error &&
+      (error.name === 'AbortError' || error.message.includes('aborted'));
+    console.warn(aborted ? '⚠️ Сервер SMS: таймаут' : '⚠️ Сервер SMS недоступен:', url, error);
+    return { ok: false, error: 'network' };
+  }
+};
+
+/**
+ * Отправка кода с подробным результатом. При сетевой ошибке — повтор через api-домен,
+ * затем ещё одна попытка на основной; ответ «rate» означает, что код уже ушёл
+ * менее 45 с назад — это не провал.
+ */
+export const sendVerificationSMSDetailed = async (phoneNumber: string): Promise<SmsSendResult> => {
+  console.log('📱 Отправляем код подтверждения на:', phoneNumber);
+  const attempts: Array<{ url: string; label: string; delayMs: number }> = [
+    { url: APP_SMS_OTP_URL, label: 'server_sms', delayMs: 0 },
+    { url: APP_SMS_OTP_FALLBACK_URL, label: 'server_sms_fallback', delayMs: 0 },
+    { url: APP_SMS_OTP_URL, label: 'server_sms_retry', delayMs: 1500 },
+  ];
+
+  let result: SmsSendResult = { ok: false, error: 'network' };
+  for (const attempt of attempts) {
+    if (attempt.delayMs) await new Promise((r) => setTimeout(r, attempt.delayMs));
+    result = await withTimeout(
+      sendVerificationSmsViaServer(phoneNumber, attempt.url),
+      APP_SMS_TIMEOUT_MS + 2000,
+      attempt.label
+    ).catch((): SmsSendResult => ({ ok: false, error: 'network' }));
+    // Любой ответ сервера (в т.ч. rate/phone_format) — окончательный, повторяем только сетевые сбои
+    if (result.ok || result.error !== 'network') break;
+  }
+
+  if (!result.ok) {
+    console.error('❌ Не удалось отправить SMS через сервер HockeyStars:', result.error, result.message);
+  }
+  return result;
+};
+
+export const sendVerificationSMS = async (phoneNumber: string, _code?: string): Promise<boolean> => {
+  const result = await sendVerificationSMSDetailed(phoneNumber);
+  // Код уже отправлен недавно — пользователь может ввести его
+  return result.ok || result.error === 'rate';
 };
 
 // Проверка SMS кода через БД (Twilio Verify отключен)

@@ -5,6 +5,8 @@ import {
   normalizeSeoLanguage,
   type SeoLanguage,
 } from './playerSeoPath';
+import { prefetchPlayerTeams } from './playerStorage';
+import { prefetchPlayerCover } from './teamAssets';
 import { pushBrowserUrlThenReplace } from './webHistory';
 
 export const HS_PROFILE_NAV_KEY = 'hs_profile_nav';
@@ -106,6 +108,9 @@ export function navigateToPlayerProfile(router: RouterLike, opts: NavigateToPlay
   const { playerId, name, lang, replace, ...rest } = opts;
   const id = String(playerId || '').trim();
   if (!id) return;
+
+  void prefetchPlayerCover(id);
+  prefetchPlayerTeams(id);
 
   const navParams = pickNavParams(rest as Record<string, unknown>);
   const path = buildPlayerPath(id, name, normalizeSeoLanguage(lang || 'ru'));

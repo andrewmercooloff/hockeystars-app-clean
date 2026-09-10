@@ -245,54 +245,92 @@ export async function applyActivityRatingsToPlayers<T extends PlayerWithActivity
  * Sum activity points earned since the current season started.
  * Falls back to activity_points if activity_log is unavailable (quota / overload).
  */
+const BATCH_SIZE = 50;
+/** Одновременных пачек: строго по очереди весь каталог игроков растягивался на секунды. */
+const BATCH_CONCURRENCY = 4;
+const RATING_TTL_MS = 5 * 60 * 1000;
+const ratingMemo = new Map<string, { points: number; at: number }>();
+
+const runBatches = async <T>(
+  ids: string[],
+  fetchBatch: (batch: string[]) => Promise<T[] | null>,
+): Promise<T[][] | null> => {
+  const batches: string[][] = [];
+  for (let offset = 0; offset < ids.length; offset += BATCH_SIZE) {
+    batches.push(ids.slice(offset, offset + BATCH_SIZE));
+  }
+  const out: T[][] = [];
+  for (let i = 0; i < batches.length; i += BATCH_CONCURRENCY) {
+    const rows = await Promise.all(batches.slice(i, i + BATCH_CONCURRENCY).map(fetchBatch));
+    if (rows.some((r) => r === null)) return null;
+    out.push(...(rows as T[][]));
+  }
+  return out;
+};
+
 async function sumSeasonActivityPoints(userIds: string[]): Promise<{ [playerId: string]: number }> {
   const ratings: { [playerId: string]: number } = {};
   if (userIds.length === 0) return ratings;
 
-  const BATCH_SIZE = 50;
-  let logQueryFailed = false;
+  // Рейтинг за сезон меняется медленно, а спрашивают его несколько экранов подряд.
+  const now = Date.now();
+  const missing: string[] = [];
+  for (const id of userIds) {
+    const hit = ratingMemo.get(id);
+    if (hit && now - hit.at < RATING_TTL_MS) ratings[id] = hit.points;
+    else missing.push(id);
+  }
+  if (missing.length === 0) return ratings;
 
-  for (let offset = 0; offset < userIds.length; offset += BATCH_SIZE) {
-    const batch = userIds.slice(offset, offset + BATCH_SIZE);
+  const remember = () => {
+    const at = Date.now();
+    // Ноль тоже запоминаем: иначе игроки без активности перезапрашиваются каждый раз.
+    for (const id of missing) ratingMemo.set(id, { points: ratings[id] || 0, at });
+  };
+
+  const logRows = await runBatches(missing, async (batch) => {
     const { data, error } = await supabase
       .from('activity_log')
       .select('user_id, points_earned')
       .in('user_id', batch)
       .gte('created_at', CURRENT_SEASON_START_ISO);
-
     if (error) {
-      logQueryFailed = true;
       console.warn('Ошибка загрузки сезонных рейтингов (batch):', error.message);
-      break;
+      return null;
     }
+    return data ?? [];
+  });
 
-    data?.forEach((entry) => {
-      const uid = entry.user_id as string;
-      ratings[uid] = (ratings[uid] || 0) + (entry.points_earned || 0);
-    });
-  }
-
-  if (!logQueryFailed) {
+  if (logRows) {
+    for (const rows of logRows) {
+      for (const entry of rows) {
+        const uid = entry.user_id as string;
+        ratings[uid] = (ratings[uid] || 0) + ((entry.points_earned as number) || 0);
+      }
+    }
+    remember();
     return ratings;
   }
 
   // Fallback: activity_points table (stable under load)
-  for (let offset = 0; offset < userIds.length; offset += BATCH_SIZE) {
-    const batch = userIds.slice(offset, offset + BATCH_SIZE);
+  const pointRows = await runBatches(missing, async (batch) => {
     const { data, error } = await supabase
       .from('activity_points')
       .select('user_id, points')
       .in('user_id', batch);
-
     if (error) {
       console.warn('Ошибка fallback рейтингов (batch):', error.message);
-      continue;
+      return [];
     }
+    return data ?? [];
+  });
 
-    data?.forEach((entry) => {
-      ratings[entry.user_id] = entry.points || 0;
-    });
+  for (const rows of pointRows ?? []) {
+    for (const entry of rows) {
+      ratings[entry.user_id as string] = (entry.points as number) || 0;
+    }
   }
+  remember();
 
   return ratings;
 }

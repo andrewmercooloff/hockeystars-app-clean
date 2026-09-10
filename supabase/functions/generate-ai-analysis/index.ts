@@ -3,7 +3,7 @@
 // Features:
 //   - NHL Scout scouting report: stats, height/weight, teams, achievements, videos
 //   - Google Search grounding for real external info
-//   - Rate limit: 5 times per player per calendar month
+//   - Rate limit per calendar month: 1 + 1 (complete profile) + 1 per invited registered friend
 //   - Translation caching
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -17,7 +17,49 @@ const corsHeaders = {
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const MAX_MONTHLY_USES = 5;
+// Monthly allowance: 1 base + 1 for a complete profile + 1 per invited friend who registered.
+const BASE_MONTHLY_USES = 1;
+
+interface Allowance {
+  limit: number;
+  profileComplete: boolean;
+  invitedFriends: number;
+}
+
+async function computeAllowance(supabase: any, playerId: string): Promise<Allowance> {
+  const [{ data: p }, { count: teamsCount }, { count: invited }] = await Promise.all([
+    supabase
+      .from("players")
+      .select("avatar, position, country, birth_date, height, weight, grip, goals, assists, games, minutes, shots")
+      .eq("id", playerId)
+      .maybeSingle(),
+    supabase.from("player_teams").select("id", { count: "exact", head: true }).eq("player_id", playerId),
+    supabase
+      .from("players")
+      .select("id", { count: "exact", head: true })
+      .eq("invited_by", playerId)
+      .neq("status", "pending_verification"),
+  ]);
+
+  let profileComplete = false;
+  if (p) {
+    const num = (v: unknown) => Number(v) || 0;
+    const isGoalie = p.position === "goalie";
+    const hasStats = isGoalie
+      ? num(p.games) > 0 || num(p.minutes) > 0 || num(p.shots) > 0
+      : num(p.goals) > 0 || num(p.assists) > 0 || num(p.games) > 0;
+    profileComplete =
+      !!p.avatar && !!p.position && !!p.country && !!p.birth_date &&
+      num(p.height) > 0 && num(p.weight) > 0 && !!p.grip &&
+      (teamsCount || 0) > 0 && hasStats;
+  }
+  const invitedFriends = invited || 0;
+  return {
+    limit: BASE_MONTHLY_USES + (profileComplete ? 1 : 0) + invitedFriends,
+    profileComplete,
+    invitedFriends,
+  };
+}
 // Comma-separated player IDs that bypass the monthly limit (for testing/admin)
 const BYPASS_LIMIT_IDS = (Deno.env.get("BYPASS_LIMIT_PLAYER_IDS") || "").split(",").map(s => s.trim()).filter(Boolean);
 // gemini-2.5-flash: stable quota, supports Video + Search Grounding
@@ -46,6 +88,8 @@ interface PlayerData {
   minutes?: number;
   shots?: number;
   saves?: number;
+  /** Archived seasons: { "25/26": { goals, assists, games, minutes, shots, saves } } */
+  season_stats?: string | Record<string, Record<string, unknown>> | null;
   hockey_start_date?: string;
   city?: string;
   number?: string;
@@ -72,22 +116,6 @@ function isValidNormValue(value: unknown): value is number {
   if (value === null || value === undefined) return false;
   const n = Number(value);
   return Number.isFinite(n) && n > 0;
-}
-
-function parsePuckSpeed(raw?: string): { maxKmh?: number; lastKmh?: number } {
-  if (!raw) return {};
-  try {
-    const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
-    const history = Array.isArray(parsed?.history) ? parsed.history : [];
-    const maxFromHistory = history.length
-      ? Math.max(...history.map((r: { speed?: number }) => Number(r?.speed) || 0))
-      : 0;
-    const maxKmh = Number(parsed?.maxSpeed) || maxFromHistory || undefined;
-    const lastKmh = history.length ? Number(history[history.length - 1]?.speed) || undefined : undefined;
-    return { maxKmh: maxKmh || undefined, lastKmh };
-  } catch {
-    return {};
-  }
 }
 
 function parseExerciseCompletions(raw?: string | Record<string, unknown>): { id: string; count: number }[] {
@@ -234,10 +262,8 @@ function buildTextPrompt(
     for (const line of normativeLines) lines.push(`- ${line}`);
   }
 
-  const puck = parsePuckSpeed(player.puck_speed_data);
-  if (puck.maxKmh) {
-    lines.push(`\nPuck shot speed (app test): max ${puck.maxKmh} km/h${puck.lastKmh ? `, latest ${puck.lastKmh} km/h` : ""}`);
-  }
+  // Puck speed from the in-app radar mini-game is entertainment, not a measured
+  // normative — deliberately excluded from the scouting report.
 
   if (completedExercises.length > 0) {
     lines.push("\nCompleted training exercises in app (normatives / drills):");
@@ -267,29 +293,64 @@ function buildTextPrompt(
     lines.push(`\nCurrent team: ${player.team}`);
   }
 
-  // Season stats — use Number() to avoid string concatenation
-  const goals = Number(player.goals ?? 0);
-  const assists = Number(player.assists ?? 0);
-  const games = Number(player.games ?? 0);
-  const shots = Number(player.shots ?? 0);
-  const saves = Number(player.saves ?? 0);
-  const minutes = Number(player.minutes ?? 0);
-
-  lines.push("\nSeason statistics:");
-  if (isGoalie) {
-    if (games) lines.push(`- Games: ${games}`);
-    if (minutes) lines.push(`- Minutes: ${minutes}`);
-    if (shots) lines.push(`- Shots against: ${shots}`);
-    if (saves) lines.push(`- Saves: ${saves}`);
-    if (shots && saves) {
-      lines.push(`- Save%: ${((saves / shots) * 100).toFixed(1)}%`);
+  // Statistics: current season (player columns) + every archived season + career totals.
+  // The app ranks players by career totals, so the report must reason about them too.
+  type Block = { goals: number; assists: number; games: number; minutes: number; shots: number; saves: number };
+  const toBlock = (src: Record<string, unknown> | null | undefined): Block => ({
+    goals: Number(src?.goals ?? 0) || 0,
+    assists: Number(src?.assists ?? 0) || 0,
+    games: Number(src?.games ?? 0) || 0,
+    minutes: Number(src?.minutes ?? 0) || 0,
+    shots: Number(src?.shots ?? 0) || 0,
+    saves: Number(src?.saves ?? 0) || 0,
+  });
+  const hasData = (b: Block) => Object.values(b).some((v) => v > 0);
+  const CURRENT_SEASON = "26/27";
+  const current = toBlock(player as unknown as Record<string, unknown>);
+  let archived: Record<string, Block> = {};
+  try {
+    const raw = typeof player.season_stats === "string" ? JSON.parse(player.season_stats) : player.season_stats;
+    if (raw && typeof raw === "object") {
+      for (const [key, block] of Object.entries(raw as Record<string, Record<string, unknown>>)) {
+        if (key === CURRENT_SEASON) continue;
+        const b = toBlock(block);
+        if (hasData(b)) archived[key] = b;
+      }
     }
-  } else {
-    if (games) lines.push(`- Games: ${games}`);
-    lines.push(`- Goals: ${goals}`);
-    lines.push(`- Assists: ${assists}`);
-    lines.push(`- Points: ${goals + assists}`);
-    if (games) lines.push(`- Goals/game: ${(goals / games).toFixed(2)}`);
+  } catch { archived = {}; }
+  const seasonKeys = Object.keys(archived).sort();
+  const total: Block = [current, ...seasonKeys.map((k) => archived[k])].reduce(
+    (acc, b) => ({
+      goals: acc.goals + b.goals, assists: acc.assists + b.assists, games: acc.games + b.games,
+      minutes: acc.minutes + b.minutes, shots: acc.shots + b.shots, saves: acc.saves + b.saves,
+    }),
+    toBlock(null),
+  );
+  const describe = (b: Block): string[] => {
+    const out: string[] = [];
+    if (isGoalie) {
+      if (b.games) out.push(`games ${b.games}`);
+      if (b.minutes) out.push(`minutes ${b.minutes}`);
+      if (b.shots) out.push(`shots against ${b.shots}`);
+      if (b.saves) out.push(`saves ${b.saves}`);
+      if (b.shots && b.saves) out.push(`SV% ${((b.saves / b.shots) * 100).toFixed(1)}%`);
+      if (b.minutes && b.shots) out.push(`GAA ${(((b.shots - b.saves) * 60) / b.minutes).toFixed(2)}`);
+    } else {
+      if (b.games) out.push(`games ${b.games}`);
+      out.push(`goals ${b.goals}`, `assists ${b.assists}`, `points ${b.goals + b.assists}`);
+      if (b.games) out.push(`points/game ${((b.goals + b.assists) / b.games).toFixed(2)}`);
+    }
+    return out;
+  };
+
+  lines.push("\nStatistics by season:");
+  lines.push(`- Current season ${CURRENT_SEASON}: ${hasData(current) ? describe(current).join(", ") : "no data yet (season just started)"}`);
+  for (const key of seasonKeys) {
+    lines.push(`- Season ${key}: ${describe(archived[key]).join(", ")}`);
+  }
+  if (seasonKeys.length > 0) {
+    lines.push(`- CAREER TOTAL (${seasonKeys.length + (hasData(current) ? 1 : 0)} seasons): ${describe(total).join(", ")}`);
+    lines.push("Base the assessment on the career totals and the trend between seasons; do not treat an empty current season as a lack of experience.");
   }
 
   // Achievements
@@ -328,7 +389,8 @@ Player position: ${posLabel}. Every recommendation must fit this position.
 
 ${positionFocus}
 
-Use Google Search for "${player.name}" hockey and team context when helpful.${hasVideos ? ` Watch each YouTube link in PLAYER DATA. Track jersey #${player.number || "?"} only.` : ""}
+### EXTERNAL RESEARCH (use Google Search)
+Search for "${player.name}"${player.birth_date ? ` (born ${player.birth_date})` : ""}${player.team ? ` "${player.team}"` : ""} hockey. Prioritise scouting-grade sources: Eliteprospects, league/federation statistics portals, tournament protocols and rosters, club pages, hockey media and scouting blogs. Extract only verified facts: past clubs, tournaments, awards, all-star selections, published stats, coach/scout quotes. Cite each such fact as (web: source name). If nothing reliable is found, write one line "No external records found" and do not speculate.${hasVideos ? ` Watch each YouTube link in PLAYER DATA. Track jersey #${player.number || "?"} only.` : ""}
 
 ### EVIDENCE RULES (CRITICAL — prevents generic reports)
 1. Every strength and every growth zone MUST cite its source in parentheses: (video ~MM:SS), (season stats), (normative: …), or (exercise history: …).
@@ -521,11 +583,18 @@ serve(async (req) => {
       .maybeSingle();
 
     const currentCount = usageRow?.count || 0;
+    const allowance = await computeAllowance(supabase, player_id);
+    const MAX_MONTHLY_USES = allowance.limit;
+    const allowanceInfo = {
+      limit: allowance.limit,
+      profile_complete: allowance.profileComplete,
+      invited_friends: allowance.invitedFriends,
+    };
 
     // ACTION: get_usage
     if (action === "get_usage") {
       return new Response(
-        JSON.stringify({ count: currentCount, remaining: MAX_MONTHLY_USES - currentCount }),
+        JSON.stringify({ count: currentCount, remaining: Math.max(0, MAX_MONTHLY_USES - currentCount), ...allowanceInfo }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -587,7 +656,8 @@ serve(async (req) => {
           error: "LIMIT_REACHED",
           count: currentCount,
           remaining: 0,
-          message: `You have used all ${MAX_MONTHLY_USES} analyses for this month. Resets on the 1st of next month.`,
+          ...allowanceInfo,
+          message: `You have used all ${MAX_MONTHLY_USES} analyses for this month. Invite a friend for +1 per month; resets on the 1st.`,
           // legacy compat
         }),
         { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -680,7 +750,8 @@ serve(async (req) => {
       JSON.stringify({
         analysis: analysisText,
         count: currentCount + 1,
-        remaining: MAX_MONTHLY_USES - currentCount - 1,
+        remaining: Math.max(0, MAX_MONTHLY_USES - currentCount - 1),
+        ...allowanceInfo,
         has_video_analysis: validVideos.length > 0,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }

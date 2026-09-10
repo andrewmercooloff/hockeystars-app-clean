@@ -15,12 +15,19 @@ $pages = [
     ['loc' => '/', 'changefreq' => 'weekly', 'priority' => '1.0'],
     ['loc' => '/en', 'changefreq' => 'weekly', 'priority' => '0.9'],
     ['loc' => '/top', 'changefreq' => 'daily', 'priority' => '0.8'],
+    ['loc' => '/search?lang=ru', 'changefreq' => 'daily', 'priority' => '0.8'],
+    ['loc' => '/search?lang=en', 'changefreq' => 'daily', 'priority' => '0.7'],
     ['loc' => '/rules.html', 'changefreq' => 'yearly', 'priority' => '0.3'],
     ['loc' => '/privacy-en.html', 'changefreq' => 'yearly', 'priority' => '0.3'],
     ['loc' => '/contact.html', 'changefreq' => 'yearly', 'priority' => '0.4'],
     ['loc' => '/delete-account.html', 'changefreq' => 'yearly', 'priority' => '0.2'],
     ['loc' => '/delete-account-en.html', 'changefreq' => 'yearly', 'priority' => '0.2'],
 ];
+
+foreach (range((int) date('Y') - 6, (int) date('Y') - 20) as $year) {
+    $pages[] = ['loc' => '/search?lang=ru&year=' . $year, 'changefreq' => 'weekly', 'priority' => '0.6'];
+    $pages[] = ['loc' => '/search?lang=en&year=' . $year, 'changefreq' => 'weekly', 'priority' => '0.5'];
+}
 
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 ?>

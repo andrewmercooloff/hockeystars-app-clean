@@ -11,7 +11,7 @@ HTTPS_CONF = REPO / "deploy" / "nginx" / "hockey-stars.com.conf"
 REMOTE_SITE = "/var/www/hockeystars-site"
 
 CONFIG_LOCAL = """<?php
-define('HS_NOTIFICORE_API_KEY', 'REDACTED_NOTIFICORE_KEY');
+define('HS_NOTIFICORE_API_KEY', getenv('NOTIFICORE_API_KEY') ?: '');
 define('HS_NOTIFICORE_ORIGINATOR', 'HockeyStars');
 define('HS_NOTIFICORE_SERVICE_NAME', 'ХоккейСтарс');
 """

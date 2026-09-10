@@ -33,8 +33,8 @@
 {
   "expo": {
     "extra": {
-      "twilioAccountSid": "REDACTED_TWILIO_ACCOUNT_SID",
-      "twilioAuthToken": "REDACTED_HEX_SECRET",
+      "twilioAccountSid": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "twilioAuthToken": "YOUR_TWILIO_AUTH_TOKEN",
       "twilioFromNumber": "+46731727922",
       "twilioFromNumberUS": "+12345678900",
       "twilioWhatsAppFrom": "whatsapp:+14155238886"

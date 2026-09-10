@@ -43,138 +43,55 @@ export async function registerChildWithParentalConsent(
   weight?: string, // Вес игрока
   number?: string // Номер игрока
 ): Promise<{ success: boolean; error?: string; playerId?: string }> {
+  const requestBody = {
+    phone, name, birthDate, parentEmail, country, position, team,
+    userStatus, language, avatar, grip, height, weight, number,
+  };
+
+  const mapError = (raw: unknown): string => {
+    const msg = typeof raw === 'string' ? raw : '';
+    if (
+      msg === 'PHONE_ALREADY_EXISTS' || msg === 'EMAIL_ALREADY_EXISTS' ||
+      msg.includes('уже зарегистрирован') || msg.includes('уже существует') ||
+      msg.includes('already exists') || msg.includes('already registered')
+    ) {
+      return 'PHONE_ALREADY_EXISTS';
+    }
+    if (msg === 'PARENT_EMAIL_SEND_FAILED' || msg.includes('Не удалось отправить письмо')) {
+      return 'PARENT_EMAIL_SEND_FAILED';
+    }
+    return msg || 'PARENTAL_CONSENT_ERROR';
+  };
+
+  // Один POST напрямую: functions.invoke() при не-2xx скрывает тело ответа,
+  // а повторный вызов создал бы вторую регистрацию (и ложное "номер уже занят").
   try {
-    console.log(`🌐 registerChildWithParentalConsent: передаем язык=${language}, avatar=${avatar ? 'есть' : 'нет'}`);
-    const requestBody = {
-        phone,
-        name,
-        birthDate,
-        parentEmail,
-        country,
-        position,
-        team,
-      userStatus, // Передаем исходный статус
-      language, // Передаем язык приложения
-      avatar, // Передаем аватар
-      grip, // Хват игрока
-      height, // Рост игрока
-      weight, // Вес игрока
-      number // Номер игрока
-    };
-    console.log(`🌐 Полный body запроса:`, JSON.stringify({ ...requestBody, phone: '[phone]', avatar: avatar ? (avatar.substring(0, 50) + '...') : 'нет' }));
-    // Вызываем Edge Function через SDK
-    const { data, error } = await supabase.functions.invoke('handle-child-registration', {
-      body: requestBody
+    const { supabaseUrl, supabaseAnonKey } = getSupabaseConfig();
+    const response = await supabaseFetch(`${supabaseUrl}/functions/v1/handle-child-registration`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${supabaseAnonKey}`,
+        'apikey': supabaseAnonKey,
+      },
+      body: JSON.stringify(requestBody),
     });
 
-    // Сначала проверяем, есть ли ошибка в data (даже при не-2xx статусе SDK может вернуть data)
-    if (data) {
-      if (data.error) {
-        const errorMessage = data.error;
-        // Проверяем, является ли это ошибкой о существующем пользователе
-        if (errorMessage.includes('уже зарегистрирован') || 
-            errorMessage.includes('уже существует') || 
-            errorMessage.includes('already exists') ||
-            errorMessage.includes('already registered')) {
-          return { success: false, error: 'PHONE_ALREADY_EXISTS' };
-        }
-        return { success: false, error: errorMessage };
-      }
-      if (data.success) {
-        return { success: true, playerId: data.playerId };
-      }
+    let data: any = null;
+    try {
+      data = await response.json();
+    } catch {
+      data = null;
     }
 
-    // Если есть error, используем прямой fetch для получения полного ответа
-    if (error) {
-      console.error('❌ Error calling handle-child-registration:', error);
-      
-      // Пытаемся извлечь сообщение из data, если оно есть
-      if (data && data.error) {
-        const errorMessage = data.error;
-        if (errorMessage.includes('уже зарегистрирован') || 
-            errorMessage.includes('уже существует') || 
-            errorMessage.includes('already exists') ||
-            errorMessage.includes('already registered')) {
-          return { success: false, error: 'PHONE_ALREADY_EXISTS' };
-        }
-        return { success: false, error: errorMessage };
-      }
-      
-      // Используем прямой fetch для получения полного ответа с телом ошибки
-      try {
-        const { supabaseUrl, supabaseAnonKey } = getSupabaseConfig();
-        
-        const response = await supabaseFetch(`${supabaseUrl}/functions/v1/handle-child-registration`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${supabaseAnonKey}`
-          },
-          body: JSON.stringify({
-            phone,
-            name,
-            birthDate,
-            parentEmail,
-            country,
-            position,
-            team,
-            userStatus,
-            language,
-            avatar,
-            grip,
-            height,
-            weight,
-            number
-          })
-        });
-
-        const responseData = await response.json();
-        
-        if (!response.ok && responseData.error) {
-          const errorMessage = responseData.error;
-          if (errorMessage.includes('уже зарегистрирован') || 
-              errorMessage.includes('уже существует') || 
-              errorMessage.includes('already exists') ||
-              errorMessage.includes('already registered')) {
-            return { success: false, error: 'Этот номер уже зарегистрирован. Попробуйте войти' };
-          }
-          return { success: false, error: errorMessage };
-        }
-      } catch (fetchError) {
-        console.error('❌ Error fetching full response:', fetchError);
-      }
-      
-      // Если не удалось получить сообщение из fetch, используем стандартное сообщение
-      const errorMessage = (error as any).context?.error || error.message;
-      if (errorMessage && (
-        errorMessage.includes('уже зарегистрирован') || 
-        errorMessage.includes('уже существует') || 
-        errorMessage.includes('already exists') ||
-        errorMessage.includes('already registered')
-      )) {
-        return { success: false, error: 'PHONE_ALREADY_EXISTS' };
-      }
-      
-      return { success: false, error: errorMessage || 'PARENTAL_CONSENT_ERROR' };
+    if (response.ok && data?.success) {
+      return { success: true, playerId: data.playerId };
     }
-
-    // Если нет ни data, ни error, но и нет success
-    if (!data || !data.success) {
-      return { success: false, error: data?.error || 'CONSENT_REQUEST_FAILED' };
-    }
-
-    return { success: true, playerId: data.playerId };
+    console.error('❌ handle-child-registration:', response.status, data);
+    return { success: false, error: mapError(data?.code || data?.error) };
   } catch (error: any) {
     console.error('❌ Error in registerChildWithParentalConsent:', error);
-    const errorMessage = error.message || 'UNKNOWN_ERROR';
-    if (errorMessage.includes('уже зарегистрирован') || 
-        errorMessage.includes('уже существует') || 
-        errorMessage.includes('already exists') ||
-        errorMessage.includes('already registered')) {
-      return { success: false, error: 'PHONE_ALREADY_EXISTS' };
-    }
-    return { success: false, error: errorMessage };
+    return { success: false, error: mapError(error?.message) };
   }
 }
 

@@ -24,7 +24,7 @@ import LikeButton from './LikeButton';
 import { generatePhotoContentId } from '../utils/likesService';
 import { colors } from '../theme/colors';
 import { rewriteSupabasePublicUrl } from '../utils/supabase';
-import { updateAvatarGlobally } from '../utils/AvatarCache';
+import { ensureAvatarCached } from '../utils/AvatarCache';
 
 interface PhotoAddedNotificationProps {
   playerName: string;
@@ -196,7 +196,7 @@ const PhotoAddedNotification = React.memo(function PhotoAddedNotification({
 
   useEffect(() => {
     if (!playerId || !playerAvatar) return;
-    void updateAvatarGlobally(playerId, playerAvatar);
+    void ensureAvatarCached(playerId, playerAvatar);
   }, [playerId, playerAvatar]);
 
   useEffect(() => {

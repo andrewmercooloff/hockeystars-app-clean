@@ -6,6 +6,8 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import {
     Alert,
     Animated,
+    AppState,
+    type AppStateStatus,
     BackHandler,
     Image,
     ImageBackground,
@@ -25,6 +27,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from '../../components/BlurOrSolid';
+import { onInboxRefresh } from '../../utils/inboxEvents';
 import LoadingCenter from '../../components/LoadingCenter';
 import { colors } from '../../theme/colors';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
@@ -589,6 +592,28 @@ export default function ChatScreen() {
     };
   }, [currentUser?.id, otherPlayer?.id, id]);
 
+  // Возврат из фона и пуш о сообщении — тихая сверка с БД (сокет realtime в фоне закрыт)
+  const loadMessagesRef = useRef<((skipBlockCheck?: boolean) => Promise<void>) | null>(null);
+  useEffect(() => {
+    if (!currentUser || !otherPlayer || otherPlayer.id !== id) return;
+    let last: AppStateStatus = AppState.currentState;
+    const appSub = AppState.addEventListener('change', (next) => {
+      if ((last === 'background' || last === 'inactive') && next === 'active') {
+        void loadMessagesRef.current?.(true);
+      }
+      last = next;
+    });
+    const offInbox = onInboxRefresh(({ peerId }) => {
+      if (!peerId || peerId === otherPlayer.id) {
+        void loadMessagesRef.current?.(true);
+      }
+    });
+    return () => {
+      appSub.remove();
+      offInbox();
+    };
+  }, [currentUser?.id, otherPlayer?.id, id]);
+
   // Функция загрузки сообщений - определена до useFocusEffect чтобы избежать ошибки "Cannot access before initialization"
   const loadMessages = useCallback(async (skipBlockCheck = false) => {
     if (currentUser && otherPlayer && otherPlayer.id === id) {
@@ -698,6 +723,7 @@ export default function ChatScreen() {
       }
     }
   }, [currentUser, otherPlayer, id, t, router]);
+  loadMessagesRef.current = loadMessages;
 
   // Обработка системной кнопки "назад" и восстановление позиции при возврате в чат
   useFocusEffect(
@@ -715,7 +741,11 @@ export default function ChatScreen() {
       const loadMessagesOnFocus = async () => {
         // Если данные уже загружены через loadChatData, не загружаем повторно
         if (chatDataLoadedRef.current) {
-          console.log('📱 Чат в фокусе - данные уже загружены, пропускаем повторную загрузку');
+          // Данные уже есть — всё равно тихо сверяемся с БД: realtime мог пропустить
+          // сообщения, пока экран был не в фокусе (loadMessages мерджит, без мигания)
+          if (currentUser && otherPlayer && otherPlayer.id === id) {
+            void loadMessages(true);
+          }
           return;
         }
         

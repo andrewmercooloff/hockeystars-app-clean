@@ -12,6 +12,7 @@
     "lint": "expo lint",
     "submit:testflight": "node scripts/submit-latest-build.js",
     "submit:ios": "eas submit --platform ios --profile production --latest --non-interactive",
+    "ota:production": "node scripts/ota-production-guard.js && eas update --branch production --non-interactive",
     "postinstall": "patch-package"
   },
   "dependencies": {

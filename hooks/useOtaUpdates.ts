@@ -1,21 +1,66 @@
 import { useEffect, useRef } from 'react';
 import { AppState, type AppStateStatus, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { usePathname } from 'expo-router';
 import * as Updates from 'expo-updates';
+import { markOtaJustUpdated, presentOtaReload } from '../utils/otaReloadSignal';
 
 const CHECK_COOLDOWN_MS = 5 * 60_000;
+const FOREGROUND_POLL_MS = 30 * 60_000;
 const INITIAL_DELAY_MS = 20_000;
 const PENDING_UPDATE_KEY = 'hs_ota_pending_reload_v1';
 
+const isAuthPath = (pathname: string | null): boolean =>
+  !!pathname && (pathname.startsWith('/login') || pathname.startsWith('/register'));
+
+/** Apply a downloaded OTA bundle (e.g. before login when user kept app open for days). */
+export async function applyOtaUpdateIfPending(): Promise<boolean> {
+  if (__DEV__ || Platform.OS === 'web' || !Updates.isEnabled) {
+    return false;
+  }
+  try {
+    const pending = await AsyncStorage.getItem(PENDING_UPDATE_KEY);
+    if (pending !== '1') {
+      return false;
+    }
+    await AsyncStorage.removeItem(PENDING_UPDATE_KEY);
+    await reloadWithResurfacing(true);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /**
- * Downloads OTA updates in the background and applies them only when the user
- * leaves the app (background) — avoids a jarring mid-session reload.
+ * Reload into the downloaded bundle. When the user can see the screen we first
+ * play the "ice resurfacing" overlay so the restart doesn't feel like a crash;
+ * a flag makes the next launch show a short "updated" toast.
+ */
+async function reloadWithResurfacing(visible: boolean): Promise<void> {
+  await markOtaJustUpdated();
+  if (visible) {
+    await presentOtaReload();
+  }
+  await Updates.reloadAsync();
+}
+
+/**
+ * Downloads OTA updates in the background and applies them when safe:
+ * - user leaves the app (background / inactive)
+ * - user opens login or register (critical auth fixes)
+ * - periodic poll while app stays in foreground (long-running sessions)
  */
 export function useOtaUpdates(): void {
+  const pathname = usePathname();
   const checkingRef = useRef(false);
   const lastCheckRef = useRef(0);
   const pendingReloadRef = useRef(false);
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
+  const pathnameRef = useRef(pathname);
+
+  useEffect(() => {
+    pathnameRef.current = pathname;
+  }, [pathname]);
 
   useEffect(() => {
     if (__DEV__ || Platform.OS === 'web' || !Updates.isEnabled) {
@@ -26,12 +71,12 @@ export function useOtaUpdates(): void {
       pendingReloadRef.current = v === '1';
     });
 
-    const applyPendingReload = async () => {
+    const applyPendingReload = async (visible: boolean) => {
       if (!pendingReloadRef.current) return;
       pendingReloadRef.current = false;
       await AsyncStorage.removeItem(PENDING_UPDATE_KEY);
       try {
-        await Updates.reloadAsync();
+        await reloadWithResurfacing(visible);
       } catch {
         /* ignore */
       }
@@ -50,9 +95,12 @@ export function useOtaUpdates(): void {
         await Updates.fetchUpdateAsync();
         pendingReloadRef.current = true;
         await AsyncStorage.setItem(PENDING_UPDATE_KEY, '1');
-        // If already in background, reload immediately (user won't notice).
-        if (appStateRef.current !== 'active') {
-          await applyPendingReload();
+
+        const canReloadNow =
+          appStateRef.current !== 'active' || isAuthPath(pathnameRef.current);
+
+        if (canReloadNow) {
+          await applyPendingReload(appStateRef.current === 'active');
         }
       } catch {
         /* OTA unavailable — ignore */
@@ -65,12 +113,19 @@ export function useOtaUpdates(): void {
       void checkAndDownload();
     }, INITIAL_DELAY_MS);
 
+    const pollTimer = setInterval(() => {
+      if (appStateRef.current === 'active') {
+        void checkAndDownload();
+      }
+    }, FOREGROUND_POLL_MS);
+
     const subscription = AppState.addEventListener('change', (nextState) => {
       const wasActive = appStateRef.current === 'active';
-      const goingBackground = nextState === 'background' || nextState === 'inactive';
+      const leavingActive =
+        nextState === 'background' || nextState === 'inactive';
 
-      if (wasActive && goingBackground && pendingReloadRef.current) {
-        void applyPendingReload();
+      if (wasActive && leavingActive && pendingReloadRef.current) {
+        void applyPendingReload(false);
       }
 
       if (
@@ -85,7 +140,14 @@ export function useOtaUpdates(): void {
 
     return () => {
       clearTimeout(initialTimer);
+      clearInterval(pollTimer);
       subscription.remove();
     };
   }, []);
+
+  // Auth screens: apply a pending bundle as soon as user opens login/register.
+  useEffect(() => {
+    if (!isAuthPath(pathname)) return;
+    void applyOtaUpdateIfPending();
+  }, [pathname]);
 }

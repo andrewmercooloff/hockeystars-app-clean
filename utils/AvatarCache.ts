@@ -63,12 +63,10 @@ class AvatarCache {
       // Если в кеше уже есть URL и новый URL содержит тот же файл
     // НЕ обновляем кеш - игнорируем дублирующие аватары из уведомлений
     if (oldUrl && avatarUrl) {
-      // Извлекаем имя файла из URL (последняя часть после последнего /)
+      // Имя файла ВМЕСТЕ с параметрами: ?v=<time> означает новый файл под старым именем
       const getFilename = (url: string) => {
         const parts = url.split('/');
-        const lastPart = parts[parts.length - 1];
-        // Удаляем параметры запроса, если есть
-        return lastPart.split('?')[0];
+        return parts[parts.length - 1];
       };
       
       const oldFilename = getFilename(oldUrl);
@@ -84,16 +82,10 @@ class AvatarCache {
     
     
     try {
-      // При forceNotify очищаем кэш изображений, чтобы гарантировать загрузку нового файла
-      if (forceNotify) {
-        try {
-          // Очищаем кэш expo-image для принудительной перезагрузки
-          await Image.clearMemoryCache();
-        } catch (cacheError) {
-          console.warn('⚠️ Не удалось очистить кэш изображений:', cacheError);
-        }
-      }
-      
+      // Глобальный Image.clearMemoryCache() здесь был ошибкой: он выбрасывал из памяти
+      // аватары ВСЕХ игроков ради одного. Новый файл под тем же именем и так
+      // подхватывается через уникальный _v=timestamp ниже.
+
       // При forceNotify используем timestamp для гарантированной перезагрузки
       // Иначе инкрементируем версию
       const currentVersion = this.avatarVersions.get(playerId) || 0;
@@ -189,6 +181,17 @@ class AvatarCache {
 }
 
 export const avatarCache = AvatarCache.getInstance();
+
+/**
+ * Один и тот же файл или разные. Хост не учитываем: direct и proxy отдают один
+ * объект, а строки приходят из разных мест — realtime отдаёт URL как в БД, а в
+ * списках он уже переписан на активный origin. Параметры (?v=, _v=) оставляем:
+ * перезаписанный под тем же именем файл — это уже другой аватар.
+ */
+export const isSameAvatarFile = (a?: string | null, b?: string | null): boolean => {
+  const path = (url?: string | null) => (url || '').replace(/^https?:\/\/[^/]+/, '');
+  return path(a) === path(b);
+};
 
 // Хук для подписки на изменения аватаров
 export const useAvatarCache = (playerId: string, fallbackUrl?: string) => {
@@ -286,10 +289,21 @@ export const useAvatarCache = (playerId: string, fallbackUrl?: string) => {
   return avatarUrl;
 };
 
-// Функция для обновления аватара во всех местах
-// ВАЖНО: forceNotify = true гарантирует уведомление всех listeners при обновлении
+// Аватар РЕАЛЬНО изменился (новый файл загружен / пришло realtime‑событие смены):
+// ломаем кеш через _v=timestamp и уведомляем всех подписчиков.
+// НЕ вызывать при обычной загрузке профиля — иначе каждый вход = новый уникальный URL,
+// который никогда не берётся с диска и на плохой сети остаётся чёрным кругом.
 export const updateAvatarGlobally = async (playerId: string, newAvatarUrl: string): Promise<void> => {
   await avatarCache.setAvatar(playerId, newAvatarUrl, true);
+};
+
+/**
+ * Просто убедиться, что URL аватара известен кешу (после getCurrentUser, refresh и т.п.).
+ * Тот же файл → ничего не делает; другой файл → обычное обновление без timestamp.
+ */
+export const ensureAvatarCached = async (playerId: string, avatarUrl: string): Promise<void> => {
+  if (!playerId || !avatarUrl) return;
+  await avatarCache.setAvatar(playerId, avatarUrl, false);
 };
 
 // Функция для предзагрузки аватара

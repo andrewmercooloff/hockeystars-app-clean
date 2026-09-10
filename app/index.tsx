@@ -1,9 +1,39 @@
 import React, { useEffect, useLayoutEffect, useRef, useState, useCallback, useMemo, Suspense } from 'react';
 import { View, StyleSheet, Dimensions, Image as RNImage, TouchableOpacity, Platform, Vibration, AppState, AppStateStatus, InteractionManager } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Image as ExpoImage } from 'expo-image';
 import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useIsFocused } from '@react-navigation/native';
-import Animated, { useAnimatedStyle, useSharedValue, withTiming, runOnJS } from 'react-native-reanimated';
+import Animated, { Easing as ReEasing, makeMutable, useAnimatedStyle, useSharedValue, withDelay, withTiming, runOnJS, type SharedValue } from 'react-native-reanimated';
+
+/**
+ * The whole puck layer fades in as one group when the home tab (re)mounts.
+ * Per-view entering animations left iOS shadow layers painting as grey
+ * rectangles for a few frames; a single opacity ramp on the parent hides
+ * that window and reads as "the ice lights up".
+ */
+const PuckSceneFade: React.FC<{
+  ready: boolean;
+  onRevealed: () => void;
+  children: React.ReactNode;
+}> = ({ ready, onRevealed, children }) => {
+  const opacity = useSharedValue(0);
+  useEffect(() => {
+    if (!ready) return;
+    // Two frames for native layout/border rendering to settle, then ramp up.
+    opacity.value = withDelay(
+      120,
+      withTiming(1, { duration: 380, easing: ReEasing.out(ReEasing.cubic) }, (finished) => {
+        if (finished) runOnJS(onRevealed)();
+      })
+    );
+  }, [opacity, ready, onRevealed]);
+  const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
+  return (
+    <Animated.View style={[StyleSheet.absoluteFill, style]} pointerEvents="box-none">
+      {children}
+    </Animated.View>
+  );
+};
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Puck, { PUCK_SCOUT_LOGO } from '../components/Puck';
@@ -18,22 +48,25 @@ import {
   mergePlayerFromPlayersRealtimeRow,
   getPlayerSeasonPoints,
 } from '../utils/playerStorage';
-import { preloadPlayerAvatars, seedPlayerAvatarUrls, updateAvatarGlobally } from '../utils/AvatarCache';
+import { isSameAvatarFile, preloadPlayerAvatars, seedPlayerAvatarUrls, updateAvatarGlobally } from '../utils/AvatarCache';
 import { supabase } from '../utils/supabase';
 import CountryFilter from '../components/CountryFilter';
 import YearFilter from '../components/YearFilter';
 import InviteFriendsPill from '../components/InviteFriendsPill';
 import IceRinkMarkings from '../components/IceRinkMarkings';
+import { colors } from '../theme/colors';
 import { useCountryFilter } from '../utils/CountryFilterContext';
 import { useYearFilter } from '../utils/YearFilterContext';
 import { navigateToPlayerProfile } from '../utils/navigateToPlayer';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getPerformanceLevel, isLowEndAndroid, startupPhysicsDeferMs, startupRenderGraceMs } from '../utils/devicePerformance';
 import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
+import { useWebIsFocused, useWebPathname } from '../hooks/useWebOnly';
 import PuckGame from '../components/PuckGame';
 import HockeyStarQuizGame from '../components/HockeyStarQuizGame';
 import CachedBackground from '../components/CachedBackground';
 import { ICE_BACKGROUND } from '../utils/iceBackground';
+import { markHomeSceneMounted, markHomeSceneReady } from '../utils/homeSceneSignal';
 import HomeSeoHead from '../components/HomeSeoHead';
 import {
   getTopSeasonLeaderRanks,
@@ -64,8 +97,10 @@ const usePuckCollisionSystem = (
   physicsActive = true,
   leaderRanks?: Map<string, LeaderRank>,
   basePuckSize?: number,
+  dustEmitter?: React.RefObject<IceDustHandle | null>,
 ) => {
   const puckSize = basePuckSize ?? PUCK_BASE_SIZE;
+  const dustLastEmitRef = useRef<Map<string, number>>(new Map());
   const leaderRanksRef = useRef(leaderRanks);
   leaderRanksRef.current = leaderRanks;
   const sizeForPlayer = useCallback(
@@ -118,7 +153,7 @@ const usePuckCollisionSystem = (
   
   // Shared values для всех позиций - обновляются напрямую без React state
   // Тип: объект с value для совместимости с useSharedValue
-  const sharedPositionsRef = useRef<Map<string, { x: { value: number }, y: { value: number } }>>(new Map());
+  const sharedPositionsRef = useRef<Map<string, { x: { value: number }, y: { value: number }, vx?: { value: number }, vy?: { value: number } }>>(new Map());
   
   // Адаптивные константы для FPS - баланс между плавностью и производительностью
   // ИСПРАВЛЕНИЕ: Увеличено до 80 FPS для максимальной плавности
@@ -1241,7 +1276,31 @@ const usePuckCollisionSystem = (
       alphaRef.current = alpha;
 
       const physics = physicsPositionsRef.current;
+      // Снежная пыль: не чаще 2 вспышек за кадр на всю сцену — JS→UI трафик ограничен.
+      const dust = dustEmitter?.current;
+      let dustBudget = dust ? 2 : 0;
+      const nowMs = Date.now();
       physics.forEach(physicsPos => {
+        if (dustBudget > 0 && !physicsPos.isDragging) {
+          const speed = Math.sqrt(physicsPos.vx * physicsPos.vx + physicsPos.vy * physicsPos.vy);
+          if (speed > 0.9) {
+            const last = dustLastEmitRef.current.get(physicsPos.id) ?? 0;
+            const interval = Math.max(70, 160 - speed * 18);
+            if (nowMs - last >= interval) {
+              dustLastEmitRef.current.set(physicsPos.id, nowMs);
+              dustBudget--;
+              const half = physicsPos.size / 2;
+              const back = half * 0.55;
+              dust!.emit(
+                physicsPos.x + half - (physicsPos.vx / speed) * back,
+                physicsPos.y + half - (physicsPos.vy / speed) * back,
+                Math.atan2(physicsPos.vy, physicsPos.vx),
+                Math.min(1, (speed - 0.6) / 3),
+                physicsPos.size,
+              );
+            }
+          }
+        }
         const shared = sharedPositionsRef.current.get(physicsPos.id);
         if (shared && shared.x && shared.y) {
           if (!useInterpolation) {
@@ -1569,8 +1628,8 @@ const usePuckCollisionSystem = (
   }, []);
 
   // Функция для регистрации shared values из компонентов
-  const registerSharedPosition = useCallback((id: string, x: { value: number }, y: { value: number }) => {
-    sharedPositionsRef.current.set(id, { x, y });
+  const registerSharedPosition = useCallback((id: string, x: { value: number }, y: { value: number }, vx?: { value: number }, vy?: { value: number }) => {
+    sharedPositionsRef.current.set(id, { x, y, vx, vy });
   }, []);
 
   return {
@@ -1607,6 +1666,100 @@ interface PuckPosition {
 // Импортируем оригинальный PuckAnimator из основного экрана
 // Для этого нужно создать временную копию компонента
 // Мемоизированный компонент шайбы для оптимизации производительности
+export type IceDustHandle = {
+  emit: (x: number, y: number, angle: number, strength: number, puckSize: number) => void;
+};
+
+const DUST_POOL = 40;
+const DUST_LIFE_MS = 1050;
+
+type DustSlot = {
+  x: SharedValue<number>;
+  y: SharedValue<number>;
+  angle: SharedValue<number>;
+  strength: SharedValue<number>;
+  size: SharedValue<number>;
+  progress: SharedValue<number>;
+};
+
+const DustFlake = React.memo(({ slot }: { slot: DustSlot }) => {
+  const style = useAnimatedStyle(() => {
+    const p = slot.progress.value;
+    if (p >= 1 || slot.strength.value <= 0) {
+      return { opacity: 0, transform: [{ translateX: -9999 }] };
+    }
+    // h — поперёк хода шайбы: это и есть ширина следа (пятно повёрнуто по вектору скорости).
+    const w = slot.size.value * 0.6;
+    const h = slot.size.value * 0.34;
+    const life = 1 - p;
+    const spread = 0.85 + p * 0.55;
+    return {
+      opacity: slot.strength.value * 0.44 * life * life * Math.min(1, p * 6 + 0.35),
+      width: w,
+      height: h,
+      borderRadius: h / 2,
+      transform: [
+        { translateX: slot.x.value - w / 2 },
+        { translateY: slot.y.value - h / 2 },
+        { rotate: `${slot.angle.value}rad` },
+        { scaleX: spread },
+        { scaleY: 0.7 + spread * 0.3 },
+      ],
+    };
+  });
+  return <Animated.View pointerEvents="none" style={[styles.trailFlake, style]} />;
+});
+DustFlake.displayName = 'DustFlake';
+
+/**
+ * Снежная пыль на льду — один слой в мировых координатах под всеми шайбами.
+ * Пул фиксированного размера; каждое пятно анимируется withTiming только пока
+ * живо, поэтому на кадр не выполняется никакой лишней работы (в отличие от
+ * покадрового worklet на каждую шайбу).
+ */
+const IceDustLayer = React.forwardRef<IceDustHandle, { enabled: boolean }>(({ enabled }, ref) => {
+  const slots = useRef<DustSlot[] | null>(null);
+  if (!slots.current) {
+    slots.current = Array.from({ length: DUST_POOL }, () => ({
+      x: makeMutable(0),
+      y: makeMutable(0),
+      angle: makeMutable(0),
+      strength: makeMutable(0),
+      size: makeMutable(0),
+      progress: makeMutable(1),
+    }));
+  }
+  const nextRef = useRef(0);
+  React.useImperativeHandle(
+    ref,
+    () => ({
+      emit: (x, y, angle, strength, puckSize) => {
+        if (!enabled) return;
+        const pool = slots.current!;
+        const slot = pool[nextRef.current];
+        nextRef.current = (nextRef.current + 1) % DUST_POOL;
+        slot.x.value = x;
+        slot.y.value = y;
+        slot.angle.value = angle;
+        slot.strength.value = strength;
+        slot.size.value = puckSize;
+        slot.progress.value = 0;
+        slot.progress.value = withTiming(1, { duration: DUST_LIFE_MS, easing: ReEasing.linear });
+      },
+    }),
+    [enabled]
+  );
+  if (!enabled) return null;
+  return (
+    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+      {slots.current.map((slot, i) => (
+        <DustFlake key={i} slot={slot} />
+      ))}
+    </View>
+  );
+});
+IceDustLayer.displayName = 'IceDustLayer';
+
 const OriginalPuckAnimator = React.memo(({
   player,
   position,
@@ -1615,7 +1768,8 @@ const OriginalPuckAnimator = React.memo(({
   onDrag,
   enableDrag = true,
   getAndroidPerformanceLevel,
-  registerSharedPosition
+  registerSharedPosition,
+  onAvatarReady,
 }: {
   player: Player; 
   position: PuckPosition; 
@@ -1624,10 +1778,13 @@ const OriginalPuckAnimator = React.memo(({
   onDrag?: (id: string, x: number, y: number, vx: number, vy: number, isDragging?: boolean) => void;
   enableDrag?: boolean;
   getAndroidPerformanceLevel?: () => 'high' | 'medium' | 'low';
-  registerSharedPosition?: (id: string, x: { value: number }, y: { value: number }) => void;
+  registerSharedPosition?: (id: string, x: { value: number }, y: { value: number }, vx?: { value: number }, vy?: { value: number }) => void;
+  onAvatarReady?: (id: string) => void;
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [hasDragged, setHasDragged] = useState(false);
+  const isDraggingRef = useRef(false);
+  const pointerActiveRef = useRef(false);
   const dragStartRef = useRef({ x: 0, y: 0, pageX: 0, pageY: 0, time: 0, startX: 0, startY: 0 });
   const lastPositionRef = useRef({ x: 0, y: 0 });
   const hasDraggedRef = useRef(false);
@@ -1647,9 +1804,28 @@ const OriginalPuckAnimator = React.memo(({
     }
   }, [position.id, animatedX, animatedY, registerSharedPosition]);
 
+  // Шайба проявляется только с уже декодированным аватаром — при смене фильтров
+  // новые шайбы не выскакивают чёрными дисками. Предохранитель на медленной сети.
+  const puckReveal = useSharedValue(0);
+  const revealedRef = useRef(false);
+  const revealPuck = useCallback(() => {
+    if (revealedRef.current) return;
+    revealedRef.current = true;
+    puckReveal.value = withTiming(1, { duration: 260, easing: ReEasing.out(ReEasing.cubic) });
+  }, [puckReveal]);
+  useEffect(() => {
+    const timeout = setTimeout(revealPuck, 1200);
+    return () => clearTimeout(timeout);
+  }, [revealPuck]);
+  const handleAvatarReady = useCallback(() => {
+    revealPuck();
+    onAvatarReady?.(player.id);
+  }, [revealPuck, onAvatarReady, player.id]);
+
   const animatedStyle = useAnimatedStyle(() => ({
     left: animatedX.value,
     top: animatedY.value,
+    opacity: puckReveal.value,
   }), []);
 
   const handleTouchStart = (e: any) => {
@@ -1678,6 +1854,7 @@ const OriginalPuckAnimator = React.memo(({
     // Синхронизация с устаревшими position.x/y вызывала "мелькание" шайбы в пустом месте
     
     setIsDragging(true);
+    isDraggingRef.current = true;
     
     // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Сразу обновляем физику с текущей позицией
     // Это предотвращает "мелькание" шайбы в пустом месте при касании
@@ -1693,7 +1870,7 @@ const OriginalPuckAnimator = React.memo(({
   };
 
   const handleTouchMove = (e: any) => {
-    if (!isDragging || !onDrag) return;
+    if (!isDraggingRef.current || !onDrag) return;
     
     const touch = e.nativeEvent;
     const now = Date.now();
@@ -1761,6 +1938,7 @@ const OriginalPuckAnimator = React.memo(({
 
   const handleTouchEnd = () => {
     setIsDragging(false);
+    isDraggingRef.current = false;
     
     if (onDrag && hasDraggedRef.current) {
       // Это был drag - применяем скорость движения, с которой двигали шайбу
@@ -1871,19 +2049,83 @@ const OriginalPuckAnimator = React.memo(({
     }, 100);
   };
 
+  const beginPointerInteraction = useCallback((pageX: number, pageY: number) => {
+    dragStartRef.current = {
+      x: 0,
+      y: 0,
+      pageX,
+      pageY,
+      time: Date.now(),
+      startX: animatedX.value,
+      startY: animatedY.value,
+    };
+    lastPositionRef.current = { x: animatedX.value, y: animatedY.value };
+    hasDraggedRef.current = false;
+    setHasDragged(false);
+    dragVelocityRef.current = { vx: 0, vy: 0 };
+    dragHistoryRef.current = [];
+    setIsDragging(true);
+    isDraggingRef.current = true;
+    if (onDrag) {
+      onDrag(position.id, animatedX.value, animatedY.value, 0, 0, true);
+    }
+  }, [animatedX, animatedY, onDrag, position.id]);
+
+  const webPointerProps = useMemo(() => {
+    if (Platform.OS !== 'web' || !enableDrag) return null;
+    return {
+      onPointerDown: (e: any) => {
+        if (e?.button != null && e.button !== 0) return;
+        pointerActiveRef.current = true;
+        const ne = e?.nativeEvent || e || {};
+        beginPointerInteraction(ne.pageX ?? ne.clientX ?? 0, ne.pageY ?? ne.clientY ?? 0);
+        if (typeof e?.preventDefault === 'function') e.preventDefault();
+      },
+      onPointerMove: (e: any) => {
+        if (!pointerActiveRef.current) return;
+        const ne = e?.nativeEvent || e || {};
+        handleTouchMove({
+          nativeEvent: {
+            pageX: ne.pageX ?? ne.clientX ?? 0,
+            pageY: ne.pageY ?? ne.clientY ?? 0,
+          },
+        });
+      },
+      onPointerUp: (e: any) => {
+        if (!pointerActiveRef.current) return;
+        pointerActiveRef.current = false;
+        const wasDrag = hasDraggedRef.current;
+        handleTouchEnd();
+        if (!wasDrag) {
+          onNav();
+        }
+      },
+      onPointerCancel: () => {
+        pointerActiveRef.current = false;
+        handleTouchEnd();
+      },
+    } as any;
+  }, [enableDrag, beginPointerInteraction, handleTouchMove, handleTouchEnd, onNav]);
+
   return (
     <Animated.View 
-      style={[styles.puckContainer, animatedStyle]}
-      onTouchStart={enableDrag ? handleTouchStart : undefined}
-      onTouchMove={enableDrag ? handleTouchMove : undefined}
-      onTouchEnd={enableDrag ? handleTouchEnd : undefined}
+      style={[
+        styles.puckContainer,
+        animatedStyle,
+        Platform.OS === 'web' && ({ touchAction: 'none', cursor: 'grab' } as any),
+      ]}
+      {...(webPointerProps ?? {})}
+      onTouchStart={enableDrag && Platform.OS !== 'web' ? handleTouchStart : undefined}
+      onTouchMove={enableDrag && Platform.OS !== 'web' ? handleTouchMove : undefined}
+      onTouchEnd={enableDrag && Platform.OS !== 'web' ? handleTouchEnd : undefined}
     >
       <Puck
           avatar={player.avatar}
           playerId={player.id}
           denseScene
+          suppressWebTap={Platform.OS === 'web'}
           onPress={() => {
-            if (!hasDragged) {
+            if (!hasDraggedRef.current) {
               onNav();
             }
           }}
@@ -1897,6 +2139,7 @@ const OriginalPuckAnimator = React.memo(({
           leaderRank={leaderRank}
           isOnline={player.isOnline}
           isNew={player.createdAt ? (Date.now() - new Date(player.createdAt).getTime()) < 2 * 24 * 60 * 60 * 1000 : false}
+          onAvatarReady={handleAvatarReady}
         />
     </Animated.View>
   );
@@ -1923,8 +2166,20 @@ export default function HomeScreen() {
   const { language } = useLanguage();
   const { setCurrentScreen, currentScreen } = useScreenContext();
   const params = useLocalSearchParams();
-  const isFocused = useIsFocused();
+  const isFocused = useWebIsFocused();
+  const pathname = useWebPathname();
+  // Web: render the rink only on /feed while focused — an inactive scene would sit
+  // on top of deep-linked player profiles and swallow touches.
+  const isWebHomeRoute =
+    Platform.OS === 'web' &&
+    (pathname === '/feed' || pathname === '/' || pathname === '');
   const performanceLevel = useMemo(() => getPerformanceLevel(), []);
+
+  // Заставка ждёт лёд: пока сцена не проявилась, логотип не уходит.
+  useEffect(() => {
+    if (Platform.OS === 'web' && !isWebHomeRoute) return;
+    markHomeSceneMounted();
+  }, [isWebHomeRoute]);
   const isDesktopLayout = useIsDesktopLayout();
   // Desktop: physics on (pucks move), drag off (no grab with mouse)
   const [physicsActive, setPhysicsActive] = useState(!isLowEndAndroid());
@@ -2614,24 +2869,23 @@ export default function HomeScreen() {
     lastPuckPrefetchSigRef.current = sig;
 
     const concurrency =
-      performanceLevel === 'low' ? 3 : performanceLevel === 'medium' ? 5 : 12;
+      performanceLevel === 'low' ? 3 : performanceLevel === 'medium' ? 5 : 8;
 
     const run = () => {
       preloadPlayerAvatars(puckPlayers, { concurrency }).catch(() => {});
     };
 
-    if (isLowEndAndroid()) {
-      let timeout: ReturnType<typeof setTimeout> | null = null;
-      const handle = InteractionManager.runAfterInteractions(() => {
-        timeout = setTimeout(run, physicsActive ? 0 : startupPhysicsDeferMs());
-      });
-      return () => {
-        handle.cancel?.();
-        if (timeout) clearTimeout(timeout);
-      };
-    }
-
-    run();
+    // Шайбы на льду грузят те же URL сами, поэтому прогрев ничего не ускоряет —
+    // он только греет диск на будущее. Запускать его прямо на монтировании значит
+    // отдать первым кадрам горсть параллельных загрузок: старт заметно дёргается.
+    let timeout: ReturnType<typeof setTimeout> | null = null;
+    const handle = InteractionManager.runAfterInteractions(() => {
+      timeout = setTimeout(run, isLowEndAndroid() && !physicsActive ? startupPhysicsDeferMs() : 0);
+    });
+    return () => {
+      handle.cancel?.();
+      if (timeout) clearTimeout(timeout);
+    };
   }, [allVisiblePlayers, performanceLevel, physicsActive]);
 
   // Для игры: берём игроков НЕЗАВИСИМО от фильтров (страна/год),
@@ -2680,6 +2934,17 @@ export default function HomeScreen() {
   // Пока открыта полноэкранная игра (шайбы главного экрана не видны под модалкой),
   // ставим домашнюю физику на паузу — иначе на слабых устройствах работают два движка сразу.
   const effectiveScreenForPhysics = (showGame || showQuizGame) ? 'game-modal' : (currentScreen || undefined);
+  const iceDustRef = useRef<IceDustHandle | null>(null);
+
+  // Шайбы стоят, пока сцена проявляется. Групповая прозрачность заставляет iOS
+  // композитить весь слой шайб offscreen, и физика в этот момент отъедает те самые
+  // кадры, на которых старт «подтормаживает». Ждём конца проявления — дальше
+  // композитинга нет и лёд оживает на чистом кадре.
+  const [sceneRevealed, setSceneRevealed] = useState(false);
+  const handleSceneRevealed = useCallback(() => {
+    setSceneRevealed(true);
+    markHomeSceneReady();
+  }, []);
 
   const { puckPositions, updatePuckPosition, boundaries, registerSharedPosition, resetPucksMotion } = usePuckCollisionSystem(
     puckPlayersForScene,
@@ -2688,9 +2953,10 @@ export default function HomeScreen() {
     puckFieldWidth,
     puckFieldHeight,
     playfieldLayoutReady,
-    physicsActive,
+    physicsActive && sceneRevealed,
     homeLeaderRanks,
     scaledPuckSize,
+    iceDustRef,
   );
 
   // На слабом Android: как только шайбы на льду — сразу включаем физику (без второй паузы).
@@ -2761,7 +3027,7 @@ export default function HomeScreen() {
         hasLoadedBlockedInitiallyRef.current = true;
       }
       return () => {
-        setCurrentScreen(null);
+        setCurrentScreen(null, 'home');
       };
     }, [setCurrentScreen, currentUser?.id, loadBlockedUsers, params.refresh, loadAllPlayers, resetPucksMotion])
   );
@@ -2897,7 +3163,7 @@ export default function HomeScreen() {
               const AsyncStorage = require('@react-native-async-storage/async-storage').default;
               AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]).catch(() => {});
             }
-            if (playerData.avatar != null && playerData.avatar !== cur.avatar) {
+            if (playerData.avatar != null && !isSameAvatarFile(playerData.avatar as string, cur.avatar)) {
               void updateAvatarGlobally(playerId, playerData.avatar as string);
             }
             return currentPlayers.map((p, i) => (i === idx ? merged.next : p));
@@ -2958,7 +3224,8 @@ export default function HomeScreen() {
       setShowQuizGame(true);
       return;
     }
-    if (!currentUser) {
+    // Web: guests can open public profiles; native app still requires sign-in.
+    if (!currentUser && Platform.OS !== 'web') {
       router.push('/login');
       return;
     }
@@ -2977,6 +3244,47 @@ export default function HomeScreen() {
   // Компоненты получают позиции через shared values, которые обновляются каждый кадр
   // React state обновляется только при изменении списка игроков (добавление/удаление)
   // Используем puckPlayersForScene — тот же набор, что и в физике (без двойной инициализации)
+  // Сцена появляется только когда аватары шайб уже декодированы (или истёк лимит ожидания):
+  // иначе шайбы выезжают чёрными кружками и аватары «проявляются» с задержкой.
+  const AVATARS_SETTLE_MAX_WAIT_MS = 900;
+  const [avatarsSettled, setAvatarsSettled] = useState(false);
+  const readyAvatarIdsRef = useRef<Set<string>>(new Set());
+  const sceneIdsRef = useRef<Set<string>>(new Set());
+  sceneIdsRef.current = new Set(puckPlayersForScene.map((p) => p.id));
+
+  const checkAvatarsSettled = useCallback(() => {
+    const need = sceneIdsRef.current;
+    if (need.size === 0) return;
+    for (const id of need) {
+      if (!readyAvatarIdsRef.current.has(id)) return;
+    }
+    setAvatarsSettled(true);
+  }, []);
+
+  const handlePuckAvatarReady = useCallback(
+    (id: string) => {
+      if (readyAvatarIdsRef.current.has(id)) return;
+      readyAvatarIdsRef.current.add(id);
+      checkAvatarsSettled();
+    },
+    [checkAvatarsSettled]
+  );
+
+  useEffect(() => {
+    if (avatarsSettled || puckPositions.length === 0) return;
+    checkAvatarsSettled();
+    const timeout = setTimeout(() => setAvatarsSettled(true), AVATARS_SETTLE_MAX_WAIT_MS);
+    return () => clearTimeout(timeout);
+  }, [avatarsSettled, puckPositions.length, checkAvatarsSettled]);
+
+  // Физика ждёт конца проявления сцены. Если та анимация почему-то не доиграет,
+  // лёд остался бы мёртвым — поэтому отпускаем шайбы по таймеру в любом случае.
+  useEffect(() => {
+    if (sceneRevealed || puckPositions.length === 0) return;
+    const timeout = setTimeout(() => setSceneRevealed(true), 2500);
+    return () => clearTimeout(timeout);
+  }, [sceneRevealed, puckPositions.length]);
+
   const renderedPucks = useMemo(() => {
     // Карта позиций по ID для быстрого доступа
     const positionMap = new Map<string, PuckPosition>();
@@ -3011,17 +3319,21 @@ export default function HomeScreen() {
           enableDrag={!isDesktopLayout}
           getAndroidPerformanceLevel={() => performanceLevel}
           registerSharedPosition={registerSharedPosition}
+          onAvatarReady={handlePuckAvatarReady}
         />
       );
     });
-  }, [puckPositions.length, puckPlayersForScene, homeLeaderRanks, handlePuckPress, handleDrag, performanceLevel, registerSharedPosition, boundaries, scaledPuckSize, isDesktopLayout]);
+  }, [puckPositions.length, puckPlayersForScene, homeLeaderRanks, handlePuckPress, handleDrag, performanceLevel, registerSharedPosition, boundaries, scaledPuckSize, isDesktopLayout, handlePuckAvatarReady]);
 
   // Анимация запущена если есть шайбы
   const isRunning = puckPositions.length > 0;
 
-  // A inactive home tab must not paint over deep-linked /ru/player on mobile web Tabs.
-  if (!isFocused) {
-    return <View style={{ flex: 1, backgroundColor: 'transparent' }} />;
+  // Native: stay mounted when the tab blurs. Unmounting made the whole puck layer
+  // repaint on every return, and those first frames are where the grey stripes come
+  // from (iOS paints backgrounds/borders before their corner radii land). Physics is
+  // already parked by `currentScreen`, so a blurred rink costs nothing.
+  if (Platform.OS === 'web' && (!isFocused || !isWebHomeRoute)) {
+    return null;
   }
 
     return (
@@ -3047,7 +3359,13 @@ export default function HomeScreen() {
         )}
         
         {/* Шайбы рендерятся через мемоизированный список для оптимизации производительности */}
-        {renderedPucks}
+        <PuckSceneFade
+          ready={puckPositions.length > 0 && avatarsSettled}
+          onRevealed={handleSceneRevealed}
+        >
+          <IceDustLayer ref={iceDustRef} enabled={performanceLevel !== 'low'} />
+          {renderedPucks}
+        </PuckSceneFade>
 
         {/* Внутренняя граница - ТОЛЬКО для визуального эффекта, не блокирует touch */}
         <View style={styles.innerBorder} pointerEvents="box-none"></View>
@@ -3091,8 +3409,8 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // Прозрачно: под табами уже лежит лёд из _layout — нет чёрного кадра при возврате
-    backgroundColor: 'transparent',
+    // Тёмная сцена вокруг коробки — иначе скругление бортов не видно на льду из _layout
+    backgroundColor: colors.scene,
   },
   containerDesktop: {
     paddingTop: 20,
@@ -3103,11 +3421,11 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
-    borderRadius: 28,
+    borderRadius: 44, // скругление бортов хоккейной коробки
     overflow: 'hidden',
   },
   backgroundDesktop: {
-    borderRadius: 24,
+    borderRadius: 32,
   },
   innerBorder: {
     position: 'absolute',
@@ -3115,13 +3433,19 @@ const styles = StyleSheet.create({
     left: 8,
     right: 8,
     bottom: 8,
-    borderRadius: 28,
+    borderRadius: 38,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.22)',
   },
   puckContainer: {
     position: 'absolute',
     zIndex: 1,
+  },
+  trailFlake: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    backgroundColor: 'rgba(255,255,255,0.6)',
   },
   filtersWrapper: {
     position: 'absolute',
