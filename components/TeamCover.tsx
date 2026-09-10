@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   Dimensions,
-  ImageBackground,
   StyleProp,
   StyleSheet,
   Text,
@@ -50,6 +49,11 @@ const LOGO_STAR = require('../assets/images/star.png');
 const STAR = 52;
 const STAR_PITCH_X = STAR * 2;
 const STAR_PITCH_Y = STAR * 1.15;
+
+/** Team emblem wallpaper: staggered grid, same rhythm as before. */
+const LOGO = 60;
+const LOGO_PITCH_X = LOGO * 1.9;
+const LOGO_PITCH_Y = LOGO * 1.1;
 
 type Tile = { x: number; y: number; key: string };
 
@@ -230,6 +234,11 @@ const TeamCover: React.FC<Props> = ({
     [showStars, layoutWidth, layoutHeight]
   );
 
+  const logoTiles = useMemo(
+    () => (showLogoPattern ? staggeredGrid(layoutWidth, layoutHeight, LOGO, LOGO_PITCH_X, LOGO_PITCH_Y) : []),
+    [showLogoPattern, layoutWidth, layoutHeight]
+  );
+
   const nameRows = useMemo(() => {
     if (!showTeamName || !team) return [];
     const label = team.teamName.toUpperCase();
@@ -275,13 +284,19 @@ const TeamCover: React.FC<Props> = ({
       )}
 
       {showLogoPattern && (
-        <ImageBackground
-          key={logoUrl}
-          source={{ uri: logoUrl! }}
-          style={StyleSheet.absoluteFill}
-          imageStyle={styles.logoRepeatImage}
-          resizeMode="repeat"
-        />
+        <View style={StyleSheet.absoluteFill} pointerEvents="none">
+          {logoTiles.map((tile) => (
+            <Image
+              key={tile.key}
+              source={{ uri: logoUrl! }}
+              style={[styles.logoTile, { left: tile.x, top: tile.y }]}
+              contentFit="contain"
+              cachePolicy="memory-disk"
+              transition={0}
+              onError={() => markAssetMissing(logoUrl!)}
+            />
+          ))}
+        </View>
       )}
 
       {showTeamName && team && (
@@ -389,7 +404,10 @@ const styles = StyleSheet.create({
     height: STAR,
     opacity: 0.28,
   },
-  logoRepeatImage: {
+  logoTile: {
+    position: 'absolute',
+    width: LOGO,
+    height: LOGO,
     opacity: 0.26,
   },
   nameRow: {
