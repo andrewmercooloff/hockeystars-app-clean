@@ -8,6 +8,7 @@ import {
 import { avatarCache, updateAvatarGlobally, ensureAvatarCached, isSameAvatarFile, preloadPlayerAvatars, seedPlayerAvatarUrls } from './AvatarCache';
 import { dataCache, CACHE_KEYS } from './DataCache';
 import { addActivityPoints } from '../services/activityService';
+import { normalizeVerificationContact } from './emailService';
 import {
   getDisplayGoalieBlock,
   getDisplaySeasonPoints,
@@ -5272,51 +5273,38 @@ export const getPlayerByEmail = async (email: string): Promise<Player | null> =>
 // Поиск игрока по телефону
 export const getPlayerByPhone = async (phone: string, isAdminAccess: boolean = false): Promise<Player | null> => {
   try {
-    
-    // Если это доступ администратора, ищем любого пользователя с этим номером
-    // Если есть несколько пользователей с одним телефоном, берем самого нового
-    if (isAdminAccess) {
-      const { data, error } = await supabase
+    const normalized = normalizeVerificationContact(phone);
+    const phoneVariants = [...new Set(
+      normalized.startsWith('+')
+        ? [normalized, normalized.slice(1)]
+        : [`+${normalized}`, normalized]
+    )];
+
+    for (const variant of phoneVariants) {
+      const { data: matches, error } = await supabase
         .from('players')
         .select('*')
-        .eq('phone', phone)
+        .eq('phone', variant)
         .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      
+        .limit(isAdminAccess ? 1 : 5);
+
       if (error) {
         throwIfSupabaseNetworkError(error);
-        console.error('❌ Ошибка поиска игрока (admin access):', error);
+        console.error('❌ Ошибка поиска игрока:', error);
         throw error;
       }
-      
-      if (data) {
-        return convertSupabaseToPlayer(data);
+
+      if (!matches || matches.length === 0) continue;
+
+      if (isAdminAccess) {
+        return convertSupabaseToPlayer(matches[0]);
       }
-      
-      return null;
-    }
-    
-    // Один запрос вместо двух: приоритет admin, иначе самый новый профиль
-    const { data: matches, error } = await supabase
-      .from('players')
-      .select('*')
-      .eq('phone', phone)
-      .order('created_at', { ascending: false })
-      .limit(5);
 
-    if (error) {
-      throwIfSupabaseNetworkError(error);
-      console.error('❌ Ошибка поиска игрока:', error);
-      throw error;
+      const adminMatch = matches.find((row) => row.status === 'admin');
+      return convertSupabaseToPlayer(adminMatch ?? matches[0]);
     }
 
-    if (!matches || matches.length === 0) {
-      return null;
-    }
-
-    const adminMatch = matches.find((row) => row.status === 'admin');
-    return convertSupabaseToPlayer(adminMatch ?? matches[0]);
+    return null;
   } catch (error) {
     throwIfSupabaseNetworkError(error);
     console.error('❌ Ошибка поиска игрока по телефону:', error);

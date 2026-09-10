@@ -32,7 +32,7 @@ import { addPlayer, saveCurrentUser, Team, createPlayer, getPlayerByPhone, getPl
 import RegisterTeamPicker, { RegisterTeamValue } from '../components/RegisterTeamPicker';
 import { requiresParentalConsent, registerChildWithParentalConsent, calculateAge } from '../utils/parentalConsentService';
 import { uploadImageToStorage } from '../utils/uploadImage';
-import { sendVerificationSMSDetailed, verifyCode, verifySMSCode, saveVerificationCode, sendVerificationEmail, SmsSendResult } from '../utils/emailService';
+import { sendVerificationSMSDetailed, verifyCode, verifySMSCode, saveVerificationCode, sendVerificationEmail, normalizeVerificationContact, SmsSendResult } from '../utils/emailService';
 import { ICE_BACKGROUND } from '../utils/iceBackground';
 import { formatPickerDate } from '../utils/birthDate';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -194,15 +194,23 @@ export default function RegisterScreen() {
   /** Найденный по контакту аккаунт: после кода — вход, а не регистрация */
   const existingUserRef = useRef<Player | null | undefined>(undefined);
 
+  const normalizeContact = (contact: string): string =>
+    contact.includes('@') ? contact.trim().toLowerCase() : normalizeVerificationContact(contact);
+
   const lookupExistingUser = async (contact: string): Promise<Player | null> => {
-    const isEmail = contact.includes('@');
-    const lookup = isEmail ? getPlayerByEmail(contact) : getPlayerByPhone(contact);
-    const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 6000));
-    try {
-      return (await Promise.race([lookup, timeout])) ?? null;
-    } catch {
-      return null;
+    const key = normalizeContact(contact);
+    const isEmail = key.includes('@');
+    // Два прохода: сеть после выхода иногда подвисает, а null из фонового поиска
+    // нельзя путать с «аккаунта нет» — иначе существующий пользователь уходит в регистрацию.
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        return isEmail ? await getPlayerByEmail(key) : await getPlayerByPhone(key);
+      } catch (err) {
+        console.warn(`⚠️ lookupExistingUser attempt ${attempt + 1} failed:`, err);
+        if (attempt === 0) await new Promise((r) => setTimeout(r, 600));
+      }
     }
+    return null;
   };
 
   const signInExisting = async (user: Player) => {
@@ -225,8 +233,10 @@ export default function RegisterScreen() {
   /** После подтверждения контакта: существующий аккаунт — вход, новый — заполнение профиля */
   const proceedAfterContactVerified = async (contact: string) => {
     setContactVerified(true);
-    let user = existingUserRef.current;
-    if (user === undefined) user = await lookupExistingUser(contact);
+    const key = normalizeContact(contact);
+    // Всегда ищем заново после кода: фоновый prefetch мог вернуть null по таймауту/сети,
+    // и ref=null тогда ошибочно считался «новый пользователь».
+    const user = await lookupExistingUser(key);
     existingUserRef.current = user;
     if (user) {
       await signInExisting(user);
@@ -681,10 +691,10 @@ export default function RegisterScreen() {
         return;
       }
 
-      // Заранее узнаём, есть ли аккаунт: результат применим только после подтверждения кода
+      // Заранее узнаём, есть ли аккаунт (только если нашли — кладём в ref; null не кешируем)
       existingUserRef.current = undefined;
-      void lookupExistingUser(contactValue.replace(/\s/g, '')).then((u) => {
-        existingUserRef.current = u;
+      void lookupExistingUser(contactValue).then((u) => {
+        if (u) existingUserRef.current = u;
       });
 
       // Для США/Канады отправляем email, для остальных - SMS через сервер
