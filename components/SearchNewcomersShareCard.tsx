@@ -14,26 +14,28 @@ export type SearchNewcomersShareCardProps = {
   t: (key: string, params?: Record<string, string | number>) => string;
 };
 
-export const NEWCOMERS_SHARE_COLS = 3;
 export const NEWCOMERS_SHARE_CARD_WIDTH = getRatingShareCardWidth();
 
 const CARD_SCALE = NEWCOMERS_SHARE_CARD_WIDTH / 1080;
 const s = (n: number) => Math.round(n * CARD_SCALE);
 
 const STAR_BG = require('../assets/images/star.png');
-const LOGO_HEADER_W = 189;
-const LOGO_HEADER_H = 63;
 const LOGO_DESIGN_WIDTH = 440;
+const LOGO_HEADER_H = 63;
+const LOGO_HEADER_W = 189;
 const LOGO_DESIGN_HEIGHT = Math.round(LOGO_DESIGN_WIDTH * (LOGO_HEADER_H / LOGO_HEADER_W));
-const ROW_HEIGHT = s(128);
-const ROW_GAP = s(8);
+
+const ROW_AVATAR_RING = s(104);
+const ROW_AVATAR_IMAGE = s(96);
+const ROW_MIN_HEIGHT = s(118);
+const ROW_GAP = s(10);
 const HEADER_HEIGHT = s(300);
 const FOOTER_HEIGHT = s(72);
 
 export function getNewcomersShareCardHeight(playerCount: number): number {
-  const rows = Math.max(1, Math.ceil(playerCount / NEWCOMERS_SHARE_COLS));
-  const gridHeight = rows * ROW_HEIGHT + Math.max(0, rows - 1) * ROW_GAP;
-  const total = HEADER_HEIGHT + gridHeight + FOOTER_HEIGHT;
+  const count = Math.max(playerCount, 1);
+  const listHeight = count * ROW_MIN_HEIGHT + Math.max(0, count - 1) * ROW_GAP;
+  const total = HEADER_HEIGHT + listHeight + FOOTER_HEIGHT;
   return Math.max(Math.round(NEWCOMERS_SHARE_CARD_WIDTH * 1.25), total);
 }
 
@@ -149,8 +151,6 @@ const SearchNewcomersShareCard = React.forwardRef<View, SearchNewcomersShareCard
         ? 'hockey-stars.com'
         : t('search.shareRatingFooter');
 
-    const ring = s(72);
-    const image = s(66);
     const cardHeight = getNewcomersShareCardHeight(players.length);
 
     return (
@@ -182,28 +182,35 @@ const SearchNewcomersShareCard = React.forwardRef<View, SearchNewcomersShareCard
           ) : null}
           {countLine ? <Text style={styles.countLine}>{countLine}</Text> : null}
 
-          <View style={styles.grid}>
-            {players.map((player) => {
+          <View style={styles.list}>
+            {players.map((player, index) => {
               const meta = getPlayerMeta(player, t);
               const joined = formatJoinedDate(player.createdAt, language);
               return (
-                <View key={player.id} style={styles.cell}>
-                  <ShareAvatar
-                    player={player}
-                    ringSize={ring}
-                    imageSize={image}
-                    iconSize={Math.round(28 * CARD_SCALE)}
-                  />
-                  <Text style={styles.name} numberOfLines={2}>
-                    {player.name}
-                  </Text>
-                  {meta ? (
-                    <Text style={styles.meta} numberOfLines={1}>
-                      {meta}
+                <View
+                  key={player.id}
+                  style={[styles.row, index < players.length - 1 ? styles.rowGap : null]}
+                >
+                  <View style={styles.rowAvatarWrap}>
+                    <ShareAvatar
+                      player={player}
+                      ringSize={ROW_AVATAR_RING}
+                      imageSize={ROW_AVATAR_IMAGE}
+                      iconSize={Math.round(40 * CARD_SCALE)}
+                    />
+                  </View>
+                  <View style={styles.rowText}>
+                    <Text style={styles.name} numberOfLines={2}>
+                      {player.name}
                     </Text>
-                  ) : null}
+                    {meta ? (
+                      <Text style={styles.meta} numberOfLines={1}>
+                        {meta}
+                      </Text>
+                    ) : null}
+                  </View>
                   {joined ? (
-                    <Text style={styles.joined} numberOfLines={1}>
+                    <Text style={styles.joined} numberOfLines={2}>
                       {joined}
                     </Text>
                   ) : null}
@@ -316,51 +323,56 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: s(10),
   },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  list: {
     marginTop: s(18),
-    gap: ROW_GAP,
   },
-  cell: {
-    width: (NEWCOMERS_SHARE_CARD_WIDTH - s(64) - ROW_GAP * (NEWCOMERS_SHARE_COLS - 1)) / NEWCOMERS_SHARE_COLS,
+  row: {
+    flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: s(16),
+    borderRadius: s(20),
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.28)',
     paddingVertical: s(10),
-    paddingHorizontal: s(6),
-    minHeight: ROW_HEIGHT,
+    paddingHorizontal: s(14),
+    minHeight: ROW_MIN_HEIGHT,
+  },
+  rowGap: {
+    marginBottom: ROW_GAP,
+  },
+  rowAvatarWrap: {
+    marginRight: s(14),
   },
   avatarRing: {
     overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
     borderColor: 'rgba(250, 47, 64, 0.55)',
-    borderWidth: 2,
-    marginBottom: s(6),
+    borderWidth: 3,
+  },
+  rowText: {
+    flex: 1,
+    minWidth: 0,
+    marginRight: s(10),
   },
   name: {
     color: '#fff',
-    fontSize: s(20),
+    fontSize: s(28),
     fontFamily: 'Gilroy-Bold',
-    textAlign: 'center',
     textTransform: 'uppercase',
-    minHeight: s(44),
   },
   meta: {
     color: 'rgba(255,255,255,0.65)',
-    fontSize: s(18),
+    fontSize: s(22),
     fontFamily: 'Gilroy-Regular',
-    textAlign: 'center',
+    marginTop: s(4),
   },
   joined: {
     color: '#fa2f40',
-    fontSize: s(18),
+    fontSize: s(24),
     fontFamily: 'Gilroy-Bold',
-    textAlign: 'center',
-    marginTop: s(2),
+    minWidth: s(88),
+    textAlign: 'right',
   },
   footer: {
     color: 'rgba(255,255,255,0.55)',
