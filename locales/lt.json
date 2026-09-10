@@ -32,7 +32,8 @@
     "offline": "Nėra ryšio",
     "and": "ir",
     "info": "Informacija",
-    "continue": "Tęsti"
+    "continue": "Tęsti",
+    "warning": "Dėmesio"
   },
   "winger": "Krašto puolėjas",
   "center": "Centro į priekį",
@@ -3527,7 +3528,9 @@
     "playerNumberPlaceholder": "Numeris ant aprangos",
     "selectBirthDate": "Pasirinkite gimimo datą",
     "skateServices": "Paslaugos",
-    "weightWithUnit": "Svoris (kg)"
+    "weightWithUnit": "Svoris (kg)",
+    "videoUploaded": "Vaizdo įrašas pridėtas prie profilio",
+    "videoUploadSaveReminder": "Vaizdo įrašas įkeltas. Paspauskite «Išsaugoti», kad jis liktų profilyje."
   },
   "register": {
     "title": "Registracija",

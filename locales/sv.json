@@ -31,7 +31,8 @@
     "and": "och",
     "info": "Info",
     "continue": "Fortsätt",
-    "retry": "Försök igen"
+    "retry": "Försök igen",
+    "warning": "Varning"
   },
   "winger": "Ytter",
   "center": "Center framåt",
@@ -3518,7 +3519,9 @@
     "selectBirthDate": "Välj födelsedatum",
     "shareError": "Fel vid skapande av bild",
     "skateServices": "Tjänster",
-    "weightWithUnit": "Vikt (kg)"
+    "weightWithUnit": "Vikt (kg)",
+    "videoUploaded": "Video tillagt i profilen",
+    "videoUploadSaveReminder": "Video uppladdat. Tryck på «Spara» för att behålla det i profilen."
   },
   "register": {
     "title": "Registrering",

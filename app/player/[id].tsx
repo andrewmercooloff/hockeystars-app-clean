@@ -2324,14 +2324,14 @@ export default function PlayerProfile() {
       } catch (saveError) {
         console.error('❌ Видео загружено, но не сохранено в профиль:', saveError);
         showCustomAlert(
-          t('common.warning') || 'Внимание',
-          'Видео загружено. Нажмите «Сохранить», чтобы закрепить его в профиле.',
+          t('common.warning'),
+          t('profile.videoUploadSaveReminder'),
           'warning'
         );
         return;
       }
 
-      showCustomAlert(t('common.success'), t('profile.videoUploaded') || 'Видео добавлено в профиль', 'success');
+      showCustomAlert(t('common.success'), t('profile.videoUploaded'), 'success');
     } else {
       setVideoFields((prev) => prev.filter((v) => v.tempId !== tempId));
       showCustomAlert(

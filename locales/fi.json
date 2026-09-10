@@ -31,7 +31,8 @@
     "and": "ja",
     "info": "Tiedote",
     "continue": "Jatka",
-    "retry": "Yritä uudelleen"
+    "retry": "Yritä uudelleen",
+    "warning": "Huomio"
   },
   "winger": "Laituri",
   "center": "Keskushyökkääjä",
@@ -3511,7 +3512,9 @@
     "selectBirthDate": "Valitse syntymäaika",
     "shareError": "Virhe kuvan luonnissa",
     "skateServices": "Palvelut",
-    "weightWithUnit": "Paino (kg)"
+    "weightWithUnit": "Paino (kg)",
+    "videoUploaded": "Video lisätty profiiliin",
+    "videoUploadSaveReminder": "Video ladattu. Napauta «Tallenna», jotta se jää profiiliin."
   },
   "register": {
     "title": "Rekisteröinti",

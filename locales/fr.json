@@ -31,7 +31,8 @@
     "and": "et",
     "info": "Info",
     "continue": "Continuer",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "warning": "Attention"
   },
   "winger": "Ailier",
   "center": "Avant-centre",
@@ -3518,7 +3519,9 @@
     "selectBirthDate": "Choisir la date de naissance",
     "shareError": "Erreur lors de la création de l'image",
     "skateServices": "Services",
-    "weightWithUnit": "Poids (kg)"
+    "weightWithUnit": "Poids (kg)",
+    "videoUploaded": "Vidéo ajoutée au profil",
+    "videoUploadSaveReminder": "Vidéo téléversée. Appuyez sur « Enregistrer » pour la garder sur le profil."
   },
   "register": {
     "title": "Inscription",

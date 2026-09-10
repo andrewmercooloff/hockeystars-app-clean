@@ -31,7 +31,8 @@
     "and": "und",
     "info": "Info",
     "continue": "Weiter",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "warning": "Hinweis"
   },
   "winger": "Flügelspieler",
   "center": "Mittelstürmer",
@@ -3518,7 +3519,9 @@
     "selectBirthDate": "Geburtsdatum wählen",
     "shareError": "Fehler beim Erstellen des Bildes",
     "skateServices": "Dienstleistungen",
-    "weightWithUnit": "Gewicht (kg)"
+    "weightWithUnit": "Gewicht (kg)",
+    "videoUploaded": "Video zum Profil hinzugefügt",
+    "videoUploadSaveReminder": "Video hochgeladen. Tippe auf «Speichern», damit es im Profil bleibt."
   },
   "register": {
     "title": "Anmeldung",

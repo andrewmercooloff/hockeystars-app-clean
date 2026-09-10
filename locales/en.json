@@ -32,7 +32,8 @@
     "right": "Right",
     "offline": "No connection",
     "info": "Info",
-    "continue": "Continue"
+    "continue": "Continue",
+    "warning": "Warning"
   },
   "winger": "Winger",
   "center": "Center",
@@ -3594,7 +3595,9 @@
     "editAchievement": "Edit achievement",
     "errorEnterCompetition": "Enter the competition name",
     "errorEnterYear": "Enter the year",
-    "fullScreen": "Full screen"
+    "fullScreen": "Full screen",
+    "videoUploaded": "Video added to profile",
+    "videoUploadSaveReminder": "Video uploaded. Tap Save to keep it on your profile."
   },
   "register": {
     "title": "Registration",

@@ -31,7 +31,8 @@
     "and": "a",
     "info": "Informace",
     "continue": "Pokračovat",
-    "retry": "Zkusit znovu"
+    "retry": "Zkusit znovu",
+    "warning": "Upozornění"
   },
   "winger": "Křídelník",
   "center": "Střed dopředu",
@@ -3511,7 +3512,9 @@
     "selectBirthDate": "Vyberte datum narození",
     "shareError": "Chyba při vytváření obrázku",
     "skateServices": "Služby",
-    "weightWithUnit": "Váha (kg)"
+    "weightWithUnit": "Váha (kg)",
+    "videoUploaded": "Video bylo přidáno do profilu",
+    "videoUploadSaveReminder": "Video nahráno. Klepněte na «Uložit», aby zůstalo v profilu."
   },
   "register": {
     "title": "Registrace",

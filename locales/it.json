@@ -31,7 +31,8 @@
     "and": "e",
     "info": "Info",
     "continue": "Continua",
-    "retry": "Riprova"
+    "retry": "Riprova",
+    "warning": "Attenzione"
   },
   "winger": "Ala",
   "center": "Centravanti",
@@ -3518,7 +3519,9 @@
     "selectBirthDate": "Scegli la data di nascita",
     "shareError": "Errore nella creazione dell'immagine",
     "skateServices": "Servizi",
-    "weightWithUnit": "Peso (kg)"
+    "weightWithUnit": "Peso (kg)",
+    "videoUploaded": "Video aggiunto al profilo",
+    "videoUploadSaveReminder": "Video caricato. Tocca «Salva» per mantenerlo nel profilo."
   },
   "register": {
     "title": "Registrazione",

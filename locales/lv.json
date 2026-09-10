@@ -32,7 +32,8 @@
     "offline": "Nav savienojuma",
     "and": "un",
     "info": "Informācija",
-    "continue": "Turpināt"
+    "continue": "Turpināt",
+    "warning": "Uzmanību"
   },
   "winger": "Malējais uzbrucējs",
   "center": "Centra uzbrucējs",
@@ -3527,7 +3528,9 @@
     "playerNumberPlaceholder": "Numurs uz krekla",
     "selectBirthDate": "Izvēlieties dzimšanas datumu",
     "skateServices": "Pakalpojumi",
-    "weightWithUnit": "Svars (kg)"
+    "weightWithUnit": "Svars (kg)",
+    "videoUploaded": "Video pievienots profilam",
+    "videoUploadSaveReminder": "Video augšupielādēts. Nospiediet «Saglabāt», lai tas paliktu profilā."
   },
   "register": {
     "title": "Reģistrācija",

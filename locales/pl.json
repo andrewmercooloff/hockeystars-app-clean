@@ -32,7 +32,8 @@
     "offline": "Brak połączenia",
     "and": "i",
     "info": "Informacja",
-    "continue": "Dalej"
+    "continue": "Dalej",
+    "warning": "Uwaga"
   },
   "winger": "Skrzydłowy",
   "center": "Środkowy napastnik",
@@ -3306,7 +3307,9 @@
     "playerNumberPlaceholder": "Numer na koszulce",
     "selectBirthDate": "Wybierz datę urodzenia",
     "skateServices": "Usługi",
-    "weightWithUnit": "Waga (kg)"
+    "weightWithUnit": "Waga (kg)",
+    "videoUploaded": "Wideo dodano do profilu",
+    "videoUploadSaveReminder": "Wideo wgrane. Naciśnij «Zapisz», aby zachować je w profilu."
   },
   "register": {
     "title": "Rejestracja",
