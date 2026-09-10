@@ -485,7 +485,14 @@ export default function PlayerProfile() {
   const [friendLoading, setFriendLoading] = useState(false);
   const [friends, setFriends] = useState<Player[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
+  const [fullscreenVideo, setFullscreenVideo] = useState<{ url: string; timeCode?: string } | null>(null);
   const [videoLikeRefreshTrigger, setVideoLikeRefreshTrigger] = useState(0);
+  const videoFullscreenLabel =
+    t('videoNotification.fullScreen') !== 'videoNotification.fullScreen'
+      ? t('videoNotification.fullScreen')
+      : t('profile.fullScreen') !== 'profile.fullScreen'
+        ? t('profile.fullScreen')
+        : 'Full screen';
   const [deleteSpeedRecordDate, setDeleteSpeedRecordDate] = useState<string | null>(null);
   const [isDeletingSpeedRecord, setIsDeletingSpeedRecord] = useState(false);
   const [alert, setAlert] = useState({
@@ -8295,12 +8302,15 @@ export default function PlayerProfile() {
             </TouchableOpacity>
             {selectedVideo && (
               <View style={styles.videoModalContent}>
-              <VideoPlayer 
-                url={selectedVideo.url}
-                title={t('myMoment')}
-                timeCode={selectedVideo.timeCode}
-                autoPlay
-              />
+                <VideoPlayer
+                  url={selectedVideo.url}
+                  title={t('myMoment')}
+                  timeCode={selectedVideo.timeCode}
+                  autoPlay
+                  layoutMode="modal"
+                  onRequestFullscreen={() => setFullscreenVideo(selectedVideo)}
+                  fullscreenButtonLabel={videoFullscreenLabel}
+                />
                 {player && (
                   <View style={styles.videoModalLikeButton}>
                     <LikeButton
@@ -8313,6 +8323,38 @@ export default function PlayerProfile() {
               </View>
             )}
           </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={fullscreenVideo !== null}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+        onRequestClose={() => setFullscreenVideo(null)}
+      >
+        <View style={styles.videoFullscreenOverlay}>
+          <TouchableOpacity
+            style={styles.videoFullscreenCloseButton}
+            onPress={() => setFullscreenVideo(null)}
+            hitSlop={12}
+            accessibilityRole="button"
+            accessibilityLabel={t('common.close') !== 'common.close' ? t('common.close') : 'Close'}
+          >
+            <Ionicons name="close" size={26} color="#fff" />
+          </TouchableOpacity>
+          {fullscreenVideo && (
+            <View style={styles.videoFullscreenPlayer}>
+              <VideoPlayer
+                key={`${fullscreenVideo.url}-${fullscreenVideo.timeCode || ''}-fs`}
+                url={fullscreenVideo.url}
+                timeCode={fullscreenVideo.timeCode}
+                autoPlay
+                fullscreen
+                onClose={() => setFullscreenVideo(null)}
+              />
+            </View>
+          )}
         </View>
       </Modal>
 
@@ -9886,22 +9928,40 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   videoModalContainer: {
-    width: '90%',
-    maxHeight: '80%',
+    alignItems: 'center',
+    maxHeight: '85%',
     borderRadius: 12,
-    overflow: 'hidden',
     position: 'relative',
     zIndex: 1,
   },
   videoModalContent: {
-    width: '100%',
+    alignItems: 'center',
     position: 'relative',
   },
   videoModalLikeButton: {
     position: 'absolute',
     bottom: 20,
-    right: 20,
+    left: 20,
     zIndex: 1000,
+  },
+  videoFullscreenOverlay: {
+    flex: 1,
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  videoFullscreenCloseButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 1001,
+    backgroundColor: 'rgba(22, 22, 26, 0.78)',
+    borderRadius: 20,
+    padding: 8,
+  },
+  videoFullscreenPlayer: {
+    flex: 1,
+    width: '100%',
   },
   videoModalCloseButton: {
     position: 'absolute',

@@ -552,8 +552,15 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
     [cardHeight, cardMaxWidth]
   );
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
+  const [fullscreenVideo, setFullscreenVideo] = useState<{ url: string; timeCode?: string } | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [likeRefreshTrigger, setLikeRefreshTrigger] = useState(0);
+  const videoFullscreenLabel =
+    t('videoNotification.fullScreen') !== 'videoNotification.fullScreen'
+      ? t('videoNotification.fullScreen')
+      : t('profile.fullScreen') !== 'profile.fullScreen'
+        ? t('profile.fullScreen')
+        : 'Full screen';
 
   // Греем серверные превью всех роликов сразу — карусель не ждёт каждую картинку по очереди
   useEffect(() => {
@@ -655,23 +662,50 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
       >
         <TouchableWithoutFeedback onPress={closeModal}>
           <View style={styles.modalOverlay} {...panResponder.panHandlers}>
-            <View style={styles.modalContent} pointerEvents="box-none">
-              <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
-                <Ionicons name="close" size={24} color="#fff" />
-              </TouchableOpacity>
-              {selectedVideo && (
-                <View pointerEvents="box-none">
-                  <VideoPlayer
-                    key={`${selectedVideo.url}-${selectedVideo.timeCode || ''}`}
-                    url={selectedVideo.url}
-                    timeCode={selectedVideo.timeCode}
-                    autoPlay
-                  />
-                </View>
-              )}
-            </View>
+            <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+              <Ionicons name="close" size={24} color="#fff" />
+            </TouchableOpacity>
+            {selectedVideo && (
+              <View pointerEvents="box-none" style={styles.modalPlayerWrap}>
+                <VideoPlayer
+                  key={`${selectedVideo.url}-${selectedVideo.timeCode || ''}`}
+                  url={selectedVideo.url}
+                  timeCode={selectedVideo.timeCode}
+                  autoPlay
+                  layoutMode="modal"
+                  onRequestFullscreen={() => setFullscreenVideo(selectedVideo)}
+                  fullscreenButtonLabel={videoFullscreenLabel}
+                />
+              </View>
+            )}
           </View>
         </TouchableWithoutFeedback>
+      </Modal>
+
+      <Modal
+        visible={fullscreenVideo !== null}
+        animationType="fade"
+        transparent
+        statusBarTranslucent
+        onRequestClose={() => setFullscreenVideo(null)}
+      >
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity style={styles.closeButton} onPress={() => setFullscreenVideo(null)}>
+            <Ionicons name="close" size={24} color="#fff" />
+          </TouchableOpacity>
+          {fullscreenVideo && (
+            <View style={styles.fullscreenPlayerWrap}>
+              <VideoPlayer
+                key={`${fullscreenVideo.url}-${fullscreenVideo.timeCode || ''}-fs`}
+                url={fullscreenVideo.url}
+                timeCode={fullscreenVideo.timeCode}
+                autoPlay
+                fullscreen
+                onClose={() => setFullscreenVideo(null)}
+              />
+            </View>
+          )}
+        </View>
       </Modal>
     </View>
   );
@@ -743,13 +777,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  modalContent: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#000',
-    position: 'relative',
-    justifyContent: 'center',
+  modalPlayerWrap: {
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fullscreenPlayerWrap: {
+    flex: 1,
+    width: '100%',
   },
   closeButton: {
     position: 'absolute',
