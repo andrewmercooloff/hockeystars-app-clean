@@ -1119,14 +1119,14 @@ export default function PlayerProfile() {
           setSkateServices([]); // Устанавливаем пустой массив
         }
         
-        // Инициализируем видео поля сразу
-        if (finalPlayerData?.favoriteGoals) {
+        // Инициализируем видео поля — не затираем активную загрузку / черновик в режиме редактирования
+        if (finalPlayerData?.favoriteGoals && !isEditingRef.current) {
           const goals = finalPlayerData.favoriteGoals.split('\n').filter(goal => goal.trim());
-          const videoData = goals.map(goal => {
-            const { url, hours, minutes, seconds } = parseVideoUrl(goal);
-            return { url, hours: hours || '0', minutes: minutes || '0', seconds: seconds || '0' };
+          const videoData = goals.map((goal) => {
+            const { url } = parseVideoUrl(goal);
+            return { url };
           });
-          setVideoFields(videoData.length > 0 ? videoData : [{ url: '', hours: '0', minutes: '0', seconds: '0' }]);
+          setVideoFields(videoData);
         }
         
         // Инициализируем достижения сразу
@@ -2279,15 +2279,23 @@ export default function PlayerProfile() {
   const uploadPickedVideo = async (asset: ImagePicker.ImagePickerAsset) => {
     if (!player) return;
     const tempId = Date.now();
-    let thumbUri: string | undefined;
-    try {
-      const thumb = await VideoThumbnails.getThumbnailAsync(asset.uri, { time: 500 });
-      thumbUri = thumb.uri;
-    } catch {
-      // превью необязательно — останется плейсхолдер
-    }
-    setVideoFields((prev) => [{ url: '', uploading: true, tempId, thumbUri }, ...prev]);
+    // Сразу показываем плитку загрузки — превью и upload не должны блокировать UI.
+    setVideoFields((prev) => [{ url: '', uploading: true, tempId }, ...prev]);
+
+    const thumbPromise = VideoThumbnails.getThumbnailAsync(asset.uri, { time: 500 })
+      .then((thumb) => {
+        setVideoFields((prev) =>
+          prev.map((v) => (v.tempId === tempId ? { ...v, thumbUri: thumb.uri } : v))
+        );
+        return thumb.uri;
+      })
+      .catch(() => undefined);
+
     const { uploadVideoToStorage } = await import('../../utils/uploadImage');
+    const thumbUri = await Promise.race([
+      thumbPromise,
+      new Promise<string | undefined>((resolve) => setTimeout(() => resolve(undefined), 2500)),
+    ]);
     const { url: uploadedUrl, error: uploadError } = await uploadVideoToStorage(
       asset.uri,
       player.id,
