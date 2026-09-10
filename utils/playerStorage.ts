@@ -6259,15 +6259,24 @@ export const notifyFriendsAboutAvatarChange = async (
           // Отправляем push уведомление
           try {
             const { sendNotificationToUser } = await import('./notificationService');
-            const changedText = translations?.avatarNotification?.changed || 'изменил свой аватар';
+            const friendLang = friendLanguages.get(notification.user_id) || 'en';
+            const friendTranslations = loadTranslations(friendLang);
+            const changedText =
+              friendTranslations?.avatarNotification?.changed ||
+              translations?.avatarNotification?.changed ||
+              'changed avatar';
+            const pushTitle =
+              friendTranslations?.avatarNotification?.title || notification.title || 'New Avatar';
             await sendNotificationToUser(
               notification.user_id,
-              '🖼️ Новый аватар',
+              `🖼️ ${pushTitle}`,
               `${playerName} ${changedText}`,
               {
                 type: 'avatar_changed',
                 player_id: playerId,
-                action: 'open_notifications'
+                action: 'open_player',
+                deepLink: `/player/${playerId}`,
+                changedPlayerAvatar: newAvatarUrl,
               }
             );
           } catch (pushError) {

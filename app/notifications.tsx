@@ -76,6 +76,11 @@ import {
   extendNotificationsBadgeSuppressMs,
   setNotificationsScreenFocused,
 } from '../utils/notificationsBadgeGate';
+import {
+  parseNotificationData,
+  resolveNotificationPlayerId,
+  subscribeNotificationFeedRefresh,
+} from '../utils/notificationFeedSync';
 import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
 
 const iceBg = require('../assets/images/led.jpg');
@@ -909,12 +914,15 @@ export default function NotificationsScreen() {
         }
         
         // Правильно маппим поля из Supabase (поддерживаем обе структуры)
+        const parsedData = parseNotificationData(notification.data) ?? notification.data;
+
         const mappedNotification = {
           ...notification,
           id: notification.id,
           type: notification.type,
           title: notification.title,
           message: notification.message,
+          data: parsedData,
           timestamp,
           isRead: notification.is_read || notification.isRead || false,
           // Для gift_request используем requesterId из data, для остальных - стандартную логику
@@ -1368,10 +1376,8 @@ export default function NotificationsScreen() {
             clearTimeout(reloadDebounceRef.current);
           }
           reloadDebounceRef.current = setTimeout(() => {
-            // На фильтрованной вкладке не перезагружаем page 0 — это вызывает сортировку и мигание
-            if (activeFilterRef.current !== 'all') return;
             void loadNotificationsData(false, true);
-          }, 700);
+          }, 350);
         }
       )
       .subscribe();
@@ -1383,6 +1389,14 @@ export default function NotificationsScreen() {
       }
       void supabase.removeChannel(channel);
     };
+  }, [currentUser?.id, loadNotificationsData]);
+
+  // Push пришёл раньше, чем Realtime — подтягиваем ленту, пока экран открыт
+  useEffect(() => {
+    if (!currentUser?.id) return;
+    return subscribeNotificationFeedRefresh(() => {
+      void loadNotificationsData(false, true);
+    });
   }, [currentUser?.id, loadNotificationsData]);
 
   // Отмечаем все уведомления как прочитанные
@@ -1558,6 +1572,16 @@ export default function NotificationsScreen() {
     );
   };
 
+  const markNotificationReadInBackground = useCallback((notification: NotificationItem) => {
+    if (notification.isRead !== false) return;
+    void markNotificationAsRead(notification.id).then((success) => {
+      if (!success) return;
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === notification.id ? { ...n, isRead: true } : n)),
+      );
+    });
+  }, []);
+
   const handleNotificationPress = useCallback(async (notification: NotificationItem) => {
     
     try {
@@ -1566,6 +1590,35 @@ export default function NotificationsScreen() {
       // Исключение: friend_request - для него нужно обрабатывать навигацию
       if (notification.isActionable && notification.type !== 'friend_request') {
         // Просто обрабатываем нажатие без изменения статуса
+        return;
+      }
+
+      const data = parseNotificationData(notification.data) ?? notification.data;
+      const normalizedNotification =
+        data !== notification.data ? { ...notification, data } : notification;
+
+      // Аватар: сначала переход в профиль (не ждём сеть / prefetch аватара)
+      if (normalizedNotification.type === 'avatar_changed') {
+        const changedPlayerId = resolveNotificationPlayerId(normalizedNotification);
+        if (changedPlayerId) {
+          const changedPlayerAvatar =
+            (data as Record<string, string> | null)?.changedPlayerAvatar ||
+            (data as Record<string, string> | null)?.playerAvatar;
+          const changedPlayerName =
+            (data as Record<string, string> | null)?.changedPlayerName ||
+            normalizedNotification.playerName;
+          navigateToPlayerProfile(router, {
+            playerId: changedPlayerId,
+            name: changedPlayerName,
+            returnTo: 'notifications',
+            refreshProfile: 'true',
+          });
+          markNotificationReadInBackground(normalizedNotification);
+          if (changedPlayerAvatar) {
+            void updateAvatarGlobally(changedPlayerId, changedPlayerAvatar).catch(() => undefined);
+          }
+          clearPlayerMemoryCache(changedPlayerId);
+        }
         return;
       }
       
@@ -1663,20 +1716,6 @@ export default function NotificationsScreen() {
         if (changedPlayerId) {
           navigateToPlayerProfile(router, { playerId: changedPlayerId, returnTo: 'notifications' });
         }
-      } else if (notification.type === 'avatar_changed') {
-        const changedPlayerId = notification.data?.changedPlayerId;
-        const changedPlayerAvatar = notification.data?.changedPlayerAvatar;
-        if (changedPlayerId) {
-          if (changedPlayerAvatar) {
-            await updateAvatarGlobally(changedPlayerId, changedPlayerAvatar);
-          }
-          clearPlayerMemoryCache(changedPlayerId);
-          navigateToPlayerProfile(router, {
-            playerId: changedPlayerId,
-            returnTo: 'notifications',
-            refreshProfile: 'true',
-          });
-        }
       } else if (notification.type === 'achievement_added') {
         // Для уведомлений о новых достижениях показываем достижения игрока
         if (notification.data && notification.data.changedPlayerId) {
@@ -1743,7 +1782,7 @@ export default function NotificationsScreen() {
     } catch (error) {
       console.error('❌ Ошибка обработки уведомления:', error);
     }
-  }, [currentUser, router]);
+  }, [currentUser, router, markNotificationReadInBackground]);
 
   const handleSuperAction = useCallback(async (notification: NotificationItem) => {
     try {

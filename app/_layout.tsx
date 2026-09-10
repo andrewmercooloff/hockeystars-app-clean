@@ -52,6 +52,7 @@ import { safeHideSplashScreen } from '../utils/splashScreenUtils';
 import { isHomeSceneMounted, isHomeSceneReady, subscribeHomeScene } from '../utils/homeSceneSignal';
 import { useOtaUpdates } from '../hooks/useOtaUpdates';
 import { emitInboxRefresh, isMessagePushType } from '../utils/inboxEvents';
+import { emitNotificationFeedRefresh } from '../utils/notificationFeedSync';
 import AnimatedSplash from '../components/AnimatedSplash';
 import OtaResurfaceOverlay from '../components/OtaResurfaceOverlay';
 
@@ -1664,6 +1665,7 @@ export default function RootLayout() {
         loadNotificationCount(currentUser.id, false).catch(error => {
           console.error('❌ Ошибка загрузки счетчика после push уведомления:', error);
         });
+        emitNotificationFeedRefresh();
       }, 200);
     });
 
