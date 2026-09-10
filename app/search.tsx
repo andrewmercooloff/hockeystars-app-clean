@@ -1301,7 +1301,6 @@ export default function SearchScreen() {
   const newcomersShareRef = useRef<View>(null);
   const [isExportingRating, setIsExportingRating] = useState(false);
   const [isExportingNewcomers, setIsExportingNewcomers] = useState(false);
-  const isAdmin = currentUser?.status === 'admin';
 
   const newcomerSharePlayers = useMemo(
     () => getSearchNewcomers(filteredPlayers, SEARCH_NEWCOMER_MAX_MS),
