@@ -1878,6 +1878,7 @@ export default function PlayerProfile() {
       return () => {
         setCurrentScreen(null, 'player');
         setSelectedVideo(null);
+        setVideoExpanded(false);
       };
     }, [id])
   );
