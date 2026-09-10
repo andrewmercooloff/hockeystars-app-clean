@@ -3729,7 +3729,9 @@
     "ratingPointsLabel": "очков",
     "allCountries": "Все страны",
     "allYears": "Все года",
-    "filters": "Фильтры"
+    "filters": "Фильтры",
+    "shareNewcomers": "Выгрузить новичков",
+    "shareNewcomersCount": "{count} игроков"
   },
   "messages": {
     "title": "Сообщения",

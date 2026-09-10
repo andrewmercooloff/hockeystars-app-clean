@@ -56,13 +56,15 @@ import { platformCardShadow } from '../utils/androidShadow';
 import { registerTabScrollHandler } from '../utils/tabScrollRegistry';
 import LeaderShine from '../components/LeaderShine';
 import SearchRatingShareCard, { type SearchRatingShareEntry } from '../components/SearchRatingShareCard';
+import SearchNewcomersShareCard from '../components/SearchNewcomersShareCard';
 import { RATING_SHARE_SEASON_KEY } from '../utils/seasonConfig';
-import { prefetchRatingShareAvatars } from '../utils/ratingShareExport';
+import { prefetchPlayersShareAvatars, prefetchRatingShareAvatars } from '../utils/ratingShareExport';
 import {
   LEADER_BORDER_COLORS,
   LEADER_MEDAL_BORDER_WIDTH,
   getMedalLeaderRank,
   getSearchAvatarSize,
+  getSearchNewcomers,
   sortPlayersForSearchList,
 } from '../utils/leaderDisplay';
 import { getAllTimeBlock } from '../utils/seasonStats';
@@ -1296,7 +1298,15 @@ export default function SearchScreen() {
 
 
   const ratingShareRef = useRef<View>(null);
+  const newcomersShareRef = useRef<View>(null);
   const [isExportingRating, setIsExportingRating] = useState(false);
+  const [isExportingNewcomers, setIsExportingNewcomers] = useState(false);
+  const isAdmin = currentUser?.status === 'admin';
+
+  const newcomerSharePlayers = useMemo(
+    () => getSearchNewcomers(filteredPlayers, SEARCH_NEWCOMER_MAX_MS),
+    [filteredPlayers]
+  );
 
   const leaderShareEntries = useMemo((): SearchRatingShareEntry[] => {
     return filteredPlayers
@@ -1363,6 +1373,47 @@ export default function SearchScreen() {
       setIsExportingRating(false);
     }
   }, [isExportingRating, leaderShareEntries, t]);
+
+  const handleShareNewcomers = useCallback(async () => {
+    if (!isAdmin || isExportingNewcomers || newcomerSharePlayers.length === 0) return;
+    setIsExportingNewcomers(true);
+
+    try {
+      await prefetchPlayersShareAvatars(newcomerSharePlayers);
+      await new Promise<void>((resolve) => {
+        InteractionManager.runAfterInteractions(() => {
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+        });
+      });
+      await new Promise((r) => setTimeout(r, Platform.OS === 'android' ? 400 : 250));
+      if (!newcomersShareRef.current) {
+        throw new Error('Newcomers share card not ready');
+      }
+      const uri = await captureRef(newcomersShareRef, {
+        format: 'png',
+        quality: 0.9,
+        result: 'tmpfile',
+      });
+      const available = await Sharing.isAvailableAsync();
+      if (available) {
+        await Sharing.shareAsync(uri, {
+          mimeType: 'image/png',
+          dialogTitle: t('search.shareNewcomers') || 'Share newcomers',
+        });
+      } else {
+        const { status } = await MediaLibrary.requestPermissionsAsync();
+        if (status === 'granted') {
+          await MediaLibrary.saveToLibraryAsync(uri);
+          Alert.alert(t('common.success') || 'OK', t('profile.savedToGallery') || 'Saved');
+        }
+      }
+    } catch (e) {
+      console.error('Newcomers share error:', e);
+      Alert.alert(t('common.error') || 'Error', t('profile.shareError') || 'Share failed');
+    } finally {
+      setIsExportingNewcomers(false);
+    }
+  }, [isAdmin, isExportingNewcomers, newcomerSharePlayers, t]);
   
   // Мемоизированные фильтры, зависящие от игроков, отфильтрованных по другим фильтрам (свой фильтр игнорируем)
   const countries = useMemo(() => {
@@ -1499,8 +1550,17 @@ export default function SearchScreen() {
                 ? handleShareRating
                 : undefined
             }
+            onShareNewcomers={
+              showSection &&
+              isAdmin &&
+              player.id === firstNewcomerId &&
+              newcomerSharePlayers.length > 0
+                ? handleShareNewcomers
+                : undefined
+            }
             isExportingRating={isExportingRating}
-            isAdmin={currentUser?.status === 'admin'}
+            isExportingNewcomers={isExportingNewcomers}
+            isAdmin={isAdmin}
             language={language}
             onPress={openPlayerFromSearch}
             t={t}
@@ -1531,6 +1591,20 @@ export default function SearchScreen() {
                   : (t('search.newcomers') || 'Newcomers')}
               </Text>
               <View style={styles.sectionLabelLine} />
+              {pairSection === 'newcomers' && isAdmin && newcomerSharePlayers.length > 0 ? (
+                <TouchableOpacity
+                  onPress={handleShareNewcomers}
+                  style={styles.sectionExportButton}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  disabled={isExportingNewcomers}
+                >
+                  {isExportingNewcomers ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    <Ionicons name="share-outline" size={16} color="#fff" />
+                  )}
+                </TouchableOpacity>
+              ) : null}
             </View>
           ) : null}
           <View style={styles.playerPairRow}>
@@ -1540,7 +1614,7 @@ export default function SearchScreen() {
         </View>
       );
     },
-    [currentUser?.status, language, openPlayerFromSearch, searchLeaderPositions, firstNewcomerId, firstLeaderId, leadersShareTitle, leaderShareEntries.length, handleShareRating, isExportingRating, t]
+    [isAdmin, language, openPlayerFromSearch, searchLeaderPositions, firstNewcomerId, firstLeaderId, leadersShareTitle, leaderShareEntries.length, newcomerSharePlayers.length, handleShareRating, handleShareNewcomers, isExportingRating, isExportingNewcomers, t]
   );
 
   const activeFilterChips = useMemo(() => {
@@ -1986,6 +2060,19 @@ export default function SearchScreen() {
             seasonLine={t('search.shareRatingSeason', { season: RATING_SHARE_SEASON_KEY })}
             goalieMode={isGoalieLeaderMode}
             entries={leaderShareEntries}
+            t={t}
+          />
+        </View>
+      ) : null}
+      {isAdmin && newcomerSharePlayers.length > 0 ? (
+        <View style={styles.ratingShareOffscreen} pointerEvents="none">
+          <SearchNewcomersShareCard
+            ref={newcomersShareRef}
+            title={t('search.newcomers') || 'Newcomers'}
+            filterLine={ratingShareFilterLine || undefined}
+            countLine={t('search.shareNewcomersCount', { count: newcomerSharePlayers.length })}
+            players={newcomerSharePlayers}
+            language={language}
             t={t}
           />
         </View>
@@ -2509,7 +2596,9 @@ type SearchPlayerRowProps = {
   sectionLabel?: 'newcomers' | 'leaders';
   leadersSectionTitle?: string;
   onShareLeaders?: () => void;
+  onShareNewcomers?: () => void;
   isExportingRating?: boolean;
+  isExportingNewcomers?: boolean;
   isAdmin?: boolean;
   language: string;
   onPress: (id: string, name?: string | null) => void;
@@ -2526,6 +2615,8 @@ function areSearchPlayerRowPropsEqual(
   if (prev.sectionLabel !== next.sectionLabel) return false;
   if (prev.leadersSectionTitle !== next.leadersSectionTitle) return false;
   if (prev.isExportingRating !== next.isExportingRating) return false;
+  if (prev.isExportingNewcomers !== next.isExportingNewcomers) return false;
+  if (!!prev.onShareNewcomers !== !!next.onShareNewcomers) return false;
   if (prev.compact !== next.compact) return false;
   return searchPlayerRowDataEqual(prev.player, next.player);
 }
@@ -2536,7 +2627,9 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
   sectionLabel,
   leadersSectionTitle,
   onShareLeaders,
+  onShareNewcomers,
   isExportingRating,
+  isExportingNewcomers,
   isAdmin,
   language,
   onPress,
@@ -2580,6 +2673,20 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
               disabled={isExportingRating}
             >
               {isExportingRating ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Ionicons name="share-outline" size={16} color="#fff" />
+              )}
+            </TouchableOpacity>
+          ) : null}
+          {sectionLabel === 'newcomers' && isAdmin && onShareNewcomers ? (
+            <TouchableOpacity
+              onPress={onShareNewcomers}
+              style={styles.sectionExportButton}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              disabled={isExportingNewcomers}
+            >
+              {isExportingNewcomers ? (
                 <ActivityIndicator size="small" color="#fff" />
               ) : (
                 <Ionicons name="share-outline" size={16} color="#fff" />

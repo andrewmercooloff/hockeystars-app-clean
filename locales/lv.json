@@ -3881,7 +3881,9 @@
     "ratingPointsLabel": "punktu",
     "allCountries": "Visas valstis",
     "allYears": "Visi gadi",
-    "filters": "Filtri"
+    "filters": "Filtri",
+    "shareNewcomers": "Dalīties ar jaunpienācējiem",
+    "shareNewcomersCount": "{count} spēlētāji"
   },
   "messages": {
     "title": "Ziņojumi",

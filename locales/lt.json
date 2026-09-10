@@ -3886,7 +3886,9 @@
     "ratingPointsLabel": "taškų",
     "allCountries": "Visos šalys",
     "allYears": "Visi metai",
-    "filters": "Filtrai"
+    "filters": "Filtrai",
+    "shareNewcomers": "Dalintis naujokais",
+    "shareNewcomersCount": "{count} žaidėjų"
   },
   "messages": {
     "title": "Žinutės",

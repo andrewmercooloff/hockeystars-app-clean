@@ -3871,7 +3871,9 @@
     "ratingPointsLabel": "poäng",
     "allCountries": "Alla länder",
     "allYears": "Alla år",
-    "filters": "Filter"
+    "filters": "Filter",
+    "shareNewcomers": "Dela nykomlingar",
+    "shareNewcomersCount": "{count} spelare"
   },
   "messages": {
     "title": "Meddelanden",

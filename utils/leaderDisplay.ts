@@ -118,6 +118,22 @@ export const compareLeaderPlayers = (
   return getAllTimePoints(b) - getAllTimePoints(a);
 };
 
+/** Новички в скауте: зарегистрировались за последние newcomerMaxMs, новые первыми. */
+export function getSearchNewcomers(players: Player[], newcomerMaxMs: number): Player[] {
+  const now = Date.now();
+  return players
+    .filter((player) => {
+      if (!player.createdAt) return false;
+      const createdTime = new Date(player.createdAt).getTime();
+      return !isNaN(createdTime) && now - createdTime < newcomerMaxMs;
+    })
+    .sort((a, b) => {
+      const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return bTime - aTime;
+    });
+}
+
 /** Скаут: новички → топ-10 лидеров → остальные по тем же очкам. */
 export const sortPlayersForSearchList = (
   players: Player[],

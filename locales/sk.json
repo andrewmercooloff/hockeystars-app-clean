@@ -3864,7 +3864,9 @@
     "ratingPointsLabel": "bodov",
     "allCountries": "Všetky krajiny",
     "allYears": "Všetky roky",
-    "filters": "Filtre"
+    "filters": "Filtre",
+    "shareNewcomers": "Zdieľať nováčikov",
+    "shareNewcomersCount": "{count} hráčov"
   },
   "messages": {
     "title": "Správy",

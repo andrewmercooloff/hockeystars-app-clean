@@ -3871,7 +3871,9 @@
     "ratingPointsLabel": "points",
     "allCountries": "Tous les pays",
     "allYears": "Toutes les années",
-    "filters": "Filtres"
+    "filters": "Filtres",
+    "shareNewcomers": "Partager les nouveaux",
+    "shareNewcomersCount": "{count} joueurs"
   },
   "messages": {
     "title": "Messages",

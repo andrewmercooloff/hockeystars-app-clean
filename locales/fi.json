@@ -3864,7 +3864,9 @@
     "ratingPointsLabel": "pistettä",
     "allCountries": "Kaikki maat",
     "allYears": "Kaikki vuodet",
-    "filters": "Suodattimet"
+    "filters": "Suodattimet",
+    "shareNewcomers": "Jaa tulokkaat",
+    "shareNewcomersCount": "{count} pelaajaa"
   },
   "messages": {
     "title": "Viestit",

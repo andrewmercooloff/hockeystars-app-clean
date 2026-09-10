@@ -3660,7 +3660,9 @@
     "ratingPointsLabel": "punktów",
     "allCountries": "Wszystkie kraje",
     "allYears": "Wszystkie lata",
-    "filters": "Filtry"
+    "filters": "Filtry",
+    "shareNewcomers": "Udostępnij nowych",
+    "shareNewcomersCount": "{count} graczy"
   },
   "messages": {
     "title": "Wiadomości",
