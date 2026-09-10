@@ -91,8 +91,50 @@ const forgetMissing = (name: string) => {
   persistMissing();
 };
 
-/** Resolve whether both caches are hydrated (call before first cover render if you can). */
-export const teamAssetsReady = () => Promise.all([loadVersions(), loadMissing()]).then(() => undefined);
+/** Remembered wallpaper for a profile — instant fallback on the next open. */
+export type CoverLayerKind = 'photo' | 'logo' | 'teamname' | 'stars';
+
+export type CachedCoverState = {
+  kind: CoverLayerKind;
+  teamId?: string;
+};
+
+const LAYER_KEY = 'hs_cover_layer_v1';
+let coverLayers: Record<string, CachedCoverState> = {};
+let layersLoaded: Promise<void> | null = null;
+
+const loadLayers = () => {
+  if (!layersLoaded) {
+    layersLoaded = AsyncStorage.getItem(LAYER_KEY)
+      .then((raw) => {
+        if (raw) coverLayers = { ...JSON.parse(raw), ...coverLayers };
+      })
+      .catch(() => {});
+  }
+  return layersLoaded;
+};
+void loadLayers();
+
+const persistLayers = () => {
+  AsyncStorage.setItem(LAYER_KEY, JSON.stringify(coverLayers)).catch(() => {});
+};
+
+export const getCachedCoverState = (playerId: string): CachedCoverState | null =>
+  coverLayers[playerId] ?? null;
+
+export const setCachedCoverState = (playerId: string, state: CachedCoverState) => {
+  coverLayers[playerId] = state;
+  persistLayers();
+};
+
+export const clearCachedCoverState = (playerId: string) => {
+  delete coverLayers[playerId];
+  persistLayers();
+};
+
+/** Resolve whether all asset caches are hydrated (call before first cover render if you can). */
+export const teamAssetsReady = () =>
+  Promise.all([loadVersions(), loadMissing(), loadLayers()]).then(() => undefined);
 
 /**
  * Warm the disk cache for a cover / logo while the profile data is still loading.
@@ -187,8 +229,14 @@ export const uploadTeamLogo = (uri: string, teamId: string) =>
   uploadProcessed(uri, teamLogoFileName(teamId), 512, 'png');
 
 /** Player: upload a custom profile cover. */
-export const uploadPlayerCover = (uri: string, playerId: string) =>
-  uploadProcessed(uri, playerCoverFileName(playerId), 1200, 'jpeg');
+export const uploadPlayerCover = async (uri: string, playerId: string) => {
+  const url = await uploadProcessed(uri, playerCoverFileName(playerId), 1200, 'jpeg');
+  if (url) {
+    warmedUrls.set(url, true);
+    setCachedCoverState(playerId, { kind: 'photo' });
+  }
+  return url;
+};
 
 export const removePlayerCover = async (playerId: string): Promise<boolean> => {
   const name = playerCoverFileName(playerId);
@@ -202,6 +250,7 @@ export const removePlayerCover = async (playerId: string): Promise<boolean> => {
   missingAt[name] = Date.now();
   persistMissing();
   AsyncStorage.setItem(VERSIONS_KEY, JSON.stringify(versions)).catch(() => {});
+  clearCachedCoverState(playerId);
   return true;
 };
 

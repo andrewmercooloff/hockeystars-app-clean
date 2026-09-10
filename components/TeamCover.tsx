@@ -1,48 +1,58 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ImageBackground, StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import {
+  Dimensions,
+  ImageBackground,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../contexts/LanguageContext';
 import { usePlayerCoverUrl, useTeamLogoUrl } from '../hooks/useTeamAssetUrl';
-import { resolveAssetUrl } from '../utils/teamAssets';
+import {
+  CachedCoverState,
+  CoverLayerKind,
+  getCachedCoverState,
+  isAssetKnownMissing,
+  markAssetMissing,
+  prefetchPlayerCover,
+  prefetchTeamLogo,
+  resolveAssetUrl,
+  setCachedCoverState,
+  teamAssetsReady,
+} from '../utils/teamAssets';
 
 export type CoverTeam = { teamId: string; teamName: string };
-
-type AssetLayer = 'pending' | 'present' | 'missing';
 
 type Props = {
   playerId: string;
   team: CoverTeam | null;
-  /** Teams list finished loading — avoids stars → logo flash while teams are still fetching. */
+  /** Teams list finished loading — avoids stars → logo flash on first visit. */
   teamsReady?: boolean;
-  /** Owner or admin: can set / replace the custom cover. */
   canEditCover?: boolean;
-  /** Admin: can upload the team emblem right from the profile. */
   canEditTeamLogo?: boolean;
   onPickCover?: () => void;
   onRemoveCover?: () => void;
   onPickTeamLogo?: () => void;
-  /** Bumped by the parent after an upload so the images re-resolve. */
   refreshKey?: number;
-  /** Fixed height; omit when the parent stretches the band with absolute top/bottom. */
   height?: number;
-  /** Absolute placement is decided by the parent (bleeds to screen edges on phones). */
   style?: StyleProp<ViewStyle>;
-  /** Reports the rendered band size (used for the crop frame aspect). */
   onMeasure?: (size: { width: number; height: number }) => void;
 };
 
 const LOGO_STAR = require('../assets/images/star.png');
 
-/** Brand star wallpaper: star ≈ 2× the share-card size, gap equal to the star, staggered rows. */
 const STAR = 52;
 const STAR_PITCH_X = STAR * 2;
 const STAR_PITCH_Y = STAR * 1.15;
 
 type Tile = { x: number; y: number; key: string };
 
-/** Checkerboard grid: every other row shifted by half a pitch. */
 const staggeredGrid = (width: number, height: number, size: number, pitchX: number, pitchY: number): Tile[] => {
   if (!width) return [];
   const cols = Math.ceil(width / pitchX) + 2;
@@ -57,10 +67,37 @@ const staggeredGrid = (width: number, height: number, size: number, pitchX: numb
   return out;
 };
 
+function pickUnderlayKind(
+  cached: CachedCoverState | null,
+  team: CoverTeam | null,
+  teamsReady: boolean,
+): CoverLayerKind {
+  if (cached?.kind === 'logo' || cached?.kind === 'teamname' || cached?.kind === 'stars') {
+    return cached.kind;
+  }
+  if (cached?.kind === 'photo') {
+    return 'stars';
+  }
+  if (team && teamsReady) return 'logo';
+  if (team) return 'logo';
+  return 'stars';
+}
+
+function rememberCoverState(
+  playerId: string,
+  kind: CoverLayerKind,
+  team: CoverTeam | null,
+  cached: CachedCoverState | null,
+) {
+  setCachedCoverState(playerId, {
+    kind,
+    teamId: team?.teamId ?? cached?.teamId,
+  });
+}
+
 /**
- * Header band behind the avatar (no text). Priority: the player's own cover →
- * team emblem wallpaper → repeated team name → brand star wallpaper.
- * Fallback layers stay hidden until the higher-priority asset probe finishes.
+ * Header band behind the avatar. Custom photo loads on top; wallpaper shows
+ * immediately (from cache or best guess) so the band never sits empty/black.
  */
 const TeamCover: React.FC<Props> = ({
   playerId,
@@ -80,67 +117,120 @@ const TeamCover: React.FC<Props> = ({
   const [width, setWidth] = useState(0);
   const [measuredHeight, setMeasuredHeight] = useState(fixedHeight ?? 0);
   const height = fixedHeight ?? measuredHeight;
+
+  const [cachedCover, setCachedCover] = useState<CachedCoverState | null>(() =>
+    getCachedCoverState(playerId)
+  );
+  const [hasCustomCover, setHasCustomCover] = useState(
+    () => getCachedCoverState(playerId)?.kind === 'photo'
+  );
+
+  const logoTeamId = team?.teamId ?? cachedCover?.teamId;
   const coverUrl = usePlayerCoverUrl(playerId, refreshKey);
-  const logoUrl = useTeamLogoUrl(team?.teamId, refreshKey);
-
-  const [coverLayer, setCoverLayer] = useState<AssetLayer>('pending');
-  const [logoLayer, setLogoLayer] = useState<AssetLayer>('pending');
+  const logoUrl = useTeamLogoUrl(logoTeamId, refreshKey);
 
   useEffect(() => {
-    if (!coverUrl) return;
     let cancelled = false;
-    setCoverLayer('pending');
-    void resolveAssetUrl(coverUrl).then((result) => {
-      if (!cancelled) setCoverLayer(result);
+    void teamAssetsReady().then(() => {
+      if (!cancelled) {
+        const next = getCachedCoverState(playerId);
+        setCachedCover(next);
+        setHasCustomCover(next?.kind === 'photo');
+      }
     });
     return () => {
       cancelled = true;
     };
-  }, [coverUrl, refreshKey]);
+  }, [playerId, refreshKey]);
 
   useEffect(() => {
-    if (coverLayer !== 'missing') {
-      setLogoLayer('pending');
-      return;
-    }
-    if (!logoUrl) {
-      setLogoLayer('missing');
-      return;
-    }
+    if (!coverUrl || isAssetKnownMissing(coverUrl)) return;
+    void prefetchPlayerCover(playerId);
+  }, [coverUrl, playerId, refreshKey]);
+
+  useEffect(() => {
+    if (!logoUrl || !logoTeamId) return;
+    if (isAssetKnownMissing(logoUrl)) return;
+    void prefetchTeamLogo(logoTeamId);
+  }, [logoUrl, logoTeamId, refreshKey]);
+
+  useEffect(() => {
     let cancelled = false;
-    setLogoLayer('pending');
-    void resolveAssetUrl(logoUrl).then((result) => {
-      if (!cancelled) setLogoLayer(result);
-    });
+    void (async () => {
+      await teamAssetsReady();
+      if (cancelled || !coverUrl) return;
+      const persisted = getCachedCoverState(playerId);
+
+      if (!isAssetKnownMissing(coverUrl)) {
+        const photo = await resolveAssetUrl(coverUrl);
+        if (cancelled) return;
+        if (photo === 'present') {
+          rememberCoverState(playerId, 'photo', team, persisted);
+          return;
+        }
+      }
+
+      if (!logoUrl) {
+        const kind: CoverLayerKind = team ? 'teamname' : 'stars';
+        rememberCoverState(playerId, kind, team, persisted);
+        return;
+      }
+
+      if (isAssetKnownMissing(logoUrl)) {
+        rememberCoverState(playerId, team ? 'teamname' : 'stars', team, persisted);
+        return;
+      }
+
+      const logo = await resolveAssetUrl(logoUrl);
+      if (cancelled) return;
+      rememberCoverState(
+        playerId,
+        logo === 'present' ? 'logo' : team ? 'teamname' : 'stars',
+        team,
+        persisted,
+      );
+    })();
+
     return () => {
       cancelled = true;
     };
-  }, [coverLayer, logoUrl, refreshKey]);
+  }, [coverUrl, logoUrl, team, playerId, refreshKey]);
 
-  const showCoverImage = !!coverUrl && coverLayer !== 'missing';
-  const showLogoPattern = coverLayer === 'missing' && logoLayer === 'present' && !!logoUrl;
-  const showTeamName = coverLayer === 'missing' && logoLayer === 'missing' && !!team && teamsReady;
-  const showStars = coverLayer === 'missing' && logoLayer === 'missing' && !team && teamsReady;
+  const coverKnownMissing = !!coverUrl && isAssetKnownMissing(coverUrl);
+  const tryCustomCover = !!coverUrl && !coverKnownMissing;
+  const underlayKind = pickUnderlayKind(cachedCover, team, teamsReady);
+  /** Neutral stars while a custom photo may still load — avoids logo → photo flash. */
+  const activeUnderlay =
+    tryCustomCover && cachedCover?.kind !== 'logo' && cachedCover?.kind !== 'teamname'
+      ? 'stars'
+      : underlayKind;
+  const logoMissing = !!logoUrl && isAssetKnownMissing(logoUrl);
+
+  const showStars = activeUnderlay === 'stars' || (activeUnderlay === 'logo' && logoMissing && !team);
+  const showLogoPattern = activeUnderlay === 'logo' && !!logoUrl && !logoMissing;
+  const showTeamName =
+    activeUnderlay === 'teamname' || (activeUnderlay === 'logo' && logoMissing && !!team);
+
+  const layoutWidth = width > 0 ? width : Dimensions.get('window').width + 40;
+  const layoutHeight = height > 0 ? height : 160;
 
   const starTiles = useMemo(
-    () => (showStars ? staggeredGrid(width, height, STAR, STAR_PITCH_X, STAR_PITCH_Y) : []),
-    [showStars, width, height]
+    () => (showStars ? staggeredGrid(layoutWidth, layoutHeight, STAR, STAR_PITCH_X, STAR_PITCH_Y) : []),
+    [showStars, layoutWidth, layoutHeight]
   );
 
   const nameRows = useMemo(() => {
-    if (!showTeamName || !width) return [];
-    const label = team!.teamName.toUpperCase();
+    if (!showTeamName || !team) return [];
+    const label = team.teamName.toUpperCase();
     const approxWordWidth = label.length * NAME_FONT * 0.62 + NAME_GAP;
-    const repeats = Math.ceil(width / approxWordWidth) + 2;
-    const rows = Math.ceil(height / NAME_LINE) + 1;
+    const repeats = Math.ceil(layoutWidth / approxWordWidth) + 2;
+    const rows = Math.ceil(layoutHeight / NAME_LINE) + 1;
     return Array.from({ length: rows }, (_, row) => ({
       key: `r${row}`,
       shift: row % 2 ? -approxWordWidth / 2 : 0,
       text: Array.from({ length: repeats }, () => label).join('   '),
     }));
-  }, [showTeamName, team, width, height]);
-
-  const hasCustomCover = coverLayer === 'present';
+  }, [showTeamName, team, layoutWidth, layoutHeight]);
 
   return (
     <View
@@ -182,7 +272,7 @@ const TeamCover: React.FC<Props> = ({
         />
       )}
 
-      {showTeamName && (
+      {showTeamName && team && (
         <>
           <View style={[StyleSheet.absoluteFill, { top: -NAME_LINE * 0.35 }]} pointerEvents="none">
             {nameRows.map((row, i) => (
@@ -210,16 +300,30 @@ const TeamCover: React.FC<Props> = ({
         </>
       )}
 
-      {showCoverImage && (
+      {tryCustomCover && (
         <Image
-          source={{ uri: coverUrl! }}
+          source={{ uri: coverUrl }}
           style={StyleSheet.absoluteFill}
           contentFit="cover"
           cachePolicy="memory-disk"
           priority="high"
           recyclingKey={`cover-${playerId}`}
           transition={0}
-          onError={() => setCoverLayer('missing')}
+          onLoad={() => {
+            setHasCustomCover(true);
+            rememberCoverState(playerId, 'photo', team, cachedCover);
+          }}
+          onError={() => {
+            markAssetMissing(coverUrl);
+            setHasCustomCover(false);
+            const kind: CoverLayerKind = showLogoPattern
+              ? 'logo'
+              : showTeamName
+                ? 'teamname'
+                : 'stars';
+            rememberCoverState(playerId, kind, team, cachedCover);
+            setCachedCover(getCachedCoverState(playerId));
+          }}
         />
       )}
 
@@ -249,7 +353,7 @@ const TeamCover: React.FC<Props> = ({
             <TouchableOpacity style={styles.chip} onPress={onPickTeamLogo} activeOpacity={0.8}>
               <Ionicons name="shield-outline" size={13} color="#fff" />
               <Text style={styles.chipText}>
-                {logoLayer === 'present' ? t('profile.teamLogo') : t('profile.uploadTeamLogo')}
+                {showLogoPattern ? t('profile.teamLogo') : t('profile.uploadTeamLogo')}
               </Text>
             </TouchableOpacity>
           )}
