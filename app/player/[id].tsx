@@ -2274,6 +2274,80 @@ export default function PlayerProfile() {
     return { uri: a.uri, width: a.width || 1, height: a.height || 1 };
   };
 
+  const [pickingVideo, setPickingVideo] = useState(false);
+
+  const pickVideoFromLibrary = async (): Promise<ImagePicker.ImagePickerAsset | null> => {
+    try {
+      // Android 13+ — системный Photo Picker без READ_MEDIA_VIDEO; iOS и старый Android — запрос.
+      if (!(Platform.OS === 'android' && Platform.Version >= 33)) {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          showCustomAlert(t('common.error'), 'Нет доступа к галерее с видео', 'error');
+          return null;
+        }
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['videos'],
+        videoMaxDuration: 20,
+        allowsEditing: false,
+      });
+
+      if (result.canceled || !result.assets?.[0]) return null;
+      return result.assets[0];
+    } catch (error) {
+      console.error('❌ Ошибка выбора видео из галереи:', error);
+      showCustomAlert(t('common.error'), 'Не удалось открыть галерею с видео', 'error');
+      return null;
+    }
+  };
+
+  const uploadPickedVideo = async (asset: ImagePicker.ImagePickerAsset) => {
+    if (!player) return;
+    const tempId = Date.now();
+    let thumbUri: string | undefined;
+    try {
+      const thumb = await VideoThumbnails.getThumbnailAsync(asset.uri, { time: 500 });
+      thumbUri = thumb.uri;
+    } catch {
+      // превью необязательно — останется плейсхолдер
+    }
+    setVideoFields((prev) => [{ url: '', uploading: true, tempId, thumbUri }, ...prev]);
+    const { uploadVideoToStorage } = await import('../../utils/uploadImage');
+    const { url: uploadedUrl, error: uploadError } = await uploadVideoToStorage(
+      asset.uri,
+      player.id,
+      undefined,
+      thumbUri
+    );
+    if (uploadedUrl) {
+      setVideoFields((prev) =>
+        prev.map((v) =>
+          v.tempId === tempId ? { url: uploadedUrl, uploading: false, thumbUri: v.thumbUri ?? thumbUri } : v
+        )
+      );
+    } else {
+      setVideoFields((prev) => prev.filter((v) => v.tempId !== tempId));
+      showCustomAlert(
+        'Ошибка',
+        uploadError || 'Не удалось загрузить видео. Проверьте интернет и попробуйте снова.',
+        'error'
+      );
+    }
+  };
+
+  const handleAddVideo = async () => {
+    if (!player || pickingVideo) return;
+    if (!isEditing) handleStartEditing();
+    setPickingVideo(true);
+    try {
+      const asset = await pickVideoFromLibrary();
+      if (asset) await uploadPickedVideo(asset);
+    } finally {
+      setPickingVideo(false);
+    }
+  };
+
   // Фото выбирается без системного кропа: пользователь сам двигает кадр в CoverPositionModal.
   const handlePickCover = async () => {
     if (!player) return;
@@ -6888,51 +6962,18 @@ export default function PlayerProfile() {
                     ))}
                     {videoFields.length < 10 && (
                       <TouchableOpacity
-                        style={[styles.addVideoButton, videoEditTileStyle]}
-                        onPress={async () => {
-                          const ImagePicker = await import('expo-image-picker');
-                          const result = await ImagePicker.launchImageLibraryAsync({
-                            mediaTypes: 'videos' as any,
-                            videoMaxDuration: 20,
-                            quality: 0.5,
-                            allowsEditing: false,
-                          });
-                          if (result.canceled || !result.assets?.[0]) return;
-                          const asset = result.assets[0];
-                          const tempId = Date.now();
-                          let thumbUri: string | undefined;
-                          try {
-                            const thumb = await VideoThumbnails.getThumbnailAsync(asset.uri, { time: 500 });
-                            thumbUri = thumb.uri;
-                          } catch {
-                            // превью необязательно — останется плейсхолдер
-                          }
-                          setVideoFields(prev => [{ url: '', uploading: true, tempId, thumbUri }, ...prev]);
-                          const { uploadVideoToStorage } = await import('../../utils/uploadImage');
-                          const { url: uploadedUrl, error: uploadError } = await uploadVideoToStorage(
-                            asset.uri,
-                            player.id,
-                            undefined,
-                            thumbUri
-                          );
-                          if (uploadedUrl) {
-                            setVideoFields(prev =>
-                              prev.map(v =>
-                                v.tempId === tempId ? { url: uploadedUrl, uploading: false, thumbUri: v.thumbUri ?? thumbUri } : v
-                              )
-                            );
-                          } else {
-                            setVideoFields(prev => prev.filter(v => v.tempId !== tempId));
-                            showCustomAlert(
-                              'Ошибка',
-                              uploadError || 'Не удалось загрузить видео. Проверьте интернет и попробуйте снова.',
-                              'error'
-                            );
-                          }
-                        }}
+                        style={[styles.addVideoButton, videoEditTileStyle, pickingVideo && styles.addVideoButtonDisabled]}
+                        onPress={handleAddVideo}
+                        disabled={pickingVideo}
                       >
-                        <Ionicons name="add" size={32} color="#fa2f40" />
-                        <Text style={styles.addVideoButtonText}>{t('addMoreVideo')}</Text>
+                        {pickingVideo ? (
+                          <ActivityIndicator color="#fa2f40" size="small" />
+                        ) : (
+                          <>
+                            <Ionicons name="add" size={32} color="#fa2f40" />
+                            <Text style={styles.addVideoButtonText}>{t('addMoreVideo')}</Text>
+                          </>
+                        )}
                       </TouchableOpacity>
                     )}
                   </View>
@@ -6970,6 +7011,17 @@ export default function PlayerProfile() {
                 <View style={styles.emptySectionContainer}>
                   <Ionicons name="videocam-outline" size={48} color="#8a8a92" />
                   <Text style={styles.emptySectionText}>{t('profile.noVideosYet')}</Text>
+                  <TouchableOpacity
+                    style={[styles.addVideoEmptyButton, pickingVideo && styles.addVideoButtonDisabled]}
+                    onPress={handleAddVideo}
+                    disabled={pickingVideo}
+                  >
+                    {pickingVideo ? (
+                      <ActivityIndicator color="#fa2f40" size="small" />
+                    ) : (
+                      <Text style={styles.addVideoEmptyButtonText}>{t('addMoreVideo')}</Text>
+                    )}
+                  </TouchableOpacity>
                 </View>
               ) : null;
               
@@ -10120,6 +10172,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 2,
     fontFamily: 'Gilroy-Regular',
+  },
+  addVideoButtonDisabled: {
+    opacity: 0.55,
+  },
+  addVideoEmptyButton: {
+    marginTop: 14,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#fa2f40',
+  },
+  addVideoEmptyButtonText: {
+    color: '#fa2f40',
+    fontSize: 14,
+    fontFamily: 'Gilroy-Bold',
   },
   videoUploadHint: {
     color: '#8a8a92',

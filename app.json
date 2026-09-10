@@ -53,7 +53,7 @@
         ],
         "NSMicrophoneUsageDescription": "This app uses the microphone to measure puck speed by detecting the sound of a puck hitting the net. For example, when you shoot a puck at the net, the app records the sound and calculates the speed based on the time between the shot and the impact sound.",
         "NSCameraUsageDescription": "This app uses the camera to measure puck speed by detecting motion through the camera frame. For example, when you shoot a puck, the app tracks the puck's movement in the video frame and calculates its speed based on the distance traveled and time elapsed.",
-        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to upload profile photos, team photos, and achievement photos. For example, you can select a photo from your library to set as your profile picture or add photos to your achievements gallery.",
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photo and video library to upload profile photos, game moment videos, team photos, and achievement photos. For example, you can select a video from your library to add to your profile highlights.",
         "NSPhotoLibraryAddUsageDescription": "This app needs permission to save photos to your library. For example, you can save achievement photos or team photos to your device's photo library.",
         "NSLocationWhenInUseUsageDescription": "This app does not directly use location services. However, some third-party libraries integrated for analytics or crash reporting may request location permissions. If prompted, you can deny this permission as it is not required for the app's core functionality."
       },
@@ -228,7 +228,7 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "This app needs access to your photos to upload profile photos, team photos, and achievement photos. The app uses Android Photo Picker for one-time access without requiring persistent permissions."
+          "photosPermission": "This app needs access to your photos and videos to upload profile media and game moment clips. The app uses Android Photo Picker for one-time access without requiring persistent permissions."
         }
       ],
       "./plugins/withRemoveBootCompletedReceivers",
