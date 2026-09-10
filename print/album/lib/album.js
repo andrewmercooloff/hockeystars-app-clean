@@ -657,6 +657,20 @@ function statsPage(data, pageNo) {
   </section>`;
 }
 
+// Blank filler so card-slot pages land on the right side of each spread (odd page numbers).
+function blankPage(data, pageNo) {
+  return `<section class="page ice">
+    ${deco(data)}
+    <div class="orn br" style="opacity:.35"></div>
+    <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
+  </section>`;
+}
+
+function pushTeamPage(inner, data, chunk) {
+  if ((inner.length + 2) % 2 === 0) inner.push((n) => blankPage(data, n));
+  inner.push((n) => teamPage(data, chunk, n));
+}
+
 function notesPage(data, pageNo) {
   const lines = Array.from({ length: 22 }, () => '<div class="line"></div>').join('');
   return `<section class="page notes ice">
@@ -782,7 +796,7 @@ function albumHtml(data) {
     extra = albumCfg.pages;
   } else {
     inner.push((n) => introPage(data, n));
-    if (chunks.length) inner.push((n) => teamPage(data, chunks[chunkIdx++], n));
+    if (chunks.length) pushTeamPage(inner, data, chunks[chunkIdx++]);
     inner.push((n) => historyPage(data, n));
     extra = albumCfg.extraPages?.length ? albumCfg.extraPages : data.assets.gallery.length ? ['gallery'] : [];
     extra = [...Array(chunks.length - chunkIdx).fill('team'), ...extra];
@@ -796,7 +810,7 @@ function albumHtml(data) {
     return chunk;
   };
   for (const kind of extra) {
-    if (kind === 'team') { if (chunkIdx < chunks.length) { const chunk = chunks[chunkIdx++]; inner.push((n) => teamPage(data, chunk, n)); } }
+    if (kind === 'team') { if (chunkIdx < chunks.length) pushTeamPage(inner, data, chunks[chunkIdx++]); }
     else if (kind === 'intro') inner.push((n) => introPage(data, n));
     else if (kind === 'history') inner.push((n) => historyPage(data, n));
     else if (kind === 'facts') inner.push((n) => factsPage(data, n));
@@ -822,7 +836,7 @@ function albumHtml(data) {
       if (tiles.length) inner.push((n) => galleryPage(data, n, tiles, title));
     }
   }
-  while (chunkIdx < chunks.length) { const chunk = chunks[chunkIdx++]; inner.push((n) => teamPage(data, chunk, n)); }
+  while (chunkIdx < chunks.length) pushTeamPage(inner, data, chunks[chunkIdx++]);
   // Saddle-stitched booklet: pad to a multiple of 4 pages — leftover gallery photos, then autographs, then the match log.
   let statsUsed = extra.includes('stats');
   while ((inner.length + 2) % 4 !== 0) {

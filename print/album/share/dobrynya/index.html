@@ -78,7 +78,7 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      padding: 6px 44px;
+      padding: 4px 36px;
       min-height: 0;
     }
     main.grid-mode { padding: 8px; align-items: stretch; }
@@ -253,7 +253,7 @@
       .cards-grid .num { font-size: 10px; }
     }
     @media (max-width: 640px) {
-      main { padding: 2px 30px; }
+      main { padding: 2px 34px; }
       main.grid-mode { padding: 2px 4px; }
       .brand img.logo { height: 36px; }
       .nav { width: 28px; height: 44px; font-size: 20px; }
@@ -322,7 +322,7 @@
 
   <script>
     (function () {
-      const REV = '670a705';
+      const REV = '7509e15b';
       const RAW = 'https://raw.githubusercontent.com/andrewmercooloff/hockeystars-app-clean/cursor/hockey-card-album-generator-a9a3/print/album';
       const IMG = (file) => RAW + '/print-ready/dobrynya/pages/' + file + '?v=' + REV;
 
@@ -352,7 +352,7 @@
       let mode = 'pages';
       let index = 0;
       let cardSide = 'front';
-      const PREVIEW = 0.62;
+      const PREVIEW = 0.96;
 
       const bookEl = document.getElementById('book');
       const stageEl = document.getElementById('stage');
