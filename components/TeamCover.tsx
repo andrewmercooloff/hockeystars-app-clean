@@ -4,11 +4,13 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../contexts/LanguageContext';
+import { usePlayerCoverUrl, useTeamLogoUrl } from '../hooks/useTeamAssetUrl';
 import {
-  getPlayerCoverUrl,
-  getTeamLogoUrl,
   isAssetKnownMissing,
+  isAssetWarmed,
   markAssetMissing,
+  prefetchPlayerCover,
+  prefetchTeamLogo,
 } from '../utils/teamAssets';
 
 export type CoverTeam = { teamId: string; teamName: string };
@@ -84,24 +86,44 @@ const TeamCover: React.FC<Props> = ({
   const [width, setWidth] = useState(0);
   const [measuredHeight, setMeasuredHeight] = useState(fixedHeight ?? 0);
   const height = fixedHeight ?? measuredHeight;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const coverUrl = useMemo(() => getPlayerCoverUrl(playerId), [playerId, refreshKey]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const logoUrl = useMemo(() => (team ? getTeamLogoUrl(team.teamId) : null), [team, refreshKey]);
+  const coverUrl = usePlayerCoverUrl(playerId, refreshKey);
+  const logoUrl = useTeamLogoUrl(team?.teamId, refreshKey);
 
   const [coverOk, setCoverOk] = useState<boolean | null>(() =>
-    isAssetKnownMissing(coverUrl) ? false : null
+    isAssetKnownMissing(coverUrl) ? false : isAssetWarmed(coverUrl) ? true : null
   );
   const [logoOk, setLogoOk] = useState<boolean | null>(() =>
-    logoUrl && isAssetKnownMissing(logoUrl) ? false : null
+    logoUrl && isAssetKnownMissing(logoUrl) ? false : logoUrl && isAssetWarmed(logoUrl) ? true : null
   );
 
   useEffect(() => {
-    setCoverOk(isAssetKnownMissing(coverUrl) ? false : null);
-  }, [coverUrl]);
+    if (isAssetKnownMissing(coverUrl)) {
+      setCoverOk(false);
+      return;
+    }
+    if (isAssetWarmed(coverUrl)) {
+      setCoverOk(true);
+      return;
+    }
+    setCoverOk(null);
+    void prefetchPlayerCover(playerId);
+  }, [coverUrl, playerId]);
   useEffect(() => {
-    setLogoOk(logoUrl && isAssetKnownMissing(logoUrl) ? false : null);
-  }, [logoUrl]);
+    if (!logoUrl) {
+      setLogoOk(null);
+      return;
+    }
+    if (isAssetKnownMissing(logoUrl)) {
+      setLogoOk(false);
+      return;
+    }
+    if (isAssetWarmed(logoUrl)) {
+      setLogoOk(true);
+      return;
+    }
+    setLogoOk(null);
+    void prefetchTeamLogo(team!.teamId);
+  }, [logoUrl, team]);
 
   const showLogoPattern = !!logoUrl && logoOk !== false;
   const showTeamName = !!team && logoOk === false;
@@ -214,10 +236,12 @@ const TeamCover: React.FC<Props> = ({
       {coverOk !== false && (
         <Image
           source={{ uri: coverUrl }}
-          style={[StyleSheet.absoluteFill, { opacity: coverOk ? 1 : 0 }]}
+          style={StyleSheet.absoluteFill}
           contentFit="cover"
           cachePolicy="memory-disk"
-          transition={120}
+          priority="high"
+          recyclingKey={`cover-${playerId}`}
+          transition={0}
           onError={() => {
             markAssetMissing(coverUrl);
             setCoverOk(false);

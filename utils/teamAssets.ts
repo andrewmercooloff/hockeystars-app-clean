@@ -98,13 +98,21 @@ export const teamAssetsReady = () => Promise.all([loadVersions(), loadMissing()]
  * Warm the disk cache for a cover / logo while the profile data is still loading.
  * A miss is remembered, so the wallpaper fallback shows without waiting.
  */
+const warmedUrls = new Map<string, boolean>();
+
+export const isAssetWarmed = (url: string) => warmedUrls.get(url) === true;
+
 const warm = async (url: string): Promise<boolean> => {
+  await teamAssetsReady();
   if (isAssetKnownMissing(url)) return false;
+  if (warmedUrls.get(url) === true) return true;
   try {
     const ok = await Image.prefetch(url, { cachePolicy: 'memory-disk' });
+    warmedUrls.set(url, ok);
     if (!ok) markAssetMissing(url);
     return ok;
   } catch {
+    warmedUrls.set(url, false);
     markAssetMissing(url);
     return false;
   }

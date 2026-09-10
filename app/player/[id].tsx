@@ -51,7 +51,14 @@ import PreviousSeasonStatsSection from '../../components/PreviousSeasonStatsSect
 import AllTimeStatsSection from '../../components/AllTimeStatsSection';
 import TeamCover from '../../components/TeamCover';
 import CoverPositionModal, { type CoverSource } from '../../components/CoverPositionModal';
-import { prefetchPlayerCover, prefetchTeamLogo, removePlayerCover, uploadPlayerCover, uploadTeamLogo } from '../../utils/teamAssets';
+import {
+  prefetchPlayerCover,
+  prefetchTeamLogo,
+  removePlayerCover,
+  teamAssetsReady,
+  uploadPlayerCover,
+  uploadTeamLogo,
+} from '../../utils/teamAssets';
 import { buildSeasonStatsForSave, playerHasArchivedSeasonStats } from '../../utils/seasonStats';
 import CurrentTeamsSection from '../../components/CurrentTeamsSection';
 import CustomAlert from '../../components/CustomAlert';
@@ -2263,7 +2270,7 @@ export default function PlayerProfile() {
   // а эмблему — как только известна команда. 404 запоминается, фолбэк не ждёт сеть.
   useEffect(() => {
     const pid = Array.isArray(routeIdParam) ? routeIdParam[0] : routeIdParam;
-    if (pid) void prefetchPlayerCover(String(pid));
+    if (pid) void teamAssetsReady().then(() => prefetchPlayerCover(String(pid)));
   }, [routeIdParam]);
   useEffect(() => {
     if (coverTeam) void prefetchTeamLogo(coverTeam.teamId);
