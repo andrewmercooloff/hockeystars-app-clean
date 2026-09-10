@@ -76,6 +76,8 @@ import { birthYearOf } from '../utils/birthDate';
 SplashScreen.preventAutoHideAsync();
 
 const SEARCH_NEWCOMER_MAX_MS = 2 * 24 * 60 * 60 * 1000;
+/** Карточки игроков в скауте — ~20% компактнее по высоте. */
+const SCOUT_ROW_HEIGHT_SCALE = 0.8;
 /** Верх абсолютной панели поиска/фильтров (под заголовком страницы). */
 const SEARCH_PANEL_TOP = 41;
 /** Стартовая высота панели до первого onLayout (поиск + 3 ряда фильтров + кнопка). */
@@ -2385,14 +2387,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 16,
-    padding: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     backgroundColor: '#1c1c21',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   playerGradientShadow: {
     marginHorizontal: 16,
-    marginVertical: 6,
+    marginVertical: 5,
     borderRadius: 16,
     ...platformCardShadow({
       shadowColor: '#000',
@@ -2404,11 +2407,11 @@ const styles = StyleSheet.create({
   },
   playerGradientShadowCompact: {
     marginHorizontal: 8,
-    marginVertical: 6,
+    marginVertical: 5,
   },
   playerPhotoWrap: {
     position: 'relative',
-    marginRight: 15,
+    marginRight: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -2440,8 +2443,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 6,
-    fontSize: 64,
-    lineHeight: 70,
+    fontSize: 52,
+    lineHeight: 56,
     fontFamily: 'Gilroy-Bold',
     color: 'rgba(255, 255, 255, 0.06)',
     zIndex: 3
@@ -2457,7 +2460,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 5,
+    marginBottom: 3,
   },
   playerName: {
     color: '#fff',
@@ -2638,7 +2641,7 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
   const playerPhoto =
     player.avatar || (player.photos && player.photos.length > 0 && player.photos[0]) || undefined;
   const medalRank = leaderPosition != null ? getMedalLeaderRank(leaderPosition) : undefined;
-  const avatarSize = getSearchAvatarSize(leaderPosition);
+  const avatarSize = Math.round(getSearchAvatarSize(leaderPosition) * SCOUT_ROW_HEIGHT_SCALE);
   const ringSize = medalRank ? avatarSize + LEADER_MEDAL_BORDER_WIDTH * 2 + 4 : avatarSize;
   const photoContainerStyle = [
     player.status === 'coach' ? styles.coachPhotoContainer : styles.playerPhotoContainer,
