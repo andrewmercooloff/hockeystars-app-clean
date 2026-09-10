@@ -90,7 +90,7 @@ export default function FriendshipNotification({
       <View style={styles.contentContainer}>
         <View style={styles.header}>
           <Text style={styles.friendsText} numberOfLines={1}>
-            {friend1Name} и {friend2Name}
+            {friend1Name} {t('common.and')} {friend2Name}
           </Text>
           <Text style={styles.timeText}>
             {formatTime(timestamp)}
