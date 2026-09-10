@@ -15,7 +15,7 @@ function errorMessage(error: unknown): string {
   return String(error);
 }
 
-/** Wait until RN modals/transitions finish so iOS can present PHPicker. */
+/** Wait until RN modals/transitions finish so iOS can present the picker. */
 function waitForPresentationReady(extraIosDelayMs = 150): Promise<void> {
   return new Promise((resolve) => {
     InteractionManager.runAfterInteractions(() => {
@@ -36,13 +36,18 @@ async function ensureGalleryPermission(): Promise<boolean> {
   return status === 'granted';
 }
 
+/** expo-image-picker returns duration in milliseconds. */
 function isDurationTooLong(asset: ImagePicker.ImagePickerAsset, maxSeconds: number): boolean {
-  const durationSec = asset.duration;
-  return typeof durationSec === 'number' && durationSec > 0 && durationSec > maxSeconds;
+  const durationMs = asset.duration;
+  if (typeof durationMs !== 'number' || durationMs <= 0) {
+    return false;
+  }
+  return durationMs > maxSeconds * 1000;
 }
 
 /**
- * Opens the system video picker with iOS-safe deferral and a legacy-picker fallback.
+ * Opens the system video picker once (no second gallery fallback).
+ * iOS uses legacy UIImagePickerController — PHPicker often fails on video export.
  */
 export async function pickVideoFromLibrary(maxSeconds = DEFAULT_MAX_SECONDS): Promise<PickVideoOutcome> {
   const granted = await ensureGalleryPermission();
@@ -52,43 +57,33 @@ export async function pickVideoFromLibrary(maxSeconds = DEFAULT_MAX_SECONDS): Pr
 
   await waitForPresentationReady();
 
-  const tryLaunch = async (options: ImagePicker.ImagePickerOptions) => {
-    const result = await ImagePicker.launchImageLibraryAsync(options);
-    if (result.canceled || !result.assets?.[0]) {
-      return { status: 'canceled' as const };
-    }
-    const asset = result.assets[0];
-    if (isDurationTooLong(asset, maxSeconds)) {
-      return { status: 'too_long' as const, maxSeconds };
-    }
-    return { status: 'picked' as const, asset };
-  };
+  const options: ImagePicker.ImagePickerOptions =
+    Platform.OS === 'ios'
+      ? {
+          mediaTypes: ['videos'],
+          allowsEditing: true,
+          videoMaxDuration: maxSeconds,
+        }
+      : {
+          mediaTypes: ['videos'],
+          allowsEditing: false,
+        };
 
   try {
-    // PHPicker (allowsEditing: false). videoMaxDuration applies only to legacy picker / camera.
-    return await tryLaunch({
-      mediaTypes: ['videos'],
-      allowsEditing: false,
-    });
-  } catch (primaryError) {
-    console.warn('Video picker (PHPicker) failed:', primaryError);
-
-    if (Platform.OS !== 'ios') {
-      return { status: 'failed', message: errorMessage(primaryError) };
+    const result = await ImagePicker.launchImageLibraryAsync(options);
+    if (result.canceled || !result.assets?.[0]) {
+      return { status: 'canceled' };
     }
 
-    await waitForPresentationReady(200);
-
-    try {
-      // Legacy UIImagePickerController — more reliable for video-only on some iOS builds.
-      return await tryLaunch({
-        mediaTypes: ['videos'],
-        allowsEditing: true,
-        videoMaxDuration: maxSeconds,
-      });
-    } catch (fallbackError) {
-      console.error('Video picker (legacy) failed:', fallbackError);
-      return { status: 'failed', message: errorMessage(fallbackError) };
+    const asset = result.assets[0];
+    // iOS enforces videoMaxDuration in the native trim UI; Android PHPicker needs a JS check.
+    if (Platform.OS === 'android' && isDurationTooLong(asset, maxSeconds)) {
+      return { status: 'too_long', maxSeconds };
     }
+
+    return { status: 'picked', asset };
+  } catch (error) {
+    console.error('Video picker failed:', error);
+    return { status: 'failed', message: errorMessage(error) };
   }
 }

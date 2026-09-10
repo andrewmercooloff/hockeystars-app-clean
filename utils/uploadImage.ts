@@ -533,18 +533,22 @@ const readVideoArrayBuffer = async (uri: string): Promise<ArrayBuffer | null> =>
   }
 };
 
+const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes.buffer;
+};
+
 const readVideoArrayBufferFromFileSystem = async (uri: string): Promise<ArrayBuffer | null> => {
   try {
     const base64 = await FileSystem.readAsStringAsync(uri, {
       encoding: FileSystem.EncodingType.Base64,
     });
     if (!base64) return null;
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i += 1) {
-      bytes[i] = binary.charCodeAt(i);
-    }
-    return bytes.buffer;
+    return base64ToArrayBuffer(base64);
   } catch {
     return null;
   }
@@ -590,43 +594,23 @@ export const uploadVideoToStorage = async (
 
     onProgress?.(30);
 
-    let data: { path: string } | null = null;
-    let uploadError: { message?: string } | null = null;
+    // file:// на iOS: fetch и FormData часто ломаются — читаем байты через FileSystem.
+    const arrayBuffer =
+      localUri.startsWith('file://')
+        ? await readVideoArrayBufferFromFileSystem(localUri)
+        : (await readVideoArrayBuffer(localUri)) ??
+          (await readVideoArrayBufferFromFileSystem(localUri));
 
-    // RN iOS: FormData с uri надёжнее fetch(file://) для видео.
-    if (localUri.startsWith('file://')) {
-      try {
-        const formData = new FormData();
-        formData.append('file', {
-          uri: localUri,
-          type: resolved.mimeType,
-          name: `${timestamp}.mp4`,
-        } as any);
-        const result = await supabase.storage.from('videos').upload(fileName, formData, {
-          contentType: resolved.mimeType,
-          upsert: false,
-        });
-        data = result.data;
-        uploadError = result.error;
-      } catch (formError) {
-        console.warn('⚠️ FormData upload video failed, trying arrayBuffer:', formError);
-      }
+    if (!arrayBuffer?.byteLength) {
+      return { url: null, error: 'Не удалось прочитать файл с устройства' };
     }
 
-    if (!data) {
-      onProgress?.(40);
-      const arrayBuffer =
-        (await readVideoArrayBuffer(localUri)) ?? (await readVideoArrayBufferFromFileSystem(localUri));
-      if (!arrayBuffer?.byteLength) {
-        return { url: null, error: 'Не удалось прочитать файл с устройства' };
-      }
-      const result = await supabase.storage.from('videos').upload(fileName, arrayBuffer, {
-        contentType: resolved.mimeType,
-        upsert: false,
-      });
-      data = result.data;
-      uploadError = result.error;
-    }
+    onProgress?.(50);
+
+    const { data, error: uploadError } = await supabase.storage.from('videos').upload(fileName, arrayBuffer, {
+      contentType: resolved.mimeType,
+      upsert: false,
+    });
 
     onProgress?.(60);
 

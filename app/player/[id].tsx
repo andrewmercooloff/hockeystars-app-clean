@@ -2275,6 +2275,7 @@ export default function PlayerProfile() {
   };
 
   const [pickingVideo, setPickingVideo] = useState(false);
+  const videoPickInFlightRef = useRef(false);
 
   const uploadPickedVideo = async (asset: ImagePicker.ImagePickerAsset) => {
     if (!player) return;
@@ -2303,11 +2304,34 @@ export default function PlayerProfile() {
       thumbUri
     );
     if (uploadedUrl) {
-      setVideoFields((prev) =>
-        prev.map((v) =>
+      let goalsText = '';
+      setVideoFields((prev) => {
+        const updated = prev.map((v) =>
           v.tempId === tempId ? { url: uploadedUrl, uploading: false, thumbUri: v.thumbUri ?? thumbUri } : v
-        )
-      );
+        );
+        goalsText = sortVideoUrlsNewestFirst(
+          updated.filter((v) => v.url.trim() && !v.uploading).map((v) => v.url.trim())
+        ).join('\n');
+        return updated;
+      });
+
+      try {
+        const saved = await updatePlayer(player.id, { favoriteGoals: goalsText });
+        if (saved) {
+          setPlayer(saved);
+          setEditData((prev) => ({ ...prev, favoriteGoals: goalsText }));
+        }
+      } catch (saveError) {
+        console.error('❌ Видео загружено, но не сохранено в профиль:', saveError);
+        showCustomAlert(
+          t('common.warning') || 'Внимание',
+          'Видео загружено. Нажмите «Сохранить», чтобы закрепить его в профиле.',
+          'warning'
+        );
+        return;
+      }
+
+      showCustomAlert(t('common.success'), t('profile.videoUploaded') || 'Видео добавлено в профиль', 'success');
     } else {
       setVideoFields((prev) => prev.filter((v) => v.tempId !== tempId));
       showCustomAlert(
@@ -2319,7 +2343,8 @@ export default function PlayerProfile() {
   };
 
   const handleAddVideo = async () => {
-    if (!player || pickingVideo) return;
+    if (!player || pickingVideo || videoPickInFlightRef.current) return;
+    videoPickInFlightRef.current = true;
     const enteringEditMode = !isEditing;
     if (enteringEditMode) handleStartEditing();
     setPickingVideo(true);
@@ -2349,6 +2374,7 @@ export default function PlayerProfile() {
         showCustomAlert(t('common.error'), 'Не удалось открыть галерею с видео', 'error');
       }
     } finally {
+      videoPickInFlightRef.current = false;
       setPickingVideo(false);
     }
   };
