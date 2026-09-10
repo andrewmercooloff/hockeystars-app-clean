@@ -552,7 +552,7 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
     [cardHeight, cardMaxWidth]
   );
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
-  const [fullscreenVideo, setFullscreenVideo] = useState<{ url: string; timeCode?: string } | null>(null);
+  const [videoExpanded, setVideoExpanded] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [likeRefreshTrigger, setLikeRefreshTrigger] = useState(0);
   const videoFullscreenLabel =
@@ -600,6 +600,7 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
 
   const closeModal = useCallback(() => {
     setSelectedVideo(null);
+    setVideoExpanded(false);
     setLikeRefreshTrigger((prev) => prev + 1);
   }, []);
 
@@ -658,14 +659,34 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
         visible={selectedVideo !== null}
         animationType="fade"
         transparent={true}
-        onRequestClose={closeModal}
+        statusBarTranslucent
+        onRequestClose={videoExpanded ? () => setVideoExpanded(false) : closeModal}
       >
-        <TouchableWithoutFeedback onPress={closeModal}>
-          <View style={styles.modalOverlay} {...panResponder.panHandlers}>
-            <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
-              <Ionicons name="close" size={24} color="#fff" />
-            </TouchableOpacity>
-            {selectedVideo && (
+        <View style={styles.modalOverlay} {...(videoExpanded ? {} : panResponder.panHandlers)}>
+          {!videoExpanded && (
+            <TouchableWithoutFeedback onPress={closeModal}>
+              <View style={styles.modalBackdrop} />
+            </TouchableWithoutFeedback>
+          )}
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={videoExpanded ? () => setVideoExpanded(false) : closeModal}
+          >
+            <Ionicons name="close" size={24} color="#fff" />
+          </TouchableOpacity>
+          {selectedVideo && (
+            videoExpanded ? (
+              <View style={styles.fullscreenPlayerWrap}>
+                <VideoPlayer
+                  key={`${selectedVideo.url}-${selectedVideo.timeCode || ''}-fs`}
+                  url={selectedVideo.url}
+                  timeCode={selectedVideo.timeCode}
+                  autoPlay
+                  fullscreen
+                  onClose={() => setVideoExpanded(false)}
+                />
+              </View>
+            ) : (
               <View pointerEvents="box-none" style={styles.modalPlayerWrap}>
                 <VideoPlayer
                   key={`${selectedVideo.url}-${selectedVideo.timeCode || ''}`}
@@ -673,37 +694,11 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
                   timeCode={selectedVideo.timeCode}
                   autoPlay
                   layoutMode="modal"
-                  onRequestFullscreen={() => setFullscreenVideo(selectedVideo)}
+                  onRequestFullscreen={() => setVideoExpanded(true)}
                   fullscreenButtonLabel={videoFullscreenLabel}
                 />
               </View>
-            )}
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-
-      <Modal
-        visible={fullscreenVideo !== null}
-        animationType="fade"
-        transparent
-        statusBarTranslucent
-        onRequestClose={() => setFullscreenVideo(null)}
-      >
-        <View style={styles.modalOverlay}>
-          <TouchableOpacity style={styles.closeButton} onPress={() => setFullscreenVideo(null)}>
-            <Ionicons name="close" size={24} color="#fff" />
-          </TouchableOpacity>
-          {fullscreenVideo && (
-            <View style={styles.fullscreenPlayerWrap}>
-              <VideoPlayer
-                key={`${fullscreenVideo.url}-${fullscreenVideo.timeCode || ''}-fs`}
-                url={fullscreenVideo.url}
-                timeCode={fullscreenVideo.timeCode}
-                autoPlay
-                fullscreen
-                onClose={() => setFullscreenVideo(null)}
-              />
-            </View>
+            )
           )}
         </View>
       </Modal>
@@ -776,6 +771,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(22, 22, 26, 0.94)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  modalBackdrop: {
+    ...StyleSheet.absoluteFillObject,
   },
   modalPlayerWrap: {
     alignItems: 'center',

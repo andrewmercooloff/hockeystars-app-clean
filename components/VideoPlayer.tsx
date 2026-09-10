@@ -343,10 +343,20 @@ const DirectVideoPlayer: React.FC<{
     [embedded, isPlaying, onScrubActiveChange, scheduleHideUi],
   );
 
+  const overlayControls = layoutMode === 'modal' || !!fullscreen;
   const showSeekBar = embedded ? durationMs > 0 && !error : (showUi || !isPlaying) && durationMs > 0 && !error;
   const showCenterPlay = !isPlaying && !isLoading && !error && !isScrubbing;
   const sliderValue = isScrubbing ? scrubMs : positionMs;
   const progress = durationMs > 0 ? positionMs / durationMs : 0;
+  const seekBar = showSeekBar ? (
+    <VideoSeekBar
+      durationMs={durationMs}
+      positionMs={sliderValue}
+      onScrubStart={beginScrub}
+      onScrubChange={changeScrub}
+      onScrubEnd={(ms) => { void endScrub(ms); }}
+    />
+  ) : null;
 
   const handleLoad = (status: AVPlaybackStatus) => {
     setIsLoading(false);
@@ -387,7 +397,13 @@ const DirectVideoPlayer: React.FC<{
         />
 
         {!isScrubbing && (
-          <Pressable style={dvStyles.touchOverlay} onPress={onVideoTap} />
+          <Pressable
+            style={[
+              dvStyles.touchOverlay,
+              overlayControls && dvStyles.touchOverlayAboveSeek,
+            ]}
+            onPress={onVideoTap}
+          />
         )}
 
         {onClose && !embedded && (
@@ -398,7 +414,10 @@ const DirectVideoPlayer: React.FC<{
 
         {onRequestFullscreen && !embedded && !fullscreen && (
           <TouchableOpacity
-            style={dvStyles.expandBtn}
+            style={[
+              dvStyles.expandBtn,
+              overlayControls && dvStyles.expandBtnAboveSeek,
+            ]}
             onPress={onRequestFullscreen}
             accessibilityRole="button"
             accessibilityLabel={fullscreenButtonLabel}
@@ -406,6 +425,12 @@ const DirectVideoPlayer: React.FC<{
             <Ionicons name="expand" size={22} color="#fff" />
           </TouchableOpacity>
         )}
+
+        {seekBar && overlayControls ? (
+          <View style={dvStyles.seekBarOverlay} pointerEvents="box-none">
+            {seekBar}
+          </View>
+        ) : null}
 
         {isLoading && !error && (
           <View style={dvStyles.loadingOverlay} pointerEvents="none">
@@ -433,15 +458,7 @@ const DirectVideoPlayer: React.FC<{
         )}
       </View>
 
-      {showSeekBar && (
-        <VideoSeekBar
-          durationMs={durationMs}
-          positionMs={sliderValue}
-          onScrubStart={beginScrub}
-          onScrubChange={changeScrub}
-          onScrubEnd={(ms) => { void endScrub(ms); }}
-        />
-      )}
+      {seekBar && !overlayControls ? seekBar : null}
     </View>
   );
 };
@@ -478,6 +495,19 @@ const dvStyles = StyleSheet.create({
   touchOverlay: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 4,
+  },
+  touchOverlayAboveSeek: {
+    bottom: 48,
+  },
+  seekBarOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 28,
+  },
+  expandBtnAboveSeek: {
+    bottom: 56,
   },
   video: {
     width: '100%',

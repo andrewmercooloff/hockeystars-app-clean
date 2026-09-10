@@ -485,8 +485,13 @@ export default function PlayerProfile() {
   const [friendLoading, setFriendLoading] = useState(false);
   const [friends, setFriends] = useState<Player[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
-  const [fullscreenVideo, setFullscreenVideo] = useState<{ url: string; timeCode?: string } | null>(null);
+  const [videoExpanded, setVideoExpanded] = useState(false);
   const [videoLikeRefreshTrigger, setVideoLikeRefreshTrigger] = useState(0);
+  const closeVideoModal = useCallback(() => {
+    setSelectedVideo(null);
+    setVideoExpanded(false);
+    setVideoLikeRefreshTrigger((prev) => prev + 1);
+  }, []);
   const videoFullscreenLabel =
     t('videoNotification.fullScreen') !== 'videoNotification.fullScreen'
       ? t('videoNotification.fullScreen')
@@ -8273,87 +8278,65 @@ export default function PlayerProfile() {
         </TouchableOpacity>
       )}
       
-      {/* Модальное окно для видео */}
+      {/* Модальное окно для видео (preview + fullscreen в одном Modal — iOS не показывает вложенные) */}
       <Modal
         visible={selectedVideo !== null}
         transparent={true}
         animationType="fade"
-        onRequestClose={() => {
-          setSelectedVideo(null);
-          setVideoLikeRefreshTrigger(prev => prev + 1);
-        }}
-      >
-        <View style={styles.videoModalOverlay}>
-          <TouchableWithoutFeedback onPress={() => {
-            setSelectedVideo(null);
-            setVideoLikeRefreshTrigger(prev => prev + 1);
-          }}>
-            <View style={styles.videoModalOverlayTouchable} />
-          </TouchableWithoutFeedback>
-          <View style={styles.videoModalContainer} pointerEvents="box-none">
-            <TouchableOpacity
-              style={styles.videoModalCloseButton}
-              onPress={() => {
-                setSelectedVideo(null);
-                setVideoLikeRefreshTrigger(prev => prev + 1);
-              }}
-            >
-              <Ionicons name="close" size={24} color="#fff" />
-            </TouchableOpacity>
-            {selectedVideo && (
-              <View style={styles.videoModalContent}>
-                <VideoPlayer
-                  url={selectedVideo.url}
-                  title={t('myMoment')}
-                  timeCode={selectedVideo.timeCode}
-                  autoPlay
-                  layoutMode="modal"
-                  onRequestFullscreen={() => setFullscreenVideo(selectedVideo)}
-                  fullscreenButtonLabel={videoFullscreenLabel}
-                />
-                {player && (
-                  <View style={styles.videoModalLikeButton}>
-                    <LikeButton
-                      playerId={player.id}
-                      contentId={generateVideoContentId(selectedVideo.url, selectedVideo.timeCode)}
-                      contentType="video"
-                    />
-                  </View>
-                )}
-              </View>
-            )}
-          </View>
-        </View>
-      </Modal>
-
-      <Modal
-        visible={fullscreenVideo !== null}
-        transparent
-        animationType="fade"
         statusBarTranslucent
-        onRequestClose={() => setFullscreenVideo(null)}
+        onRequestClose={videoExpanded ? () => setVideoExpanded(false) : closeVideoModal}
       >
-        <View style={styles.videoFullscreenOverlay}>
+        <View style={videoExpanded ? styles.videoFullscreenOverlay : styles.videoModalOverlay}>
+          {!videoExpanded && (
+            <TouchableWithoutFeedback onPress={closeVideoModal}>
+              <View style={styles.videoModalOverlayTouchable} />
+            </TouchableWithoutFeedback>
+          )}
           <TouchableOpacity
-            style={styles.videoFullscreenCloseButton}
-            onPress={() => setFullscreenVideo(null)}
+            style={videoExpanded ? styles.videoFullscreenCloseButton : styles.videoModalCloseButton}
+            onPress={videoExpanded ? () => setVideoExpanded(false) : closeVideoModal}
             hitSlop={12}
             accessibilityRole="button"
             accessibilityLabel={t('common.close') !== 'common.close' ? t('common.close') : 'Close'}
           >
-            <Ionicons name="close" size={26} color="#fff" />
+            <Ionicons name="close" size={videoExpanded ? 26 : 24} color="#fff" />
           </TouchableOpacity>
-          {fullscreenVideo && (
-            <View style={styles.videoFullscreenPlayer}>
-              <VideoPlayer
-                key={`${fullscreenVideo.url}-${fullscreenVideo.timeCode || ''}-fs`}
-                url={fullscreenVideo.url}
-                timeCode={fullscreenVideo.timeCode}
-                autoPlay
-                fullscreen
-                onClose={() => setFullscreenVideo(null)}
-              />
-            </View>
+          {selectedVideo && (
+            videoExpanded ? (
+              <View style={styles.videoFullscreenPlayer}>
+                <VideoPlayer
+                  key={`${selectedVideo.url}-${selectedVideo.timeCode || ''}-fs`}
+                  url={selectedVideo.url}
+                  timeCode={selectedVideo.timeCode}
+                  autoPlay
+                  fullscreen
+                  onClose={() => setVideoExpanded(false)}
+                />
+              </View>
+            ) : (
+              <View style={styles.videoModalContainer} pointerEvents="box-none">
+                <View style={styles.videoModalContent}>
+                  <VideoPlayer
+                    url={selectedVideo.url}
+                    title={t('myMoment')}
+                    timeCode={selectedVideo.timeCode}
+                    autoPlay
+                    layoutMode="modal"
+                    onRequestFullscreen={() => setVideoExpanded(true)}
+                    fullscreenButtonLabel={videoFullscreenLabel}
+                  />
+                  {player && (
+                    <View style={styles.videoModalLikeButton}>
+                      <LikeButton
+                        playerId={player.id}
+                        contentId={generateVideoContentId(selectedVideo.url, selectedVideo.timeCode)}
+                        contentType="video"
+                      />
+                    </View>
+                  )}
+                </View>
+              </View>
+            )
           )}
         </View>
       </Modal>
@@ -9940,8 +9923,8 @@ const styles = StyleSheet.create({
   },
   videoModalLikeButton: {
     position: 'absolute',
-    bottom: 20,
-    left: 20,
+    top: 12,
+    left: 12,
     zIndex: 1000,
   },
   videoFullscreenOverlay: {
