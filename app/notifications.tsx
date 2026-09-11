@@ -62,6 +62,7 @@ import {
     getReceivedFriendRequests,
     loadNotifications,
     markNotificationAsRead,
+    pruneStaleFriendRequestNotifications,
     syncUnreadNotificationsCountInDb,
 } from '../utils/playerStorage';
 import { supabase } from '../utils/supabase';
@@ -225,7 +226,6 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
               photoUrls={notification.data.photoUrls || []}
               onHeaderPress={handlePress}
-              reactionsFooter={feedReactionsFooter}
             />
         ) : notification.type === 'new_friendship' ? (
           <FriendshipNotification
@@ -1034,7 +1034,10 @@ export default function NotificationsScreen() {
         offset,
         updateCache: offset === 0,
       });
-      const pageNotifications = processNotificationsPage(storedNotifications);
+      const pageNotifications = await pruneStaleFriendRequestNotifications(
+        processNotificationsPage(storedNotifications),
+        currentUser.id,
+      );
       const fetchedCount = storedNotifications.length;
       const nextOffset = offset + fetchedCount;
 

@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from './BlurOrSolid';
 import { useLanguage } from '../contexts/LanguageContext';
 import CachedAvatar from './CachedAvatar';
-import { NOTIFICATION_CARD, NOTIFICATION_CARD_BLUR } from '../utils/notificationCard';
+import { NOTIFICATION_CARD, NOTIFICATION_CARD_BLUR, NOTIFICATION_DELTA_BADGE } from '../utils/notificationCard';
 
 interface ExerciseNotificationProps {
   playerName: string;
@@ -88,7 +88,7 @@ export default function ExerciseNotification({
                  {t('exerciseNotification.completed')} "{getLocalizedExerciseName(exerciseId)}"
                </Text>
           <View style={styles.exerciseBadge}>
-            <Ionicons name="barbell-outline" size={16} color="#000" />
+            <Ionicons name="barbell-outline" size={12} color="#fff" />
           </View>
         </View>
       </View>
@@ -158,15 +158,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   exerciseBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.10)',
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    borderRadius: 12,
-    width: 32,
-    height: 32,
+    ...NOTIFICATION_DELTA_BADGE,
+    minWidth: 32,
   },
   badgeText: {
     color: '#fff',

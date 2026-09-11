@@ -34,7 +34,7 @@ export const NOTIFICATION_CARD_ROW: ViewStyle = {
 };
 
 export const NOTIFICATION_REACTIONS_INSET: ViewStyle = {
-  marginTop: 6,
+  marginTop: 10,
   paddingTop: 0,
   paddingHorizontal: 12,
   paddingBottom: 0,
@@ -44,9 +44,22 @@ export const NOTIFICATION_REACTIONS_INSET: ViewStyle = {
 
 /** For cards that already have inner padding (stats, physical data, etc.). */
 export const NOTIFICATION_REACTIONS_INSET_PADDED: ViewStyle = {
-  marginTop: 6,
+  marginTop: 10,
   paddingTop: 0,
   paddingBottom: 0,
   width: '100%',
   alignSelf: 'stretch',
+};
+
+/** Red delta badge used on stats / achievement / exercise rows. */
+export const NOTIFICATION_DELTA_BADGE: ViewStyle = {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 4,
+  paddingHorizontal: 8,
+  paddingVertical: 2,
+  borderRadius: 12,
+  minWidth: 32,
+  backgroundColor: '#FF4444',
 };

@@ -71,7 +71,6 @@ export const REACTABLE_NOTIFICATION_TYPES = new Set([
   'achievement_added',
   'achievement',
   'scout_report',
-  'photo_added',
   'video_added',
   'avatar_changed',
   'cover_changed',

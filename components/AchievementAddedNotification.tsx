@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from './BlurOrSolid';
 import { platformCardShadow } from '../utils/androidShadow';
+import { NOTIFICATION_DELTA_BADGE } from '../utils/notificationCard';
 import { useLanguage } from '../contexts/LanguageContext';
 import CachedAvatar from './CachedAvatar';
 
@@ -91,7 +92,7 @@ const AchievementAddedNotification = React.memo(function AchievementAddedNotific
             {t('achievementNotification.added')} {getAchievementText(achievementsCount)}
           </Text>
           <View style={styles.achievementsInfo}>
-            <Ionicons name="trophy" size={14} color="#fff" />
+            <Ionicons name="trophy" size={12} color="#fff" />
             <Text style={styles.achievementsCountText}>
               +{achievementsCount}
             </Text>
@@ -186,19 +187,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   achievementsInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.10)',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 12,
-    minWidth: 32,
+    ...NOTIFICATION_DELTA_BADGE,
   },
   achievementsCountText: {
-    color: '#000',
+    color: '#fff',
     fontSize: 12,
     fontFamily: 'Gilroy-Bold',
-    marginLeft: 4,
   },
 });
 

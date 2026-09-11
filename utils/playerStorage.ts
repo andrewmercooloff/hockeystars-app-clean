@@ -3735,6 +3735,80 @@ export const getFriendRequests = async (userId: string): Promise<FriendRequest[]
   }
 };
 
+async function deleteFriendRequestNotificationsForSender(
+  userId: string,
+  senderId: string
+): Promise<number> {
+  const { data: rows, error } = await supabase
+    .from('notifications')
+    .select('id, data')
+    .eq('user_id', userId)
+    .eq('type', 'friend_request');
+
+  if (error || !rows?.length) return 0;
+
+  const ids = rows
+    .filter((row) => {
+      const data = (row.data || {}) as Record<string, string | undefined>;
+      return (
+        data.sender_id === senderId ||
+        data.playerId === senderId ||
+        data.from_id === senderId
+      );
+    })
+    .map((row) => row.id);
+
+  if (!ids.length) return 0;
+
+  const { error: deleteError } = await supabase.from('notifications').delete().in('id', ids);
+  if (deleteError) {
+    console.error('⚠️ Ошибка удаления уведомлений о запросе дружбы:', deleteError);
+    return 0;
+  }
+  return ids.length;
+}
+
+/** Drops friend_request cards when the sender is no longer pending (already accepted/declined). */
+export async function pruneStaleFriendRequestNotifications<
+  T extends { id: string; type: string; data?: Record<string, unknown>; playerId?: string },
+>(notifications: T[], userId: string): Promise<T[]> {
+  if (!notifications.some((n) => n.type === 'friend_request')) return notifications;
+
+  const { data: pending } = await supabase
+    .from('friend_requests')
+    .select('from_id')
+    .eq('to_id', userId)
+    .eq('status', 'pending');
+
+  const pendingSenders = new Set((pending || []).map((row) => row.from_id));
+  const staleIds: string[] = [];
+
+  const filtered = notifications.filter((n) => {
+    if (n.type !== 'friend_request') return true;
+    const senderId =
+      (n.data?.sender_id as string | undefined) ||
+      (n.data?.playerId as string | undefined) ||
+      n.playerId;
+    if (senderId && pendingSenders.has(senderId)) return true;
+    staleIds.push(n.id);
+    return false;
+  });
+
+  if (staleIds.length > 0) {
+    void supabase
+      .from('notifications')
+      .delete()
+      .in('id', staleIds)
+      .then(({ error: deleteError }) => {
+        if (deleteError) {
+          console.error('⚠️ Ошибка удаления устаревших friend_request уведомлений:', deleteError);
+        }
+      });
+  }
+
+  return filtered;
+}
+
 // Принятие запроса дружбы
 export const acceptFriendRequest = async (userId1: string, userId2: string): Promise<boolean> => {
   try {
@@ -3778,16 +3852,10 @@ export const acceptFriendRequest = async (userId1: string, userId2: string): Pro
     try {
       const senderId = requestData?.from_id === userId1 ? userId2 : requestData?.from_id;
       if (senderId) {
-        const { data: deletedNotifications } = await supabase
-          .from('notifications')
-          .delete()
-          .eq('user_id', userId1)
-          .eq('type', 'friend_request')
-          .or(`data->sender_id.eq.${senderId},data->from_id.eq.${senderId},data->playerId.eq.${senderId}`)
-          .select();
-        
-        if (deletedNotifications && deletedNotifications.length > 0) {
-          console.log('✅ Удалено уведомление о запросе дружбы после принятия:', deletedNotifications.length);
+        const deletedCount = await deleteFriendRequestNotificationsForSender(userId1, senderId);
+
+        if (deletedCount > 0) {
+          console.log('✅ Удалено уведомление о запросе дружбы после принятия:', deletedCount);
           
           // ИСПРАВЛЕНО: Пересчитываем все непрочитанные уведомления для точности
           // Это гарантирует, что счетчик будет правильным даже если были другие изменения
@@ -3966,16 +4034,10 @@ export const declineFriendRequest = async (userId1: string, userId2: string): Pr
     try {
       const senderId = requestData?.from_id === userId1 ? userId2 : requestData?.from_id;
       if (senderId) {
-        const { data: deletedNotifications } = await supabase
-          .from('notifications')
-          .delete()
-          .eq('user_id', userId1)
-          .eq('type', 'friend_request')
-          .or(`data->sender_id.eq.${senderId},data->from_id.eq.${senderId},data->playerId.eq.${senderId}`)
-          .select();
-        
-        if (deletedNotifications && deletedNotifications.length > 0) {
-          console.log('✅ Удалено уведомление о запросе дружбы после отклонения:', deletedNotifications.length);
+        const deletedCount = await deleteFriendRequestNotificationsForSender(userId1, senderId);
+
+        if (deletedCount > 0) {
+          console.log('✅ Удалено уведомление о запросе дружбы после отклонения:', deletedCount);
           
           // ИСПРАВЛЕНО: Пересчитываем все непрочитанные уведомления для точности
           // Это гарантирует, что счетчик будет правильным даже если были другие изменения
