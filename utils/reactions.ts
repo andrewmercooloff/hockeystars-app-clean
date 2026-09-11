@@ -1,16 +1,26 @@
 export type ProfileReactionType = 'respect' | 'like' | 'strength' | 'high_five';
 export type FeedReactionType = 'respect' | 'fire' | 'strength' | 'lightning';
 
+/** All profile reaction types (incl. legacy) — for emoji lookup in notifications. */
+export const PROFILE_REACTION_META: Record<
+  ProfileReactionType,
+  { emoji: string; labelKey: string }
+> = {
+  respect: { emoji: '🤜🏻🤛🏻', labelKey: 'reactions.respect' },
+  like: { emoji: '👍🏻', labelKey: 'reactions.like' },
+  strength: { emoji: '💪🏻', labelKey: 'reactions.strength' },
+  high_five: { emoji: '👋🏻', labelKey: 'reactions.highFive' },
+};
+
+/** Reactions shown on player profile (respect + hello). */
 export const PROFILE_REACTIONS: readonly {
   type: ProfileReactionType;
   emoji: string;
   labelKey: string;
-}[] = [
-  { type: 'respect', emoji: '🤜🏻🤛🏻', labelKey: 'reactions.respect' },
-  { type: 'like', emoji: '👍🏻', labelKey: 'reactions.like' },
-  { type: 'strength', emoji: '💪🏻', labelKey: 'reactions.strength' },
-  { type: 'high_five', emoji: '✋🏻', labelKey: 'reactions.highFive' },
-];
+}[] = (['respect', 'high_five'] as const).map((type) => ({
+  type,
+  ...PROFILE_REACTION_META[type],
+}));
 
 export const FEED_REACTIONS: readonly {
   type: FeedReactionType;
@@ -91,7 +101,7 @@ export const EMPTY_FEED_REACTION_SUMMARY: FeedReactionSummary = {
 };
 
 export function profileReactionEmoji(type: ProfileReactionType): string {
-  return PROFILE_REACTIONS.find((r) => r.type === type)?.emoji ?? '👍🏻';
+  return PROFILE_REACTION_META[type]?.emoji ?? '👍🏻';
 }
 
 export function feedReactionEmoji(type: FeedReactionType): string {

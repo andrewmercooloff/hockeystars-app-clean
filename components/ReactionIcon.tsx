@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import {
   FEED_REACTIONS,
-  PROFILE_REACTIONS,
+  profileReactionEmoji,
   type FeedReactionType,
   type ProfileReactionType,
 } from '../utils/reactions';
@@ -16,8 +16,9 @@ type ReactionIconProps = {
 };
 
 function emojiForType(type: ReactionIconType): string {
-  const profile = PROFILE_REACTIONS.find((r) => r.type === type);
-  if (profile) return profile.emoji;
+  if (type === 'respect' || type === 'like' || type === 'strength' || type === 'high_five') {
+    return profileReactionEmoji(type);
+  }
   const feed = FEED_REACTIONS.find((r) => r.type === type);
   return feed?.emoji ?? '👍🏻';
 }
