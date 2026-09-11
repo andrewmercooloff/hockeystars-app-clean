@@ -2719,11 +2719,6 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
                     ? (t('profile.scout') || (language === 'ru' ? 'Скаут' : 'Scout'))
                     : displayName(player.name)}
                 </Text>
-                {showNewBadge ? (
-                  <View style={styles.newBadge}>
-                    <Text style={styles.newBadgeText}>NEW</Text>
-                  </View>
-                ) : null}
                 {player.is_hidden && isAdmin ? (
                   <Ionicons
                     name="eye-off-outline"
@@ -2733,6 +2728,11 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
                   />
                 ) : null}
                 <PlayerStarBadge player={player} inline hideZero />
+                {showNewBadge ? (
+                  <View style={styles.newBadge}>
+                    <Text style={styles.newBadgeText}>NEW</Text>
+                  </View>
+                ) : null}
               </View>
               <Text style={styles.playerInfo}>{subtitle}</Text>
             </View>
