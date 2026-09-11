@@ -459,7 +459,6 @@ export default function PlayerProfile() {
   // Это гарантирует, что аватар обновится везде при изменении
   const cachedPlayerAvatar = useAvatarCache(player?.id || '', player?.avatar);
   const [playerNotFoundTimeout, setPlayerNotFoundTimeout] = useState<NodeJS.Timeout | null>(null);
-  const [activityRefreshKey, setActivityRefreshKey] = useState<number>(0);
   const [friendshipStatus, setFriendshipStatus] = useState<'friends' | 'sent_request' | 'received_request' | 'none' | 'pending'>('none');
   
   // Ref для отслеживания времени последнего ручного изменения статуса
@@ -4551,8 +4550,6 @@ export default function PlayerProfile() {
        // Трекаем обновление профиля
        try {
          await addActivityPoints(currentUser.id, 'PROFILE_UPDATE');
-         // Обновляем рейтинг активности
-         setActivityRefreshKey(prev => prev + 1);
       } catch (error) {
         console.error('Failed to track profile update:', error);
       }
@@ -5339,13 +5336,7 @@ export default function PlayerProfile() {
                   )}
                 </View>
               
-                {/* Activity Rating - показывается только владельцу и администратору */}
-                <ActivityRating 
-                  userId={player.id}
-                  currentUserId={currentUser?.id}
-                  isAdmin={currentUser?.status === 'admin'}
-                  refreshKey={activityRefreshKey}
-                />
+                <ActivityRating player={player} />
               </View>
               
               <View style={[styles.profileMetaColumn, isDesktop && styles.profileMetaColumnDesktop]}>

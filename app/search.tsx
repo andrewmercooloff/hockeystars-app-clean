@@ -41,9 +41,9 @@ import {
   ALL_PLAYERS_LIST_CACHE_KEYS,
   mergePlayerFromPlayersRealtimeRow,
 } from '../utils/playerStorage';
-import { applyActivityRatingsToPlayers } from '../services/activityService';
-
+import PlayerStarBadge from '../components/ActivityRating';
 import { isSameAvatarFile, updateAvatarGlobally } from '../utils/AvatarCache';
+import { getAllTimeBlock } from '../utils/seasonStats';
 import { supabase } from '../utils/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
 import OptimizedBackground from '../components/OptimizedBackground';
@@ -67,7 +67,6 @@ import {
   getSearchNewcomers,
   sortPlayersForSearchList,
 } from '../utils/leaderDisplay';
-import { getAllTimeBlock } from '../utils/seasonStats';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
 import { birthYearOf } from '../utils/birthDate';
@@ -256,7 +255,10 @@ function searchPlayerRowDataEqual(a: Player, b: Player): boolean {
     a.name === b.name &&
     a.avatar === b.avatar &&
     a.status === b.status &&
-    (a.activityRating ?? 0) === (b.activityRating ?? 0) &&
+    getAllTimeBlock(a).goals === getAllTimeBlock(b).goals &&
+    getAllTimeBlock(a).assists === getAllTimeBlock(b).assists &&
+    getAllTimeBlock(a).saves === getAllTimeBlock(b).saves &&
+    getAllTimeBlock(a).shots === getAllTimeBlock(b).shots &&
     !!a.is_hidden === !!b.is_hidden &&
     a.createdAt === b.createdAt &&
     a.position === b.position &&
@@ -648,13 +650,7 @@ export default function SearchScreen() {
 
         const applySearchPlayers = (allPlayers: Player[]) => {
           setPlayers((prevPlayers) => {
-            const prevRatings = new Map(
-              prevPlayers.map((p) => [p.id, p.activityRating] as const)
-            );
-            const next = filterForSearch(allPlayers).map((player) => ({
-              ...player,
-              activityRating: player.activityRating ?? prevRatings.get(player.id) ?? player.activityRating,
-            }));
+            const next = filterForSearch(allPlayers);
             // Защита от "фликера": если пришёл пустой ответ (временная сет. ошибка/таймаут/плохой кеш),
             // не затираем уже показанный список "нет игроков".
             if (next.length === 0 && prevPlayers.length > 0) {
@@ -665,13 +661,10 @@ export default function SearchScreen() {
         };
 
         const allPlayers = await loadPlayers(isAdmin, {
-          onUpdated: (fresh) => {
-            void applyActivityRatingsToPlayers(fresh).then(() => applySearchPlayers(fresh));
-          },
+          onUpdated: applySearchPlayers,
         });
 
         applySearchPlayers(allPlayers);
-        void applyActivityRatingsToPlayers(allPlayers).then(() => applySearchPlayers(allPlayers));
         
       } catch (error) {
         console.error('❌ Ошибка загрузки поиска:', error);
@@ -733,13 +726,7 @@ export default function SearchScreen() {
 
             const applySearchPlayers = (allPlayers: Player[]) => {
               setPlayers((prevPlayers) => {
-                const prevRatings = new Map(
-                  prevPlayers.map((p) => [p.id, p.activityRating] as const)
-                );
-                const next = filterForSearch(allPlayers).map((player) => ({
-                  ...player,
-                  activityRating: player.activityRating ?? prevRatings.get(player.id) ?? player.activityRating,
-                }));
+                const next = filterForSearch(allPlayers);
                 if (next.length === 0 && prevPlayers.length > 0) {
                   return prevPlayers;
                 }
@@ -748,12 +735,9 @@ export default function SearchScreen() {
             };
 
             const allPlayers = await loadPlayers(hasList, {
-              onUpdated: (fresh) => {
-                void applyActivityRatingsToPlayers(fresh).then(() => applySearchPlayers(fresh));
-              },
+              onUpdated: applySearchPlayers,
             });
             applySearchPlayers(allPlayers);
-            void applyActivityRatingsToPlayers(allPlayers).then(() => applySearchPlayers(allPlayers));
           } catch (error) {
             console.error('❌ Ошибка обновления списка игроков:', error);
           }
@@ -2468,17 +2452,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy-Bold',
     flex: 1,
   },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 8,
-  },
-  ratingText: {
-    color: '#a1a1aa',
-    fontSize: 12,
-    fontFamily: 'Gilroy-Bold',
-    marginLeft: 2,
-  },
   newBadge: {
     backgroundColor: '#fa2f40',
     paddingHorizontal: 6,
@@ -2759,12 +2732,7 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
                     style={{ marginLeft: 8 }}
                   />
                 ) : null}
-                {player.activityRating !== undefined && player.activityRating > 0 ? (
-                  <View style={styles.ratingContainer}>
-                    <Ionicons name="star" size={11} color="#a1a1aa" />
-                    <Text style={styles.ratingText}>{Math.round(player.activityRating)}</Text>
-                  </View>
-                ) : null}
+                <PlayerStarBadge player={player} inline hideZero />
               </View>
               <Text style={styles.playerInfo}>{subtitle}</Text>
             </View>

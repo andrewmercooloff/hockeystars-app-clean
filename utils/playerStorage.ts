@@ -297,7 +297,8 @@ export interface Player {
   // Поля для заточки коньков
   skate_services?: string[]; // услуги заточки коньков
   // Рейтинг активности
-  activityRating?: number; // рейтинг активности игрока
+  /** @deprecated Season activity rating — no longer shown in UI. */
+  activityRating?: number;
   profileViewsToday?: number;
   profileViewsTotal?: number;
   // Дата создания

@@ -2374,7 +2374,7 @@ export default function HomeScreen() {
 
   const unblockLoadRef = useRef(false);
   const homePuckRecoveryAttemptedRef = useRef(false);
-  /** ID шайб на льду после первого расчёта — не пересобираем при догрузке activityRating (~1 с). */
+  /** ID шайб на льду после первого расчёта — не пересобираем при догрузке meta (~1 с). */
   const homePuckSelectionIdsRef = useRef<string[] | null>(null);
   const homePuckSelectionKeyRef = useRef<string | null>(null);
 
@@ -2432,16 +2432,12 @@ export default function HomeScreen() {
             const next = prev.map((p) => {
               const fresh = byId.get(p.id);
               if (!fresh) return p;
-              if (
-                fresh.activityRating === p.activityRating &&
-                fresh.teams === p.teams
-              ) {
+              if (fresh.teams === p.teams) {
                 return p;
               }
               changed = true;
               return {
                 ...p,
-                activityRating: fresh.activityRating,
                 teams: fresh.teams ?? p.teams,
               };
             });
