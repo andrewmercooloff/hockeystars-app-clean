@@ -57,7 +57,6 @@ import CachedAvatar from '../components/CachedAvatar';
 import { registerTabScrollHandler } from '../utils/tabScrollRegistry';
 import {
     acceptFriendRequest,
-    clearPlayerMemoryCache,
     dedupeDuplicateNotifications,
     declineFriendRequest,
     getReceivedFriendRequests,
@@ -1746,13 +1745,11 @@ export default function NotificationsScreen() {
         const changedPlayerAvatar = notification.data?.changedPlayerAvatar;
         if (changedPlayerId) {
           if (changedPlayerAvatar) {
-            await updateAvatarGlobally(changedPlayerId, changedPlayerAvatar);
+            void updateAvatarGlobally(changedPlayerId, changedPlayerAvatar);
           }
-          clearPlayerMemoryCache(changedPlayerId);
           navigateToPlayerProfile(router, {
             playerId: changedPlayerId,
             returnTo: 'notifications',
-            refreshProfile: 'true',
           });
         }
       } else if (notification.type === 'achievement_added') {

@@ -6,7 +6,7 @@ export const PROFILE_REACTIONS: readonly {
   emoji: string;
   labelKey: string;
 }[] = [
-  { type: 'respect', emoji: '🤜🏻🤛🏻', labelKey: 'reactions.respect' },
+  { type: 'respect', emoji: '🤜🤛', labelKey: 'reactions.respect' },
   { type: 'like', emoji: '👍🏻', labelKey: 'reactions.like' },
   { type: 'strength', emoji: '💪🏻', labelKey: 'reactions.strength' },
   { type: 'high_five', emoji: '✋🏻', labelKey: 'reactions.highFive' },
@@ -17,7 +17,7 @@ export const FEED_REACTIONS: readonly {
   emoji: string;
   labelKey: string;
 }[] = [
-  { type: 'respect', emoji: '🤜🏻🤛🏻', labelKey: 'reactions.respect' },
+  { type: 'respect', emoji: '🤜🤛', labelKey: 'reactions.respect' },
   { type: 'fire', emoji: '🔥', labelKey: 'reactions.fire' },
   { type: 'strength', emoji: '💪🏻', labelKey: 'reactions.strength' },
   { type: 'lightning', emoji: '⚡️', labelKey: 'reactions.lightning' },

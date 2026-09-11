@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { FeedReactionType, ProfileReactionType } from '../utils/reactions';
@@ -12,11 +12,10 @@ type ReactionIconProps = {
   active?: boolean;
 };
 
-const ICONS: Record<
-  ReactionIconType,
+const VECTOR_ICONS: Record<
+  Exclude<ReactionIconType, 'respect'>,
   { family: 'ionicons' | 'mci'; name: string }
 > = {
-  respect: { family: 'mci', name: 'handshake' },
   like: { family: 'ionicons', name: 'thumbs-up' },
   strength: { family: 'mci', name: 'arm-flex' },
   high_five: { family: 'ionicons', name: 'hand-left' },
@@ -24,8 +23,27 @@ const ICONS: Record<
   lightning: { family: 'ionicons', name: 'flash' },
 };
 
+function RespectFistsIcon({ size, active }: { size: number; active: boolean }) {
+  return (
+    <Text
+      style={[
+        styles.fists,
+        { fontSize: Math.round(size * 0.72), lineHeight: size + 2 },
+        active && styles.fistsActive,
+      ]}
+      allowFontScaling={false}
+    >
+      🤜🤛
+    </Text>
+  );
+}
+
 export default function ReactionIcon({ type, size = 18, active = false }: ReactionIconProps) {
-  const spec = ICONS[type];
+  if (type === 'respect') {
+    return <RespectFistsIcon size={size} active={active} />;
+  }
+
+  const spec = VECTOR_ICONS[type];
   const tint = active ? '#fa2f40' : 'rgba(255,255,255,0.88)';
 
   if (spec.family === 'mci') {
@@ -56,6 +74,15 @@ export function ReactionIconBadge({ type, size = 20 }: { type: ReactionIconType;
 }
 
 const styles = StyleSheet.create({
+  fists: {
+    textAlign: 'center',
+    opacity: 0.92,
+    letterSpacing: -2,
+  },
+  fistsActive: {
+    opacity: 1,
+    transform: [{ scale: 1.06 }],
+  },
   badge: {
     minWidth: 28,
     minHeight: 28,
