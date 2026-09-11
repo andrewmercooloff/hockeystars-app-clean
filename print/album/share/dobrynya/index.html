@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Дobrynya — альбом 2026–2027</title>
+  <link rel="icon" href="https://cdn.jsdelivr.net/gh/andrewmercooloff/hockeystars-app-clean@cursor/hockey-card-album-generator-a9a3/print/album/share/dobrynya/logo.png" type="image/png">
+  <style>
+    :root {
+      --orange: #f05a1a;
+      --gold: #ffb347;
+      --ice: #b8dff5;
+      --panel: rgba(12, 28, 48, 0.92);
+      --panel-border: rgba(184, 223, 245, 0.22);
+      --accent: #f05a1a;
+      --text: #f8fbff;
+      --muted: #b8cfe8;
+      --cdn: https://cdn.jsdelivr.net/gh/andrewmercooloff/hockeystars-app-clean@cursor/hockey-card-album-generator-a9a3/print/album/share/dobrynya;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      overflow: hidden;
+      background: #0c1a2e;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100dvh;
+      background:
+        linear-gradient(180deg, rgba(8, 20, 38, 0.5) 0%, rgba(12, 28, 48, 0.65) 50%, rgba(8, 16, 30, 0.78) 100%),
+        url("https://cdn.jsdelivr.net/gh/andrewmercooloff/hockeystars-app-clean@cursor/hockey-card-album-generator-a9a3/print/album/share/dobrynya/ice-bg.jpg") center / cover no-repeat fixed;
+    }
+
+    header {
+      flex: 0 0 auto;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--panel-border);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .brand img.logo { height: 44px; width: auto; display: block; }
+    .brand .tagline { font-size: 12px; color: var(--ice); white-space: nowrap; }
+
+    .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tabs button {
+      border: 1px solid rgba(184, 223, 245, 0.25);
+      background: rgba(255,255,255,.1);
+      color: var(--text);
+      padding: 6px 12px; border-radius: 999px; font-size: 13px; cursor: pointer;
+    }
+    .tabs button.active {
+      background: linear-gradient(180deg, var(--gold), var(--orange));
+      border-color: var(--gold);
+      color: #1a1008;
+      font-weight: 700;
+    }
+
+    .card-side { display: none; gap: 6px; flex: 1 1 100%; justify-content: flex-end; }
+    .card-side.visible { display: flex; }
+    .card-side button {
+      border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.08); color: var(--text);
+      padding: 4px 10px; border-radius: 999px; font-size: 12px; cursor: pointer;
+    }
+    .card-side button.active { background: var(--accent); color: #111; font-weight: 600; }
+
+    main {
+      flex: 1 1 auto;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 4px 36px;
+      min-height: 0;
+    }
+    main.grid-mode { padding: 8px; align-items: stretch; }
+
+    .stage {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 0;
+    }
+
+    .book {
+      position: relative;
+      display: flex;
+      align-items: stretch;
+      flex-shrink: 0;
+      background: #0a1018;
+      cursor: zoom-in;
+      border-radius: 4px;
+      border: 1px solid rgba(184, 223, 245, 0.15);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 6px 20px rgba(240, 90, 26, 0.15);
+      transition: transform .2s ease;
+    }
+    .book:active { transform: scale(0.98); }
+    .book.single-mode .half { flex: 1 1 100%; border: none; }
+
+    .half {
+      flex: 1 1 50%;
+      overflow: hidden;
+      background: #0d1520;
+      min-width: 0;
+    }
+    .half.left { border-right: 1px solid rgba(255,255,255,.08); }
+    .half img, .book.spread-mode .spread-img {
+      width: 100%; height: 100%; object-fit: contain; display: block;
+      user-select: none; -webkit-user-drag: none; pointer-events: none;
+      background: #0d1520;
+    }
+
+    .cards-grid {
+      display: none;
+      width: 100%; height: 100%;
+      overflow: hidden;
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: repeat(6, minmax(0, 1fr));
+      gap: 3px;
+      padding: 2px;
+      align-content: stretch;
+    }
+    .cards-grid.visible { display: grid; }
+    .cards-grid button {
+      border: 1px solid rgba(184, 223, 245, 0.18);
+      padding: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background: rgba(0,0,0,.28);
+      border-radius: 5px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,.25);
+      cursor: zoom-in;
+    }
+    .cards-grid img {
+      flex: 1 1 auto;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      background: #141e2c;
+    }
+    .cards-grid .num {
+      flex: 0 0 auto;
+      font-size: 8px;
+      line-height: 1;
+      color: var(--muted);
+      text-align: center;
+      padding: 2px 0 3px;
+    }
+
+    .nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 40px; height: 56px;
+      border: 1px solid rgba(184, 223, 245, 0.25);
+      border-radius: 10px;
+      background: rgba(12, 28, 48, 0.95);
+      color: #fff; font-size: 26px; cursor: pointer;
+      z-index: 6;
+    }
+    .nav:active { background: var(--orange); color: #111; }
+    .nav:disabled { opacity: .2; pointer-events: none; }
+    .nav.prev { left: 4px; }
+    .nav.next { right: 4px; }
+    .nav.hidden { display: none; }
+
+    footer {
+      flex: 0 0 auto;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+      background: var(--panel);
+      border-top: 1px solid var(--panel-border);
+      font-size: 13px; color: var(--muted);
+    }
+    .counter { color: var(--ice); font-weight: 600; }
+
+    .loading {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 10px;
+      background: rgba(10,22,40,.88); font-size: 14px; z-index: 10;
+    }
+    .loading.hidden { display: none; }
+    .loading progress { width: min(220px, 70vw); accent-color: var(--accent); }
+
+    .error-box {
+      display: none;
+      position: fixed; inset: 0; z-index: 200;
+      background: #0c1a2e; color: #fff;
+      padding: 24px; text-align: center;
+      align-items: center; justify-content: center; flex-direction: column; gap: 12px;
+    }
+    .error-box.visible { display: flex; }
+
+    .zoom-overlay {
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(4, 12, 24, 0.96);
+      display: none; flex-direction: column;
+      touch-action: none;
+    }
+    .zoom-overlay.open { display: flex; }
+    body.zoom-open main { touch-action: none; }
+    .zoom-toolbar {
+      flex: 0 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px;
+      background: rgba(17,31,54,.95);
+    }
+    .zoom-toolbar span { font-size: 14px; }
+    .zoom-toolbar button { border: none; background: transparent; color: #fff; font-size: 28px; cursor: pointer; }
+    .zoom-stage { flex: 1 1 auto; overflow: hidden; touch-action: none; position: relative; }
+    .zoom-frame {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(1);
+      transform-origin: center center;
+      display: flex; align-items: stretch;
+      max-height: 92vh; max-width: 96vw;
+      user-select: none;
+    }
+    .zoom-frame .zoom-half { flex: none; height: 92vh; overflow: hidden; background: #0d1520; }
+    .zoom-frame.single .zoom-half { width: calc(92vh * 210 / 297); }
+    .zoom-frame.spread .zoom-half { width: calc(92vh * 210 / 297); }
+    .zoom-frame.spread .zoom-half.left { border-right: 1px solid rgba(255,255,255,.12); }
+    .zoom-frame img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .zoom-frame .zoom-half.hidden { display: none; }
+    .zoom-controls {
+      flex: 0 0 auto;
+      display: flex; justify-content: center; gap: 16px;
+      padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+      background: rgba(17,31,54,.95);
+    }
+    .zoom-controls button {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(255,255,255,.1);
+      color: #fff; font-size: 22px; cursor: pointer;
+    }
+    .zoom-controls button:disabled { opacity: .35; cursor: default; }
+
+    @media (min-width: 520px) {
+      .cards-grid { gap: 4px; padding: 3px; }
+      .cards-grid .num { font-size: 9px; }
+    }
+    @media (min-width: 820px) {
+      .cards-grid { gap: 5px; padding: 4px; }
+      .cards-grid .num { font-size: 10px; }
+    }
+    @media (max-width: 640px) {
+      main { padding: 2px 34px; }
+      main.grid-mode { padding: 2px 4px; }
+      .brand img.logo { height: 36px; }
+      .nav { width: 28px; height: 44px; font-size: 20px; }
+      header { padding: 8px 10px; }
+      .card-side.visible { flex: 1 1 100%; justify-content: flex-start; margin-top: 2px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img class="logo" src="https://cdn.jsdelivr.net/gh/andrewmercooloff/hockeystars-app-clean@cursor/hockey-card-album-generator-a9a3/print/album/share/dobrynya/logo.png" alt="HK «Дobrynya»">
+      <span class="tagline">Альбом 2026–2027</span>
+    </div>
+    <div class="tabs">
+      <button type="button" class="active" data-mode="pages">Перелистывание</button>
+      <button type="button" data-mode="cards">Карточки</button>
+    </div>
+    <div class="card-side" id="card-side">
+      <button type="button" class="active" data-side="front">Лицо</button>
+      <button type="button" data-side="back">Оборот</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="loading" id="loading">
+      <span id="loading-text">Загрузка альбома…</span>
+      <progress id="loading-bar" max="100" value="0"></progress>
+    </div>
+    <button type="button" class="nav prev" id="prev" aria-label="Назад">‹</button>
+    <div class="stage" id="stage">
+      <div class="book spread-mode" id="book"></div>
+    </div>
+    <div class="cards-grid" id="cards-grid"></div>
+    <button type="button" class="nav next" id="next" aria-label="Вперёд">›</button>
+  </main>
+
+  <footer>
+    <span class="counter" id="counter">—</span>
+    <span id="hint">Нажмите для увеличения · колёсико или ± чтобы менять масштаб</span>
+  </footer>
+
+  <div class="error-box" id="error">
+    <p>Не удалось загрузить альбом.</p>
+    <p id="error-msg" style="color:#b8cfe8;font-size:13px"></p>
+    <button type="button" onclick="location.reload()" style="padding:10px 18px;border-radius:8px;border:none;background:#f05a1a;color:#111;font-weight:600">Обновить</button>
+  </div>
+
+  <div class="zoom-overlay" id="zoom">
+    <div class="zoom-toolbar">
+      <span id="zoom-title">Просмотр</span>
+      <button type="button" id="zoom-close" aria-label="Закрыть">×</button>
+    </div>
+    <div class="zoom-stage" id="zoom-stage">
+      <div class="zoom-frame single" id="zoom-frame">
+        <div class="zoom-half left" id="zoom-half-l"><img id="zoom-img-l" alt=""></div>
+        <div class="zoom-half right hidden" id="zoom-half-r"><img id="zoom-img-r" alt=""></div>
+      </div>
+    </div>
+    <div class="zoom-controls">
+      <button type="button" id="zoom-out">−</button>
+      <button type="button" id="zoom-reset">◎</button>
+      <button type="button" id="zoom-in">+</button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const REV = 'warm-ghost-v5';
+      const RAW = 'https://raw.githubusercontent.com/andrewmercooloff/hockeystars-app-clean/cursor/hockey-card-album-generator-a9a3/print/album';
+      const IMG = (file) => RAW + '/print-ready/dobrynya/pages/' + file + '?v=' + REV;
+
+      const albumPages = [];
+      for (let i = 1; i <= 16; i++) albumPages.push(IMG('album-' + String(i).padStart(2, '0') + '.jpg'));
+      const cardFronts = [];
+      const cardBacks = [];
+      for (let i = 1; i <= 36; i++) {
+        const n = String(i).padStart(2, '0');
+        cardFronts.push(IMG('card-' + n + '-front.jpg'));
+        cardBacks.push(IMG('card-' + n + '-back.jpg'));
+      }
+
+      const modes = {
+        pages: {
+          label: 'разворот', type: 'book',
+          pairs: [
+            { single: 0 }, { left: 1, right: 2 }, { left: 3, right: 4 },
+            { left: 5, right: 6 }, { left: 7, right: 8 }, { left: 9, right: 10 },
+            { left: 11, right: 12 }, { left: 13, right: 14 }, { single: 15 },
+          ],
+          urls: albumPages,
+        },
+        cards: { label: 'карточка', type: 'grid', count: 36 },
+      };
+
+      let mode = 'pages';
+      let index = 0;
+      let cardSide = 'front';
+      const PREVIEW = 0.96;
+
+      const bookEl = document.getElementById('book');
+      const stageEl = document.getElementById('stage');
+      const gridEl = document.getElementById('cards-grid');
+      const loadingEl = document.getElementById('loading');
+      const loadingText = document.getElementById('loading-text');
+      const loadingBar = document.getElementById('loading-bar');
+      const counterEl = document.getElementById('counter');
+      const hintEl = document.getElementById('hint');
+      const prevBtn = document.getElementById('prev');
+      const nextBtn = document.getElementById('next');
+      const tabs = document.querySelectorAll('.tabs button');
+      const mainEl = document.getElementById('main');
+      const cardSideEl = document.getElementById('card-side');
+      const cardSideBtns = document.querySelectorAll('.card-side button');
+      const zoomOverlay = document.getElementById('zoom');
+      const zoomFrame = document.getElementById('zoom-frame');
+      const zoomHalfL = document.getElementById('zoom-half-l');
+      const zoomHalfR = document.getElementById('zoom-half-r');
+      const zoomImgL = document.getElementById('zoom-img-l');
+      const zoomImgR = document.getElementById('zoom-img-r');
+      const zoomStage = document.getElementById('zoom-stage');
+      const zoomTitle = document.getElementById('zoom-title');
+      const errorBox = document.getElementById('error');
+
+      const ZOOM_MIN = 0.3;
+      const ZOOM_MAX = 6;
+      const ZOOM_STEP = 0.35;
+      let zoomScale = 1, zoomPanX = 0, zoomPanY = 0;
+      let pinchStartDist = 0, pinchStartScale = 1, pinchCenter = null, dragStart = null, lastTap = 0;
+      let mainTouchX = null, mainMultiTouch = false, zoomGesturing = false;
+      const zoomInBtn = document.getElementById('zoom-in');
+      const zoomOutBtn = document.getElementById('zoom-out');
+      const zoomResetBtn = document.getElementById('zoom-reset');
+
+      function showError(msg) {
+        loadingEl.classList.add('hidden');
+        document.getElementById('error-msg').textContent = msg || '';
+        errorBox.classList.add('visible');
+      }
+
+      function cardList() { return cardSide === 'front' ? cardFronts : cardBacks; }
+
+      function currentZoomPair() {
+        if (mode === 'cards') return { single: cardList()[index] };
+        var pair = modes.pages.pairs[index];
+        if (pair.single != null) return { single: modes.pages.urls[pair.single] };
+        return { left: modes.pages.urls[pair.left], right: modes.pages.urls[pair.right] };
+      }
+
+      function loadImage(src) {
+        return new Promise(function (resolve, reject) {
+          const img = new Image();
+          img.onload = function () { resolve(src); };
+          img.onerror = function () { reject(new Error(src)); };
+          img.src = src;
+        });
+      }
+
+      function preloadAll(urls) {
+        var done = 0;
+        loadingBar.max = urls.length;
+        loadingBar.value = 0;
+        return Promise.all(urls.map(function (src) {
+          return loadImage(src).catch(function () {}).then(function () {
+            done += 1;
+            loadingBar.value = done;
+            loadingText.textContent = 'Загрузка… ' + done + '/' + urls.length;
+          });
+        }));
+      }
+
+      function halfHtml(side, src) {
+        return '<div class="half ' + side + '"><img src="' + src + '" alt=""></div>';
+      }
+
+      function bookRatio() {
+        return bookEl.classList.contains('single-mode') ? 210 / 297 : 420 / 297;
+      }
+
+      function fitBook() {
+        if (!stageEl || mode === 'cards') return;
+        var maxW = stageEl.clientWidth - 4;
+        var maxH = stageEl.clientHeight - 4;
+        var ratio = bookRatio();
+        var w = maxW;
+        var h = w / ratio;
+        if (h > maxH) { h = maxH; w = h * ratio; }
+        w *= PREVIEW;
+        h *= PREVIEW;
+        bookEl.style.width = Math.floor(w) + 'px';
+        bookEl.style.height = Math.floor(h) + 'px';
+      }
+
+      function clampZoom(scale) {
+        return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, scale));
+      }
+
+      function applyZoomTransform() {
+        zoomFrame.style.transform = 'translate(calc(-50% + ' + zoomPanX + 'px), calc(-50% + ' + zoomPanY + 'px)) scale(' + zoomScale + ')';
+        if (zoomInBtn) zoomInBtn.disabled = zoomScale >= ZOOM_MAX - 0.01;
+        if (zoomOutBtn) zoomOutBtn.disabled = zoomScale <= ZOOM_MIN + 0.01;
+      }
+
+      function zoomAt(clientX, clientY, nextScale) {
+        var rect = zoomStage.getBoundingClientRect();
+        var cx = clientX - rect.left - rect.width / 2;
+        var cy = clientY - rect.top - rect.height / 2;
+        var clamped = clampZoom(nextScale);
+        var ratio = clamped / zoomScale;
+        zoomPanX = cx - ratio * (cx - zoomPanX);
+        zoomPanY = cy - ratio * (cy - zoomPanY);
+        zoomScale = clamped;
+        applyZoomTransform();
+      }
+
+      function resetZoom() {
+        zoomScale = 1;
+        zoomPanX = 0;
+        zoomPanY = 0;
+        applyZoomTransform();
+      }
+
+      function openZoom(cardIndex) {
+        if (cardIndex != null) index = cardIndex;
+        if (mode === 'cards') {
+          zoomTitle.textContent = 'Карточка ' + (index + 1) + ' · ' + (cardSide === 'front' ? 'лицо' : 'оборот');
+        } else {
+          var pair = modes.pages.pairs[index];
+          zoomTitle.textContent = pair.single != null
+            ? 'Страница ' + (pair.single + 1)
+            : 'Разворот · стр. ' + (pair.left + 1) + ' и ' + (pair.right + 1);
+        }
+        var content = currentZoomPair();
+        var waiting = 0;
+        function onReady() {
+          waiting -= 1;
+          if (waiting <= 0) resetZoom();
+        }
+        if (content.single) {
+          zoomFrame.className = 'zoom-frame single';
+          zoomHalfR.classList.add('hidden');
+          waiting = 1;
+          zoomImgL.onload = onReady;
+          zoomImgL.onerror = onReady;
+          zoomImgL.src = content.single;
+        } else {
+          zoomFrame.className = 'zoom-frame spread';
+          zoomHalfR.classList.remove('hidden');
+          waiting = 2;
+          zoomImgL.onload = onReady;
+          zoomImgR.onload = onReady;
+          zoomImgL.onerror = onReady;
+          zoomImgR.onerror = onReady;
+          zoomImgL.src = content.left;
+          zoomImgR.src = content.right;
+        }
+        zoomOverlay.classList.add('open');
+        document.body.classList.add('zoom-open');
+      }
+
+      function closeZoom() {
+        zoomOverlay.classList.remove('open');
+        document.body.classList.remove('zoom-open');
+        zoomGesturing = false;
+        mainTouchX = null;
+        mainMultiTouch = false;
+      }
+
+      function buildCardsGrid() {
+        var list = cardList();
+        gridEl.innerHTML = list.map(function (src, i) {
+          return '<button type="button" data-i="' + i + '">' +
+            '<img src="' + src + '" alt="" loading="lazy">' +
+            '<span class="num">' + (i + 1) + '</span></button>';
+        }).join('');
+        gridEl.querySelectorAll('button').forEach(function (btn) {
+          btn.addEventListener('click', function () { openZoom(Number(btn.dataset.i)); });
+        });
+      }
+
+      function renderBookPair(pair) {
+        var urls = modes.pages.urls;
+        if (pair.single != null) {
+          bookEl.className = 'book single-mode';
+          bookEl.innerHTML = halfHtml('left', urls[pair.single]);
+        } else {
+          bookEl.className = 'book page-mode';
+          bookEl.innerHTML = halfHtml('left', urls[pair.left]) + halfHtml('right', urls[pair.right]);
+        }
+        fitBook();
+      }
+
+      function renderCurrent() {
+        var cfg = modes[mode];
+        if (cfg.type === 'grid') { buildCardsGrid(); updateNav(); return; }
+        renderBookPair(cfg.pairs[index]);
+        updateNav();
+      }
+
+      function updateNav() {
+        var cfg = modes[mode];
+        var isGrid = cfg.type === 'grid';
+        stageEl.style.display = isGrid ? 'none' : 'flex';
+        gridEl.classList.toggle('visible', isGrid);
+        mainEl.classList.toggle('grid-mode', isGrid);
+        prevBtn.classList.toggle('hidden', isGrid);
+        nextBtn.classList.toggle('hidden', isGrid);
+        cardSideEl.classList.toggle('visible', isGrid);
+        if (isGrid) {
+          counterEl.textContent = '36 карточек · ' + (cardSide === 'front' ? 'лица' : 'обороты');
+          hintEl.textContent = 'Нажмите на карточку';
+          return;
+        }
+        var total = cfg.pairs.length;
+        var pair = cfg.pairs[index];
+        var detail = (index + 1) + ' / ' + total + ' · ' + cfg.label;
+        if (pair) {
+          if (pair.single != null) detail += ' · стр. ' + (pair.single + 1);
+          else detail += ' · стр. ' + (pair.left + 1) + ' и ' + (pair.right + 1);
+        }
+        counterEl.textContent = detail;
+        hintEl.textContent = 'Нажмите для увеличения';
+        prevBtn.disabled = index <= 0;
+        nextBtn.disabled = index >= total - 1;
+      }
+
+      function go(delta) {
+        var cfg = modes[mode];
+        if (cfg.type === 'grid') return;
+        var total = cfg.pairs.length;
+        var next = index + delta;
+        if (next < 0 || next >= total) return;
+        index = next;
+        renderCurrent();
+      }
+
+      function setMode(nextMode) {
+        mode = nextMode;
+        index = 0;
+        tabs.forEach(function (btn) {
+          btn.classList.toggle('active', btn.dataset.mode === mode);
+        });
+        loadingEl.classList.remove('hidden');
+        var urls = mode === 'cards' ? cardFronts.slice(0, 4) : albumPages.slice(0, 2);
+        return preloadAll(urls).then(function () {
+          loadingEl.classList.add('hidden');
+          renderCurrent();
+          if (mode === 'cards') preloadAll(cardList());
+          else preloadAll(albumPages);
+        });
+      }
+
+      bookEl.addEventListener('click', function () {
+        if (mode !== 'cards' && !zoomGesturing && !mainMultiTouch) openZoom();
+      });
+      prevBtn.addEventListener('click', function () { go(-1); });
+      nextBtn.addEventListener('click', function () { go(1); });
+      tabs.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          if (btn.dataset.mode !== mode) setMode(btn.dataset.mode).catch(function (e) { showError(e.message); });
+        });
+      });
+      cardSideBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          cardSide = btn.dataset.side;
+          cardSideBtns.forEach(function (b) { b.classList.toggle('active', b === btn); });
+          if (mode === 'cards') renderCurrent();
+        });
+      });
+
+      document.getElementById('zoom-close').addEventListener('click', closeZoom);
+      zoomInBtn.addEventListener('click', function () {
+        var rect = zoomStage.getBoundingClientRect();
+        zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, zoomScale + ZOOM_STEP);
+      });
+      zoomOutBtn.addEventListener('click', function () {
+        var rect = zoomStage.getBoundingClientRect();
+        zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, zoomScale - ZOOM_STEP);
+      });
+      zoomResetBtn.addEventListener('click', resetZoom);
+
+      zoomStage.addEventListener('wheel', function (e) {
+        if (!zoomOverlay.classList.contains('open')) return;
+        e.preventDefault();
+        var delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
+        zoomAt(e.clientX, e.clientY, zoomScale + delta);
+      }, { passive: false });
+
+      zoomStage.addEventListener('dblclick', function (e) {
+        e.preventDefault();
+        if (zoomScale > 1.05) resetZoom();
+        else zoomAt(e.clientX, e.clientY, 2.5);
+      });
+
+      function stopTouchBubble(e) { e.stopPropagation(); }
+
+      zoomOverlay.addEventListener('touchstart', function (e) {
+        stopTouchBubble(e);
+        zoomGesturing = true;
+        if (e.touches.length >= 2) e.preventDefault();
+      }, { passive: false });
+      zoomOverlay.addEventListener('touchmove', stopTouchBubble, { passive: false });
+      zoomOverlay.addEventListener('touchend', function (e) {
+        stopTouchBubble(e);
+        if (e.touches.length === 0) {
+          setTimeout(function () { zoomGesturing = false; }, 80);
+        }
+      }, { passive: false });
+      zoomOverlay.addEventListener('touchcancel', function (e) {
+        stopTouchBubble(e);
+        zoomGesturing = false;
+      }, { passive: false });
+
+      zoomStage.addEventListener('touchstart', function (e) {
+        stopTouchBubble(e);
+        zoomGesturing = true;
+        if (e.touches.length === 2) {
+          e.preventDefault();
+          var dx = e.touches[0].clientX - e.touches[1].clientX;
+          var dy = e.touches[0].clientY - e.touches[1].clientY;
+          pinchStartDist = Math.hypot(dx, dy) || 1;
+          pinchStartScale = zoomScale;
+          pinchCenter = {
+            x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+            y: (e.touches[0].clientY + e.touches[1].clientY) / 2,
+          };
+          dragStart = null;
+        } else if (e.touches.length === 1) {
+          dragStart = { x: e.touches[0].clientX - zoomPanX, y: e.touches[0].clientY - zoomPanY };
+        }
+      }, { passive: false });
+
+      zoomStage.addEventListener('touchmove', function (e) {
+        stopTouchBubble(e);
+        if (e.touches.length === 2) {
+          e.preventDefault();
+          var dx = e.touches[0].clientX - e.touches[1].clientX;
+          var dy = e.touches[0].clientY - e.touches[1].clientY;
+          var dist = Math.hypot(dx, dy) || 1;
+          var next = clampZoom(pinchStartScale * (dist / pinchStartDist));
+          var cx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+          var cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+          if (pinchCenter) {
+            var rect = zoomStage.getBoundingClientRect();
+            var px = cx - rect.left - rect.width / 2;
+            var py = cy - rect.top - rect.height / 2;
+            var ratio = next / zoomScale;
+            zoomPanX = px - ratio * (px - zoomPanX);
+            zoomPanY = py - ratio * (py - zoomPanY);
+          }
+          zoomScale = next;
+          applyZoomTransform();
+        } else if (e.touches.length === 1 && dragStart) {
+          zoomPanX = e.touches[0].clientX - dragStart.x;
+          zoomPanY = e.touches[0].clientY - dragStart.y;
+          applyZoomTransform();
+        }
+      }, { passive: false });
+
+      zoomStage.addEventListener('touchend', function (e) {
+        stopTouchBubble(e);
+        if (e.touches.length < 2) {
+          pinchStartDist = 0;
+          pinchCenter = null;
+        }
+        if (e.touches.length === 0) {
+          dragStart = null;
+          setTimeout(function () { zoomGesturing = false; }, 80);
+        }
+        if (e.changedTouches.length === 1 && e.touches.length === 0) {
+          var now = Date.now();
+          if (now - lastTap < 280) {
+            if (zoomScale > 1.05) resetZoom();
+            else {
+              var t = e.changedTouches[0];
+              zoomAt(t.clientX, t.clientY, 2.5);
+            }
+            lastTap = 0;
+          } else {
+            lastTap = now;
+          }
+        }
+      });
+
+      window.addEventListener('keydown', function (e) {
+        if (zoomOverlay.classList.contains('open')) {
+          if (e.key === 'Escape') closeZoom();
+          else if (e.key === '+' || e.key === '=') {
+            var rect = zoomStage.getBoundingClientRect();
+            zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, zoomScale + ZOOM_STEP);
+          } else if (e.key === '-' || e.key === '_') {
+            var rect2 = zoomStage.getBoundingClientRect();
+            zoomAt(rect2.left + rect2.width / 2, rect2.top + rect2.height / 2, zoomScale - ZOOM_STEP);
+          } else if (e.key === '0') resetZoom();
+          return;
+        }
+        if (e.key === 'ArrowLeft') go(-1);
+        if (e.key === 'ArrowRight') go(1);
+      });
+
+      mainEl.addEventListener('touchstart', function (e) {
+        if (zoomOverlay.classList.contains('open') || zoomGesturing || mode === 'cards') return;
+        if (e.touches.length > 1) {
+          mainMultiTouch = true;
+          mainTouchX = null;
+          return;
+        }
+        mainMultiTouch = false;
+        mainTouchX = e.touches[0].clientX;
+      }, { passive: true });
+      mainEl.addEventListener('touchmove', function (e) {
+        if (zoomOverlay.classList.contains('open') || zoomGesturing || mode === 'cards') return;
+        if (e.touches.length > 1) {
+          mainMultiTouch = true;
+          mainTouchX = null;
+        }
+      }, { passive: true });
+      mainEl.addEventListener('touchend', function (e) {
+        if (zoomOverlay.classList.contains('open') || zoomGesturing || mode === 'cards') {
+          mainTouchX = null;
+          if (e.touches.length === 0) mainMultiTouch = false;
+          return;
+        }
+        if (mainMultiTouch || mainTouchX == null || e.touches.length > 0) {
+          if (e.touches.length === 0) mainMultiTouch = false;
+          mainTouchX = null;
+          return;
+        }
+        var dx = e.changedTouches[0].clientX - mainTouchX;
+        mainTouchX = null;
+        mainMultiTouch = false;
+        if (Math.abs(dx) > 42) go(dx < 0 ? 1 : -1);
+      }, { passive: true });
+      mainEl.addEventListener('touchcancel', function () {
+        mainTouchX = null;
+        mainMultiTouch = false;
+      }, { passive: true });
+
+      window.addEventListener('resize', fitBook);
+      window.addEventListener('orientationchange', function () { setTimeout(fitBook, 120); });
+
+      setMode('pages').catch(function (e) { showError(e.message); });
+    })();
+  </script>
+</body>
+</html>

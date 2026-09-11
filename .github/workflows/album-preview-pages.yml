@@ -1,0 +1,56 @@
+name: Album preview (GitHub Pages)
+
+on:
+  push:
+    branches:
+      - cursor/hockey-card-album-generator-a9a3
+      - main
+    paths:
+      - 'print/album/share/**'
+      - 'print/album/print-ready/**'
+      - '.github/workflows/album-preview-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: album-preview-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare site
+        run: |
+          mkdir -p _site/dobrynya
+          cp -r print/album/share/dobrynya/* _site/dobrynya/
+          cat > _site/index.html <<'EOF'
+          <!DOCTYPE html>
+          <html lang="ru">
+          <head>
+            <meta charset="utf-8">
+            <meta http-equiv="refresh" content="0; url=dobrynya/">
+            <title>Album preview</title>
+          </head>
+          <body><p><a href="dobrynya/">Дobrynya album preview</a></p></body>
+          </html>
+          EOF
+
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
