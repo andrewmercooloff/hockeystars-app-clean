@@ -6,7 +6,7 @@ const { loadTeam } = require('./lib/data');
 const { albumHtml, PAGE } = require('./lib/album');
 const { execFileSync } = require('child_process');
 const { cardsHtml } = require('./lib/cards');
-const { withBrowser, htmlToPdf, pdfPreviews } = require('./lib/render');
+const { withBrowser, htmlToPdf, pdfPreviews, exportShareCards } = require('./lib/render');
 
 function syncSharePages(slug, outDir) {
   const previewDir = path.join(outDir, 'preview');
@@ -76,6 +76,9 @@ async function main() {
       fs.rmSync(previewDir, { recursive: true, force: true });
       await pdfPreviews(browser, albumPdf, albumHtmlFile, previewDir, 'album');
       await pdfPreviews(browser, cardsPdf, cardsHtmlFile, previewDir, 'cards');
+      const sharePagesDir = path.join(__dirname, 'print-ready', slug, 'pages');
+      await exportShareCards(browser, cardsHtmlFile, sharePagesDir, data.cards.length);
+      console.log(`✔ карточки для share → ${path.relative(process.cwd(), sharePagesDir)}/card-*.jpg`);
       console.log(`✔ превью: ${path.relative(process.cwd(), previewDir)}/`);
     }
     if (!args.keepHtml) {

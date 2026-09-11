@@ -59,6 +59,48 @@ function hasPdftoppm() {
   }
 }
 
+async function exportShareCards(browser, htmlFile, pagesDir, cardCount) {
+  fs.mkdirSync(pagesDir, { recursive: true });
+  const page = await browser.newPage();
+  await page.goto(pathToFileURL(htmlFile).href, { waitUntil: 'load', timeout: 180000 });
+  await page.evaluate(() => document.fonts.ready);
+  await page.evaluate(() =>
+    Promise.all(
+      Array.from(document.images)
+        .filter((i) => !i.complete)
+        .map((i) => new Promise((r) => (i.onload = i.onerror = r)))
+    )
+  );
+  const isSingle = (await page.$('.page.single')) !== null;
+  if (isSingle) {
+    const els = await page.$$('.page.single');
+    for (let i = 0; i < cardCount; i++) {
+      const n = String(i + 1).padStart(2, '0');
+      if (els[i * 2]) {
+        await els[i * 2].screenshot({ path: path.join(pagesDir, `card-${n}-front.jpg`), type: 'jpeg', quality: 88 });
+      }
+      if (els[i * 2 + 1]) {
+        await els[i * 2 + 1].screenshot({ path: path.join(pagesDir, `card-${n}-back.jpg`), type: 'jpeg', quality: 88 });
+      }
+    }
+  } else {
+    const sheets = await page.$$('.page.sheet');
+    let idx = 0;
+    for (let s = 0; s < sheets.length && idx < cardCount; s += 2) {
+      const frontSlots = await sheets[s].$$('.slot');
+      const backSlots = sheets[s + 1] ? await sheets[s + 1].$$('.slot') : [];
+      for (let j = 0; j < frontSlots.length && idx < cardCount; j++, idx++) {
+        const n = String(idx + 1).padStart(2, '0');
+        await frontSlots[j].screenshot({ path: path.join(pagesDir, `card-${n}-front.jpg`), type: 'jpeg', quality: 88 });
+        if (backSlots[j]) {
+          await backSlots[j].screenshot({ path: path.join(pagesDir, `card-${n}-back.jpg`), type: 'jpeg', quality: 88 });
+        }
+      }
+    }
+  }
+  await page.close();
+}
+
 async function pdfPreviews(browser, pdfFile, htmlFile, previewDir, prefix, dpi = 60) {
   fs.mkdirSync(previewDir, { recursive: true });
   if (hasPdftoppm()) {
@@ -75,4 +117,4 @@ async function pdfPreviews(browser, pdfFile, htmlFile, previewDir, prefix, dpi =
   await page.close();
 }
 
-module.exports = { withBrowser, htmlToPdf, pdfPreviews };
+module.exports = { withBrowser, htmlToPdf, pdfPreviews, exportShareCards };
