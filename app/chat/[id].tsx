@@ -2362,7 +2362,9 @@ const styles = StyleSheet.create({
     maxWidth: '80%',
     paddingHorizontal: 12,
     paddingVertical: 8,
+    paddingBottom: 10,
     borderRadius: 20,
+    position: 'relative',
     opacity: 1,
     shadowColor: 'rgb(1,0,0)',
     shadowOffset: {
@@ -2941,16 +2943,15 @@ const ChatMessageRow = React.memo(function ChatMessageRow({
                 />
               )}
             </View>
+            <MessageReactionsBar
+              variant="inline"
+              summary={reactionSummary}
+              viewerId={currentUserId}
+              messageOwnerId={message.senderId}
+              onSummaryChange={onReactionSummaryChange}
+              onToggle={onReactionToggle}
+            />
           </View>
-          <MessageReactionsBar
-            variant="inline"
-            summary={reactionSummary}
-            viewerId={currentUserId}
-            messageOwnerId={message.senderId}
-            alignRight={isMyMessage}
-            onSummaryChange={onReactionSummaryChange}
-            onToggle={onReactionToggle}
-          />
         </View>
       </TouchableOpacity>
     </Swipeable>

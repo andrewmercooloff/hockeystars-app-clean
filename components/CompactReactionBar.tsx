@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import {
-  FEED_REACTIONS,
+  NOTIFICATION_FEED_REACTIONS,
   type FeedReactionType,
   emptyFeedReactionSummary,
   optimisticSetFeedReaction,
@@ -81,7 +81,7 @@ export default function CompactReactionBar({
       )}
 
       <View style={styles.footerRight}>
-        {FEED_REACTIONS.map(({ type, emoji }) => {
+        {NOTIFICATION_FEED_REACTIONS.map(({ type, emoji }) => {
           const active = summary.mine === type;
           const count = summary.counts[type];
           const isPair = emoji.length > 2;

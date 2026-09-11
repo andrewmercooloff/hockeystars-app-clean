@@ -32,6 +32,11 @@ export const FEED_REACTIONS: readonly {
   { type: 'strength', emoji: '💪🏻', labelKey: 'reactions.strength' },
 ];
 
+/** Feed reactions on notification cards (no respect). */
+export const NOTIFICATION_FEED_REACTIONS = FEED_REACTIONS.filter(
+  (r) => r.type !== 'respect'
+);
+
 export type ReactionSender = {
   id: string;
   name: string;
