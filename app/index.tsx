@@ -80,6 +80,13 @@ import {
 // Размер шайбы
 const PUCK_SIZE = PUCK_BASE_SIZE;
 
+/** Если в стране пользователя меньше N зарегистрированных — на старте показываем «Все». */
+const MIN_COUNTRY_PLAYERS_FOR_DEFAULT_FILTER = 10;
+
+function countRegisteredInCountry(players: Player[], country: string): number {
+  return players.filter((p) => p.country === country && p.status !== 'admin').length;
+}
+
 /** Android: ~30 % мягче движение и отскоки относительно iPhone (подстройте 0.75–0.85). */
 const ANDROID_PUCK_SOFT = Platform.OS === 'android' ? 0.7 : 1;
 const GAME_PUCK_ID = '__game__';
@@ -2316,16 +2323,16 @@ export default function HomeScreen() {
       // Проверяем, есть ли игроки в стране пользователя
     // ВАЖНО: учитываем всех пользователей со статусом 'player', 'star', 'coach', 'scout'
     // чтобы фильтр работал правильно для всех типов пользователей
+    // Мало зарегистрированных в стране — показываем «Все» на старте
+    if (countRegisteredInCountry(players, defaultCountry) < MIN_COUNTRY_PLAYERS_FOR_DEFAULT_FILTER) {
+      return { country: null, year: null };
+    }
+
         const playersInCountry = players.filter(player =>
           player.country === defaultCountry &&
           player.birthDate &&
       (player.status === 'player' || player.status === 'star' || player.status === 'coach' || player.status === 'scout')
     );
-
-    // Если нет игроков в стране пользователя, показываем "Все"
-    if (playersInCountry.length === 0) {
-      return { country: null, year: null };
-    }
 
     // Устанавливаем фильтр по году рождения текущего пользователя
     let defaultYear: number | null = null;
@@ -2385,6 +2392,9 @@ export default function HomeScreen() {
   const computeFiltersForPlayers = useCallback((loadedPlayers: Player[], user: Player | null): { country: string | null; year: number | null } => {
     if (!user?.country || loadedPlayers.length === 0) return { country: null, year: null };
     const defaultCountry = user.country;
+    if (countRegisteredInCountry(loadedPlayers, defaultCountry) < MIN_COUNTRY_PLAYERS_FOR_DEFAULT_FILTER) {
+      return { country: null, year: null };
+    }
     const playersInCountry = loadedPlayers.filter(p =>
       p.country === defaultCountry && p.birthDate &&
       (p.status === 'player' || p.status === 'star' || p.status === 'coach' || p.status === 'scout')
