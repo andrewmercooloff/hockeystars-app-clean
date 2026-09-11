@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 /**
- * Blocks incomplete OTA bundles from reaching production.
+ * Blocks incomplete or stale OTA bundles from reaching production.
  * Run via: npm run ota:production -- --message "..."
+ *
+ * Why: feature work lives on many cursor/* branches. Publishing OTA from main
+ * (design refresh only) or an old branch rolls back notifications, reactions,
+ * scout cache, maps, OTA fixes, etc.
  */
 const { execSync } = require('child_process');
 const fs = require('fs');
@@ -20,46 +24,44 @@ function die(msg) {
 
 const branch = sh('git branch --show-current');
 
-/** Branches known to be incomplete if published alone (missing merged agent fixes). */
-const BLOCKED_BRANCHES = new Set(['cursor/profile-preview-contain-51f6']);
+/** Only these branches may publish production OTA without override. */
+const ALLOWED_BRANCHES = new Set(['main', 'cursor/consolidated-release-51f6']);
 
-if (BLOCKED_BRANCHES.has(branch)) {
+if (!ALLOWED_BRANCHES.has(branch) && process.env.OTA_ALLOW_ANY_BRANCH !== '1') {
   die(
-    `Branch "${branch}" must not be published alone — it lacks video/SMS/splash fixes.\n` +
-      'Merge into cursor/video-upload-fix-51f6 or main, then publish from there.'
+    `Branch "${branch}" cannot publish production OTA.\n` +
+      'Merge into main (or cursor/consolidated-release-51f6), then publish.\n' +
+      'Emergency override: OTA_ALLOW_ANY_BRANCH=1 npm run ota:production'
   );
 }
 
-/** Files/markers that must exist in any production OTA after Sep 2026 agent work. */
+/** Files/markers that must exist — catches partial merges and stale main-only publishes. */
 const REQUIRED_MARKERS = [
   { file: 'utils/pickVideoFromLibrary.ts', needle: 'export async function pickVideoFromLibrary' },
   { file: 'utils/homeSceneSignal.ts', needle: 'markHomeSceneReady' },
-  { file: 'app/register.tsx', needle: 'proceedAfterContactVerified' },
-  { file: 'components/FriendshipNotification.tsx', needle: "t('common.and')" },
-  { file: 'utils/mediaTileSize.ts', needle: 'widthForAspectHeight' },
-  { file: 'components/VideoPlayer.tsx', needle: "layoutMode?: 'default' | 'modal'" },
-  { file: 'scripts/ota-production-guard.js', needle: 'BLOCKED_BRANCHES' },
+  { file: 'utils/otaLaunch.ts', needle: 'shouldSkipSplashAfterOta' },
+  { file: 'hooks/useOtaUpdates.ts', needle: 'reloadAsync' },
+  { file: 'utils/playerStorage.ts', needle: 'peekCachedPlayersList' },
+  { file: 'app/search.tsx', needle: 'scoutListSessionCache' },
+  { file: 'components/ShopLocationMap.tsx', needle: 'EXPO_PUBLIC_CARTO_API_KEY' },
+  { file: 'components/CompactReactionBar.tsx', needle: 'NOTIFICATION_FEED_REACTIONS' },
+  { file: 'components/MessageReactionsBar.tsx', needle: 'inline' },
+  { file: 'utils/reactions.ts', needle: 'PROFILE_REACTIONS' },
+  { file: 'app/index.tsx', needle: 'MIN_COUNTRY_PLAYERS_FOR_DEFAULT_FILTER' },
+  { file: 'components/ReactionReceivedNotification.tsx', needle: 'ReactionReceivedNotification' },
+  { file: 'eas.json', needle: 'EXPO_PUBLIC_CARTO_API_KEY' },
+  { file: 'scripts/ota-production-guard.js', needle: 'ALLOWED_BRANCHES' },
 ];
 
 for (const { file, needle } of REQUIRED_MARKERS) {
   const abs = path.join(ROOT, file);
   if (!fs.existsSync(abs)) {
-    die(`Missing required file: ${file}\nPublish from a branch that includes all recent fixes.`);
+    die(`Missing required file: ${file}\nPublish from consolidated-release after merging all agent fixes.`);
   }
   const text = fs.readFileSync(abs, 'utf8');
   if (!text.includes(needle)) {
     die(`File ${file} is missing expected marker "${needle}".\nYour branch looks incomplete for production OTA.`);
   }
-}
-
-/** Warn when not on main or the consolidated release branch (still allow with env override). */
-const PREFERRED_BRANCHES = new Set(['main', 'cursor/video-upload-fix-51f6']);
-if (!PREFERRED_BRANCHES.has(branch) && process.env.OTA_ALLOW_ANY_BRANCH !== '1') {
-  console.warn(
-    `\n⚠️  OTA guard: branch "${branch}" is not main or cursor/video-upload-fix-51f6.\n` +
-      '    Markers passed, but prefer merging to main before OTA.\n' +
-      '    Set OTA_ALLOW_ANY_BRANCH=1 to silence this warning.\n'
-  );
 }
 
 if (sh('git status --porcelain')) {

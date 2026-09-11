@@ -27,7 +27,8 @@
       },
       "env": {
         "NPM_CONFIG_LEGACY_PEER_DEPS": "true",
-        "EXPO_PUBLIC_SUPABASE_URL": "https://api.hockey-stars.com"
+        "EXPO_PUBLIC_SUPABASE_URL": "https://api.hockey-stars.com",
+        "EXPO_PUBLIC_CARTO_API_KEY": "cb1_3h3t_1_e7b691d4e5380192c29c3b23"
       }
     },
     "production": {
@@ -41,7 +42,8 @@
       },
       "env": {
         "NPM_CONFIG_LEGACY_PEER_DEPS": "true",
-        "EXPO_PUBLIC_SUPABASE_URL": "https://api.hockey-stars.com"
+        "EXPO_PUBLIC_SUPABASE_URL": "https://api.hockey-stars.com",
+        "EXPO_PUBLIC_CARTO_API_KEY": "cb1_3h3t_1_e7b691d4e5380192c29c3b23"
       }
     }
   },

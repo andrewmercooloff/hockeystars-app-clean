@@ -21,6 +21,10 @@ type ShopLocationMapProps = {
   height?: number;
 };
 
+/** Leaflet и стили лежат на нашем сайте; для web — тот же origin, для WebView — абсолютно. */
+const MAP_ASSETS_ORIGIN = 'https://hockey-stars.com';
+const LEAFLET_CDN = 'https://unpkg.com/leaflet@1.9.4/dist';
+
 /** Dark Leaflet map without OSM/Leaflet chrome; fits all markers. */
 export default function ShopLocationMap({
   address,
@@ -55,9 +59,11 @@ export default function ShopLocationMap({
     }
   }, [stablePayload]);
 
+  const cartoApiKey = process.env.EXPO_PUBLIC_CARTO_API_KEY?.trim() || '';
+
   const html = useMemo(
-    () => buildMapHtml(parsed.list, parsed.city),
-    [parsed.list, parsed.city]
+    () => buildMapHtml(parsed.list, parsed.city, cartoApiKey),
+    [parsed.list, parsed.city, cartoApiKey]
   );
 
   if (!parsed.list.length) return null;
@@ -83,7 +89,7 @@ export default function ShopLocationMap({
       key={stablePayload}
       // baseUrl: без него относительные ссылки внутри HTML (и Referer для геокодера)
       // резолвятся от about:blank — Leaflet не загружался, карта была пустой.
-      source={{ html, baseUrl: MAP_ASSETS_ORIGIN }}
+      source={{ html, baseUrl: `${MAP_ASSETS_ORIGIN}/` }}
       style={[styles.map, { height }]}
       javaScriptEnabled
       domStorageEnabled
@@ -95,13 +101,27 @@ export default function ShopLocationMap({
   );
 }
 
-/** Leaflet и стили лежат на нашем сайте; для web — тот же origin, для WebView — абсолютно. */
-const MAP_ASSETS_ORIGIN = 'https://hockey-stars.com';
-const LEAFLET_CDN = 'https://unpkg.com/leaflet@1.9.4/dist';
-
-function buildMapHtml(addresses: string[], city: string): string {
+function buildMapHtml(addresses: string[], city: string, cartoApiKey: string): string {
   const addressesJson = JSON.stringify(addresses);
   const cityJson = JSON.stringify(city || '');
+  const hasCartoKey = Boolean(cartoApiKey);
+  const cartoKeyParam = hasCartoKey ? `?key=${encodeURIComponent(cartoApiKey)}` : '';
+  const cartoTileUrl = `https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png${cartoKeyParam}`;
+  const mapLibreScripts = hasCartoKey
+    ? ''
+    : `
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.20/leaflet-maplibre-gl.js"></script>`;
+  const basemapInit = hasCartoKey
+    ? `L.tileLayer(${JSON.stringify(cartoTileUrl)}, {
+        attribution: '',
+        maxZoom: 19,
+        subdomains: 'abcd'
+      }).addTo(map);`
+    : `L.maplibreGL({
+        style: 'https://tiles.openfreemap.org/styles/dark'
+      }).addTo(map);`;
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -127,12 +147,11 @@ function buildMapHtml(addresses: string[], city: string): string {
   <link rel="stylesheet" href="${MAP_ASSETS_ORIGIN}/vendor/leaflet/leaflet.css" />
   <script src="${MAP_ASSETS_ORIGIN}/vendor/leaflet/leaflet.js"></script>
   <script>
-    // Запасной источник Leaflet, если наш хост недоступен из сети пользователя
     if (typeof L === 'undefined') {
       document.write('<link rel="stylesheet" href="${LEAFLET_CDN}/leaflet.css" />');
-      document.write('<script src="${LEAFLET_CDN}/leaflet.js"><\/script>');
+      document.write('<script src="${LEAFLET_CDN}/leaflet.js"><\\/script>');
     }
-  </script>
+  </script>${mapLibreScripts}
 </head>
 <body>
   <div id="map"></div>
@@ -144,13 +163,9 @@ function buildMapHtml(addresses: string[], city: string): string {
       var map = L.map('map', {
         attributionControl: false,
         zoomControl: true
-      }).setView([53.9, 27.6], 11);
+      }).setView([59.93, 30.33], 11);
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '',
-        maxZoom: 19,
-        subdomains: 'abcd'
-      }).addTo(map);
+      ${basemapInit}
 
       function queryFor(addr) {
         if (city && addr.toLowerCase().indexOf(city.toLowerCase()) === -1) {
@@ -188,7 +203,6 @@ function buildMapHtml(addresses: string[], city: string): string {
               throw new Error('empty');
             })
             .catch(function () {
-              // Запасной геокодер (Photon/komoot), тоже без ключа
               return fetch('https://photon.komoot.io/api/?limit=1&lang=en&q=' + encodeURIComponent(q))
                 .then(function (r) { return r.json(); })
                 .then(function (data) {
