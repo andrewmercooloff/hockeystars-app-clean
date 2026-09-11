@@ -109,6 +109,13 @@ async function main() {
     syncSharePages(slug, outDir);
   }
 
+  const printReady = path.join(__dirname, 'print-ready', slug);
+  fs.mkdirSync(printReady, { recursive: true });
+  for (const name of [`${slug}-album.pdf`, `${slug}-album-A3-spreads.pdf`, `${slug}-cards.pdf`, `${slug}-album-preview.pdf`, `${slug}-cards-preview.pdf`]) {
+    const src = path.join(outDir, name);
+    if (fs.existsSync(src)) fs.copyFileSync(src, path.join(printReady, name));
+  }
+
   const shareHtml = path.join(__dirname, 'share', slug, 'index.html');
   if (fs.existsSync(shareHtml)) {
     try {
