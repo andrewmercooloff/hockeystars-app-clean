@@ -322,7 +322,7 @@
 
   <script>
     (function () {
-      const REV = '9bd4590b';
+      const REV = 'ea531cb';
       const RAW = 'https://raw.githubusercontent.com/andrewmercooloff/hockeystars-app-clean/cursor/hockey-card-album-generator-a9a3/print/album';
       const IMG = (file) => RAW + '/print-ready/dobrynya/pages/' + file + '?v=' + REV;
 
@@ -383,6 +383,7 @@
       const ZOOM_STEP = 0.35;
       let zoomScale = 1, zoomPanX = 0, zoomPanY = 0;
       let pinchStartDist = 0, pinchStartScale = 1, pinchCenter = null, dragStart = null, lastTap = 0;
+      let mainTouchX = null, mainMultiTouch = false, zoomGesturing = false;
       const zoomInBtn = document.getElementById('zoom-in');
       const zoomOutBtn = document.getElementById('zoom-out');
       const zoomResetBtn = document.getElementById('zoom-reset');
@@ -510,9 +511,16 @@
           zoomImgR.src = content.right;
         }
         zoomOverlay.classList.add('open');
+        document.body.classList.add('zoom-open');
       }
 
-      function closeZoom() { zoomOverlay.classList.remove('open'); }
+      function closeZoom() {
+        zoomOverlay.classList.remove('open');
+        document.body.classList.remove('zoom-open');
+        zoomGesturing = false;
+        mainTouchX = null;
+        mainMultiTouch = false;
+      }
 
       function buildCardsGrid() {
         var list = cardList();
@@ -599,7 +607,7 @@
       }
 
       bookEl.addEventListener('click', function () {
-        if (mode !== 'cards') openZoom();
+        if (mode !== 'cards' && !zoomGesturing && !mainMultiTouch) openZoom();
       });
       prevBtn.addEventListener('click', function () { go(-1); });
       nextBtn.addEventListener('click', function () { go(1); });
@@ -640,8 +648,30 @@
         else zoomAt(e.clientX, e.clientY, 2.5);
       });
 
+      function stopTouchBubble(e) { e.stopPropagation(); }
+
+      zoomOverlay.addEventListener('touchstart', function (e) {
+        stopTouchBubble(e);
+        zoomGesturing = true;
+        if (e.touches.length >= 2) e.preventDefault();
+      }, { passive: false });
+      zoomOverlay.addEventListener('touchmove', stopTouchBubble, { passive: false });
+      zoomOverlay.addEventListener('touchend', function (e) {
+        stopTouchBubble(e);
+        if (e.touches.length === 0) {
+          setTimeout(function () { zoomGesturing = false; }, 80);
+        }
+      }, { passive: false });
+      zoomOverlay.addEventListener('touchcancel', function (e) {
+        stopTouchBubble(e);
+        zoomGesturing = false;
+      }, { passive: false });
+
       zoomStage.addEventListener('touchstart', function (e) {
+        stopTouchBubble(e);
+        zoomGesturing = true;
         if (e.touches.length === 2) {
+          e.preventDefault();
           var dx = e.touches[0].clientX - e.touches[1].clientX;
           var dy = e.touches[0].clientY - e.touches[1].clientY;
           pinchStartDist = Math.hypot(dx, dy) || 1;
@@ -654,9 +684,10 @@
         } else if (e.touches.length === 1) {
           dragStart = { x: e.touches[0].clientX - zoomPanX, y: e.touches[0].clientY - zoomPanY };
         }
-      }, { passive: true });
+      }, { passive: false });
 
       zoomStage.addEventListener('touchmove', function (e) {
+        stopTouchBubble(e);
         if (e.touches.length === 2) {
           e.preventDefault();
           var dx = e.touches[0].clientX - e.touches[1].clientX;
@@ -683,11 +714,15 @@
       }, { passive: false });
 
       zoomStage.addEventListener('touchend', function (e) {
+        stopTouchBubble(e);
         if (e.touches.length < 2) {
           pinchStartDist = 0;
           pinchCenter = null;
         }
-        if (e.touches.length === 0) dragStart = null;
+        if (e.touches.length === 0) {
+          dragStart = null;
+          setTimeout(function () { zoomGesturing = false; }, 80);
+        }
         if (e.changedTouches.length === 1 && e.touches.length === 0) {
           var now = Date.now();
           if (now - lastTap < 280) {
@@ -719,16 +754,42 @@
         if (e.key === 'ArrowRight') go(1);
       });
 
-      var touchX = null;
       mainEl.addEventListener('touchstart', function (e) {
-        if (zoomOverlay.classList.contains('open') || mode === 'cards') return;
-        touchX = e.changedTouches[0].clientX;
+        if (zoomOverlay.classList.contains('open') || zoomGesturing || mode === 'cards') return;
+        if (e.touches.length > 1) {
+          mainMultiTouch = true;
+          mainTouchX = null;
+          return;
+        }
+        mainMultiTouch = false;
+        mainTouchX = e.touches[0].clientX;
+      }, { passive: true });
+      mainEl.addEventListener('touchmove', function (e) {
+        if (zoomOverlay.classList.contains('open') || zoomGesturing || mode === 'cards') return;
+        if (e.touches.length > 1) {
+          mainMultiTouch = true;
+          mainTouchX = null;
+        }
       }, { passive: true });
       mainEl.addEventListener('touchend', function (e) {
-        if (zoomOverlay.classList.contains('open') || mode === 'cards' || touchX == null) return;
-        var dx = e.changedTouches[0].clientX - touchX;
+        if (zoomOverlay.classList.contains('open') || zoomGesturing || mode === 'cards') {
+          mainTouchX = null;
+          if (e.touches.length === 0) mainMultiTouch = false;
+          return;
+        }
+        if (mainMultiTouch || mainTouchX == null || e.touches.length > 0) {
+          if (e.touches.length === 0) mainMultiTouch = false;
+          mainTouchX = null;
+          return;
+        }
+        var dx = e.changedTouches[0].clientX - mainTouchX;
+        mainTouchX = null;
+        mainMultiTouch = false;
         if (Math.abs(dx) > 42) go(dx < 0 ? 1 : -1);
-        touchX = null;
+      }, { passive: true });
+      mainEl.addEventListener('touchcancel', function () {
+        mainTouchX = null;
+        mainMultiTouch = false;
       }, { passive: true });
 
       window.addEventListener('resize', fitBook);
