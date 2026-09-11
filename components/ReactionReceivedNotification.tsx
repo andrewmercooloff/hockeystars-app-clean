@@ -1,6 +1,5 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from './BlurOrSolid';
 import { platformCardShadow } from '../utils/androidShadow';
 import CachedAvatar from './CachedAvatar';
@@ -16,7 +15,6 @@ type ReactionReceivedNotificationProps = {
   timestamp: string;
   reactions?: ProfileReactionType[];
   reactionType?: string;
-  onSendBack: () => void;
   onHeaderPress?: () => void;
 };
 
@@ -28,7 +26,6 @@ export default function ReactionReceivedNotification({
   timestamp,
   reactions,
   reactionType,
-  onSendBack,
   onHeaderPress,
 }: ReactionReceivedNotificationProps) {
   const { t } = useLanguage();
@@ -78,10 +75,6 @@ export default function ReactionReceivedNotification({
       <View style={styles.container}>
         {header}
         <Text style={styles.message}>{message}</Text>
-        <TouchableOpacity style={styles.sendBackBtn} onPress={onSendBack} activeOpacity={0.8}>
-          <Ionicons name="arrow-undo-outline" size={16} color="#fff" />
-          <Text style={styles.sendBackText}>{t('reactions.sendBack')}</Text>
-        </TouchableOpacity>
       </View>
     </BlurOrSolid>
   );
@@ -137,21 +130,5 @@ const styles = StyleSheet.create({
     color: '#d4d4d8',
     fontSize: 13,
     fontFamily: 'Gilroy-Regular',
-    marginBottom: 10,
-  },
-  sendBackBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    gap: 6,
-    backgroundColor: '#fa2f40',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  sendBackText: {
-    color: '#fff',
-    fontSize: 13,
-    fontFamily: 'Gilroy-Bold',
   },
 });

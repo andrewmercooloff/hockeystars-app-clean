@@ -161,13 +161,6 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
       />
     ) : null;
 
-  const handleReactionSendBack = React.useCallback(() => {
-    const senderId = notification.data?.senderId || notification.playerId;
-    if (senderId) {
-      navigateToPlayerProfile(router, { playerId: senderId, returnTo: 'notifications' });
-    }
-  }, [notification, router]);
-
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'friend_request':
@@ -461,7 +454,6 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
             timestamp={new Date(notification.timestamp).toISOString()}
             reactions={notification.data?.reactions}
             reactionType={notification.data?.reactionType || notification.data?.lastReactionType}
-            onSendBack={handleReactionSendBack}
             onHeaderPress={handlePress}
           />
         ) : notification.type === 'video_liked' || notification.type === 'photo_liked' ? (
