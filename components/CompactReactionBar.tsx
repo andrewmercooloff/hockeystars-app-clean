@@ -8,19 +8,14 @@ import {
 } from '../utils/reactions';
 import { loadFeedReactions, setFeedReaction } from '../services/reactionService';
 import ReactionIcon from './ReactionIcon';
-import {
-  NOTIFICATION_REACTIONS_INSET,
-  NOTIFICATION_REACTIONS_INSET_PADDED,
-} from '../utils/notificationCard';
 
 type CompactReactionBarProps = {
   notificationId: string;
   notificationType: string;
   recipientId: string;
   viewerId?: string | null;
-  embedded?: boolean;
-  /** Cards with outer padding (stats, physical data) — skip extra horizontal inset. */
-  paddedCard?: boolean;
+  /** Inline circles to the left of the card's trailing badge. */
+  inline?: boolean;
 };
 
 export default function CompactReactionBar({
@@ -28,8 +23,7 @@ export default function CompactReactionBar({
   notificationType,
   recipientId,
   viewerId,
-  embedded = true,
-  paddedCard = false,
+  inline = true,
 }: CompactReactionBarProps) {
   const [summary, setSummary] = useState(emptyFeedReactionSummary());
   const summaryRef = useRef(summary);
@@ -63,25 +57,25 @@ export default function CompactReactionBar({
   };
 
   return (
-    <View
-      style={[
-        styles.bar,
-        embedded && (paddedCard ? NOTIFICATION_REACTIONS_INSET_PADDED : NOTIFICATION_REACTIONS_INSET),
-      ]}
-    >
+    <View style={inline ? styles.inlineBar : styles.bar}>
       {FEED_REACTIONS.map(({ type }) => {
         const active = summary.mine === type;
         const count = summary.counts[type];
         return (
           <Pressable
             key={type}
-            style={[styles.chip, active && styles.chipActive]}
+            style={[
+              inline ? styles.circle : styles.chip,
+              active && (inline ? styles.circleActive : styles.chipActive),
+            ]}
             onPress={() => onPress(type)}
             disabled={!viewerId || viewerId === recipientId}
-            hitSlop={6}
+            hitSlop={4}
           >
-            <ReactionIcon type={type} size={17} active={active} />
-            {count > 0 ? <Text style={[styles.count, active && styles.countActive]}>{count}</Text> : null}
+            <ReactionIcon type={type} size={inline ? 13 : 17} active={active} />
+            {!inline && count > 0 ? (
+              <Text style={[styles.count, active && styles.countActive]}>{count}</Text>
+            ) : null}
           </Pressable>
         );
       })}
@@ -90,6 +84,25 @@ export default function CompactReactionBar({
 }
 
 const styles = StyleSheet.create({
+  inlineBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    marginRight: 4,
+    flexShrink: 0,
+  },
+  circle: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'visible',
+  },
+  circleActive: {
+    backgroundColor: 'rgba(250, 47, 64, 0.2)',
+  },
   bar: {
     flexDirection: 'row',
     flexWrap: 'nowrap',

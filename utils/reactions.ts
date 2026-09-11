@@ -20,7 +20,6 @@ export const FEED_REACTIONS: readonly {
   { type: 'respect', emoji: '🤜🏻🤛🏻', labelKey: 'reactions.respect' },
   { type: 'fire', emoji: '🔥', labelKey: 'reactions.fire' },
   { type: 'strength', emoji: '💪🏻', labelKey: 'reactions.strength' },
-  { type: 'lightning', emoji: '⚡️', labelKey: 'reactions.lightning' },
 ];
 
 export type ReactionSender = {
@@ -39,6 +38,17 @@ export type FeedReactionSummary = {
   counts: Record<FeedReactionType, number>;
   mine: FeedReactionType | null;
 };
+
+export function totalProfileReactionCount(
+  summary: Pick<ProfileReactionSummary, 'counts'>
+): number {
+  return (
+    summary.counts.respect +
+    summary.counts.like +
+    summary.counts.strength +
+    summary.counts.high_five
+  );
+}
 
 export const REACTION_GROUP_WINDOW_MS = 24 * 60 * 60 * 1000;
 

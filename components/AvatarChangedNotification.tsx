@@ -13,7 +13,7 @@ interface AvatarChangedNotificationProps {
   playerAvatar?: string;
   newAvatarUrl?: string;
   timestamp: string;
-  reactionsFooter?: ReactNode;
+  reactionsInline?: ReactNode;
 }
 
 const CARD_HORIZONTAL_INSET = 16 * 2 + 14 * 2;
@@ -28,7 +28,7 @@ const AvatarChangedNotification = React.memo(function AvatarChangedNotification(
   playerAvatar,
   newAvatarUrl,
   timestamp,
-  reactionsFooter,
+  reactionsInline,
 }: AvatarChangedNotificationProps) {
   const { t } = useLanguage();
   const previewAvatar = React.useMemo(() => {
@@ -90,8 +90,11 @@ const AvatarChangedNotification = React.memo(function AvatarChangedNotification(
               <Text style={styles.actionText}>
                 {t('avatarNotification.changed')}
               </Text>
-              <View style={styles.avatarBadge}>
-                <Ionicons name="camera-outline" size={14} color="#fff" />
+              <View style={styles.trailingGroup}>
+                {reactionsInline}
+                <View style={styles.avatarBadge}>
+                  <Ionicons name="camera-outline" size={14} color="#fff" />
+                </View>
               </View>
             </View>
           </View>
@@ -110,8 +113,6 @@ const AvatarChangedNotification = React.memo(function AvatarChangedNotification(
           </View>
         ) : null}
       </View>
-
-      {reactionsFooter}
     </View>
     </BlurOrSolid>
   );
@@ -191,6 +192,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: 'Gilroy-Regular',
     flex: 1,
+  },
+  trailingGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   avatarBadge: {
     flexDirection: 'row',

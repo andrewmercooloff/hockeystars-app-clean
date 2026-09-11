@@ -12,7 +12,7 @@ interface AchievementAddedNotificationProps {
   achievementsCount: number;
   timestamp: string;
   playerAvatar?: string;
-  reactionsFooter?: ReactNode;
+  reactionsInline?: ReactNode;
 }
 
 const AchievementAddedNotification = React.memo(function AchievementAddedNotification({
@@ -21,7 +21,7 @@ const AchievementAddedNotification = React.memo(function AchievementAddedNotific
   achievementsCount,
   timestamp,
   playerAvatar,
-  reactionsFooter,
+  reactionsInline,
 }: AchievementAddedNotificationProps) {
   const { t } = useLanguage();
 
@@ -88,17 +88,18 @@ const AchievementAddedNotification = React.memo(function AchievementAddedNotific
           <Text style={styles.actionText}>
             {t('achievementNotification.added')} {getAchievementText(achievementsCount)}
           </Text>
-          <View style={styles.achievementsInfo}>
-            <Ionicons name="trophy" size={14} color="#fff" />
-            <Text style={styles.achievementsCountText}>
-              +{achievementsCount}
-            </Text>
+          <View style={styles.trailingGroup}>
+            {reactionsInline}
+            <View style={styles.achievementsInfo}>
+              <Ionicons name="trophy" size={14} color="#fff" />
+              <Text style={styles.achievementsCountText}>
+                +{achievementsCount}
+              </Text>
+            </View>
           </View>
         </View>
       </View>
       </View>
-
-      {reactionsFooter}
     </View>
     </BlurOrSolid>
   );
@@ -182,6 +183,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Gilroy-Regular',
     flex: 1,
+  },
+  trailingGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   achievementsInfo: {
     flexDirection: 'row',

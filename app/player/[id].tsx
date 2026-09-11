@@ -5498,20 +5498,23 @@ export default function PlayerProfile() {
                       <Text style={styles.actionButtonText}>{friendLoading ? t('common.loading') : t('profile.addFriend')}</Text>
                     </TouchableOpacity>
                   ) : null}
-                  <TouchableOpacity
-                    style={[styles.actionButton, styles.actionButtonDesktop, { backgroundColor: '#fff' }]}
-                    onPress={() => router.push({ pathname: '/chat/[id]', params: { id: player.id } })}
-                  >
-                    <Ionicons name="chatbubble-outline" size={18} color="rgb(1,0,0)" />
-                    <Text style={[styles.actionButtonText, { color: 'rgb(1,0,0)' }]}>{t('profile.sendMessage')}</Text>
-                  </TouchableOpacity>
-                  <ProfileReactionsBar
-                    targetPlayerId={player.id}
-                    viewerId={currentUser.id}
-                    viewerName={currentUser.name}
-                    viewerAvatar={currentUser.avatar}
-                    disabled={isUserBlockedState}
-                  />
+                  <View style={styles.messageReactionsRow}>
+                    <TouchableOpacity
+                      style={[styles.actionButton, styles.actionButtonDesktop, styles.messageButtonFlex, { backgroundColor: '#fff' }]}
+                      onPress={() => router.push({ pathname: '/chat/[id]', params: { id: player.id } })}
+                    >
+                      <Ionicons name="chatbubble-outline" size={18} color="rgb(1,0,0)" />
+                      <Text style={[styles.actionButtonText, { color: 'rgb(1,0,0)' }]}>{t('profile.sendMessage')}</Text>
+                    </TouchableOpacity>
+                    <ProfileReactionsBar
+                      targetPlayerId={player.id}
+                      viewerId={currentUser.id}
+                      viewerName={currentUser.name}
+                      viewerAvatar={currentUser.avatar}
+                      disabled={isUserBlockedState}
+                      compactTrigger
+                    />
+                  </View>
                 </View>
               )}
               </View>
@@ -5743,28 +5746,30 @@ export default function PlayerProfile() {
                   </>
                 )}
 
-                {/* Кнопка написать сообщение */}
-                <TouchableOpacity 
-                  style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#fff', marginBottom: 4 }]} 
-                  onPress={() => {
-                    router.push({ 
-                      pathname: '/chat/[id]', 
-                      params: { id: player.id } 
-                    });
-                  }}
-                >
-                  <Ionicons name="chatbubble-outline" size={20} color="rgb(1,0,0)" />
-                  <Text style={[styles.actionButtonText, { color: 'rgb(1,0,0)' }]}>
-                    {t('profile.sendMessage')}
-                  </Text>
-                </TouchableOpacity>
-                <ProfileReactionsBar
-                  targetPlayerId={player.id}
-                  viewerId={currentUser.id}
-                  viewerName={currentUser.name}
-                  viewerAvatar={currentUser.avatar}
-                  disabled={isUserBlockedState}
-                />
+                <View style={styles.messageReactionsRow}>
+                  <TouchableOpacity
+                    style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, styles.messageButtonFlex, { backgroundColor: '#fff' }]}
+                    onPress={() => {
+                      router.push({
+                        pathname: '/chat/[id]',
+                        params: { id: player.id },
+                      });
+                    }}
+                  >
+                    <Ionicons name="chatbubble-outline" size={20} color="rgb(1,0,0)" />
+                    <Text style={[styles.actionButtonText, { color: 'rgb(1,0,0)' }]}>
+                      {t('profile.sendMessage')}
+                    </Text>
+                  </TouchableOpacity>
+                  <ProfileReactionsBar
+                    targetPlayerId={player.id}
+                    viewerId={currentUser.id}
+                    viewerName={currentUser.name}
+                    viewerAvatar={currentUser.avatar}
+                    disabled={isUserBlockedState}
+                    compactTrigger
+                  />
+                </View>
               </View>
             )}
 
@@ -9343,6 +9348,16 @@ const styles = StyleSheet.create({
   actionsSection: {
     gap: 15,
     marginTop: 20,
+  },
+  messageReactionsRow: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    gap: 8,
+    marginBottom: 4,
+    width: '100%',
+  },
+  messageButtonFlex: {
+    flex: 3,
   },
   actionButton: {
     backgroundColor: '#fa2f40',

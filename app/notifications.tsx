@@ -108,22 +108,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
   const feedReactionRecipientId =
     notification.data?.changedPlayerId || notification.data?.playerId || notification.playerId;
 
-  const feedReactionUsesPaddedInset = new Set([
-    'stats_change',
-    'normative_changed',
-    'physical_data_changed',
-    'puck_speed_changed',
-    'achievement_added',
-    'achievement',
-    'scout_report',
-    'exercise_completed',
-    'game_first_place',
-    'quiz_first_place',
-    'avatar_changed',
-    'cover_changed',
-  ]).has(notification.type);
-
-  const feedReactionsFooter = REACTABLE_NOTIFICATION_TYPES.has(notification.type) &&
+  const feedReactionsInline = REACTABLE_NOTIFICATION_TYPES.has(notification.type) &&
     feedReactionRecipientId &&
     currentUserId ? (
       <CompactReactionBar
@@ -131,8 +116,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
         notificationType={notification.type}
         recipientId={feedReactionRecipientId}
         viewerId={currentUserId}
-        embedded
-        paddedCard={feedReactionUsesPaddedInset}
+        inline
       />
     ) : null;
 
@@ -219,7 +203,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 playerId={notification.data.changedPlayerId}
                 playerAvatar={notification.data.changedPlayerAvatar}
                 timestamp={notification.timestamp}
-                reactionsFooter={feedReactionsFooter}
+                reactionsInline={feedReactionsInline}
               />
             </PressableScale>
         ) : notification.type === 'photo_added' ? (
@@ -231,7 +215,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
               photoUrls={notification.data.photoUrls || []}
               onHeaderPress={handlePress}
-              reactionsFooter={feedReactionsFooter}
+              reactionsInline={feedReactionsInline}
             />
         ) : notification.type === 'new_friendship' ? (
           <FriendshipNotification
@@ -267,7 +251,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
                 exerciseId={notification.data.exerciseId || 'unknown'}
                 timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-                reactionsFooter={feedReactionsFooter}
+                reactionsInline={feedReactionsInline}
               />
             </PressableScale>
         ) : notification.type === 'gift_received' ? (
@@ -356,7 +340,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               videoUrls={sortVideoUrlsNewestFirst(notification.data.videoUrls || [])}
               onHeaderPress={handlePress}
               onScrubActiveChange={onVideoScrubActiveChange}
-              reactionsFooter={feedReactionsFooter}
+              reactionsInline={feedReactionsInline}
             />
         ) : notification.type === 'cover_changed' ? (
             <PressableScale
@@ -369,7 +353,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 playerAvatar={notification.playerAvatar}
                 coverUrl={notification.data?.coverUrl}
                 timestamp={notification.data?.timestamp || new Date(notification.timestamp).toISOString()}
-                reactionsFooter={feedReactionsFooter}
+                reactionsInline={feedReactionsInline}
               />
             </PressableScale>
         ) : notification.type === 'avatar_changed' ? (
@@ -383,7 +367,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
                 newAvatarUrl={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
                 timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-                reactionsFooter={feedReactionsFooter}
+                reactionsInline={feedReactionsInline}
               />
             </PressableScale>
         ) : notification.type === 'achievement_added' ? (
@@ -397,7 +381,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 achievementsCount={notification.data.addedAchievementsCount || 1}
                 timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
                 playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
-                reactionsFooter={feedReactionsFooter}
+                reactionsInline={feedReactionsInline}
               />
             </PressableScale>
         ) : notification.type === 'physical_data_changed' ? (
@@ -411,7 +395,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
                 changes={notification.data.changes || []}
                 timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-                reactionsFooter={feedReactionsFooter}
+                reactionsInline={feedReactionsInline}
               />
             </PressableScale>
         ) : notification.type === 'puck_speed_changed' ? (
@@ -425,7 +409,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
                 newMaxSpeed={notification.data.newMaxSpeed || 0}
                 timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-                reactionsFooter={feedReactionsFooter}
+                reactionsInline={feedReactionsInline}
               />
             </PressableScale>
         ) : notification.type === 'scout_report' ? (
@@ -439,7 +423,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 playerAvatar={notification.data.changedPlayerAvatar}
                 message={notification.message || ''}
                 timestamp={typeof notification.timestamp === 'string' ? new Date(notification.timestamp).getTime() : (notification.timestamp || Date.now())}
-                reactionsFooter={feedReactionsFooter}
+                reactionsInline={feedReactionsInline}
               />
             </PressableScale>
         ) : notification.type === 'game_first_place' || notification.type === 'quiz_first_place' ? (
@@ -455,7 +439,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 variant={notification.type === 'quiz_first_place' ? 'quiz' : 'game'}
                 prizeAmount={notification.data?.prizeAmount}
                 timestamp={typeof notification.timestamp === 'string' ? new Date(notification.timestamp).getTime() : (notification.timestamp || Date.now())}
-                reactionsFooter={feedReactionsFooter}
+                reactionsInline={feedReactionsInline}
               />
             </PressableScale>
         ) : notification.type === 'profile_reaction' || notification.type === 'activity_reaction' ? (
