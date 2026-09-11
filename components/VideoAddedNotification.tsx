@@ -328,9 +328,9 @@ export default VideoAddedNotification;
 
 const styles = StyleSheet.create({
   containerBlur: {
-    borderRadius: 16,
+    borderRadius: 14,
     marginHorizontal: 16,
-    marginVertical: 6,
+    marginVertical: 4,
     overflow: 'hidden',
     ...platformCardShadow({
       shadowColor: '#000',
@@ -344,14 +344,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#1c1c21',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.06)',
-    borderRadius: 16,
+    borderRadius: 14,
     overflow: 'hidden',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
   },
   avatarContainer: {
     width: 36,
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.55)',
     borderRadius: 999,
     paddingHorizontal: 9,
-    paddingVertical: 4,
+    paddingVertical: 2,
   },
   dot: {
     width: 6,
@@ -485,7 +485,7 @@ const styles = StyleSheet.create({
     right: 14,
     zIndex: 1000,
     backgroundColor: 'rgba(0,0,0,0.65)',
-    borderRadius: 16,
+    borderRadius: 14,
     padding: 8,
   },
   modalPlayer: {

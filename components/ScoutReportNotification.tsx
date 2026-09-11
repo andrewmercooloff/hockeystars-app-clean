@@ -40,7 +40,7 @@ const ScoutReportNotification = React.memo<ScoutReportNotificationProps>(({
         <View style={styles.bodyRow}>
         <View style={styles.avatarContainer}>
           {(playerAvatar || playerId) ? (
-            <CachedAvatar playerId={playerId || ''} fallbackAvatarUrl={playerAvatar} size={50} style={styles.playerAvatar} />
+            <CachedAvatar playerId={playerId || ''} fallbackAvatarUrl={playerAvatar} size={44} style={styles.playerAvatar} />
           ) : (
             <View style={styles.avatarPlaceholder}>
               <Ionicons name="document-text" size={24} color="#8B5CF6" />
@@ -75,21 +75,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
-  avatarContainer: { marginRight: 12 },
+  avatarContainer: { marginRight: 10 },
   avatarPlaceholder: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: 'rgba(139, 92, 246, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   contentContainer: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: 2 },
-  playerName: { fontSize: 16, fontFamily: 'Gilroy-Bold', color: '#fff', flex: 1 },
+  playerName: { fontSize: 15, fontFamily: 'Gilroy-Bold', color: '#fff', flex: 1 },
   timeText: { fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#a1a1aa', marginLeft: 8 },
   message: { fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#d4d4d8' },
-  playerAvatar: { width: 50, height: 50, borderRadius: 25 },
+  playerAvatar: { width: 44, height: 44, borderRadius: 22 },
 });
 
 export default ScoutReportNotification;

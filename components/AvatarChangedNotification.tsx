@@ -123,9 +123,9 @@ export default AvatarChangedNotification;
 
 const styles = StyleSheet.create({
   containerBlur: {
-    borderRadius: 16,
+    borderRadius: 14,
     marginHorizontal: 16,
-    marginVertical: 6,
+    marginVertical: 4,
     overflow: 'hidden',
     ...platformCardShadow({
       shadowColor: '#000',
@@ -139,8 +139,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#1c1c21',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.06)',
-    borderRadius: 16,
-    padding: 14,
+    borderRadius: 14,
+    padding: 12,
   },
   bodyRow: {
   },
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   playerName: {
     color: '#fff',
@@ -199,13 +199,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.10)',
     paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingVertical: 2,
     borderRadius: 12,
   },
   previewWrap: {
     marginTop: 12,
     alignItems: 'center',
-    borderRadius: 16,
+    borderRadius: 14,
     overflow: 'hidden',
     backgroundColor: 'rgba(255,255,255,0.06)',
     paddingVertical: 12,

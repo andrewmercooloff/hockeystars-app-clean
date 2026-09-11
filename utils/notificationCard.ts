@@ -3,9 +3,9 @@ import { platformCardShadow } from './androidShadow';
 
 /** Single card look for every feed item (blur wrapper + inner surface). */
 export const NOTIFICATION_CARD_BLUR: ViewStyle = {
-  borderRadius: 16,
+  borderRadius: 14,
   marginHorizontal: 16,
-  marginVertical: 6,
+  marginVertical: 4,
   overflow: 'hidden',
   ...platformCardShadow({
     shadowColor: '#000',
@@ -20,8 +20,8 @@ export const NOTIFICATION_CARD: ViewStyle = {
   backgroundColor: '#1c1c21',
   borderWidth: 1,
   borderColor: 'rgba(255, 255, 255, 0.06)',
-  borderRadius: 16,
-  padding: 16,
+  borderRadius: 14,
+  padding: 12,
 };
 
 export const NOTIFICATION_CARD_COLUMN: ViewStyle = {
@@ -34,17 +34,17 @@ export const NOTIFICATION_CARD_ROW: ViewStyle = {
 };
 
 export const NOTIFICATION_REACTIONS_INSET: ViewStyle = {
-  marginTop: 8,
+  marginTop: 6,
   paddingTop: 0,
-  paddingHorizontal: 14,
-  paddingBottom: 2,
+  paddingHorizontal: 12,
+  paddingBottom: 0,
   width: '100%',
   alignSelf: 'stretch',
 };
 
 /** For cards that already have inner padding (stats, physical data, etc.). */
 export const NOTIFICATION_REACTIONS_INSET_PADDED: ViewStyle = {
-  marginTop: 8,
+  marginTop: 6,
   paddingTop: 0,
   paddingBottom: 0,
   width: '100%',

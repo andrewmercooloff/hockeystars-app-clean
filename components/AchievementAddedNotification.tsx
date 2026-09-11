@@ -64,7 +64,7 @@ const AchievementAddedNotification = React.memo(function AchievementAddedNotific
           <CachedAvatar
             playerId={playerId}
             fallbackAvatarUrl={playerAvatar}
-            size={50}
+            size={44}
             style={styles.playerAvatar}
           />
         ) : (
@@ -110,9 +110,9 @@ export default AchievementAddedNotification;
 
 const styles = StyleSheet.create({
     containerBlur: {
-    borderRadius: 16,
+    borderRadius: 14,
     marginHorizontal: 16,
-    marginVertical: 6,
+    marginVertical: 4,
     overflow: 'hidden',
     ...platformCardShadow({
       shadowColor: '#000',
@@ -126,32 +126,32 @@ const styles = StyleSheet.create({
     backgroundColor: '#1c1c21',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.06)',
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 14,
+    padding: 12,
   },
   bodyRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
   avatarContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 12,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    marginRight: 10,
     overflow: 'hidden',
   },
   avatarPlaceholder: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   playerAvatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
   },
   contentContainer: {
     flex: 1,
@@ -159,11 +159,11 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 5,
   },
   playerName: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: 'Gilroy-Bold',
     flex: 1,
   },
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 4,
+    paddingVertical: 2,
   },
   actionText: {
     color: '#d4d4d8',

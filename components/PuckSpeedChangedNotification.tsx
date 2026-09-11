@@ -55,7 +55,7 @@ const PuckSpeedChangedNotification = React.memo(function PuckSpeedChangedNotific
         <CachedAvatar
           playerId={playerId}
           fallbackAvatarUrl={playerAvatar}
-          size={50}
+          size={44}
           style={styles.playerAvatar}
         />
       </View>
@@ -104,19 +104,19 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   avatarContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 10,
     overflow: 'hidden',
   },
   playerAvatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
   },
   contentContainer: {
     flex: 1,
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   },
   playerName: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: 'Gilroy-Bold',
     flex: 1,
   },
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 4,
+    paddingVertical: 2,
   },
   actionText: {
     color: '#d4d4d8',
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.10)',
     paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingVertical: 2,
     borderRadius: 12,
     gap: 4,
   },

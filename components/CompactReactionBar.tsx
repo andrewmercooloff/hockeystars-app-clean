@@ -7,7 +7,6 @@ import {
   optimisticSetFeedReaction,
 } from '../utils/reactions';
 import { loadFeedReactions, setFeedReaction } from '../services/reactionService';
-import ReactionIcon from './ReactionIcon';
 import {
   NOTIFICATION_REACTIONS_INSET,
   NOTIFICATION_REACTIONS_INSET_PADDED,
@@ -82,9 +81,10 @@ export default function CompactReactionBar({
       )}
 
       <View style={styles.footerRight}>
-        {FEED_REACTIONS.map(({ type }) => {
+        {FEED_REACTIONS.map(({ type, emoji }) => {
           const active = summary.mine === type;
           const count = summary.counts[type];
+          const isPair = emoji.length > 2;
           return (
             <Pressable
               key={type}
@@ -93,10 +93,13 @@ export default function CompactReactionBar({
               disabled={!canReact}
               hitSlop={4}
             >
-              <ReactionIcon type={type} size={14} active={active} />
-              {count > 0 ? (
-                <Text style={[styles.count, active && styles.countActive]}>{count}</Text>
-              ) : null}
+              <Text
+                style={[styles.emoji, isPair && styles.emojiPair]}
+                allowFontScaling={false}
+              >
+                {emoji}
+              </Text>
+              {count > 0 ? <Text style={styles.count}>{count}</Text> : null}
             </Pressable>
           );
         })}
@@ -111,11 +114,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 8,
-    minHeight: 26,
+    minHeight: 24,
   },
   footerTime: {
     color: '#71717a',
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: 'Gilroy-Regular',
     flexShrink: 0,
   },
@@ -123,37 +126,41 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    gap: 4,
+    gap: 5,
     flex: 1,
     flexWrap: 'wrap',
   },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 2,
-    paddingHorizontal: 6,
-    paddingVertical: 3,
+    justifyContent: 'center',
+    gap: 3,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
     borderRadius: 12,
-    borderWidth: 1,
+    minHeight: 28,
     overflow: 'visible',
   },
   chipIdle: {
-    borderColor: 'rgba(255,255,255,0.1)',
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    opacity: 0.55,
+    backgroundColor: 'rgba(255,255,255,0.08)',
   },
   chipActive: {
-    borderColor: 'rgba(250, 47, 64, 0.55)',
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    opacity: 1,
+    backgroundColor: '#fa2f40',
+  },
+  emoji: {
+    fontSize: 14,
+    lineHeight: 16,
+    textAlign: 'center',
+    includeFontPadding: false,
+  },
+  emojiPair: {
+    fontSize: 12,
+    letterSpacing: -2,
   },
   count: {
-    color: 'rgba(255,255,255,0.65)',
-    fontSize: 10,
+    color: '#fff',
+    fontSize: 11,
     fontFamily: 'Gilroy-Bold',
     minWidth: 8,
-  },
-  countActive: {
-    color: '#fa2f40',
   },
 });

@@ -94,7 +94,7 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
           <CachedAvatar
             playerId={playerId || ''}
             fallbackAvatarUrl={playerAvatar}
-            size={50}
+            size={44}
             style={styles.playerAvatar}
           />
         ) : (
@@ -148,9 +148,9 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
 
 const styles = StyleSheet.create({
     containerBlur: {
-    borderRadius: 16,
+    borderRadius: 14,
     marginHorizontal: 16,
-    marginVertical: 6,
+    marginVertical: 4,
     overflow: 'hidden',
     ...platformCardShadow({
       shadowColor: '#000',
@@ -164,20 +164,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#1c1c21',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.06)',
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 14,
+    padding: 12,
   },
   bodyRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
   avatarContainer: {
-    marginRight: 12,
+    marginRight: 10,
   },
   avatarPlaceholder: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: 'rgba(255, 68, 68, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -188,10 +188,10 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 5,
   },
   playerName: {
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: 'Gilroy-Bold',
     color: '#fff',
     flex: 1,
@@ -203,16 +203,16 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   changesContainer: {
-    gap: 4,
+    gap: 2,
   },
   changeItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 2,
+    paddingVertical: 1,
   },
   fieldName: {
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: 'Gilroy-Regular',
     color: '#d4d4d8',
     flex: 1,
@@ -246,9 +246,9 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   playerAvatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
   },
 });
 

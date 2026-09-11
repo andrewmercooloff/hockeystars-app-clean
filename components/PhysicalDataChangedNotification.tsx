@@ -67,7 +67,7 @@ const PhysicalDataChangedNotification = React.memo(function PhysicalDataChangedN
         <CachedAvatar
           playerId={playerId}
           fallbackAvatarUrl={playerAvatar}
-          size={50}
+          size={44}
           style={styles.playerAvatar}
         />
       </View>
@@ -124,18 +124,18 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   avatarContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 10,
   },
   playerAvatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
   },
   contentContainer: {
     flex: 1,
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   },
   playerName: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: 'Gilroy-Bold',
     flex: 1,
   },
@@ -158,13 +158,13 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   changesContainer: {
-    gap: 8,
+    gap: 4,
   },
   changeItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 4,
+    paddingVertical: 2,
   },
   actionText: {
     color: '#d4d4d8',
