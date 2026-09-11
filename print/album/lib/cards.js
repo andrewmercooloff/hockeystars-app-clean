@@ -96,7 +96,7 @@ function cardCss(size) {
 .card.back table{position:absolute;left:${pad}mm;right:${pad}mm;top:${(B + 59 * s).toFixed(2)}mm;width:calc(100% - ${pad * 2}mm);border-collapse:collapse;font-size:${mm(2.9)};}
 .card.back td{padding:${mm(0.45)} 0;border-bottom:.2mm solid rgba(255,255,255,.18);line-height:1.15;}
 .card.back td:first-child{font-family:'Roboto';font-weight:400;text-transform:uppercase;letter-spacing:.1em;font-size:${mm(2.4)};color:rgba(255,255,255,.7);}
-.card.back td:last-child{text-align:right;font-family:'Fira Sans Extra Condensed';font-weight:600;font-size:${mm(3.4)};}
+.card.back td:last-child{text-align:right;font-family:'Fira Sans Extra Condensed';font-weight:600;font-size:${mm(3.4)};max-width:58%;vertical-align:top;}
 /* team card: logo header on the light strip, full-width team photo below it, info block shifted down */
 .card.back.team.person .photo{height:${(B + 51 * s).toFixed(2)}mm;clip-path:polygon(0 0,100% 0,100% ${(B + 43.4 * s).toFixed(2)}mm,0 ${(B + 49 * s).toFixed(2)}mm);}
 .card.back.team.person .photo img{top:0 !important;height:100% !important;width:100% !important;left:0 !important;object-fit:cover;object-position:center center;}
@@ -187,6 +187,16 @@ function backLogoSide(card) {
   return 'left';
 }
 
+// Long values on the back (e.g. «Администратор ХК «Добрыня»») must wrap — right-aligned single line clips the start.
+function backValStyle(value, scale) {
+  const len = String(value).length;
+  let fs = 3.4 * scale;
+  if (len > 22) fs = 2.45 * scale;
+  else if (len > 16) fs = 2.85 * scale;
+  const wrap = len > 16 ? 'white-space:normal;line-height:1.18;' : '';
+  return `font-size:${fs.toFixed(2)}mm;${wrap}`;
+}
+
 function cardBack(card, data) {
   const t = data.team;
   const total = data.cards.length;
@@ -221,7 +231,7 @@ function cardBack(card, data) {
     <div class="who">
       <div class="nm" style="font-size:${nameSize}">${card.number ? `<span>#${esc(card.number)}${card.role ? `<sup>${esc(card.role)}</sup>` : ''}</span>` : ''}${esc(card.surname).toUpperCase()}<br>${esc(card.name).toUpperCase()}</div>
     </div>
-    <table>${rows.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('')}</table>
+    <table>${rows.map(([k, v]) => `<tr><td>${esc(k)}</td><td style="${backValStyle(v, scale)}">${esc(v)}</td></tr>`).join('')}</table>
     <div class="foot">${data.team.cards?.brandOnBack === false ? '<span></span>' : `<img src="${data.brand.hockeystarsWhite}">`}<div class="idx"><b>${card.index}</b> / ${total}</div></div>
   </div>`;
 }
