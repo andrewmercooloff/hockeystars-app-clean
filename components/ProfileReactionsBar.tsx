@@ -103,22 +103,22 @@ export default function ProfileReactionsBar({
 const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
-    alignSelf: 'stretch',
-    width: '100%',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 6,
     marginTop: 8,
     marginBottom: 2,
   },
   chip: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 4,
-    paddingHorizontal: 4,
-    paddingVertical: 7,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
     borderRadius: 14,
-    minHeight: 34,
+    minHeight: 32,
     overflow: 'visible',
   },
   chipIdle: {
