@@ -8,15 +8,34 @@ export function getPhotoTileSize(screenWidth = Dimensions.get('window').width) {
   return { width, height };
 }
 
-/** Video cards: same height as photos on desktop; comfortable 16:9 on mobile. */
-export function getVideoTileSize(
+/** Video carousel tile height (width follows media aspect ratio). */
+export function getVideoTileHeight(
   screenWidth = Dimensions.get('window').width,
   isDesktop = screenWidth >= DESKTOP_LAYOUT_MIN_WIDTH,
 ) {
   if (isDesktop) {
-    const { height } = getPhotoTileSize(screenWidth);
-    return { width: Math.round(height * (16 / 9)), height };
+    return getPhotoTileSize(screenWidth).height;
   }
   const width = Math.min(Math.round(screenWidth * 0.72), 320);
-  return { width, height: Math.round(width * (9 / 16)) };
+  return Math.round(width * (9 / 16));
+}
+
+/** Width from fixed height and aspect ratio — previews are not cropped. */
+export function widthForAspectHeight(
+  aspectRatio: number,
+  height: number,
+  minWidth = 72,
+  maxWidth = 320,
+) {
+  const safe = aspectRatio > 0.05 && aspectRatio < 20 ? aspectRatio : 1;
+  return Math.min(maxWidth, Math.max(minWidth, Math.round(height * safe)));
+}
+
+/** @deprecated Prefer getVideoTileHeight + widthForAspectHeight */
+export function getVideoTileSize(
+  screenWidth = Dimensions.get('window').width,
+  isDesktop = screenWidth >= DESKTOP_LAYOUT_MIN_WIDTH,
+) {
+  const height = getVideoTileHeight(screenWidth, isDesktop);
+  return { width: Math.round(height * (16 / 9)), height };
 }

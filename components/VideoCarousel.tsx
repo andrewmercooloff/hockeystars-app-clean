@@ -18,13 +18,71 @@ import LikeButton from './LikeButton';
 import HorizontalScrollWithArrows from './HorizontalScrollWithArrows';
 import { generateVideoContentId } from '../utils/likesService';
 import { getVideoThumbnailUrl } from '../utils/videoUrls';
-import { getVideoTileSize } from '../utils/mediaTileSize';
+import { getVideoTileHeight, widthForAspectHeight } from '../utils/mediaTileSize';
 import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
 import { rewriteSupabasePublicUrl } from '../utils/supabase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as FileSystem from 'expo-file-system/legacy';
 
 // Кеш для успешных форматов превью (чтобы не перебирать форматы каждый раз)
 const thumbnailFormatCache = new Map<string, number>();
 const generatedThumbCache = new Map<string, string>();
+
+/** Кадры, снятые на устройстве для роликов без серверного превью — переживают перезапуск. */
+const GENERATED_THUMBS_KEY = 'hs_video_thumbs_v1';
+let generatedThumbsLoaded: Promise<void> | null = null;
+const loadGeneratedThumbs = () => {
+  if (!generatedThumbsLoaded) {
+    generatedThumbsLoaded = AsyncStorage.getItem(GENERATED_THUMBS_KEY)
+      .then((raw) => {
+        if (!raw) return;
+        for (const [url, uri] of Object.entries(JSON.parse(raw) as Record<string, string>)) {
+          if (!generatedThumbCache.has(url)) generatedThumbCache.set(url, uri);
+        }
+      })
+      .catch(() => {});
+  }
+  return generatedThumbsLoaded;
+};
+if (Platform.OS !== 'web') void loadGeneratedThumbs();
+const rememberGeneratedThumb = (url: string, uri: string) => {
+  generatedThumbCache.set(url, uri);
+  if (Platform.OS === 'web') return;
+  const persisted: Record<string, string> = {};
+  generatedThumbCache.forEach((v, k) => {
+    if (!v.startsWith('data:')) persisted[k] = v;
+  });
+  AsyncStorage.setItem(GENERATED_THUMBS_KEY, JSON.stringify(persisted)).catch(() => {});
+};
+
+const nativeThumbInFlight = new Map<string, Promise<string | null>>();
+/** Native: снять кадр прямо из удалённого mp4 (expo-video-thumbnails умеет по URL), сохранить в кэш-папку. */
+const captureNativeVideoFrame = (videoUrl: string): Promise<string | null> => {
+  const existing = nativeThumbInFlight.get(videoUrl);
+  if (existing) return existing;
+  const task = (async () => {
+    try {
+      const VideoThumbnails = await import('expo-video-thumbnails');
+      const { uri } = await VideoThumbnails.getThumbnailAsync(videoUrl, { time: 800, quality: 0.6 });
+      const dir = FileSystem.cacheDirectory;
+      if (!dir) return uri;
+      const stable = `${dir}vthumb_${Math.abs(hashString(videoUrl))}.jpg`;
+      await FileSystem.copyAsync({ from: uri, to: stable }).catch(() => {});
+      return stable;
+    } catch {
+      return null;
+    } finally {
+      nativeThumbInFlight.delete(videoUrl);
+    }
+  })();
+  nativeThumbInFlight.set(videoUrl, task);
+  return task;
+};
+const hashString = (s: string): number => {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return h;
+};
 
 function captureWebVideoFrame(videoUrl: string): Promise<string | null> {
   if (Platform.OS !== 'web' || typeof document === 'undefined') {
@@ -97,7 +155,13 @@ function captureWebVideoFrame(videoUrl: string): Promise<string | null> {
 }
 
 /** Thumbnail для прямых mp4 — серверное `_thumb.jpg`, на web fallback кадр из video. */
-export const DirectVideoThumbnail = React.memo(function DirectVideoThumbnail({ videoUrl }: { videoUrl: string }) {
+export const DirectVideoThumbnail = React.memo(function DirectVideoThumbnail({
+  videoUrl,
+  onAspectRatio,
+}: {
+  videoUrl: string;
+  onAspectRatio?: (ratio: number) => void;
+}) {
   const resolvedUrl = rewriteSupabasePublicUrl(videoUrl) || videoUrl;
   const serverThumb = getVideoThumbnailUrl(resolvedUrl);
   const [serverThumbFailed, setServerThumbFailed] = React.useState(false);
@@ -121,36 +185,62 @@ export const DirectVideoThumbnail = React.memo(function DirectVideoThumbnail({ v
     setDisplayUri(null);
   }, [resolvedUrl, serverThumb, serverThumbFailed]);
 
+  // Нет серверного превью — снимаем кадр сами (web: canvas, native: expo-video-thumbnails)
+  // и на native дозагружаем его в бакет, чтобы у остальных превью пришло с сервера.
   React.useEffect(() => {
-    if (displayUri || Platform.OS !== 'web') return;
+    if (displayUri) return;
+    if (serverThumb && !serverThumbFailed) return;
     let cancelled = false;
     void (async () => {
-      const frame = await captureWebVideoFrame(resolvedUrl);
+      if (Platform.OS !== 'web') await loadGeneratedThumbs();
+      if (cancelled) return;
+      const cached = generatedThumbCache.get(resolvedUrl);
+      if (cached) {
+        setDisplayUri(cached);
+        return;
+      }
+      const frame =
+        Platform.OS === 'web'
+          ? await captureWebVideoFrame(resolvedUrl)
+          : await captureNativeVideoFrame(resolvedUrl);
       if (cancelled || !frame) return;
-      generatedThumbCache.set(resolvedUrl, frame);
+      rememberGeneratedThumb(resolvedUrl, frame);
       setDisplayUri(frame);
+      if (Platform.OS !== 'web' && serverThumb) {
+        const { backfillVideoThumbnail } = await import('../utils/uploadImage');
+        void backfillVideoThumbnail(resolvedUrl, frame);
+      }
     })();
     return () => {
       cancelled = true;
     };
-  }, [displayUri, resolvedUrl]);
+  }, [displayUri, resolvedUrl, serverThumb, serverThumbFailed]);
 
   const handleImageError = React.useCallback(() => {
     if (serverThumb && displayUri === serverThumb) {
       setServerThumbFailed(true);
+    } else if (displayUri && generatedThumbCache.get(resolvedUrl) === displayUri) {
+      // локальный файл кэша вычищен системой — снимем кадр заново
+      generatedThumbCache.delete(resolvedUrl);
     }
     setDisplayUri(null);
-  }, [displayUri, serverThumb]);
+  }, [displayUri, serverThumb, resolvedUrl]);
 
   if (displayUri) {
     return (
       <ExpoImage
         source={{ uri: displayUri }}
         style={StyleSheet.absoluteFillObject}
-        contentFit="cover"
+        contentFit="contain"
         cachePolicy="memory-disk"
         transition={150}
         onError={handleImageError}
+        onLoad={(event) => {
+          const { width, height } = event.source;
+          if (width > 0 && height > 0) {
+            onAspectRatio?.(width / height);
+          }
+        }}
       />
     );
   }
@@ -162,7 +252,13 @@ export const DirectVideoThumbnail = React.memo(function DirectVideoThumbnail({ v
   );
 });
 
-export const VideoPreviewThumbnail = React.memo(function VideoPreviewThumbnail({ videoUrl }: { videoUrl: string }) {
+export const VideoPreviewThumbnail = React.memo(function VideoPreviewThumbnail({
+  videoUrl,
+  onAspectRatio,
+}: {
+  videoUrl: string;
+  onAspectRatio?: (ratio: number) => void;
+}) {
   const [vkThumbnailUrl, setVkThumbnailUrl] = React.useState<string | null>(null);
   const [vkThumbnailError, setVkThumbnailError] = React.useState(false);
 
@@ -281,7 +377,7 @@ export const VideoPreviewThumbnail = React.memo(function VideoPreviewThumbnail({
   }, [vkVideoId, videoUrl, vkThumbnailUrl, vkThumbnailError]);
 
   if (!isYouTubeUrl(videoUrl) && !isVkUrl(videoUrl)) {
-    return <DirectVideoThumbnail videoUrl={videoUrl} />;
+    return <DirectVideoThumbnail videoUrl={videoUrl} onAspectRatio={onAspectRatio} />;
   }
 
   if (isYouTubeUrl(videoUrl) && youtubeVideoId) {
@@ -311,11 +407,17 @@ export const VideoPreviewThumbnail = React.memo(function VideoPreviewThumbnail({
       <ExpoImage
         source={{ uri: currentThumbnail }}
         style={StyleSheet.absoluteFillObject}
-        contentFit="cover"
+        contentFit="contain"
         cachePolicy="memory-disk"
         transition={100}
         onError={handleError}
-        onLoad={handleLoad}
+        onLoad={(event) => {
+          handleLoad();
+          const { width, height } = event.source;
+          if (width > 0 && height > 0) {
+            onAspectRatio?.(width / height);
+          }
+        }}
       />
     );
   }
@@ -327,9 +429,15 @@ export const VideoPreviewThumbnail = React.memo(function VideoPreviewThumbnail({
           <ExpoImage
             source={{ uri: vkThumbnailUrl }}
             style={StyleSheet.absoluteFillObject}
-            contentFit="cover"
+            contentFit="contain"
             cachePolicy="memory-disk"
             onError={() => setVkThumbnailError(true)}
+            onLoad={(event) => {
+              const { width, height } = event.source;
+              if (width > 0 && height > 0) {
+                onAspectRatio?.(width / height);
+              }
+            }}
           />
           <View style={styles.vkPlayOverlay}>
             <Ionicons name="play-circle" size={48} color="#fff" />
@@ -384,8 +492,8 @@ type VideoCarouselCardProps = {
   video: { url: string; timeCode?: string };
   playerId?: string;
   effectiveRefreshTrigger: number;
-  cardWidth: number;
   cardHeight: number;
+  cardMaxWidth: number;
   onPress: (video: { url: string; timeCode?: string }) => void;
 };
 
@@ -393,18 +501,21 @@ const VideoCarouselCard = React.memo(function VideoCarouselCard({
   video,
   playerId,
   effectiveRefreshTrigger,
-  cardWidth,
   cardHeight,
+  cardMaxWidth,
   onPress,
 }: VideoCarouselCardProps) {
   const contentId = generateVideoContentId(video.url, video.timeCode);
+  const [aspectRatio, setAspectRatio] = useState(16 / 9);
+  const cardWidth = widthForAspectHeight(aspectRatio, cardHeight, 100, cardMaxWidth);
+
   return (
     <TouchableOpacity
       style={[styles.videoCard, { width: cardWidth, height: cardHeight }]}
       onPress={() => onPress(video)}
       activeOpacity={0.85}
     >
-      <VideoPreviewThumbnail videoUrl={video.url} />
+      <VideoPreviewThumbnail videoUrl={video.url} onAspectRatio={setAspectRatio} />
       <View style={styles.playButton}>
         <Ionicons name="play-circle" size={40} color="#fa2f40" />
       </View>
@@ -431,13 +542,36 @@ const VideoCarouselCard = React.memo(function VideoCarouselCard({
 export default function VideoCarousel({ videos, onVideoPress, playerId, externalRefreshTrigger = 0 }: VideoCarouselProps) {
   const { t } = useLanguage();
   const isDesktop = useIsDesktopLayout();
-  const { width: cardWidth, height: cardHeight } = useMemo(
-    () => getVideoTileSize(screenWidth, isDesktop),
-    [isDesktop],
+  const cardHeight = useMemo(() => getVideoTileHeight(screenWidth, isDesktop), [isDesktop]);
+  const cardMaxWidth = useMemo(
+    () => Math.min(Math.round(screenWidth * 0.82), 360),
+    [screenWidth]
+  );
+  const scrollStep = useMemo(
+    () => widthForAspectHeight(16 / 9, cardHeight, 100, cardMaxWidth) + 16,
+    [cardHeight, cardMaxWidth]
   );
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; timeCode?: string } | null>(null);
+  const [videoExpanded, setVideoExpanded] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [likeRefreshTrigger, setLikeRefreshTrigger] = useState(0);
+  const videoFullscreenLabel =
+    t('videoNotification.fullScreen') !== 'videoNotification.fullScreen'
+      ? t('videoNotification.fullScreen')
+      : t('profile.fullScreen') !== 'profile.fullScreen'
+        ? t('profile.fullScreen')
+        : 'Full screen';
+
+  // Греем серверные превью всех роликов сразу — карусель не ждёт каждую картинку по очереди
+  useEffect(() => {
+    videos.forEach((v) => {
+      const resolved = rewriteSupabasePublicUrl(v.url) || v.url;
+      const thumb = getVideoThumbnailUrl(resolved);
+      if (thumb && !generatedThumbCache.has(resolved)) {
+        ExpoImage.prefetch(thumb, { cachePolicy: 'memory-disk' }).catch(() => {});
+      }
+    });
+  }, [videos]);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -466,6 +600,7 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
 
   const closeModal = useCallback(() => {
     setSelectedVideo(null);
+    setVideoExpanded(false);
     setLikeRefreshTrigger((prev) => prev + 1);
   }, []);
 
@@ -487,11 +622,10 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
     <View style={styles.container}>
       <HorizontalScrollWithArrows
         contentContainerStyle={styles.scrollContainer}
-        scrollStep={cardWidth + 16}
+        scrollStep={scrollStep}
         onScroll={(event) => {
           const contentOffset = event.nativeEvent.contentOffset.x;
-          const step = cardWidth + 16;
-          setCurrentIndex(Math.round(contentOffset / step));
+          setCurrentIndex(Math.round(contentOffset / scrollStep));
         }}
         scrollEventThrottle={16}
         removeClippedSubviews={true}
@@ -503,8 +637,8 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
             video={video}
             playerId={playerId}
             effectiveRefreshTrigger={effectiveRefreshTrigger}
-            cardWidth={cardWidth}
             cardHeight={cardHeight}
+            cardMaxWidth={cardMaxWidth}
             onPress={handleVideoPress}
           />
         ))}
@@ -525,27 +659,43 @@ export default function VideoCarousel({ videos, onVideoPress, playerId, external
         visible={selectedVideo !== null}
         animationType="fade"
         transparent={true}
-        onRequestClose={closeModal}
+        statusBarTranslucent
+        onRequestClose={videoExpanded ? () => setVideoExpanded(false) : closeModal}
       >
-        <TouchableWithoutFeedback onPress={closeModal}>
-          <View style={styles.modalOverlay} {...panResponder.panHandlers}>
-            <View style={styles.modalContent} pointerEvents="box-none">
-              <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
-                <Ionicons name="close" size={24} color="#fff" />
-              </TouchableOpacity>
-              {selectedVideo && (
-                <View pointerEvents="box-none">
-                  <VideoPlayer
-                    key={`${selectedVideo.url}-${selectedVideo.timeCode || ''}`}
-                    url={selectedVideo.url}
-                    timeCode={selectedVideo.timeCode}
-                    autoPlay
-                  />
-                </View>
-              )}
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
+        <View style={styles.modalOverlay} {...(videoExpanded ? {} : panResponder.panHandlers)}>
+          {!videoExpanded && (
+            <TouchableWithoutFeedback onPress={closeModal}>
+              <View style={styles.modalBackdrop} />
+            </TouchableWithoutFeedback>
+          )}
+          {selectedVideo && (
+            videoExpanded ? (
+              <View style={styles.fullscreenPlayerWrap}>
+                <VideoPlayer
+                  key={`${selectedVideo.url}-${selectedVideo.timeCode || ''}-fs`}
+                  url={selectedVideo.url}
+                  timeCode={selectedVideo.timeCode}
+                  autoPlay
+                  fullscreen
+                  onClose={() => setVideoExpanded(false)}
+                />
+              </View>
+            ) : (
+              <View pointerEvents="box-none" style={styles.modalPlayerWrap}>
+                <VideoPlayer
+                  key={`${selectedVideo.url}-${selectedVideo.timeCode || ''}`}
+                  url={selectedVideo.url}
+                  timeCode={selectedVideo.timeCode}
+                  autoPlay
+                  layoutMode="modal"
+                  onClose={closeModal}
+                  onRequestFullscreen={() => setVideoExpanded(true)}
+                  fullscreenButtonLabel={videoFullscreenLabel}
+                />
+              </View>
+            )
+          )}
+        </View>
       </Modal>
     </View>
   );
@@ -566,6 +716,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(250, 47, 64, 0.2)',
     overflow: 'hidden',
     position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   thumbnail: {
     width: '100%',
@@ -615,22 +767,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  modalContent: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#000',
-    position: 'relative',
-    justifyContent: 'center',
-    alignItems: 'center',
+  modalBackdrop: {
+    ...StyleSheet.absoluteFillObject,
   },
-  closeButton: {
-    position: 'absolute',
-    top: 20,
-    right: 10,
-    zIndex: 1000,
-    backgroundColor: 'rgba(22, 22, 26, 0.78)',
-    borderRadius: 20,
-    padding: 8,
+  modalPlayerWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fullscreenPlayerWrap: {
+    flex: 1,
+    width: '100%',
   },
   carouselIndicator: {
     flexDirection: 'row',

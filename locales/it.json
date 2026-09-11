@@ -28,7 +28,11 @@
     "left": "Sinistra",
     "right": "Giusto",
     "offline": "Nessuna connessione",
-    "and": "e"
+    "and": "e",
+    "info": "Info",
+    "continue": "Continua",
+    "retry": "Riprova",
+    "warning": "Attenzione"
   },
   "winger": "Ala",
   "center": "Centravanti",
@@ -56,7 +60,9 @@
   },
   "achievementNotification": {
     "added": "aggiunto",
-    "oneAchievement": "nuovo risultato"
+    "oneAchievement": "nuovo risultato",
+    "multipleAchievements": "{count} nuovi traguardi",
+    "received": "ha ricevuto"
   },
   "friendshipNotification": {
     "title": "Nuova amicizia",
@@ -201,7 +207,9 @@
       "saveError": "Impossibile contrassegnare l'esercizio come completato",
       "generalError": "Si è verificato un errore durante il salvataggio",
       "times": "una volta",
-      "timesPlural": "volte"
+      "timesPlural": "volte",
+      "loginRequired": "Accedi per completare gli esercizi",
+      "title": "Esercizio"
     },
     "difficulty": {
       "Начинающий": "Inizio",
@@ -3092,7 +3100,8 @@
       "Intermediate": "Intermedio",
       "Advanced": "Avanzato",
       "Easy": "Facile"
-    }
+    },
+    "timesPlural": "volte"
   },
   "items": {
     "autograph": "autografo",
@@ -3186,7 +3195,13 @@
     "errorProcessFriendRequest": "Impossibile elaborare la tua richiesta di amicizia.",
     "errorProcessRequest": "Impossibile elaborare la tua richiesta",
     "errorSendMessage": "Impossibile inviare il messaggio",
-    "phoneOrEmailPlaceholderShort": "+39… o email"
+    "phoneOrEmailPlaceholderShort": "+39… o email",
+    "email": "Email",
+    "errorSwitchingToEmail": "Impossibile passare all’accesso via email",
+    "smsRateLimited": "Un codice è già stato inviato a questo numero meno di un minuto fa. Inseriscilo o richiedine uno nuovo al termine del timer.",
+    "smsServerUnreachable": "Server HockeyStars non raggiungibile. Controlla la connessione (una VPN può bloccare) e tocca «Invia di nuovo».",
+    "smsEmailOnly": "Per USA e Canada accedi con l'e-mail.",
+    "smsProviderFailed": "L'operatore non ha accettato l'SMS. Controlla il numero o riprova tra un minuto."
   },
   "profile": {
     "addFriend": "Aggiungi come amico",
@@ -3480,7 +3495,34 @@
     "city": "Città",
     "addAddress": "Aggiungi indirizzo",
     "addressesHint": "Puoi inserire più indirizzi",
-    "previousSeason": "Previous season"
+    "previousSeason": "Previous season",
+    "cover": "Copertina",
+    "changeCover": "Cambia copertina",
+    "removeCover": "Rimuovi copertina",
+    "teamLogo": "Logo della squadra",
+    "uploadTeamLogo": "Carica il logo",
+    "coverUpdated": "Copertina aggiornata",
+    "teamLogoUpdated": "Logo della squadra aggiornato",
+    "coverUploadFailed": "Caricamento dell’immagine non riuscito",
+    "scoutPrivacyNote": "Gli altri utenti non vedranno la tua foto né il tuo nome: per loro sei “Scout”.",
+    "positionCover": "Posiziona la copertina",
+    "positionCoverHint": "Trascina con un dito, pizzica per ingrandire finché l’inquadratura non è giusta",
+    "allTime": "Totale carriera",
+    "seasonsCount": "{count} stagioni",
+    "currentSeasonHint": "Stagione corrente",
+    "fullScreen": "Schermo intero",
+    "heightWithUnit": "Altezza (cm)",
+    "noPermission": "Nessun accesso alla galleria",
+    "playerNumber": "Numero del giocatore",
+    "playerNumberPlaceholder": "Numero sulla maglia",
+    "savedToGallery": "Salvato nella galleria",
+    "selectBirthDate": "Scegli la data di nascita",
+    "shareError": "Errore nella creazione dell'immagine",
+    "skateServices": "Servizi",
+    "weightWithUnit": "Peso (kg)",
+    "videoUploaded": "Video aggiunto al profilo",
+    "videoUploadSaveReminder": "Video caricato. Tocca «Salva» per mantenerlo nel profilo.",
+    "removeFromFriendsConfirm": "Rimuovere {name} dagli amici?"
   },
   "register": {
     "title": "Registrazione",
@@ -3531,7 +3573,32 @@
     "fillRequiredFields": "Si prega di compilare tutti i campi obbligatori",
     "fillAllFields": "Si prega di compilare tutti i campi",
     "phoneFormatError": "Si prega di inserire un numero di telefono valido con il codice paese (es. +1234567890)",
-    "parentEmailFormatError": "Si prega di inserire un'email genitore valida"
+    "parentEmailFormatError": "Si prega di inserire un'email genitore valida",
+    "scoutPrivacyNote": "Foto e nome dello scout non sono visibili agli altri: appari come “Scout”.",
+    "emailFormatError": "Inserisci un indirizzo email valido",
+    "registrationFailed": "Registrazione non riuscita",
+    "detailsHint": "Facoltativo: numero, impugnatura, altezza e peso aiutano scout e amici a trovarti. Puoi compilarli più tardi nel profilo.",
+    "skipForNow": "Salta per ora",
+    "parentEmailSendFailed": "Impossibile inviare l'e-mail al genitore. Controlla l'indirizzo e riprova più tardi.",
+    "step": {
+      "contact": "Passo 1 · Contatto",
+      "code": "Passo 2 · Conferma",
+      "profile": "Passo 1 · Profilo",
+      "details": "Passo 2 · Dati giocatore"
+    },
+    "currentTeam": "Squadra attuale",
+    "currentTeamHint": "Compagni, copertina e pagina della squadra sono collegati tramite essa. Digita per trovare una squadra esistente.",
+    "teamPlaceholder": "es. Dinamo Minsk 2012",
+    "teamWillBeCreated": "Questa squadra non esiste ancora — la creeremo per te.",
+    "consentByContinuing": "Toccando «Continua» accetti le",
+    "haveAccount": "Hai già un account?",
+    "signIn": "Accedi",
+    "entryTitle": "Sul ghiaccio",
+    "entrySubtitle": "Inserisci il numero di telefono. Ti faremo accedere o creeremo un account.",
+    "codeSubtitle": "Inserisci il codice ricevuto",
+    "whoAreYou": "Chi sei?",
+    "useEmailInstead": "Usa l'email",
+    "usePhoneInstead": "Usa il numero di telefono"
   },
   "navigation": {
     "home": "Casa",
@@ -3588,7 +3655,14 @@
     "errorCreatingUser": "Impossibile creare l'utente",
     "fillRequiredFields": "Si prega di compilare tutti i campi obbligatori.",
     "enterValidPhone": "Inserisci un numero di telefono valido con prefisso internazionale.",
-    "requiredForPlayers": "Per i giocatori e le stelle è obbligatorio indicare la data di nascita e la posizione"
+    "requiredForPlayers": "Per i giocatori e le stelle è obbligatorio indicare la data di nascita e la posizione",
+    "adminPanel": "Pannello admin",
+    "login": "Accedi",
+    "loginAsUser": "Accedi come utente",
+    "loginAsUserConfirm": "Vuoi davvero accedere come {name}?",
+    "loginAsUserError": "Accesso come utente non riuscito",
+    "loginAsUserSuccess": "Ora sei connesso come {name}",
+    "sendGift": "Invia regalo"
   },
   "museum": {
     "title": "Museo",
@@ -3769,7 +3843,8 @@
   "settings": {
     "title": "Impostazioni",
     "language": "Lingua",
-    "selectLanguage": "Seleziona la lingua"
+    "selectLanguage": "Seleziona la lingua",
+    "autoLanguage": "Auto"
   },
   "search": {
     "title": "Ricerca",
@@ -3793,9 +3868,13 @@
     "topBySV": "Top SV%",
     "shareRating": "Condividi classifica",
     "shareRatingFooter": "hockeystars.com",
+    "shareRatingSeason": "Stagione {season}",
     "ratingPointsLabel": "punti",
     "allCountries": "Tutti i paesi",
-    "allYears": "Tutti gli anni"
+    "allYears": "Tutti gli anni",
+    "filters": "Filtri",
+    "shareNewcomers": "Condividi nuovi iscritti",
+    "shareNewcomersCount": "{count} giocatori"
   },
   "messages": {
     "title": "Messaggi",
@@ -3810,7 +3889,8 @@
     "massSend": "Invio di massa",
     "recipients": "Destinatari",
     "typeMessage": "Scrivi un messaggio...",
-    "send": "Invia"
+    "send": "Invia",
+    "searchHistoryLoading": "Ricerca nella cronologia…"
   },
   "notifications": {
     "title": "Notifiche",
@@ -3846,6 +3926,14 @@
     },
     "photo_liked": {
       "grouped": "A {name} sono piaciute {count} tue foto"
+    },
+    "profile_reaction": {
+      "title": "Nuova reazione",
+      "messageGrouped": "{name} ha inviato {reactions}"
+    },
+    "activity_reaction": {
+      "title": "Reazione al tuo aggiornamento",
+      "message": "{name} ha reagito {emoji} al tuo aggiornamento"
     }
   },
   "editProfile": {
@@ -3925,7 +4013,9 @@
     "noFriendsToForward": "Nessun amico a cui inoltrare",
     "messageForwarded": "Messaggio inoltrato",
     "forwardedTo": "Inoltrato",
-    "forwardError": "Inoltro fallito"
+    "forwardError": "Inoltro fallito",
+    "user": "Utente",
+    "you": "Tu"
   },
   "createUser": {
     "title": "Creazione di un utente",
@@ -4072,7 +4162,24 @@
     "seconds": "secondo",
     "times": "una volta",
     "sprint": "100 metri piani",
-    "_cache_clear": "2024-01-16-9"
+    "_cache_clear": "2024-01-16-9",
+    "customGift": "Chiedi un regalo",
+    "deleteGiftConfirm": "Vuoi davvero eliminare questo regalo?",
+    "errorGiftAlreadyExists": "Il giocatore {playerName} ha già questo regalo.\n\nScegli un altro regalo o creane uno nuovo.",
+    "errorGiftNotDeleted": "Il regalo non è stato eliminato",
+    "errorGiftNotFound": "Regalo non trovato",
+    "errorPermissionDenied": "Non hai i permessi per eliminare questo regalo",
+    "errorSelectOrCreate": "Scegli un regalo o creane uno nuovo",
+    "errorSendingGift": "Impossibile inviare il regalo",
+    "fromAdmin": "Admin",
+    "fromStar": "da {starName}",
+    "giftReceived": "Regalo ricevuto!",
+    "giftReceivedFromAdmin": "Hai ricevuto un regalo dall'admin: {giftName}",
+    "giftReceivedFromAdminPush": "Hai ricevuto un regalo dall'admin: {giftName}",
+    "giftReceivedFromStar": "Hai ricevuto un regalo da {starName}: {giftName}",
+    "giftReceivedFromStarPush": "Hai ricevuto un regalo da {starName}: {giftName}",
+    "giftReceivedPush": "🎁 Regalo ricevuto!",
+    "successGiftSent": "Regalo inviato a {playerName}!"
   },
   "TEMP_DELETE_ME": {
     "title": "Standard",
@@ -4243,7 +4350,13 @@
     "deleteError": "Errore",
     "deleteErrorMessage": "Impossibile eliminare il record",
     "speedExceedsLimit": "La velocità supera i 120 km/h, la misurazione non viene conteggiata",
-    "needMicrophone": "Accesso al microfono richiesto"
+    "needMicrophone": "Accesso al microfono richiesto",
+    "micPosition": {
+      "label": "Dove si trova il telefono",
+      "shooter": "Vicino al tiratore",
+      "middle": "A metà",
+      "target": "Vicino alla balaustra"
+    }
   },
   "logout": "Uscita",
   "logoutConfirm": "Esci dal tuo profilo",
@@ -4288,5 +4401,46 @@
     "scanQr": "Scansiona con il telefono — si apre App Store o Google Play",
     "appStoreCta": "Scarica dall'App Store",
     "playStoreCta": "Scarica da Google Play"
+  },
+  "videoNotification": {
+    "fullScreen": "Schermo intero",
+    "added": "ha aggiunto",
+    "multipleVideos": "{count} nuovi video",
+    "oneVideo": "nuovo video"
+  },
+  "coverNotification": {
+    "title": "Nuova copertina",
+    "changed": "ha aggiornato la copertina del profilo"
+  },
+  "ota": {
+    "resurfacing": "Rifacimento del ghiaccio…",
+    "updating": "Installazione dell'aggiornamento",
+    "updated": "Ghiaccio nuovo — app aggiornata"
+  },
+  "avatarNotification": {
+    "changed": "ha cambiato l'avatar"
+  },
+  "cm": "cm",
+  "height": "altezza",
+  "kg": "kg",
+  "referral": {
+    "leaderboard": "Migliori invitanti",
+    "noInvites": "Nessuno ha ancora invitato amici",
+    "points": "punti"
+  },
+  "statsNotification": {
+    "physicalData": "dati fisici",
+    "updated": "ha aggiornato"
+  },
+  "weight": "peso",
+  "reactions": {
+    "respect": "rispetto",
+    "like": "mi piace",
+    "strength": "forza",
+    "highFive": "dammi il cinque",
+    "fire": "fuoco",
+    "lightning": "fulmine",
+    "sendBack": "Rispondi",
+    "whoReacted": "Chi ha reagito"
   }
 }

@@ -1,14 +1,20 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import PressableScale from './PressableScale';
+
+const PuckTouchable: React.ComponentType<any> = Platform.OS === 'web' ? View : PressableScale;
 import { Image } from 'expo-image';
 import Animated from 'react-native-reanimated';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import CachedAvatar from './CachedAvatar';
 import LeaderShine from './LeaderShine';
+import Svg, { Circle } from 'react-native-svg';
 import { LEADER_BORDER_COLORS, LEADER_MEDAL_BORDER_WIDTH, type LeaderRank } from '../utils/leaderDisplay';
 
 export const PUCK_SCOUT_LOGO = require('../assets/images/scout.png');
+/** Event puck faces: pre-rendered artwork (matte disc, brand red, wordmark along the edge). */
+const PUCK_FACE_STAR_GOAL = require('../assets/images/puck-star-goal.png');
+const PUCK_FACE_QUIZ = require('../assets/images/puck-quiz.png');
 
 interface PuckProps {
   avatar?: string | null;
@@ -24,6 +30,10 @@ interface PuckProps {
   leaderRank?: LeaderRank; // топ-1/2/3 лидер — медальная обводка
   /** Много шайб на экране (мини-игра): чуть легче тень на Android — меньше нагрузка на GPU. */
   denseScene?: boolean;
+  /** Аватар декодирован (или его нет / ошибка) — шайбу можно показывать без «чёрной дырки». */
+  onAvatarReady?: () => void;
+  /** Родитель (OriginalPuckAnimator) сам ловит pointer-события на web. */
+  suppressWebTap?: boolean;
 }
 
 const Puck: React.FC<PuckProps> = ({ 
@@ -39,8 +49,24 @@ const Puck: React.FC<PuckProps> = ({
   isNew = false,
   leaderRank,
   denseScene = false,
+  onAvatarReady,
+  suppressWebTap = false,
 }) => {
   const [imageError, setImageError] = useState(false);
+  const readyNotifiedRef = useRef(false);
+  const notifyAvatarReady = useCallback(() => {
+    if (readyNotifiedRef.current) return;
+    readyNotifiedRef.current = true;
+    onAvatarReady?.();
+  }, [onAvatarReady]);
+  const handleAvatarError = useCallback(() => {
+    setImageError(true);
+    notifyAvatarReady();
+  }, [notifyAvatarReady]);
+  const hasRemoteAvatar = !!avatar && !!playerId && status !== 'scout';
+  useEffect(() => {
+    if (!hasRemoteAvatar) notifyAvatarReady();
+  }, [hasRemoteAvatar, notifyAvatarReady]);
   const avatarCacheKey = useMemo(() => playerId ? `${playerId}-${avatar}` : avatar, [playerId, avatar]);
 
   // Анимация для тени на льду - отключена для лучшей производительности
@@ -109,6 +135,31 @@ const Puck: React.FC<PuckProps> = ({
 
   }, [avatar]);
 
+  // Web: шайба непрерывно движется под курсором/пальцем, и браузерный click (на него
+  // опирается Pressable RN-web) часто не рождается. Считаем тап сами по pointerdown/up:
+  // короткое нажатие с малым смещением. Состояние в ref, поэтому переживает перерисовки.
+  const tapStartRef = useRef<{ t: number; x: number; y: number } | null>(null);
+  const webTapProps = useMemo(() => {
+    if (Platform.OS !== 'web' || suppressWebTap) return null;
+    return {
+      onPointerDown: (e: any) => {
+        const ne = e?.nativeEvent || e || {};
+        tapStartRef.current = { t: Date.now(), x: ne.clientX ?? 0, y: ne.clientY ?? 0 };
+      },
+      onPointerUp: (e: any) => {
+        const start = tapStartRef.current;
+        tapStartRef.current = null;
+        if (!start) return;
+        const ne = e?.nativeEvent || e || {};
+        const dx = (ne.clientX ?? start.x) - start.x;
+        const dy = (ne.clientY ?? start.y) - start.y;
+        if (Date.now() - start.t < 500 && dx * dx + dy * dy < 24 * 24) {
+          onPress();
+        }
+      },
+    } as any;
+  }, [onPress, suppressWebTap]);
+
   return (
     <Animated.View
       style={[
@@ -118,10 +169,21 @@ const Puck: React.FC<PuckProps> = ({
           height: size,
           borderRadius: dimensions.borderRadius,
         },
-        Platform.OS === 'android' && denseScene ? { elevation: 2 } : null,
         animatedStyle,
       ]}
     >
+      {/* Диск и тень — SVG-круги: View с backgroundColor+borderRadius на Fabric первый кадр
+          рисуется квадратом («чёрные прямоугольники» при возврате на главную). */}
+      <Svg
+        pointerEvents="none"
+        style={styles.puckDisc}
+        width={size + 2}
+        height={size + 4}
+        viewBox={`0 0 ${size + 2} ${size + 4}`}
+      >
+        <Circle cx={size / 2 + 2} cy={size / 2 + 4} r={size / 2} fill="rgba(0,0,0,0.20)" />
+        <Circle cx={size / 2 + 1} cy={size / 2 + 1} r={size / 2 - 0.75} fill="#000000" stroke="#26262b" strokeWidth={1.5} />
+      </Svg>
       {/* Дополнительная тень на льду - отключена для производительности */}
       {/* <Animated.View style={[
         styles.iceShadow,
@@ -132,7 +194,10 @@ const Puck: React.FC<PuckProps> = ({
         animatedShadowStyle
       ]} /> */}
       
-      <PressableScale onPress={onPress} scaleTo={0.92} style={styles.puckTouchable}>
+      <PuckTouchable
+        {...(webTapProps ?? { onPress, scaleTo: 0.92 })}
+        style={PUCK_TOUCHABLE_STYLE}
+      >
         {leaderRank != null ? (
           <>
             <View
@@ -173,7 +238,8 @@ const Puck: React.FC<PuckProps> = ({
               style={{
                 borderRadius: dimensions.avatarBorderRadius - 2,
               }}
-              onError={() => setImageError(true)}
+              onLoad={notifyAvatarReady}
+              onError={handleAvatarError}
             />
           </View>
         ) : status === 'scout' ? (
@@ -200,42 +266,34 @@ const Puck: React.FC<PuckProps> = ({
               cachePolicy="memory-disk"
             />
           </View>
-        ) : status === 'quizGame' ? (
-          <View style={[
-            styles.avatarPlaceholder,
-            {
+        ) : status === 'quizGame' || status === 'game' ? (
+          <View
+            style={{
               width: dimensions.avatarSize,
               height: dimensions.avatarSize,
               borderRadius: dimensions.avatarBorderRadius,
-              borderWidth: 2,
-              borderColor: avatarBorderColor,
               overflow: 'hidden',
-              backgroundColor: '#1a0a3e',
-            },
-          ]}>
-            <MaterialCommunityIcons
-              name="head-question-outline"
-              size={dimensions.iconSize * 1.2}
-              color="#d4c4ff"
+            }}
+          >
+            <Image
+              source={status === 'game' ? PUCK_FACE_STAR_GOAL : PUCK_FACE_QUIZ}
+              style={{ width: dimensions.avatarSize, height: dimensions.avatarSize }}
+              contentFit="cover"
+              transition={0}
+              cachePolicy="memory-disk"
             />
-          </View>
-        ) : status === 'game' ? (
-          <View style={[
-            styles.avatarPlaceholder,
-            {
-              width: dimensions.avatarSize,
-              height: dimensions.avatarSize,
-              borderRadius: dimensions.avatarBorderRadius,
-              borderWidth: 2,
-              borderColor: avatarBorderColor,
-              overflow: 'hidden',
-              backgroundColor: '#120810',
-            },
-          ]}>
-            <MaterialCommunityIcons
-              name="hockey-sticks"
-              size={dimensions.iconSize * 1.2}
-              color="#8EC8C8"
+            {/* Приглушаем логотипы игр: они не должны перебивать аватары игроков */}
+            <View
+              pointerEvents="none"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                borderRadius: dimensions.avatarBorderRadius,
+                backgroundColor: 'rgba(0, 0, 0, 0.32)',
+              }}
             />
           </View>
         ) : (
@@ -288,7 +346,7 @@ const Puck: React.FC<PuckProps> = ({
             <Text style={styles.pointsText}>{points}</Text>
           </View>
         )}
-      </PressableScale>
+      </PuckTouchable>
     </Animated.View>
   );
 };
@@ -298,49 +356,24 @@ const Puck: React.FC<PuckProps> = ({
 const styles = StyleSheet.create({
   puck: {
     position: 'absolute',
-    backgroundColor: '#000000',
+    backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
-    ...Platform.select({
-      ios: {
-        // Лёгкая тень - минимальный blur для производительности
-        shadowColor: '#000',
-        shadowOffset: { width: 2, height: 3 },
-        shadowOpacity: 0.4,
-        shadowRadius: 2, // Минимальный blur = меньше нагрузки на GPU
-      },
-      android: {
-        // elevation аппаратно ускорен на Android
-        elevation: 4,
-      },
-      web: {
-        boxShadow: '2px 3px 4px rgba(0, 0, 0, 0.4)',
-      },
-    }),
-    borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.75)',
+    // Без CALayer-тени и без elevation: обе рисуются прямоугольником на первых
+    // кадрах после монтирования (серые/чёрные "полосы"). Тень — отдельными View.
   },
   starPuck: {
     position: 'absolute',
-    backgroundColor: '#000000',
+    backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 2, height: 3 },
-        shadowOpacity: 0.4,
-        shadowRadius: 2,
-      },
-      android: {
-        elevation: 4,
-      },
-      web: {
-        boxShadow: '2px 3px 4px rgba(0, 0, 0, 0.4)',
-      },
-    }),
-    borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.75)',
+  },
+  // Лицевая сторона диска: чёрная резина, кромка почти чёрная (непрозрачный цвет —
+  // Fabric рисует рамку через CoreAnimation, без кадра "квадрат без скругления").
+  puckDisc: {
+    position: 'absolute',
+    top: -1,
+    left: -1,
   },
   puckTouchable: {
     width: '100%',
@@ -391,6 +424,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   // Лёгкая тень на льду (не используется в рендере, но оставлена для совместимости)
+  // Лёгкая тень на льду: чуть вниз, без объёма
   iceShadow: {
     position: 'absolute',
     bottom: -8,
@@ -421,5 +455,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+/** Stable reference: an inline array here would re-render PressableScale on every puck render. */
+const PUCK_TOUCHABLE_STYLE =
+  Platform.OS === 'web'
+    ? [styles.puckTouchable, { cursor: 'pointer' } as any]
+    : styles.puckTouchable;
 
 export default Puck; 

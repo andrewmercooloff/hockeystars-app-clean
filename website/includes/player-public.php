@@ -7,7 +7,7 @@ require_once __DIR__ . '/../config.php';
 
 /** Поля, безопасные для индексации и превью без регистрации */
 const HS_PLAYER_PUBLIC_SELECT =
-    'id,name,position,team,country,city,age,avatar,number,goals,assists,games,experience,grip,status,is_hidden,created_at,birth_date';
+    'id,name,position,team,country,city,age,avatar,number,goals,assists,games,experience,grip,status,is_hidden,created_at,birth_date,season_stats,achievements,height,weight,hockey_start_date,minutes,shots,saves';
 
 /** Расширенный публичный набор для быстрой гидрации SPA (без PII: email/phone) */
 const HS_PLAYER_BOOTSTRAP_SELECT =
@@ -74,6 +74,22 @@ function hs_slugify_latin(string $input): string
 function hs_supported_langs(): array
 {
     return ['ru', 'en', 'lt', 'lv', 'pl', 'sv', 'cs', 'sk', 'fi', 'it', 'de', 'fr'];
+}
+
+/**
+ * Языки, для которых у SEO-страницы есть НАСТОЯЩИЙ перевод текста.
+ * Остальные 10 языков рендерят русский текст — раздавать их Google как отдельные
+ * URL с hreflang = 12 дублей на игрока и размытый краулинговый бюджет.
+ */
+function hs_seo_langs(): array
+{
+    return ['ru', 'en'];
+}
+
+/** Язык для канонического URL: всё, что не переведено, схлопывается в ru. */
+function hs_seo_canonical_lang(string $lang): string
+{
+    return in_array($lang, hs_seo_langs(), true) ? $lang : 'ru';
 }
 
 function hs_normalize_lang(?string $lang): string
@@ -395,6 +411,30 @@ function hs_format_seo_team_names(array $teams, string $lang = 'ru'): string
     return implode(', ', $names);
 }
 
+/** Страны хранятся по-русски; на английской странице показываем английское название. */
+function hs_localize_country(?string $country, string $lang = 'ru'): string
+{
+    $raw = trim((string) $country);
+    if ($raw === '' || $lang === 'ru') {
+        return $raw;
+    }
+    $map = [
+        'Беларусь' => 'Belarus', 'Россия' => 'Russia', 'Казахстан' => 'Kazakhstan', 'США' => 'USA',
+        'Латвия' => 'Latvia', 'Польша' => 'Poland', 'Эстония' => 'Estonia', 'Финляндия' => 'Finland',
+        'Литва' => 'Lithuania', 'Узбекистан' => 'Uzbekistan', 'Швейцария' => 'Switzerland',
+        'Германия' => 'Germany', 'Канада' => 'Canada', 'Чехия' => 'Czechia', 'Швеция' => 'Sweden',
+        'Франция' => 'France', 'Украина' => 'Ukraine', 'Словакия' => 'Slovakia', 'Италия' => 'Italy',
+        'Австрия' => 'Austria', 'Норвегия' => 'Norway', 'Дания' => 'Denmark', 'Великобритания' => 'United Kingdom',
+        'Армения' => 'Armenia', 'Азербайджан' => 'Azerbaijan', 'Грузия' => 'Georgia', 'Молдова' => 'Moldova',
+        'Кыргызстан' => 'Kyrgyzstan', 'Киргизия' => 'Kyrgyzstan', 'Таджикистан' => 'Tajikistan', 'Турция' => 'Turkey',
+        'Испания' => 'Spain', 'Нидерланды' => 'Netherlands', 'Бельгия' => 'Belgium', 'Венгрия' => 'Hungary',
+        'Словения' => 'Slovenia', 'Хорватия' => 'Croatia', 'Сербия' => 'Serbia', 'Румыния' => 'Romania',
+        'Болгария' => 'Bulgaria', 'Израиль' => 'Israel', 'ОАЭ' => 'UAE', 'Китай' => 'China', 'Япония' => 'Japan',
+        'Корея' => 'South Korea', 'Австралия' => 'Australia',
+    ];
+    return $map[$raw] ?? $raw;
+}
+
 function hs_localize_player_position(?string $position, string $lang = 'ru'): string
 {
     $raw = trim((string) $position);
@@ -440,14 +480,152 @@ function hs_player_avatar_url(?string $avatar): string
     return rtrim(HS_SUPABASE_URL, '/') . '/storage/v1/object/public/' . ltrim($avatar, '/');
 }
 
+/** jsonb-поля иногда приходят как строка (в т.ч. дважды закодированная). */
+function hs_decode_json_field($raw)
+{
+    $value = $raw;
+    for ($i = 0; $i < 2 && is_string($value); $i++) {
+        $decoded = json_decode($value, true);
+        if ($decoded === null && trim($value) !== 'null') {
+            break;
+        }
+        $value = $decoded;
+    }
+    return $value;
+}
+
+/** Текущий сезон (колонки goals/assists/games) — ключ как в приложении. */
+const HS_CURRENT_SEASON_KEY = '26/27';
+
+/**
+ * Сезоны игрока: архив из season_stats + текущий сезон из колонок.
+ * Возвращает [ключ сезона => ['games','goals','assists','points']], новые сверху.
+ */
+function hs_player_seasons(array $player): array
+{
+    $seasons = [];
+    $archive = hs_decode_json_field($player['season_stats'] ?? null);
+    if (is_array($archive)) {
+        foreach ($archive as $key => $block) {
+            if (!is_array($block) || $key === HS_CURRENT_SEASON_KEY) {
+                continue;
+            }
+            $g = (int) ($block['goals'] ?? 0);
+            $a = (int) ($block['assists'] ?? 0);
+            $gp = (int) ($block['games'] ?? 0);
+            if ($g + $a + $gp === 0) {
+                continue;
+            }
+            $seasons[(string) $key] = ['games' => $gp, 'goals' => $g, 'assists' => $a, 'points' => $g + $a];
+        }
+    }
+    $g = (int) ($player['goals'] ?? 0);
+    $a = (int) ($player['assists'] ?? 0);
+    $gp = (int) ($player['games'] ?? 0);
+    if ($g + $a + $gp > 0) {
+        $seasons[HS_CURRENT_SEASON_KEY] = ['games' => $gp, 'goals' => $g, 'assists' => $a, 'points' => $g + $a];
+    }
+    uksort($seasons, static fn ($x, $y) => strcmp((string) $y, (string) $x));
+    return $seasons;
+}
+
+/** Сумма по всем сезонам — то, что показывает рейтинг в приложении. */
 function hs_player_season_stats(array $player): array
 {
-    $goals = (int) ($player['goals'] ?? 0);
-    $assists = (int) ($player['assists'] ?? 0);
-    $games = (int) ($player['games'] ?? 0);
+    $goals = 0;
+    $assists = 0;
+    $games = 0;
+    foreach (hs_player_seasons($player) as $block) {
+        $goals += $block['goals'];
+        $assists += $block['assists'];
+        $games += $block['games'];
+    }
     $points = $goals + $assists;
     $ppg = $games > 0 ? round($points / $games, 2) : null;
-    return ['points' => $points, 'games' => $games, 'ppg' => $ppg];
+    return ['points' => $points, 'goals' => $goals, 'assists' => $assists, 'games' => $games, 'ppg' => $ppg];
+}
+
+/** @return list<array{competition:string,year:?int,place:?int}> */
+function hs_player_achievements(array $player): array
+{
+    $raw = hs_decode_json_field($player['achievements'] ?? null);
+    if (!is_array($raw)) {
+        return [];
+    }
+    $out = [];
+    foreach ($raw as $item) {
+        if (!is_array($item)) {
+            continue;
+        }
+        $title = trim((string) ($item['competition'] ?? $item['title'] ?? ''));
+        if ($title === '') {
+            continue;
+        }
+        $out[] = [
+            'competition' => $title,
+            'year' => isset($item['year']) && (int) $item['year'] > 0 ? (int) $item['year'] : null,
+            'place' => isset($item['place']) && (int) $item['place'] > 0 ? (int) $item['place'] : null,
+        ];
+    }
+    return $out;
+}
+
+/**
+ * Игроки того же года рождения (и страны, если есть) — внутренние ссылки между профилями.
+ * Без них страницы игроков доступны только из sitemap, и Google считает их «сиротами».
+ *
+ * @return list<array{id:string,name:string,avatar:?string,position:?string}>
+ */
+function hs_fetch_related_players(array $player, int $limit = 8): array
+{
+    $year = hs_player_birth_year($player);
+    $country = trim((string) ($player['country'] ?? ''));
+    $params = [
+        'select=id,name,avatar,position,country,birth_date',
+        'is_hidden=eq.false',
+        'status=eq.player',
+        'id=neq.' . rawurlencode((string) ($player['id'] ?? '')),
+        'order=updated_at.desc',
+        'limit=' . $limit,
+    ];
+    if ($year) {
+        $params[] = 'birth_date=gte.' . $year . '-01-01';
+        $params[] = 'birth_date=lte.' . $year . '-12-31';
+    }
+    if ($country !== '') {
+        $params[] = 'country=eq.' . rawurlencode($country);
+    }
+    $url = rtrim(HS_SUPABASE_URL, '/') . '/rest/v1/players?' . implode('&', $params);
+    $ctx = stream_context_create([
+        'http' => [
+            'method' => 'GET',
+            'header' => implode("\r\n", [
+                'apikey: ' . HS_SUPABASE_ANON_KEY,
+                'Authorization: Bearer ' . HS_SUPABASE_ANON_KEY,
+                'Accept: application/json',
+            ]),
+            'timeout' => 6,
+            'ignore_errors' => true,
+        ],
+    ]);
+    $body = @file_get_contents($url, false, $ctx);
+    $rows = is_string($body) ? json_decode($body, true) : [];
+    if (!is_array($rows)) {
+        return [];
+    }
+    $out = [];
+    foreach ($rows as $row) {
+        if (empty($row['id']) || trim((string) ($row['name'] ?? '')) === '') {
+            continue;
+        }
+        $out[] = [
+            'id' => (string) $row['id'],
+            'name' => trim((string) $row['name']),
+            'avatar' => $row['avatar'] ?? null,
+            'position' => $row['position'] ?? null,
+        ];
+    }
+    return $out;
 }
 
 function hs_player_birth_year(array $player): ?string
@@ -513,7 +691,7 @@ function hs_player_seo_title(array $player, string $lang = 'ru'): string
         $bits[] = $year;
     }
 
-    $country = trim((string) ($player['country'] ?? ''));
+    $country = hs_localize_country($player['country'] ?? null, $lang);
     if ($country !== '') {
         $bits[] = $country;
     }
@@ -527,7 +705,7 @@ function hs_player_seo_description(array $player, string $lang = 'ru'): string
     $name = trim((string) ($player['name'] ?? 'HockeyStars'));
     $role = hs_player_role_word($player, $lang);
     $team = hs_player_seo_team($player, $lang);
-    $country = trim((string) ($player['country'] ?? ''));
+    $country = hs_localize_country($player['country'] ?? null, $lang);
     $position = hs_localize_player_position($player['position'] ?? null, $lang);
     $stats = hs_player_season_stats($player);
 
@@ -544,7 +722,7 @@ function hs_player_seo_description(array $player, string $lang = 'ru'): string
         }
         $text .= '. Смотри статистику игрока, перспективы и скаутский отчёт в HockeyStars.';
         if ($stats['points'] > 0 && $stats['games'] > 0) {
-            $text .= ' Сезон: ' . $stats['points'] . ' очков в ' . $stats['games'] . ' играх.';
+            $text .= ' ' . $stats['goals'] . ' голов и ' . $stats['assists'] . ' передач в ' . $stats['games'] . ' играх.';
         }
         return $text;
     }
@@ -561,7 +739,7 @@ function hs_player_seo_description(array $player, string $lang = 'ru'): string
     }
     $text .= '. View player stats, prospects and scout report on HockeyStars.';
     if ($stats['points'] > 0 && $stats['games'] > 0) {
-        $text .= ' Season: ' . $stats['points'] . ' points in ' . $stats['games'] . ' games.';
+        $text .= ' ' . $stats['goals'] . ' goals and ' . $stats['assists'] . ' assists in ' . $stats['games'] . ' games.';
     }
     return $text;
 }
@@ -580,7 +758,11 @@ function hs_player_json_ld(array $player, string $canonicalUrl, string $lang = '
         'memberOf' => $team !== ''
             ? ['@type' => 'SportsTeam', 'name' => $team]
             : null,
-        'nationality' => !empty($player['country']) ? $player['country'] : null,
+        'nationality' => !empty($player['country']) ? hs_localize_country($player['country'], $lang) : null,
+        'birthDate' => hs_player_birth_year($player),
+        'height' => !empty($player['height']) && (int) $player['height'] > 0 ? ((int) $player['height']) . ' cm' : null,
+        'weight' => !empty($player['weight']) && (int) $player['weight'] > 0 ? ((int) $player['weight']) . ' kg' : null,
+        'knowsAbout' => 'Ice hockey',
         'description' => hs_player_seo_description($player, $lang),
     ];
 

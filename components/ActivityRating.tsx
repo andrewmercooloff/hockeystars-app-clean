@@ -1,68 +1,57 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { getActivityPoints } from '../services/activityService';
-import { CURRENT_SEASON_KEY, formatSeasonLabel } from '../utils/seasonConfig';
+import { getStarBadgeText, shouldShowStarBadge, type StarBadgePlayer } from '../utils/starBadge';
 
-interface ActivityRatingProps {
-  userId: string;
-  currentUserId?: string;
-  isAdmin?: boolean;
-  style?: any;
-  refreshKey?: number;
+interface PlayerStarBadgeProps {
+  player: StarBadgePlayer;
+  style?: object;
+  /** In lists, hide skaters with 0 career points. Profile shows 0. */
+  hideZero?: boolean;
+  compact?: boolean;
+  /** Scout/search row — no absolute positioning. */
+  inline?: boolean;
 }
 
-export default function ActivityRating({
-  userId,
-  currentUserId,
-  isAdmin = false,
+/** Star badge: career points (field) or SV% (goalie). */
+export default function PlayerStarBadge({
+  player,
   style,
-  refreshKey,
-}: ActivityRatingProps) {
-  const [points, setPoints] = useState<number>(0);
-  const [error, setError] = useState<string | null>(null);
-
-  const shouldShowRating = currentUserId === userId || isAdmin;
-
-  useEffect(() => {
-    if (!shouldShowRating) return;
-
-    const loadActivityPoints = async () => {
-      try {
-        const result = await getActivityPoints(userId);
-        if (result.success) {
-          setPoints(result.points);
-        } else {
-          setError(result.error || 'Failed to load activity points');
-        }
-      } catch (err) {
-        setError('Unexpected error loading activity points');
-        console.error('Error loading activity points:', err);
-      }
-    };
-
-    void loadActivityPoints();
-  }, [userId, shouldShowRating, refreshKey]);
-
-  if (!shouldShowRating) {
+  hideZero = false,
+  compact = false,
+  inline = false,
+}: PlayerStarBadgeProps) {
+  if (!shouldShowStarBadge(player, { hideZero })) {
     return null;
   }
 
-  if (error) {
-    return (
-      <View style={[styles.container, style]}>
-        <Text style={styles.errorText}>⚠️</Text>
-      </View>
-    );
-  }
+  const text = getStarBadgeText(player);
+  const isGoalieStat = text.includes('.');
 
   return (
-    <View style={[styles.container, style]}>
-      <View style={styles.ratingContainer}>
-        <Ionicons name="star" size={8} color="#FFFFFF" />
-        <Text style={styles.pointsText}>{points}</Text>
+    <View style={[inline ? styles.inlineContainer : styles.container, style]}>
+      <View
+        style={[
+          inline ? styles.inlineRatingContainer : styles.ratingContainer,
+          compact && !inline && styles.ratingContainerCompact,
+        ]}
+      >
+        <Ionicons
+          name="star"
+          size={inline ? 11 : compact ? 11 : 8}
+          color={inline ? '#a1a1aa' : '#FFFFFF'}
+        />
+        <Text
+          style={[
+            inline ? styles.inlinePointsText : styles.pointsText,
+            compact && !inline && styles.pointsTextCompact,
+            isGoalieStat && (inline ? styles.inlineGoalieText : styles.goalieText),
+          ]}
+          numberOfLines={1}
+        >
+          {text}
+        </Text>
       </View>
-      <Text style={styles.seasonHint}>{formatSeasonLabel(CURRENT_SEASON_KEY)}</Text>
     </View>
   );
 }
@@ -74,6 +63,9 @@ const styles = StyleSheet.create({
     right: 10,
     zIndex: 10,
   },
+  inlineContainer: {
+    marginLeft: 8,
+  },
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -82,21 +74,37 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 8,
   },
+  ratingContainerCompact: {
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    borderRadius: 10,
+  },
+  inlineRatingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
   pointsText: {
     fontSize: 8,
     fontWeight: 'bold',
     color: '#FFFFFF',
     marginLeft: 1,
   },
-  seasonHint: {
-    marginTop: 2,
-    alignSelf: 'flex-end',
-    fontSize: 7,
-    fontFamily: 'Gilroy-Bold',
-    color: 'rgba(255,255,255,0.55)',
+  pointsTextCompact: {
+    fontSize: 10,
+    marginLeft: 2,
   },
-  errorText: {
-    fontSize: 16,
-    color: '#FF6B6B',
+  goalieText: {
+    fontSize: 9,
+    letterSpacing: -0.3,
+  },
+  inlinePointsText: {
+    fontSize: 12,
+    fontFamily: 'Gilroy-Bold',
+    color: '#a1a1aa',
+  },
+  inlineGoalieText: {
+    fontSize: 11,
+    letterSpacing: -0.3,
   },
 });

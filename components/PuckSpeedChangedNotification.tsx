@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from './BlurOrSolid';
 import { useLanguage } from '../contexts/LanguageContext';
 import CachedAvatar from './CachedAvatar';
+import { NOTIFICATION_CARD, NOTIFICATION_CARD_BLUR } from '../utils/notificationCard';
 
 interface PuckSpeedChangedNotificationProps {
   playerName: string;
@@ -11,6 +12,7 @@ interface PuckSpeedChangedNotificationProps {
   playerAvatar?: string;
   newMaxSpeed: number;
   timestamp: string;
+  reactionsFooter?: ReactNode;
 }
 
 const PuckSpeedChangedNotification = React.memo(function PuckSpeedChangedNotification({
@@ -18,7 +20,8 @@ const PuckSpeedChangedNotification = React.memo(function PuckSpeedChangedNotific
   playerId,
   playerAvatar,
   newMaxSpeed,
-  timestamp
+  timestamp,
+  reactionsFooter,
 }: PuckSpeedChangedNotificationProps) {
   const { t } = useLanguage();
 
@@ -47,6 +50,7 @@ const PuckSpeedChangedNotification = React.memo(function PuckSpeedChangedNotific
       style={styles.containerBlur}
     >
       <View style={styles.container}>
+        <View style={styles.bodyRow}>
         <View style={styles.avatarContainer}>
         <CachedAvatar
           playerId={playerId}
@@ -77,6 +81,9 @@ const PuckSpeedChangedNotification = React.memo(function PuckSpeedChangedNotific
         </View>
       </View>
       </View>
+
+      {reactionsFooter}
+    </View>
     </BlurOrSolid>
   );
 });
@@ -85,17 +92,14 @@ export default PuckSpeedChangedNotification;
 
 const styles = StyleSheet.create({
     containerBlur: {
-    marginHorizontal: 0,
-    marginVertical: 0,
+    ...NOTIFICATION_CARD_BLUR,
   },
   container: {
-    backgroundColor: 'transparent',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
+    ...NOTIFICATION_CARD,
+  },
+  bodyRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   avatarContainer: {
     width: 50,

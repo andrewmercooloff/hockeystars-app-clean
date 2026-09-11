@@ -144,7 +144,7 @@ export default function AdminScreen() {
       // Обновляем список игроков при возврате на экран админки
       loadData();
       return () => {
-        setCurrentScreen(null);
+        setCurrentScreen(null, 'admin');
         console.log('👑 АДМИНКА: Устанавливаем currentScreen = null');
       };
     }, [setCurrentScreen, loadData])

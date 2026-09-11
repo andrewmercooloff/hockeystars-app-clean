@@ -28,6 +28,7 @@ import CachedAvatar from '../components/CachedAvatar';
 import { BlurOrSolid } from '../components/BlurOrSolid';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useFocusEffect } from 'expo-router';
+import { useWebIsFocused } from '../hooks/useWebOnly';
 import { navigateToPlayerProfile } from '../utils/navigateToPlayer';
 import * as SplashScreen from 'expo-splash-screen';
 import {
@@ -40,9 +41,9 @@ import {
   ALL_PLAYERS_LIST_CACHE_KEYS,
   mergePlayerFromPlayersRealtimeRow,
 } from '../utils/playerStorage';
-import { applyActivityRatingsToPlayers } from '../services/activityService';
-
-import { updateAvatarGlobally } from '../utils/AvatarCache';
+import PlayerStarBadge from '../components/ActivityRating';
+import { isSameAvatarFile, updateAvatarGlobally } from '../utils/AvatarCache';
+import { getAllTimeBlock } from '../utils/seasonStats';
 import { supabase } from '../utils/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
 import OptimizedBackground from '../components/OptimizedBackground';
@@ -55,20 +56,31 @@ import { platformCardShadow } from '../utils/androidShadow';
 import { registerTabScrollHandler } from '../utils/tabScrollRegistry';
 import LeaderShine from '../components/LeaderShine';
 import SearchRatingShareCard, { type SearchRatingShareEntry } from '../components/SearchRatingShareCard';
-import { prefetchRatingShareAvatars } from '../utils/ratingShareExport';
+import SearchNewcomersShareCard from '../components/SearchNewcomersShareCard';
+import { RATING_SHARE_SEASON_KEY } from '../utils/seasonConfig';
+import { prefetchPlayersShareAvatars, prefetchRatingShareAvatars } from '../utils/ratingShareExport';
 import {
   LEADER_BORDER_COLORS,
   LEADER_MEDAL_BORDER_WIDTH,
   getMedalLeaderRank,
   getSearchAvatarSize,
+  getSearchNewcomers,
   sortPlayersForSearchList,
 } from '../utils/leaderDisplay';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useIsDesktopLayout } from '../hooks/useIsDesktopLayout';
+import { birthYearOf } from '../utils/birthDate';
 
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
 
 const SEARCH_NEWCOMER_MAX_MS = 2 * 24 * 60 * 60 * 1000;
+/** Карточки игроков в скауте — ~20% компактнее по высоте. */
+const SCOUT_ROW_HEIGHT_SCALE = 0.8;
+/** Верх абсолютной панели поиска/фильтров (под заголовком страницы). */
+const SEARCH_PANEL_TOP = 41;
+/** Стартовая высота панели до первого onLayout (поиск + 3 ряда фильтров + кнопка). */
+const SEARCH_PANEL_DEFAULT_HEIGHT = 62;
 
 type ScoutListRow =
   | { key: string; kind: 'full'; player: Player }
@@ -184,8 +196,8 @@ function buildSearchPlayerSubtitle(
   }
 
   if (item.birthDate) {
-    const birthYear = new Date(item.birthDate).getFullYear();
-    if (!isNaN(birthYear)) {
+    const birthYear = birthYearOf(item.birthDate);
+    if (birthYear) {
       parts.push(birthYear.toString());
     }
   } else if (item.age) {
@@ -212,34 +224,24 @@ function buildSearchPlayerSubtitle(
   }
 
   const isGoalkeeper = isGoalkeeperPosition(item.position);
+  // Показатели в поиске — суммарные за все сезоны
+  const total = getAllTimeBlock(item);
 
   if (isGoalkeeper) {
-    if (item.shots && item.saves) {
-      const shotsNum = parseInt(item.shots, 10) || 0;
-      const savesNum = parseInt(item.saves, 10) || 0;
-      if (shotsNum > 0) {
-        const sv = (savesNum / shotsNum).toFixed(3);
-        parts.push(`SV%: ${sv}`);
-      }
+    const shotsNum = total.shots ?? 0;
+    const savesNum = total.saves ?? 0;
+    const minutesNum = total.minutes ?? 0;
+    if (shotsNum > 0) {
+      parts.push(`SV%: ${(savesNum / shotsNum).toFixed(3)}`);
     }
-
-    if (item.minutes && item.shots && item.saves) {
-      const minutesNum = parseInt(item.minutes, 10) || 0;
-      const shotsNum = parseInt(item.shots, 10) || 0;
-      const savesNum = parseInt(item.saves, 10) || 0;
-      if (minutesNum > 0) {
-        const goalsAgainst = shotsNum - savesNum;
-        const gaa = ((goalsAgainst * 60) / minutesNum).toFixed(2);
-        parts.push(`GAA: ${gaa}`);
-      }
+    if (minutesNum > 0 && shotsNum > 0) {
+      parts.push(`GAA: ${(((shotsNum - savesNum) * 60) / minutesNum).toFixed(2)}`);
     }
-  } else if (item.goals && item.assists && item.games) {
-    const goalsNum = parseInt(item.goals, 10) || 0;
-    const assistsNum = parseInt(item.assists, 10) || 0;
-    const gamesNum = parseInt(item.games, 10) || 0;
-    if (gamesNum > 0) {
-      const ppg = ((goalsNum + assistsNum) / gamesNum).toFixed(2);
-      parts.push(`PPG: ${ppg}`);
+  } else {
+    const gamesNum = total.games ?? 0;
+    const pts = (total.goals ?? 0) + (total.assists ?? 0);
+    if (gamesNum > 0 && pts > 0) {
+      parts.push(`PPG: ${(pts / gamesNum).toFixed(2)}`);
     }
   }
 
@@ -253,7 +255,10 @@ function searchPlayerRowDataEqual(a: Player, b: Player): boolean {
     a.name === b.name &&
     a.avatar === b.avatar &&
     a.status === b.status &&
-    (a.activityRating ?? 0) === (b.activityRating ?? 0) &&
+    getAllTimeBlock(a).goals === getAllTimeBlock(b).goals &&
+    getAllTimeBlock(a).assists === getAllTimeBlock(b).assists &&
+    getAllTimeBlock(a).saves === getAllTimeBlock(b).saves &&
+    getAllTimeBlock(a).shots === getAllTimeBlock(b).shots &&
     !!a.is_hidden === !!b.is_hidden &&
     a.createdAt === b.createdAt &&
     a.position === b.position &&
@@ -269,6 +274,7 @@ function searchPlayerRowDataEqual(a: Player, b: Player): boolean {
     a.shots === b.shots &&
     a.saves === b.saves &&
     a.minutes === b.minutes &&
+    a.seasonStats === b.seasonStats &&
     (a.photos?.[0] ?? '') === (b.photos?.[0] ?? '')
   );
 }
@@ -502,8 +508,15 @@ export default function SearchScreen() {
   const { t, language } = useLanguage();
   const { setCurrentScreen } = useScreenContext();
   const { currentUser, isUserLoading } = useUser();
+  // Веб-версия: поиск открыт без регистрации (как и гостевой профиль игрока),
+  // чтобы люди и поисковики видели каталог игроков. Гость видит только публичные профили.
+  const isGuestWeb = Platform.OS === 'web' && currentUser === null;
+  const canBrowse = !!currentUser || isGuestWeb;
+  const isAdmin = currentUser?.status === 'admin';
   const isDesktop = useIsDesktopLayout();
+  const isFocused = useWebIsFocused();
   const playersListRef = useRef<FlatList<ScoutListRow>>(null);
+  const lastSearchRefreshAtRef = useRef(0);
 
   // Функция для форматирования даты в формат DD.MM.YYYY
   const formatBirthDate = (dateString: string): string => {
@@ -544,6 +557,9 @@ export default function SearchScreen() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filtersPanelHeight, setFiltersPanelHeight] = useState(SEARCH_PANEL_DEFAULT_HEIGHT);
+  // Фильтры свёрнуты по умолчанию — панель компактная, раскрывается по кнопке
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   
   // Debounce для поиска - обновляем фильтр с задержкой 300мс
@@ -610,7 +626,7 @@ export default function SearchScreen() {
         forceGilroyFont();
         
         // Используем пользователя из UserContext
-        if (!currentUser) {
+        if (!canBrowse) {
           // Не вызываем router.replace здесь, так как это может вызвать ошибку навигации
           // Вместо этого просто возвращаемся
           return;
@@ -618,7 +634,7 @@ export default function SearchScreen() {
 
         // Админам нужен сетевой свежий список (в т.ч. скрытые); остальным достаточно кеша loadPlayers при открытии
         const filterForSearch = (allPlayers: Player[]): Player[] => {
-          if (currentUser.status === 'admin') {
+          if (isAdmin) {
             return allPlayers;
           }
           return allPlayers.filter(player =>
@@ -634,13 +650,7 @@ export default function SearchScreen() {
 
         const applySearchPlayers = (allPlayers: Player[]) => {
           setPlayers((prevPlayers) => {
-            const prevRatings = new Map(
-              prevPlayers.map((p) => [p.id, p.activityRating] as const)
-            );
-            const next = filterForSearch(allPlayers).map((player) => ({
-              ...player,
-              activityRating: player.activityRating ?? prevRatings.get(player.id) ?? player.activityRating,
-            }));
+            const next = filterForSearch(allPlayers);
             // Защита от "фликера": если пришёл пустой ответ (временная сет. ошибка/таймаут/плохой кеш),
             // не затираем уже показанный список "нет игроков".
             if (next.length === 0 && prevPlayers.length > 0) {
@@ -650,14 +660,11 @@ export default function SearchScreen() {
           });
         };
 
-        const allPlayers = await loadPlayers(currentUser.status === 'admin', {
-          onUpdated: (fresh) => {
-            void applyActivityRatingsToPlayers(fresh).then(() => applySearchPlayers(fresh));
-          },
+        const allPlayers = await loadPlayers(isAdmin, {
+          onUpdated: applySearchPlayers,
         });
 
         applySearchPlayers(allPlayers);
-        void applyActivityRatingsToPlayers(allPlayers).then(() => applySearchPlayers(allPlayers));
         
       } catch (error) {
         console.error('❌ Ошибка загрузки поиска:', error);
@@ -670,7 +677,7 @@ export default function SearchScreen() {
     };
 
     // Запускаем загрузку только если currentUser определен и не null
-    if (currentUser !== undefined && currentUser !== null) {
+    if (canBrowse) {
       loadData();
     }
   }, [router, currentUser]);
@@ -688,20 +695,24 @@ export default function SearchScreen() {
   useFocusEffect(
     useCallback(() => {
       setCurrentScreen('search');
-      if (!currentUser) {
+      if (!canBrowse) {
         return () => {
-          setCurrentScreen(null);
+          setCurrentScreen(null, 'search');
         };
       }
-      if (players.length > 0) {
+      // Список уже есть: обновляем в фоне, но не чаще раза в минуту (realtime мог
+      // отвалиться в бэкграунде, и новичок иначе появится только после перезапуска).
+      const hasList = players.length > 0;
+      if (hasList && Date.now() - lastSearchRefreshAtRef.current < 60_000) {
         return () => {
-          setCurrentScreen(null);
+          setCurrentScreen(null, 'search');
         };
       }
+      lastSearchRefreshAtRef.current = Date.now();
       const refreshData = async () => {
           try {
             const filterForSearch = (allPlayers: Player[]): Player[] => {
-              if (currentUser.status === 'admin') return allPlayers;
+              if (isAdmin) return allPlayers;
               return allPlayers.filter(player =>
                 player.status === 'player' ||
                 player.status === 'admin' ||
@@ -715,13 +726,7 @@ export default function SearchScreen() {
 
             const applySearchPlayers = (allPlayers: Player[]) => {
               setPlayers((prevPlayers) => {
-                const prevRatings = new Map(
-                  prevPlayers.map((p) => [p.id, p.activityRating] as const)
-                );
-                const next = filterForSearch(allPlayers).map((player) => ({
-                  ...player,
-                  activityRating: player.activityRating ?? prevRatings.get(player.id) ?? player.activityRating,
-                }));
+                const next = filterForSearch(allPlayers);
                 if (next.length === 0 && prevPlayers.length > 0) {
                   return prevPlayers;
                 }
@@ -729,31 +734,26 @@ export default function SearchScreen() {
               });
             };
 
-            const allPlayers = await loadPlayers(false, {
-              onUpdated: (fresh) => {
-                void applyActivityRatingsToPlayers(fresh).then(() => applySearchPlayers(fresh));
-              },
+            const allPlayers = await loadPlayers(hasList, {
+              onUpdated: applySearchPlayers,
             });
             applySearchPlayers(allPlayers);
-            void applyActivityRatingsToPlayers(allPlayers).then(() => applySearchPlayers(allPlayers));
           } catch (error) {
             console.error('❌ Ошибка обновления списка игроков:', error);
           }
         };
         refreshData();
       return () => {
-        setCurrentScreen(null);
+        setCurrentScreen(null, 'search');
       };
     }, [setCurrentScreen, currentUser, players.length])
   );
 
   useEffect(() => {
-    if (!currentUser) return;
-
-    const isAdmin = currentUser.status === 'admin';
+    if (!canBrowse) return;
 
     const channel = supabase
-      .channel(`players-realtime-search-${currentUser.id}`)
+      .channel(`players-realtime-search-${currentUser?.id ?? 'guest'}`)
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'players' },
@@ -805,7 +805,7 @@ export default function SearchScreen() {
             if (merged.invalidatePlayersListCache) {
               void AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]).catch(() => {});
             }
-            if (playerData.avatar != null && playerData.avatar !== cur.avatar) {
+            if (playerData.avatar != null && !isSameAvatarFile(String(playerData.avatar), cur.avatar)) {
               void updateAvatarGlobally(playerId, String(playerData.avatar));
             }
             const row = merged.next;
@@ -813,6 +813,26 @@ export default function SearchScreen() {
               return currentPlayers.filter((p) => p.id !== playerId);
             }
             return currentPlayers.map((p, i) => (i === idx ? row : p));
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'players' },
+        (payload) => {
+          // Новая регистрация: раньше обрабатывались только UPDATE/DELETE, и новичок
+          // появлялся в поиске лишь после перезапуска (кеш списка живёт 10 минут).
+          const playerId = (payload.new as { id?: string })?.id;
+          if (!playerId) return;
+          void AsyncStorage.multiRemove([...ALL_PLAYERS_LIST_CACHE_KEYS]).catch(() => {});
+          void loadPlayers(true).then((allPlayers) => {
+            const fresh = allPlayers.find((p) => p.id === playerId);
+            if (!fresh || !isPlayerInSearchDirectory(fresh, isAdmin)) return;
+            setPlayers((prev) =>
+              prev.some((p) => p.id === playerId)
+                ? prev.map((p) => (p.id === playerId ? fresh : p))
+                : [...prev, fresh]
+            );
           });
         }
       )
@@ -966,9 +986,7 @@ export default function SearchScreen() {
   const ppgOptions = useMemo(() => {
     const hasFieldPlayersWithPPG = players.some(p => {
       if (isGoalkeeperPosition(p.position)) return false;
-      if (!p.goals || !p.assists || !p.games) return false;
-      const gamesNum = parseInt(p.games) || 0;
-      return gamesNum > 0;
+      return (getAllTimeBlock(p).games ?? 0) > 0;
     });
     
     if (!hasFieldPlayersWithPPG) return [];
@@ -990,9 +1008,7 @@ export default function SearchScreen() {
   const svOptions = useMemo(() => {
     const hasGoalkeepersWithSV = players.some(p => {
       if (!isGoalkeeperPosition(p.position)) return false;
-      if (!p.shots || !p.saves) return false;
-      const shotsNum = parseInt(p.shots) || 0;
-      return shotsNum > 0;
+      return (getAllTimeBlock(p).shots ?? 0) > 0;
     });
     
     if (!hasGoalkeepersWithSV) return [];
@@ -1013,9 +1029,8 @@ export default function SearchScreen() {
   const gaaOptions = useMemo(() => {
     const hasGoalkeepersWithGAA = players.some(p => {
       if (!isGoalkeeperPosition(p.position)) return false;
-      if (!p.minutes || !p.shots || !p.saves) return false;
-      const minutesNum = parseInt(p.minutes) || 0;
-      return minutesNum > 0;
+      const total = getAllTimeBlock(p);
+      return (total.minutes ?? 0) > 0 && (total.shots ?? 0) > 0;
     });
     
     if (!hasGoalkeepersWithGAA) return [];
@@ -1134,14 +1149,13 @@ export default function SearchScreen() {
       }
       
       // Фильтр по PPG (для полевых игроков)
+      // Фильтры по показателям — суммарные за все сезоны (как и рейтинг)
+      const totalStats = getAllTimeBlock(player);
       const matchesPPG = ignorePPG || !selectedPPG || (() => {
         // Вратари уже исключены выше
-        if (!player.goals || !player.assists || !player.games) return false;
-        const goalsNum = parseInt(player.goals) || 0;
-        const assistsNum = parseInt(player.assists) || 0;
-        const gamesNum = parseInt(player.games) || 0;
+        const gamesNum = totalStats.games ?? 0;
         if (gamesNum === 0) return false;
-        const ppg = (goalsNum + assistsNum) / gamesNum;
+        const ppg = ((totalStats.goals ?? 0) + (totalStats.assists ?? 0)) / gamesNum;
         
         if (selectedPPG === '< 0.3') return ppg < 0.3;
         if (selectedPPG === '> 0.3') return ppg > 0.3;
@@ -1157,9 +1171,8 @@ export default function SearchScreen() {
       // Фильтр по SV% (для вратарей)
       const matchesSV = ignoreSV || !selectedSV || (() => {
         // Полевые игроки уже исключены выше
-        if (!player.shots || !player.saves) return false;
-        const shotsNum = parseInt(player.shots) || 0;
-        const savesNum = parseInt(player.saves) || 0;
+        const shotsNum = totalStats.shots ?? 0;
+        const savesNum = totalStats.saves ?? 0;
         if (shotsNum === 0) return false;
         const sv = savesNum / shotsNum;
         
@@ -1176,11 +1189,10 @@ export default function SearchScreen() {
       // Фильтр по GAA (для вратарей)
       const matchesGAA = ignoreGAA || !selectedGAA || (() => {
         if (!isGoalkeeperPosition(player.position)) return false; // Полевые игроки не имеют GAA
-        if (!player.minutes || !player.shots || !player.saves) return false;
-        const minutesNum = parseInt(player.minutes) || 0;
-        const shotsNum = parseInt(player.shots) || 0;
-        const savesNum = parseInt(player.saves) || 0;
-        if (minutesNum === 0) return false;
+        const minutesNum = totalStats.minutes ?? 0;
+        const shotsNum = totalStats.shots ?? 0;
+        const savesNum = totalStats.saves ?? 0;
+        if (minutesNum === 0 || shotsNum === 0) return false;
         const goalsAgainst = shotsNum - savesNum;
         const gaa = (goalsAgainst * 60) / minutesNum;
         
@@ -1272,7 +1284,14 @@ export default function SearchScreen() {
 
 
   const ratingShareRef = useRef<View>(null);
+  const newcomersShareRef = useRef<View>(null);
   const [isExportingRating, setIsExportingRating] = useState(false);
+  const [isExportingNewcomers, setIsExportingNewcomers] = useState(false);
+
+  const newcomerSharePlayers = useMemo(
+    () => getSearchNewcomers(filteredPlayers, SEARCH_NEWCOMER_MAX_MS),
+    [filteredPlayers]
+  );
 
   const leaderShareEntries = useMemo((): SearchRatingShareEntry[] => {
     return filteredPlayers
@@ -1339,6 +1358,47 @@ export default function SearchScreen() {
       setIsExportingRating(false);
     }
   }, [isExportingRating, leaderShareEntries, t]);
+
+  const handleShareNewcomers = useCallback(async () => {
+    if (!isAdmin || isExportingNewcomers || newcomerSharePlayers.length === 0) return;
+    setIsExportingNewcomers(true);
+
+    try {
+      await prefetchPlayersShareAvatars(newcomerSharePlayers);
+      await new Promise<void>((resolve) => {
+        InteractionManager.runAfterInteractions(() => {
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+        });
+      });
+      await new Promise((r) => setTimeout(r, Platform.OS === 'android' ? 400 : 250));
+      if (!newcomersShareRef.current) {
+        throw new Error('Newcomers share card not ready');
+      }
+      const uri = await captureRef(newcomersShareRef, {
+        format: 'png',
+        quality: 0.9,
+        result: 'tmpfile',
+      });
+      const available = await Sharing.isAvailableAsync();
+      if (available) {
+        await Sharing.shareAsync(uri, {
+          mimeType: 'image/png',
+          dialogTitle: t('search.shareNewcomers') || 'Share newcomers',
+        });
+      } else {
+        const { status } = await MediaLibrary.requestPermissionsAsync();
+        if (status === 'granted') {
+          await MediaLibrary.saveToLibraryAsync(uri);
+          Alert.alert(t('common.success') || 'OK', t('profile.savedToGallery') || 'Saved');
+        }
+      }
+    } catch (e) {
+      console.error('Newcomers share error:', e);
+      Alert.alert(t('common.error') || 'Error', t('profile.shareError') || 'Share failed');
+    } finally {
+      setIsExportingNewcomers(false);
+    }
+  }, [isAdmin, isExportingNewcomers, newcomerSharePlayers, t]);
   
   // Мемоизированные фильтры, зависящие от игроков, отфильтрованных по другим фильтрам (свой фильтр игнорируем)
   const countries = useMemo(() => {
@@ -1475,8 +1535,17 @@ export default function SearchScreen() {
                 ? handleShareRating
                 : undefined
             }
+            onShareNewcomers={
+              showSection &&
+              isAdmin &&
+              player.id === firstNewcomerId &&
+              newcomerSharePlayers.length > 0
+                ? handleShareNewcomers
+                : undefined
+            }
             isExportingRating={isExportingRating}
-            isAdmin={currentUser?.status === 'admin'}
+            isExportingNewcomers={isExportingNewcomers}
+            isAdmin={isAdmin}
             language={language}
             onPress={openPlayerFromSearch}
             t={t}
@@ -1500,12 +1569,27 @@ export default function SearchScreen() {
         <View>
           {pairSection ? (
             <View style={styles.sectionLabelRow}>
+              <View style={[styles.sectionDot, pairSection === 'leaders' ? styles.sectionDotGold : styles.sectionDotRed]} />
               <Text style={styles.sectionLabelText}>
                 {pairSection === 'leaders'
                   ? (leadersShareTitle || t('search.topByPoints') || 'Top by points')
                   : (t('search.newcomers') || 'Newcomers')}
               </Text>
               <View style={styles.sectionLabelLine} />
+              {pairSection === 'newcomers' && isAdmin && newcomerSharePlayers.length > 0 ? (
+                <TouchableOpacity
+                  onPress={handleShareNewcomers}
+                  style={styles.sectionExportButton}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  disabled={isExportingNewcomers}
+                >
+                  {isExportingNewcomers ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    <Ionicons name="share-outline" size={16} color="#fff" />
+                  )}
+                </TouchableOpacity>
+              ) : null}
             </View>
           ) : null}
           <View style={styles.playerPairRow}>
@@ -1515,12 +1599,33 @@ export default function SearchScreen() {
         </View>
       );
     },
-    [currentUser?.status, language, openPlayerFromSearch, searchLeaderPositions, firstNewcomerId, firstLeaderId, leadersShareTitle, leaderShareEntries.length, handleShareRating, isExportingRating, t]
+    [isAdmin, language, openPlayerFromSearch, searchLeaderPositions, firstNewcomerId, firstLeaderId, leadersShareTitle, leaderShareEntries.length, newcomerSharePlayers.length, handleShareRating, handleShareNewcomers, isExportingRating, isExportingNewcomers, t]
   );
+
+  const activeFilterChips = useMemo(() => {
+    const chips: { key: string; label: string; clear: () => void }[] = [];
+    const findLabel = (list: ({ translated: string; original: string | null } | null)[], value: string | null) =>
+      list.find((o) => o?.original === value)?.translated ?? value ?? '';
+    if (selectedCountry) chips.push({ key: 'country', label: findLabel(countries, selectedCountry), clear: () => setSelectedCountry(null) });
+    if (selectedTeam) {
+      const team = teamsFromPlayers.find((tm) => tm.id === selectedTeam);
+      chips.push({ key: 'team', label: team ? (language === 'ru' ? team.name_ru || team.name : team.name) : selectedTeam, clear: () => setSelectedTeam(null) });
+    }
+    if (selectedPosition) chips.push({ key: 'position', label: findLabel(positions, selectedPosition), clear: () => setSelectedPosition(null) });
+    if (selectedYear) chips.push({ key: 'year', label: String(selectedYear), clear: () => setSelectedYear(null) });
+    if (selectedHand) chips.push({ key: 'grip', label: selectedHand, clear: () => setSelectedHand(null) });
+    if (selectedMinHeight) chips.push({ key: 'height', label: `${t('search.heightFrom')} ${selectedMinHeight}`, clear: () => setSelectedMinHeight(null) });
+    if (selectedMinWeight) chips.push({ key: 'weight', label: `${t('search.weightFrom')} ${selectedMinWeight}`, clear: () => setSelectedMinWeight(null) });
+    if (selectedPPG) chips.push({ key: 'ppg', label: `PPG ${selectedPPG}`, clear: () => setSelectedPPG(null) });
+    if (selectedSV) chips.push({ key: 'sv', label: `SV% ${selectedSV}`, clear: () => setSelectedSV(null) });
+    if (selectedGAA) chips.push({ key: 'gaa', label: `GAA ${selectedGAA}`, clear: () => setSelectedGAA(null) });
+    return chips;
+  }, [selectedCountry, selectedTeam, selectedPosition, selectedYear, selectedHand, selectedMinHeight, selectedMinWeight, selectedPPG, selectedSV, selectedGAA, countries, teamsFromPlayers, positions, language, t]);
+  const activeFilterCount = activeFilterChips.length;
 
   // Показываем загрузку пока проверяем авторизацию
   // Если пользователь не авторизован, показываем загрузку или перенаправляем
-  if (!currentUser) {
+  if (!canBrowse) {
     if (currentUser === null) {
       // Пользователь явно не авторизован, перенаправляем
       return null;
@@ -1540,12 +1645,17 @@ export default function SearchScreen() {
                 </TouchableOpacity>
                 <Text style={styles.pageTitle}>{t('search.title')}</Text>
               </View>
-              <SkeletonList rows={7} />
+              <SkeletonList rows={7} topInset={52} />
             </View>
           </CachedBackground>
         </View>
       );
     }
+  }
+
+  // Web: inactive tab must not paint over player profiles (blocks finger scroll).
+  if (Platform.OS === 'web' && !isFocused) {
+    return null;
   }
 
   // Если загружаем данные
@@ -1564,7 +1674,7 @@ export default function SearchScreen() {
               </TouchableOpacity>
               <Text style={styles.pageTitle}>{t('search.title')}</Text>
             </View>
-            <SkeletonList rows={7} />
+            <SkeletonList rows={7} topInset={52} />
           </View>
         </CachedBackground>
       </View>
@@ -1594,22 +1704,67 @@ export default function SearchScreen() {
             tint="dark"
             style={styles.searchSectionBlur}
           >
-            <View style={styles.searchSection}>
+            <View
+              style={styles.searchSection}
+              onLayout={(e) => setFiltersPanelHeight(Math.round(e.nativeEvent.layout.height))}
+            >
               {/* Полупрозрачный оверлей */}
               <View style={styles.searchSectionOverlay}>
-              {/* Поле поиска */}
-              <View style={styles.searchContainer}>
-              <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
-              <TextInput
-                style={styles.searchInput}
-                placeholder={t('search.placeholder')}
-                placeholderTextColor="#888"
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-              />
-            </View>
+              {/* Поле поиска + кнопка фильтров */}
+              <View style={styles.searchRow}>
+                <View style={[styles.searchContainer, styles.searchContainerInRow]}>
+                  <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder={t('search.placeholder')}
+                    placeholderTextColor="#888"
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                  />
+                </View>
+                <TouchableOpacity
+                  style={[
+                    styles.filtersToggle,
+                    (filtersOpen || activeFilterCount > 0) && styles.filtersToggleActive,
+                  ]}
+                  onPress={() => {
+                    setFiltersOpen((v) => !v);
+                    setActiveFilter(null);
+                    setOpenFilters(new Set());
+                  }}
+                  activeOpacity={0.8}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('search.filters') || 'Filters'}
+                >
+                  <Ionicons name={filtersOpen ? 'close' : 'options-outline'} size={20} color="#fff" />
+                  {!filtersOpen && activeFilterCount > 0 && (
+                    <View style={styles.filtersBadge}>
+                      <Text style={styles.filtersBadgeText}>{activeFilterCount}</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              </View>
+
+              {/* Свёрнуто: активные фильтры как чипы, каждый снимается одним тапом */}
+              {!filtersOpen && activeFilterCount > 0 && (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  style={styles.chipsScroll}
+                  contentContainerStyle={styles.chipsRow}
+                  keyboardShouldPersistTaps="handled"
+                >
+                  {activeFilterChips.map((chip) => (
+                    <TouchableOpacity key={chip.key} style={styles.chip} onPress={chip.clear} activeOpacity={0.8}>
+                      <Text style={styles.chipText} numberOfLines={1}>{chip.label}</Text>
+                      <Ionicons name="close" size={13} color="rgba(255,255,255,0.75)" />
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              )}
 
             {/* Контейнер фильтров */}
+            {filtersOpen && (
             <View style={styles.filtersContainer}>
               {/* Первая строка: Страна, Команда, Позиция */}
               <View style={styles.filterRow}>
@@ -1826,7 +1981,16 @@ export default function SearchScreen() {
                 </Text>
               </TouchableOpacity>
             </View>
+            )}
             </View>
+            {/* тонкая фирменная кромка панели — чуть цвета на тёмных экранах */}
+            <LinearGradient
+              colors={['rgba(250,47,64,0)', 'rgba(250,47,64,0.55)', 'rgba(250,47,64,0)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.panelEdge}
+              pointerEvents="none"
+            />
             </View>
           </BlurOrSolid>
 
@@ -1837,7 +2001,12 @@ export default function SearchScreen() {
             renderItem={renderPlayerItem}
             keyExtractor={keyExtractor}
             ListEmptyComponent={ListEmptyComponent}
-            contentContainerStyle={[styles.playersList, isDesktop && styles.playersListDesktop]}
+            contentContainerStyle={[
+              styles.playersList,
+              // Панель фильтров абсолютная и разной высоты (PPG / вратарские фильтры) — отступ по факту
+              { paddingTop: SEARCH_PANEL_TOP + filtersPanelHeight + 8 },
+              isDesktop && styles.playersListDesktop,
+            ]}
             removeClippedSubviews={Platform.OS === 'android'}
             maxToRenderPerBatch={8}
             updateCellsBatchingPeriod={80}
@@ -1873,8 +2042,22 @@ export default function SearchScreen() {
             ref={ratingShareRef}
             title={leadersShareTitle}
             filterLine={ratingShareFilterLine || undefined}
+            seasonLine={t('search.shareRatingSeason', { season: RATING_SHARE_SEASON_KEY })}
             goalieMode={isGoalieLeaderMode}
             entries={leaderShareEntries}
+            t={t}
+          />
+        </View>
+      ) : null}
+      {isAdmin && newcomerSharePlayers.length > 0 ? (
+        <View style={styles.ratingShareOffscreen} pointerEvents="none">
+          <SearchNewcomersShareCard
+            ref={newcomersShareRef}
+            title={t('search.newcomers') || 'Newcomers'}
+            filterLine={ratingShareFilterLine || undefined}
+            countLine={t('search.shareNewcomersCount', { count: newcomerSharePlayers.length })}
+            players={newcomerSharePlayers}
+            language={language}
             t={t}
           />
         </View>
@@ -1931,7 +2114,7 @@ const styles = StyleSheet.create({
   },
   searchSectionBlur: {
     position: 'absolute',
-    top: 41, // Под заголовком
+    top: SEARCH_PANEL_TOP, // Под заголовком
     left: 0,
     right: 0,
     zIndex: 1001,
@@ -1955,6 +2138,80 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.12)',
     height: 44,
+    width: '100%',
+  },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  searchContainerInRow: {
+    flex: 1,
+    width: undefined,
+  },
+  filtersToggle: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(22, 22, 26, 0.7)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+  },
+  filtersToggleActive: {
+    backgroundColor: '#fa2f40',
+    borderColor: '#fa2f40',
+    shadowColor: '#fa2f40',
+    shadowOpacity: 0.45,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 3 },
+  },
+  filtersBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    paddingHorizontal: 4,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filtersBadgeText: {
+    color: '#fa2f40',
+    fontSize: 11,
+    fontFamily: 'Gilroy-Bold',
+  },
+  chipsScroll: {
+    marginTop: 8,
+    marginHorizontal: -20,
+  },
+  chipsRow: {
+    paddingHorizontal: 20,
+    gap: 6,
+  },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    height: 28,
+    paddingLeft: 11,
+    paddingRight: 8,
+    borderRadius: 14,
+    backgroundColor: 'rgba(250,47,64,0.14)',
+    borderWidth: 1,
+    borderColor: 'rgba(250,47,64,0.45)',
+  },
+  chipText: {
+    color: '#fff',
+    fontSize: 12,
+    fontFamily: 'Gilroy-Bold',
+    maxWidth: 160,
+  },
+  panelEdge: {
+    height: 1.5,
     width: '100%',
   },
   searchIcon: {
@@ -2093,7 +2350,6 @@ const styles = StyleSheet.create({
     paddingBottom: 96,
     zIndex: 1,
     elevation: 1,
-    marginTop: 210
   },
   playersListDesktop: {
     paddingHorizontal: 8,
@@ -2115,14 +2371,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 16,
-    padding: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     backgroundColor: '#1c1c21',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   playerGradientShadow: {
     marginHorizontal: 16,
-    marginVertical: 6,
+    marginVertical: 5,
     borderRadius: 16,
     ...platformCardShadow({
       shadowColor: '#000',
@@ -2134,11 +2391,11 @@ const styles = StyleSheet.create({
   },
   playerGradientShadowCompact: {
     marginHorizontal: 8,
-    marginVertical: 6,
+    marginVertical: 5,
   },
   playerPhotoWrap: {
     position: 'relative',
-    marginRight: 15,
+    marginRight: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -2170,8 +2427,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 6,
-    fontSize: 64,
-    lineHeight: 70,
+    fontSize: 52,
+    lineHeight: 56,
     fontFamily: 'Gilroy-Bold',
     color: 'rgba(255, 255, 255, 0.06)',
     zIndex: 3
@@ -2187,24 +2444,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 5,
+    marginBottom: 3,
   },
   playerName: {
     color: '#fff',
     fontSize: 16,
     fontFamily: 'Gilroy-Bold',
     flex: 1,
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 8,
-  },
-  ratingText: {
-    color: '#a1a1aa',
-    fontSize: 12,
-    fontFamily: 'Gilroy-Bold',
-    marginLeft: 2,
   },
   newBadge: {
     backgroundColor: '#fa2f40',
@@ -2220,6 +2466,26 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginTop: 5,
     marginBottom: 6
+  },
+  sectionDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: 8,
+  },
+  sectionDotGold: {
+    backgroundColor: '#E8B86D',
+    shadowColor: '#E8B86D',
+    shadowOpacity: 0.9,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 0 },
+  },
+  sectionDotRed: {
+    backgroundColor: '#fa2f40',
+    shadowColor: '#fa2f40',
+    shadowOpacity: 0.9,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 0 },
   },
   sectionLabelText: {
     color: '#fff',
@@ -2305,7 +2571,9 @@ type SearchPlayerRowProps = {
   sectionLabel?: 'newcomers' | 'leaders';
   leadersSectionTitle?: string;
   onShareLeaders?: () => void;
+  onShareNewcomers?: () => void;
   isExportingRating?: boolean;
+  isExportingNewcomers?: boolean;
   isAdmin?: boolean;
   language: string;
   onPress: (id: string, name?: string | null) => void;
@@ -2322,6 +2590,8 @@ function areSearchPlayerRowPropsEqual(
   if (prev.sectionLabel !== next.sectionLabel) return false;
   if (prev.leadersSectionTitle !== next.leadersSectionTitle) return false;
   if (prev.isExportingRating !== next.isExportingRating) return false;
+  if (prev.isExportingNewcomers !== next.isExportingNewcomers) return false;
+  if (!!prev.onShareNewcomers !== !!next.onShareNewcomers) return false;
   if (prev.compact !== next.compact) return false;
   return searchPlayerRowDataEqual(prev.player, next.player);
 }
@@ -2332,7 +2602,9 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
   sectionLabel,
   leadersSectionTitle,
   onShareLeaders,
+  onShareNewcomers,
   isExportingRating,
+  isExportingNewcomers,
   isAdmin,
   language,
   onPress,
@@ -2342,7 +2614,7 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
   const playerPhoto =
     player.avatar || (player.photos && player.photos.length > 0 && player.photos[0]) || undefined;
   const medalRank = leaderPosition != null ? getMedalLeaderRank(leaderPosition) : undefined;
-  const avatarSize = getSearchAvatarSize(leaderPosition);
+  const avatarSize = Math.round(getSearchAvatarSize(leaderPosition) * SCOUT_ROW_HEIGHT_SCALE);
   const ringSize = medalRank ? avatarSize + LEADER_MEDAL_BORDER_WIDTH * 2 + 4 : avatarSize;
   const photoContainerStyle = [
     player.status === 'coach' ? styles.coachPhotoContainer : styles.playerPhotoContainer,
@@ -2361,6 +2633,7 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
     <>
       {sectionLabel ? (
         <View style={styles.sectionLabelRow}>
+          <View style={[styles.sectionDot, sectionLabel === 'leaders' ? styles.sectionDotGold : styles.sectionDotRed]} />
           <Text style={styles.sectionLabelText}>
             {sectionLabel === 'leaders'
               ? (leadersSectionTitle || t('search.topByPoints') || 'Top by points')
@@ -2375,6 +2648,20 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
               disabled={isExportingRating}
             >
               {isExportingRating ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Ionicons name="share-outline" size={16} color="#fff" />
+              )}
+            </TouchableOpacity>
+          ) : null}
+          {sectionLabel === 'newcomers' && isAdmin && onShareNewcomers ? (
+            <TouchableOpacity
+              onPress={onShareNewcomers}
+              style={styles.sectionExportButton}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              disabled={isExportingNewcomers}
+            >
+              {isExportingNewcomers ? (
                 <ActivityIndicator size="small" color="#fff" />
               ) : (
                 <Ionicons name="share-outline" size={16} color="#fff" />
@@ -2432,11 +2719,6 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
                     ? (t('profile.scout') || (language === 'ru' ? 'Скаут' : 'Scout'))
                     : displayName(player.name)}
                 </Text>
-                {showNewBadge ? (
-                  <View style={styles.newBadge}>
-                    <Text style={styles.newBadgeText}>NEW</Text>
-                  </View>
-                ) : null}
                 {player.is_hidden && isAdmin ? (
                   <Ionicons
                     name="eye-off-outline"
@@ -2445,10 +2727,10 @@ const SearchPlayerRowMemo = React.memo(function SearchPlayerRow({
                     style={{ marginLeft: 8 }}
                   />
                 ) : null}
-                {player.activityRating !== undefined && player.activityRating > 0 ? (
-                  <View style={styles.ratingContainer}>
-                    <Ionicons name="star" size={11} color="#a1a1aa" />
-                    <Text style={styles.ratingText}>{Math.round(player.activityRating)}</Text>
+                <PlayerStarBadge player={player} inline hideZero />
+                {showNewBadge ? (
+                  <View style={styles.newBadge}>
+                    <Text style={styles.newBadgeText}>NEW</Text>
                   </View>
                 ) : null}
               </View>

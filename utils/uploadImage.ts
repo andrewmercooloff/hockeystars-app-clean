@@ -503,14 +503,55 @@ export const getWorkingImageUrl = async (imageUrl: string, fallbackUrl?: string)
   }
 };
 
-// Копируем content:// / ph:// в cache — readAsStringAsync и иногда FormData не работают напрямую
-const resolveVideoUploadUri = async (videoUri: string): Promise<string> => {
+const guessVideoMimeType = (uri: string): string => {
+  const ext = uri.split('?')[0].split('.').pop()?.toLowerCase();
+  if (ext === 'mov') return 'video/quicktime';
+  if (ext === 'm4v') return 'video/x-m4v';
+  return 'video/mp4';
+};
+
+/** Локальный file:// или копия content:// / ph:// в cache для загрузки. */
+const resolveVideoUploadUri = async (
+  videoUri: string
+): Promise<{ uri: string; mimeType: string; copied: boolean }> => {
   if (videoUri.startsWith('file://')) {
-    return videoUri;
+    return { uri: videoUri, mimeType: guessVideoMimeType(videoUri), copied: false };
   }
   const cachePath = `${FileSystem.cacheDirectory}video_upload_${Date.now()}.mp4`;
   await FileSystem.copyAsync({ from: videoUri, to: cachePath });
-  return cachePath;
+  return { uri: cachePath, mimeType: guessVideoMimeType(cachePath), copied: true };
+};
+
+const readVideoArrayBuffer = async (uri: string): Promise<ArrayBuffer | null> => {
+  try {
+    const response = await fetch(uri);
+    if (!response.ok) return null;
+    const buffer = await response.arrayBuffer();
+    return buffer.byteLength > 0 ? buffer : null;
+  } catch {
+    return null;
+  }
+};
+
+const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes.buffer;
+};
+
+const readVideoArrayBufferFromFileSystem = async (uri: string): Promise<ArrayBuffer | null> => {
+  try {
+    const base64 = await FileSystem.readAsStringAsync(uri, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+    if (!base64) return null;
+    return base64ToArrayBuffer(base64);
+  } catch {
+    return null;
+  }
 };
 
 export type UploadVideoResult = { url: string | null; thumbUrl?: string | null; error?: string };
@@ -524,6 +565,7 @@ export const uploadVideoToStorage = async (
   thumbUri?: string,
 ): Promise<UploadVideoResult> => {
   let localUri = videoUri;
+  let copiedToCache = false;
   try {
     // НЕ проверяем supabase.auth.getSession(): приложение использует собственную
     // авторизацию (таблица players), а не Supabase Auth — сессии там никогда нет.
@@ -537,32 +579,45 @@ export const uploadVideoToStorage = async (
     const timestamp = Date.now();
     const fileName = `${playerId}/${timestamp}.mp4`;
     const thumbFileName = `${playerId}/${timestamp}_thumb.jpg`;
-    localUri = await resolveVideoUploadUri(videoUri);
+    const resolved = await resolveVideoUploadUri(videoUri);
+    localUri = resolved.uri;
+    copiedToCache = resolved.copied;
     onProgress?.(20);
 
-    const fileResponse = await fetch(localUri);
-    if (!fileResponse.ok) {
+    const fileInfo = await FileSystem.getInfoAsync(localUri);
+    if (!fileInfo.exists) {
       return { url: null, error: 'Не удалось прочитать файл с устройства' };
     }
-
-    const arrayBuffer = await fileResponse.arrayBuffer();
-    if (!arrayBuffer.byteLength) {
+    if ('size' in fileInfo && fileInfo.size === 0) {
       return { url: null, error: 'Пустой файл видео' };
     }
 
-    onProgress?.(40);
+    onProgress?.(30);
 
-    const { data, error } = await supabase.storage
-      .from('videos')
-      .upload(fileName, arrayBuffer, {
-        contentType: 'video/mp4',
-        upsert: false,
-      });
+    // file:// на iOS: fetch и FormData часто ломаются — читаем байты через FileSystem.
+    const arrayBuffer =
+      localUri.startsWith('file://')
+        ? await readVideoArrayBufferFromFileSystem(localUri)
+        : (await readVideoArrayBuffer(localUri)) ??
+          (await readVideoArrayBufferFromFileSystem(localUri));
 
-    if (error) {
-      console.error('❌ Ошибка загрузки видео:', error.message, error);
-      const msg = error.message || '';
-      if (msg.toLowerCase().includes('row-level security') || error.message?.includes('403')) {
+    if (!arrayBuffer?.byteLength) {
+      return { url: null, error: 'Не удалось прочитать файл с устройства' };
+    }
+
+    onProgress?.(50);
+
+    const { data, error: uploadError } = await supabase.storage.from('videos').upload(fileName, arrayBuffer, {
+      contentType: resolved.mimeType,
+      upsert: false,
+    });
+
+    onProgress?.(60);
+
+    if (uploadError) {
+      console.error('❌ Ошибка загрузки видео:', uploadError.message, uploadError);
+      const msg = uploadError.message || '';
+      if (msg.toLowerCase().includes('row-level security') || msg.includes('403')) {
         return {
           url: null,
           error: 'Нет прав на загрузку. В Supabase выполните database/videos_storage_policies.sql',
@@ -608,9 +663,33 @@ export const uploadVideoToStorage = async (
     console.error('❌ Ошибка uploadVideoToStorage:', err);
     return { url: null, error: err instanceof Error ? err.message : 'Неизвестная ошибка' };
   } finally {
-    if (localUri !== videoUri && localUri.startsWith(FileSystem.cacheDirectory ?? '')) {
+    if (copiedToCache && localUri.startsWith(FileSystem.cacheDirectory ?? '')) {
       FileSystem.deleteAsync(localUri, { idempotent: true }).catch(() => {});
     }
+  }
+};
+
+const backfilledThumbs = new Set<string>();
+
+/**
+ * Дозагрузка превью для старых роликов, у которых `_thumb.jpg` в бакете нет:
+ * кадр, снятый на устройстве, кладём рядом с mp4 — следующим зрителям он придёт с сервера.
+ */
+export const backfillVideoThumbnail = async (videoPublicUrl: string, thumbUri: string): Promise<void> => {
+  if (backfilledThumbs.has(videoPublicUrl)) return;
+  backfilledThumbs.add(videoPublicUrl);
+  try {
+    const url = new URL(videoPublicUrl);
+    const parts = url.pathname.split('/videos/');
+    if (parts.length < 2 || !/\.mp4$/i.test(parts[1])) return;
+    const thumbPath = parts[1].replace(/\.mp4$/i, '_thumb.jpg');
+    const res = await fetch(thumbUri);
+    if (!res.ok) return;
+    const buf = await res.arrayBuffer();
+    if (!buf.byteLength) return;
+    await supabase.storage.from('videos').upload(thumbPath, buf, { contentType: 'image/jpeg', upsert: true });
+  } catch (err) {
+    console.warn('⚠️ backfillVideoThumbnail:', err);
   }
 };
 

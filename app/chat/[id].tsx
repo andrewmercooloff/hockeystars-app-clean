@@ -6,6 +6,8 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import {
     Alert,
     Animated,
+    AppState,
+    type AppStateStatus,
     BackHandler,
     Image,
     ImageBackground,
@@ -25,6 +27,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from '../../components/BlurOrSolid';
+import { onInboxRefresh } from '../../utils/inboxEvents';
 import LoadingCenter from '../../components/LoadingCenter';
 import { colors } from '../../theme/colors';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
@@ -50,6 +53,16 @@ import { supabase } from '../../utils/supabase';
 import CachedBackground from '../../components/CachedBackground';
 import CachedAvatar from '../../components/CachedAvatar';
 import { addActivityPoints } from '../../services/activityService';
+import MessageReactionsBar from '../../components/MessageReactionsBar';
+import {
+  loadMessageReactionsBatch,
+  toggleMessageReaction,
+} from '../../services/reactionService';
+import {
+  type FeedReactionSummary,
+  type FeedReactionType,
+  EMPTY_FEED_REACTION_SUMMARY,
+} from '../../utils/reactions';
 import * as Clipboard from 'expo-clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -119,6 +132,7 @@ export default function ChatScreen() {
   const [otherPlayer, setOtherPlayer] = useState<Player | null>(null);
   const [currentUser, setCurrentUser] = useState<Player | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [messageReactions, setMessageReactions] = useState<Record<string, FeedReactionSummary>>({});
   const [newMessage, setNewMessage] = useState('');
   const newMessageRef = useRef<string>(''); // актуальный текст (для сохранения черновика без зависимостей)
   const [loading, setLoading] = useState(true);
@@ -589,6 +603,28 @@ export default function ChatScreen() {
     };
   }, [currentUser?.id, otherPlayer?.id, id]);
 
+  // Возврат из фона и пуш о сообщении — тихая сверка с БД (сокет realtime в фоне закрыт)
+  const loadMessagesRef = useRef<((skipBlockCheck?: boolean) => Promise<void>) | null>(null);
+  useEffect(() => {
+    if (!currentUser || !otherPlayer || otherPlayer.id !== id) return;
+    let last: AppStateStatus = AppState.currentState;
+    const appSub = AppState.addEventListener('change', (next) => {
+      if ((last === 'background' || last === 'inactive') && next === 'active') {
+        void loadMessagesRef.current?.(true);
+      }
+      last = next;
+    });
+    const offInbox = onInboxRefresh(({ peerId }) => {
+      if (!peerId || peerId === otherPlayer.id) {
+        void loadMessagesRef.current?.(true);
+      }
+    });
+    return () => {
+      appSub.remove();
+      offInbox();
+    };
+  }, [currentUser?.id, otherPlayer?.id, id]);
+
   // Функция загрузки сообщений - определена до useFocusEffect чтобы избежать ошибки "Cannot access before initialization"
   const loadMessages = useCallback(async (skipBlockCheck = false) => {
     if (currentUser && otherPlayer && otherPlayer.id === id) {
@@ -658,6 +694,11 @@ export default function ChatScreen() {
           
           return parsedConversation;
         });
+
+        void loadMessageReactionsBatch(
+          parsedConversation.map((m) => m.id),
+          currentUser.id
+        ).then(setMessageReactions);
         
         lastMessageIdsRef.current = currentMessageIds;
         
@@ -698,6 +739,7 @@ export default function ChatScreen() {
       }
     }
   }, [currentUser, otherPlayer, id, t, router]);
+  loadMessagesRef.current = loadMessages;
 
   // Обработка системной кнопки "назад" и восстановление позиции при возврате в чат
   useFocusEffect(
@@ -715,7 +757,11 @@ export default function ChatScreen() {
       const loadMessagesOnFocus = async () => {
         // Если данные уже загружены через loadChatData, не загружаем повторно
         if (chatDataLoadedRef.current) {
-          console.log('📱 Чат в фокусе - данные уже загружены, пропускаем повторную загрузку');
+          // Данные уже есть — всё равно тихо сверяемся с БД: realtime мог пропустить
+          // сообщения, пока экран был не в фокусе (loadMessages мерджит, без мигания)
+          if (currentUser && otherPlayer && otherPlayer.id === id) {
+            void loadMessages(true);
+          }
           return;
         }
         
@@ -1744,6 +1790,13 @@ export default function ChatScreen() {
                           onReplyPreviewPress={scrollReplyPreviewTarget}
                           youLabel={chatYouLabel}
                           otherLabel={chatOtherLabel}
+                          reactionSummary={messageReactions[message.id] ?? EMPTY_FEED_REACTION_SUMMARY}
+                          onReactionSummaryChange={(next) =>
+                            setMessageReactions((prev) => ({ ...prev, [message.id]: next }))
+                          }
+                          onReactionToggle={(type) =>
+                            toggleMessageReaction(message.id, currentUser.id, type, message.senderId)
+                          }
                         />
                       ))}
                     </View>
@@ -2689,6 +2742,9 @@ type ChatMessageRowProps = {
   onReplyPreviewPress: () => void;
   youLabel: string;
   otherLabel: string;
+  reactionSummary: FeedReactionSummary;
+  onReactionSummaryChange: (next: FeedReactionSummary) => void;
+  onReactionToggle: (type: FeedReactionType) => Promise<boolean>;
 };
 
 function areChatMessageRowPropsEqual(prev: ChatMessageRowProps, next: ChatMessageRowProps): boolean {
@@ -2708,6 +2764,9 @@ function areChatMessageRowPropsEqual(prev: ChatMessageRowProps, next: ChatMessag
   if (prev.onLongPress !== next.onLongPress) return false;
   if (prev.setMessageBubbleRef !== next.setMessageBubbleRef) return false;
   if (prev.onReplyPreviewPress !== next.onReplyPreviewPress) return false;
+  if (prev.reactionSummary !== next.reactionSummary) return false;
+  if (prev.onReactionSummaryChange !== next.onReactionSummaryChange) return false;
+  if (prev.onReactionToggle !== next.onReactionToggle) return false;
   return true;
 }
 
@@ -2729,6 +2788,9 @@ const ChatMessageRow = React.memo(function ChatMessageRow({
   onReplyPreviewPress,
   youLabel,
   otherLabel,
+  reactionSummary,
+  onReactionSummaryChange,
+  onReactionToggle,
 }: ChatMessageRowProps) {
   const isMyMessage = message.senderId === currentUserId;
 
@@ -2830,6 +2892,14 @@ const ChatMessageRow = React.memo(function ChatMessageRow({
               )}
             </View>
           </View>
+          <MessageReactionsBar
+            summary={reactionSummary}
+            viewerId={currentUserId}
+            messageOwnerId={message.senderId}
+            alignRight={isMyMessage}
+            onSummaryChange={onReactionSummaryChange}
+            onToggle={onReactionToggle}
+          />
         </View>
       </TouchableOpacity>
     </Swipeable>

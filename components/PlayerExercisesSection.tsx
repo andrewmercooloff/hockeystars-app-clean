@@ -21,11 +21,15 @@ export default function PlayerExercisesSection({ player, isOwnProfile, style }: 
   const [loading, setLoading] = useState(true);
   const [titlesLoading, setTitlesLoading] = useState(false);
 
+  // Сигнатура по содержимому: родитель может пересобирать объект player при каждом
+  // рендере — без этого секция уходила в «Загрузка…» и меняла высоту, дёргая скролл.
+  const exerciseStatsSignature = JSON.stringify(player.exerciseStats ?? null);
   useEffect(() => {
     if (isLanguageLoaded) { // Загружаем упражнения, когда язык загружен (для всех языков, включая английский)
       loadExerciseStats();
     }
-  }, [player.id, player.exerciseStats, language, isLanguageLoaded]); // Добавляем isLanguageLoaded в зависимости
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [player.id, exerciseStatsSignature, language, isLanguageLoaded]);
 
   // Ref для отслеживания предыдущего языка (для очистки кеша только при реальной смене языка)
   const previousLanguageRef = React.useRef<string | null>(null);
@@ -142,7 +146,9 @@ export default function PlayerExercisesSection({ player, isOwnProfile, style }: 
 
   const containerStyle = [styles.section, style];
 
-  if (loading || titlesLoading) {
+  // Плейсхолдер только пока данных нет вообще: при фоновом обновлении держим
+  // прежний контент, чтобы высота секции не прыгала под пальцем.
+  if (loading && !exerciseStats) {
     return (
       <View style={containerStyle}>
         <Text style={styles.sectionTitle}>{t('exercisesSection.title')}</Text>
@@ -169,11 +175,6 @@ export default function PlayerExercisesSection({ player, isOwnProfile, style }: 
   const sortedCompletions = [...exerciseStats.completions]
     .sort((a, b) => b.count - a.count);
 
-  // Проверяем, что все названия упражнений загружены
-  const allTitlesLoaded = sortedCompletions.every(completion => 
-    exerciseTitles[completion.exerciseId]
-  );
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('ru-RU', {
@@ -195,15 +196,8 @@ export default function PlayerExercisesSection({ player, isOwnProfile, style }: 
     );
   }
 
-  // Если не все названия загружены, показываем загрузку
-  if (!allTitlesLoaded) {
-    return (
-      <View style={containerStyle}>
-        <Text style={styles.sectionTitle}>{t('exercisesSection.title')}</Text>
-        <Text style={styles.loadingText}>{t('exercisesSection.loading')}</Text>
-      </View>
-    );
-  }
+  // Названия, которых ещё нет, подставляются как «Упражнение #id» в renderItem —
+  // без переключения всей секции в состояние загрузки.
 
   return (
     <View style={containerStyle}>

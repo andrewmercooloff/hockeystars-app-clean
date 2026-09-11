@@ -28,6 +28,8 @@ import { addActivityPoints, ensureRegistrationActivityPoints } from '../services
 import { initializePushNotifications } from '../utils/notificationService';
 import * as Notifications from 'expo-notifications';
 import { configureSystemUI } from '../utils/systemUI';
+import WebDeepLinkSync from '../components/WebDeepLinkSync';
+import WebProfileTouchFix from '../components/WebProfileTouchFix';
 import { scaleSize, scaleFont } from '../utils/fontUtils';
 import { forceGilroyFont } from '../utils/forceGilroyFont';
 import { initializeSounds } from '../utils/soundService';
@@ -47,7 +49,11 @@ import {
 // Исправляем импорт с учетом регистра
 import { dataCache, CACHE_KEYS } from '../utils/DataCache';
 import { safeHideSplashScreen } from '../utils/splashScreenUtils';
+import { isHomeSceneMounted, isHomeSceneReady, subscribeHomeScene } from '../utils/homeSceneSignal';
 import { useOtaUpdates } from '../hooks/useOtaUpdates';
+import { emitInboxRefresh, isMessagePushType } from '../utils/inboxEvents';
+import AnimatedSplash from '../components/AnimatedSplash';
+import OtaResurfaceOverlay from '../components/OtaResurfaceOverlay';
 
 // Предотвращаем автоматическое скрытие заставки
 SplashScreen.preventAutoHideAsync();
@@ -279,13 +285,26 @@ const UserSync = React.memo(({
       }
   }, [params.refresh, loadUser, refreshUser]);
     
+    // Главная сообщает, когда шайбы проявились: заставка уходит только после этого.
+    const [sceneTick, setSceneTick] = React.useState(0);
+    React.useEffect(() => subscribeHomeScene(() => setSceneTick((t) => t + 1)), []);
+
     // Скрываем splash screen когда приложение готово и пользователь загружен
     React.useEffect(() => {
       // Overlay is (!loaded || showSplash || !appReady) — force-hide must clear both.
-      // Web: ~3s safety so a hung init cannot leave an infinite spinner.
       // Web: shorter ceiling — JS parse already costs time; don't add artificial wait.
-      const maxSplashTime = Platform.OS === 'web' ? 1600 : 2000;
-      const forceHideSplashTimeout = setTimeout(() => {
+      const minSplashTime = Platform.OS === 'web' ? 1600 : 2000;
+      // Потолок ожидания льда: зависшая загрузка не должна оставить логотип навсегда.
+      const maxSplashTime = Platform.OS === 'web' ? 3000 : 4000;
+      const elapsed = () => Date.now() - splashStartTime.current;
+
+      if (!showSplash) return;
+
+      const timers: ReturnType<typeof setTimeout>[] = [];
+      let hidden = false;
+      const hideSplash = () => {
+        if (hidden) return;
+        hidden = true;
         setAppReady(true);
         Animated.timing(splashOpacity, {
           toValue: 0,
@@ -294,42 +313,35 @@ const UserSync = React.memo(({
         }).start(() => {
           setShowSplash(false);
         });
-      }, maxSplashTime);
+      };
+
+      timers.push(setTimeout(hideSplash, Math.max(0, maxSplashTime - elapsed())));
 
       if (appReady && !isUserLoading && userLoaded) {
-        // Плавно скрываем наш кастомный splash screen когда все загружено
-        clearTimeout(forceHideSplashTimeout);
-        
-        // Вычисляем оставшееся время до максимума
-        const elapsed = Date.now() - splashStartTime.current;
-        const remainingTime = Math.max(0, maxSplashTime - elapsed);
-        
-        // Если уже прошло достаточно времени, скрываем сразу
-        // Если нет, ждем минимальное время для плавности
-        const hideDelay = remainingTime > 100 ? 100 : 0;
-        
-        setTimeout(() => {
-          Animated.timing(splashOpacity, {
-            toValue: 0,
-            duration: 300,
-            useNativeDriver: true,
-          }).start(() => {
-            setShowSplash(false);
-          });
-        }, hideDelay);
+        // Между уходом логотипа и выездом шайб был кадр пустого льда: данные уже
+        // загружены, а сцена ещё проявляется. Ждём её — тогда логотип растворяется
+        // сразу в готовый лёд. Если открыт не главный маршрут (deep link на профиль),
+        // сцены не будет вовсе, поэтому ждём только пока она вообще монтируется.
+        const sceneSettled =
+          isHomeSceneReady() || (!isHomeSceneMounted() && elapsed() >= minSplashTime);
+
+        if (sceneSettled) {
+          timers.push(setTimeout(hideSplash, Math.max(100, minSplashTime - elapsed())));
+        } else if (!isHomeSceneMounted()) {
+          timers.push(setTimeout(() => setSceneTick((t) => t + 1), minSplashTime - elapsed() + 20));
+        }
       }
 
       return () => {
-        clearTimeout(forceHideSplashTimeout);
+        timers.forEach(clearTimeout);
       };
-  }, [appReady, setAppReady, isUserLoading, userLoaded, showSplash, setShowSplash, splashOpacity, splashStartTime]);
+  }, [appReady, setAppReady, isUserLoading, userLoaded, showSplash, setShowSplash, splashOpacity, splashStartTime, sceneTick]);
     
     return null;
 });
 
 export default function RootLayout() {
   useOtaUpdates();
-  const deferSecondaryTabs = React.useMemo(() => isLowEndAndroid(), []);
   const router = useRouter();
   const pathname = usePathname();
   const isDesktopLayout = useIsDesktopLayout();
@@ -1344,7 +1356,22 @@ export default function RootLayout() {
   React.useEffect(() => {
     const notificationListener = Notifications.addNotificationResponseReceivedListener(response => {
       const data = response.notification.request.content.data;
-      const deepLink = data?.deepLink;
+      let deepLink = data?.deepLink;
+      // Старые/сторонние пуши без deepLink, но с player_id (например scout_report) — ведём в профиль.
+      if (!deepLink && typeof data?.player_id === 'string' && data.player_id) {
+        deepLink =
+          data.type === 'scout_report'
+            ? `/player/${data.player_id}?scrollToAnalysis=true`
+            : `/player/${data.player_id}`;
+      }
+      // Пуши о сообщениях без deepLink (массовая рассылка, старые версии) — сразу в чат с отправителем
+      if (!deepLink && isMessagePushType(data?.type)) {
+        deepLink =
+          typeof data?.senderId === 'string' && data.senderId ? `/chat/${data.senderId}` : '/messages';
+      }
+      if (isMessagePushType(data?.type)) {
+        emitInboxRefresh('push', typeof data?.senderId === 'string' ? data.senderId : undefined);
+      }
       
       if (deepLink) {
         console.log('🔗 Deep link из уведомления:', deepLink);
@@ -1619,8 +1646,10 @@ export default function RootLayout() {
       
       // ВАЖНО: Сообщения (type: 'message') НЕ должны обновлять счетчик уведомлений
       // Счетчик уведомлений обновляется только для типов: stats_change, photo_added, gift_received, friend_request и т.д.
-      if (notificationType === 'message') {
-        console.log('🔔 Push: Это сообщение, не обновляем счетчик уведомлений');
+      if (isMessagePushType(notificationType)) {
+        // Realtime мог пропустить INSERT (сокет в фоне) — просим инбокс и открытый чат перечитать данные
+        const data = notification.request.content.data as Record<string, unknown> | undefined;
+        emitInboxRefresh('push', typeof data?.senderId === 'string' ? data.senderId : undefined);
         return; // Не обновляем счетчик уведомлений для сообщений
       }
       
@@ -1727,7 +1756,7 @@ export default function RootLayout() {
                 ...(Platform.OS === 'android' ? { backgroundColor: colors.scene } : {}),
               }}
             >
-              <CachedBackground style={{ flex: 1 }} vignette={false}>
+              <CachedBackground style={{ flex: 1 }} vignette={false} lighting={false}>
                 <StatusBar 
                   barStyle="light-content" 
                   backgroundColor="#050008" 
@@ -1736,7 +1765,7 @@ export default function RootLayout() {
                 />
                 
                 {/* Мобильный хедер; на desktop навигация в левой колонке */}
-                {!isDesktopLayout && !isAuthScreen ? <LogoHeader /> : null}
+                {!isDesktopLayout ? <LogoHeader /> : null}
                 {Platform.OS === 'web' ? <WebYandexMetrika /> : null}
 
                 {(() => {
@@ -1744,7 +1773,7 @@ export default function RootLayout() {
                 <Tabs
             screenOptions={{
               headerShown: false, // Убираем встроенные хедеры
-              tabBarStyle: isDesktopLayout || isAuthScreen
+              tabBarStyle: isDesktopLayout
                 ? { display: 'none', height: 0, overflow: 'hidden' }
                 : { 
                 backgroundColor: 'rgba(11, 11, 14, 0.96)', 
@@ -1766,6 +1795,10 @@ export default function RootLayout() {
               // и тогда виден фон контейнера. Делаем прозрачным, чтобы всегда был виден лёд.
               // expo-router Tabs типы не всегда знают этот проп — оставляем runtime‑поведение.
               sceneStyle: { backgroundColor: 'transparent' },
+              // Web: mount only the active tab — otherwise inactive absolute scenes block profile scroll on cold deep-links.
+              // Native keeps the navigator default; forcing it here would also eagerly
+              // mount hidden screens (messages/mass, admin, chat…) on launch.
+              ...(Platform.OS === 'web' ? { lazy: true } : {}),
               ...(Platform.OS === 'android'
                 ? ({ sceneContainerStyle: { backgroundColor: 'transparent', flex: 1 } } as any)
                 : ({ sceneContainerStyle: { backgroundColor: 'transparent', flex: 1 } } as any)),
@@ -1775,6 +1808,13 @@ export default function RootLayout() {
           name="index"
           listeners={({ navigation }) => ({
             tabPress: (e) => {
+              // Web: home rink lives at /feed (marketing owns /). Cannot set href
+              // on this tab — it uses a custom tabBarButton.
+              if (Platform.OS === 'web' && !navigation.isFocused()) {
+                e.preventDefault();
+                router.replace('/feed' as any);
+                return;
+              }
               if (!navigation.isFocused()) return;
               const handleHomeShake = (globalThis as { __handleHomeShake?: () => void }).__handleHomeShake;
               if (typeof handleHomeShake !== 'function') return;
@@ -1802,7 +1842,7 @@ export default function RootLayout() {
             },
           })}
           options={{
-            lazy: deferSecondaryTabs,
+            lazy: true,
             tabBarLabel: ({ focused }) => <TabBarLabel labelKey="tabs.chat" focused={focused} />,
             tabBarIcon: ({ size, focused }) => {
               const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
@@ -1856,7 +1896,7 @@ export default function RootLayout() {
             },
           })}
           options={{
-            lazy: deferSecondaryTabs,
+            lazy: true,
             tabBarLabel: ({ focused }) => <TabBarLabel labelKey="tabs.feed" focused={focused} />,
             tabBarIcon: NotificationsTabIcon,
           }}
@@ -1866,7 +1906,8 @@ export default function RootLayout() {
           name="search"
           listeners={({ navigation }) => ({
             tabPress: (e: any) => {
-              if (!currentUser) {
+              // На вебе поиск доступен гостям (публичный каталог игроков)
+              if (!currentUser && Platform.OS !== 'web') {
                 e.preventDefault();
                 router.replace('/login');
                 return;
@@ -1875,7 +1916,7 @@ export default function RootLayout() {
             },
           })}
           options={{
-            lazy: deferSecondaryTabs,
+            lazy: true,
             tabBarLabel: ({ focused }) => <TabBarLabel labelKey="tabs.scout" focused={focused} />,
             tabBarIcon: ({ size, focused }) => {
               const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
@@ -1897,7 +1938,7 @@ export default function RootLayout() {
             },
           })}
           options={{
-            lazy: deferSecondaryTabs,
+            lazy: true,
             tabBarLabel: ({ focused }) => <TabBarLabel labelKey="tabs.skills" focused={focused} />,
             tabBarIcon: ({ size, focused }) => {
               const iconSize = Platform.OS === 'ios' ? (size - 2) * 1.1 : size - 2;
@@ -1930,6 +1971,9 @@ export default function RootLayout() {
           name="player/[id]"
           options={{
             href: null,
+            ...(Platform.OS === 'web'
+              ? { sceneStyle: { backgroundColor: 'transparent', zIndex: 20 } }
+              : {}),
           }}
         />
         <Tabs.Screen
@@ -2017,6 +2061,9 @@ export default function RootLayout() {
           name="[lang]/player/[id]"
           options={{
             href: null,
+            ...(Platform.OS === 'web'
+              ? { sceneStyle: { backgroundColor: 'transparent', zIndex: 20 } }
+              : {}),
           }}
         />
 
@@ -2035,6 +2082,14 @@ export default function RootLayout() {
                   );
                 })()}
           
+          <OtaResurfaceOverlay />
+          {Platform.OS === 'web' ? (
+            <>
+              <WebDeepLinkSync />
+              <WebProfileTouchFix />
+            </>
+          ) : null}
+
           {/* Splash screen поверх всего интерфейса */}
           {(!loaded || showSplash || !appReady) && (
             <Animated.View style={{ 
@@ -2050,14 +2105,7 @@ export default function RootLayout() {
               elevation: 9999,
               opacity: splashOpacity,
             }}>
-              <Image 
-                source={require('../assets/images/splash-icon.png')} 
-                style={{ 
-                  width: 200, // Оптимизированный размер для лучшего соответствия нативному splash
-                  height: 200
-                }}
-                resizeMode="contain"
-              />
+              <AnimatedSplash opacity={splashOpacity} />
             </Animated.View>
           )}
           

@@ -3,11 +3,12 @@ import { Image, ImageBackground, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
   LEADER_BORDER_COLORS,
-  computeSavePercentage,
   getMedalLeaderRank,
 } from '../utils/leaderDisplay';
-import { getPlayerSeasonPoints, type Player } from '../utils/playerStorage';
+import { type Player } from '../utils/playerStorage';
+import { getAllTimeGoalieBlock, getAllTimePoints, getSeasonSavePercentage } from '../utils/seasonStats';
 import { getRatingShareCardWidth } from '../utils/ratingShareExport';
+import { birthYearOf } from '../utils/birthDate';
 
 export type SearchRatingShareEntry = {
   player: Player;
@@ -17,6 +18,8 @@ export type SearchRatingShareEntry = {
 export type SearchRatingShareCardProps = {
   title: string;
   filterLine?: string;
+  /** Например «Сезон 25/26» — выводится под фильтром. */
+  seasonLine?: string;
   subtitle?: string;
   goalieMode: boolean;
   entries: SearchRatingShareEntry[];
@@ -26,11 +29,13 @@ export type SearchRatingShareCardProps = {
 export const RATING_SHARE_SITE = 'hockey-stars.com';
 export const RATING_SHARE_CARD_WIDTH = getRatingShareCardWidth();
 const CARD_SCALE = RATING_SHARE_CARD_WIDTH / 1080;
+/** Формат поста Instagram 4:5 (1080×1350) — выше этого лента обрезает картинку. */
+export const RATING_SHARE_CARD_HEIGHT = Math.round(RATING_SHARE_CARD_WIDTH * 1.25);
 const STAR_BG = require('../assets/images/star.png');
 /** Те же пропорции, что в LogoHeader (189×63) — logo.png горизонтальный, не квадрат. */
 const LOGO_HEADER_W = 189;
 const LOGO_HEADER_H = 63;
-const LOGO_DESIGN_WIDTH = 619;
+const LOGO_DESIGN_WIDTH = 440;
 const LOGO_DESIGN_HEIGHT = Math.round(LOGO_DESIGN_WIDTH * (LOGO_HEADER_H / LOGO_HEADER_W));
 
 function formatLeaderStat(
@@ -38,12 +43,13 @@ function formatLeaderStat(
   goalieMode: boolean,
   t: (key: string) => string
 ): string {
+  // Рейтинг поиска — суммарно за все сезоны
   if (goalieMode) {
-    const sv = computeSavePercentage(player);
-    if (sv >= 0) return `SV% ${sv.toFixed(3)}`;
+    const block = getAllTimeGoalieBlock(player);
+    if (block) return `SV% ${getSeasonSavePercentage(block)}`;
     return 'SV% —';
   }
-  const pts = getPlayerSeasonPoints(player);
+  const pts = getAllTimePoints(player);
   return `${pts} ${t('search.ratingPointsLabel') || 'pts'}`;
 }
 
@@ -55,7 +61,7 @@ function getPlayerMeta(player: Player, t: (key: string) => string): string {
         : player.country
       : null,
     player.birthDate
-      ? String(new Date(player.birthDate).getFullYear())
+      ? String(birthYearOf(player.birthDate) ?? '')
       : player.age
         ? String(new Date().getFullYear() - player.age)
         : null,
@@ -126,12 +132,16 @@ function ShareAvatar({
 
 const SearchRatingShareCard = React.forwardRef<View, SearchRatingShareCardProps>(
   function SearchRatingShareCard(
-    { title, filterLine, subtitle, goalieMode, entries, t },
+    { title, filterLine, seasonLine, subtitle, goalieMode, entries, t },
     ref
   ) {
     const rows = entries.slice(0, 10);
     const topThree = rows.filter((e) => e.rank <= 3).sort((a, b) => a.rank - b.rank);
     const restRows = rows.filter((e) => e.rank > 3).sort((a, b) => a.rank - b.rank);
+    // Пьедестал: 2 — 1 — 3, победитель в центре и выше остальных
+    const podiumOrder = [2, 1, 3]
+      .map((r) => topThree.find((e) => e.rank === r))
+      .filter((e): e is SearchRatingShareEntry => !!e);
 
     const footer =
       t('search.shareRatingFooter') === 'search.shareRatingFooter' ||
@@ -139,10 +149,8 @@ const SearchRatingShareCard = React.forwardRef<View, SearchRatingShareCardProps>
         ? RATING_SHARE_SITE
         : t('search.shareRatingFooter');
 
-    const podiumRing = s(118);
-    const podiumImage = s(110);
-    const rowRing = s(72);
-    const rowImage = s(68);
+    const rowRing = s(58);
+    const rowImage = s(54);
 
     return (
       <View ref={ref} style={styles.card} collapsable={false}>
@@ -171,34 +179,52 @@ const SearchRatingShareCard = React.forwardRef<View, SearchRatingShareCardProps>
               <Text style={styles.filterLine}>{filterLine}</Text>
             </View>
           ) : null}
+          {seasonLine ? <Text style={styles.seasonLine}>{seasonLine}</Text> : null}
           {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
 
-          {topThree.length > 0 ? (
+          {podiumOrder.length > 0 ? (
             <View style={styles.podiumRow}>
-              {topThree.map(({ player, rank }) => {
+              {podiumOrder.map(({ player, rank }) => {
                 const medal = getMedalLeaderRank(rank);
                 const ringColor = medal ? LEADER_BORDER_COLORS[medal] : '#fa2f40';
                 const meta = getPlayerMeta(player, t);
+                const isWinner = rank === 1;
+                const ring = isWinner ? s(168) : s(118);
+                const image = isWinner ? s(156) : s(108);
                 return (
-                  <View key={player.id} style={styles.podiumCol}>
-                    <Text style={[styles.podiumRank, { color: ringColor }]}>{rank}</Text>
+                  <View
+                    key={player.id}
+                    style={[
+                      styles.podiumCol,
+                      isWinner ? styles.podiumColWinner : styles.podiumColSide,
+                      { borderColor: isWinner ? ringColor : 'rgba(250, 47, 64, 0.28)' },
+                    ]}
+                  >
+                    <View style={[styles.podiumBadge, { backgroundColor: ringColor }]}>
+                      <Text style={styles.podiumBadgeText}>{rank}</Text>
+                    </View>
                     <ShareAvatar
                       player={player}
-                      ringSize={podiumRing}
-                      imageSize={podiumImage}
+                      ringSize={ring}
+                      imageSize={image}
                       borderColor={ringColor}
-                      borderWidth={medal ? 3 : 2}
-                      iconSize={Math.round(36 * CARD_SCALE)}
+                      borderWidth={isWinner ? 5 : 3}
+                      iconSize={Math.round((isWinner ? 52 : 36) * CARD_SCALE)}
                     />
-                    <Text style={styles.podiumName} numberOfLines={2}>
+                    <Text
+                      style={[styles.podiumName, isWinner ? styles.podiumNameWinner : null]}
+                      numberOfLines={2}
+                    >
                       {player.name}
                     </Text>
                     {meta ? (
-                      <Text style={styles.podiumMeta} numberOfLines={2}>
+                      <Text style={styles.podiumMeta} numberOfLines={1}>
                         {meta}
                       </Text>
                     ) : null}
-                    <Text style={styles.podiumStat}>{formatLeaderStat(player, goalieMode, t)}</Text>
+                    <Text style={[styles.podiumStat, isWinner ? styles.podiumStatWinner : null]}>
+                      {formatLeaderStat(player, goalieMode, t)}
+                    </Text>
                   </View>
                 );
               })}
@@ -221,7 +247,7 @@ const SearchRatingShareCard = React.forwardRef<View, SearchRatingShareCardProps>
                       ringSize={rowRing}
                       imageSize={rowImage}
                       borderColor="rgba(250, 47, 64, 0.45)"
-                      iconSize={Math.round(28 * CARD_SCALE)}
+                      iconSize={Math.round(22 * CARD_SCALE)}
                     />
                   </View>
                   <View style={styles.rowText}>
@@ -240,6 +266,7 @@ const SearchRatingShareCard = React.forwardRef<View, SearchRatingShareCardProps>
             </View>
           ) : null}
 
+          <View style={styles.spacer} />
           <Text style={styles.footer}>{footer}</Text>
         </View>
       </View>
@@ -252,6 +279,7 @@ const s = (n: number) => Math.round(n * CARD_SCALE);
 const styles = StyleSheet.create({
   card: {
     width: RATING_SHARE_CARD_WIDTH,
+    height: RATING_SHARE_CARD_HEIGHT,
     backgroundColor: '#060408',
     overflow: 'hidden',
   },
@@ -302,19 +330,23 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(250, 47, 64, 0.28)',
   },
   inner: {
+    flex: 1,
     paddingHorizontal: s(40),
-    paddingTop: s(16),
-    paddingBottom: s(36),
+    paddingTop: s(22),
+    paddingBottom: s(26),
+  },
+  spacer: {
+    flex: 1,
   },
   logo: {
     width: s(LOGO_DESIGN_WIDTH),
     height: s(LOGO_DESIGN_HEIGHT),
     alignSelf: 'center',
-    marginBottom: s(6),
+    marginBottom: s(4),
   },
   title: {
     color: '#fff',
-    fontSize: s(44),
+    fontSize: s(40),
     fontFamily: 'Gilroy-Bold',
     textAlign: 'center',
     textTransform: 'uppercase',
@@ -325,14 +357,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#fa2f40',
     borderRadius: s(10),
     paddingHorizontal: s(16),
-    paddingVertical: s(8),
-    marginTop: s(10),
+    paddingVertical: s(6),
+    marginTop: s(8),
   },
   filterLine: {
     color: '#fff',
-    fontSize: s(32),
+    fontSize: s(28),
     fontFamily: 'Gilroy-Bold',
     textAlign: 'center',
+  },
+  seasonLine: {
+    color: 'rgba(255,255,255,0.72)',
+    fontSize: s(24),
+    fontFamily: 'Gilroy-Bold',
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    letterSpacing: 2,
+    marginTop: s(8),
   },
   subtitle: {
     color: 'rgba(250, 47, 64, 0.85)',
@@ -344,24 +385,42 @@ const styles = StyleSheet.create({
   podiumRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginTop: s(20),
-    gap: s(8),
+    alignItems: 'flex-end',
+    marginTop: s(18),
+    gap: s(10),
   },
   podiumCol: {
-    flex: 1,
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: s(18),
+    borderRadius: s(20),
     borderWidth: 1,
-    borderColor: 'rgba(250, 47, 64, 0.28)',
-    paddingVertical: s(14),
     paddingHorizontal: s(6),
   },
-  podiumRank: {
-    fontSize: s(36),
+  podiumColSide: {
+    flex: 1,
+    paddingTop: s(22),
+    paddingBottom: s(14),
+  },
+  podiumColWinner: {
+    flex: 1.25,
+    paddingTop: s(24),
+    paddingBottom: s(18),
+    backgroundColor: 'rgba(250, 47, 64, 0.10)',
+    borderWidth: 2,
+  },
+  podiumBadge: {
+    position: 'absolute',
+    top: -s(18),
+    width: s(40),
+    height: s(40),
+    borderRadius: s(20),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  podiumBadgeText: {
+    color: '#0a0608',
+    fontSize: s(24),
     fontFamily: 'Gilroy-Bold',
-    marginBottom: s(8),
   },
   avatarRingBase: {
     overflow: 'hidden',
@@ -371,24 +430,31 @@ const styles = StyleSheet.create({
   },
   podiumName: {
     color: '#fff',
-    fontSize: s(26),
+    fontSize: s(24),
     fontFamily: 'Gilroy-Bold',
     textAlign: 'center',
+    textTransform: 'uppercase',
     minHeight: s(56),
   },
-  podiumMeta: {
-    color: 'rgba(255,255,255,0.7)',
+  podiumNameWinner: {
     fontSize: s(28),
-    fontFamily: 'Gilroy-Bold',
+  },
+  podiumMeta: {
+    color: 'rgba(255,255,255,0.65)',
+    fontSize: s(22),
+    fontFamily: 'Gilroy-Regular',
     textAlign: 'center',
-    marginTop: s(4),
-    marginBottom: s(6),
+    marginTop: s(2),
+    marginBottom: s(4),
   },
   podiumStat: {
     color: '#fa2f40',
     fontSize: s(26),
     fontFamily: 'Gilroy-Bold',
     textAlign: 'center',
+  },
+  podiumStatWinner: {
+    fontSize: s(34),
   },
   list: {
     marginTop: s(16),
@@ -400,11 +466,11 @@ const styles = StyleSheet.create({
     borderRadius: s(20),
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.28)',
-    paddingVertical: s(14),
-    paddingHorizontal: s(16),
+    paddingVertical: s(8),
+    paddingHorizontal: s(14),
   },
   rowGap: {
-    marginBottom: s(10),
+    marginBottom: s(8),
   },
   rowAvatarWrap: {
     marginRight: s(12),
@@ -412,7 +478,7 @@ const styles = StyleSheet.create({
   rank: {
     width: s(40),
     color: 'rgba(250, 47, 64, 0.55)',
-    fontSize: s(34),
+    fontSize: s(30),
     fontFamily: 'Gilroy-Bold',
     textAlign: 'center',
   },
@@ -424,14 +490,14 @@ const styles = StyleSheet.create({
   },
   name: {
     color: '#fff',
-    fontSize: s(28),
+    fontSize: s(26),
     fontFamily: 'Gilroy-Bold',
   },
   meta: {
     color: 'rgba(255,255,255,0.6)',
-    fontSize: s(24),
+    fontSize: s(21),
     fontFamily: 'Gilroy-Regular',
-    marginTop: s(4),
+    marginTop: s(2),
   },
   stat: {
     color: '#fa2f40',
@@ -445,7 +511,7 @@ const styles = StyleSheet.create({
     fontSize: s(22),
     fontFamily: 'Gilroy-Bold',
     textAlign: 'center',
-    marginTop: s(24),
+    marginTop: s(12),
     letterSpacing: 1,
   },
 });

@@ -1,10 +1,6 @@
 import { Dimensions, Platform } from 'react-native';
-import {
-  getPlayerGAA,
-  getPlayerSeasonPoints,
-  hasValidGoalieGAAStats,
-  type Player,
-} from './playerStorage';
+import { getPlayerSeasonPoints, type Player } from './playerStorage';
+import { getAllTimeGAA, getAllTimeGoalieBlock, getAllTimePoints } from './seasonStats';
 import { getPerformanceLevel } from './devicePerformance';
 
 export type LeaderRank = 1 | 2 | 3;
@@ -102,22 +98,41 @@ export const computeSavePercentage = (player: Player): number => {
   return saves / shots;
 };
 
-/** Сравнение для таблицы лидеров: полевые — гол+пас; вратари — GAA (меньше лучше). */
+/**
+ * Сравнение для рейтинга в поиске — по суммарным показателям за все сезоны:
+ * полевые — гол+пас, вратари — GAA (меньше лучше).
+ */
 export const compareLeaderPlayers = (
   a: Player,
   b: Player,
   goalieMode: boolean
 ): number => {
   if (goalieMode) {
-    const gaaA = getPlayerGAA(a);
-    const gaaB = getPlayerGAA(b);
+    const gaaA = getAllTimeGAA(a);
+    const gaaB = getAllTimeGAA(b);
     if (gaaA < 0 && gaaB < 0) return 0;
     if (gaaA < 0) return 1;
     if (gaaB < 0) return -1;
     return gaaA - gaaB;
   }
-  return getPlayerSeasonPoints(b) - getPlayerSeasonPoints(a);
+  return getAllTimePoints(b) - getAllTimePoints(a);
 };
+
+/** Новички в скауте: зарегистрировались за последние newcomerMaxMs, новые первыми. */
+export function getSearchNewcomers(players: Player[], newcomerMaxMs: number): Player[] {
+  const now = Date.now();
+  return players
+    .filter((player) => {
+      if (!player.createdAt) return false;
+      const createdTime = new Date(player.createdAt).getTime();
+      return !isNaN(createdTime) && now - createdTime < newcomerMaxMs;
+    })
+    .sort((a, b) => {
+      const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return bTime - aTime;
+    });
+}
 
 /** Скаут: новички → топ-10 лидеров → остальные по тем же очкам. */
 export const sortPlayersForSearchList = (
@@ -149,7 +164,7 @@ export const sortPlayersForSearchList = (
   others.sort((a, b) => compareLeaderPlayers(a, b, goalieMode));
 
   const leaderPool = goalieMode
-    ? others.filter((p) => hasValidGoalieGAAStats(p))
+    ? others.filter((p) => getAllTimeGoalieBlock(p) != null)
     : others;
   const leaders = leaderPool.slice(0, MAX_SEARCH_LEADERS);
   const leaderIds = new Set(leaders.map((p) => p.id));

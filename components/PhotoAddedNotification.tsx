@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
   View,
   Text,
@@ -24,7 +24,7 @@ import LikeButton from './LikeButton';
 import { generatePhotoContentId } from '../utils/likesService';
 import { colors } from '../theme/colors';
 import { rewriteSupabasePublicUrl } from '../utils/supabase';
-import { updateAvatarGlobally } from '../utils/AvatarCache';
+import { ensureAvatarCached } from '../utils/AvatarCache';
 
 interface PhotoAddedNotificationProps {
   playerName: string;
@@ -34,6 +34,7 @@ interface PhotoAddedNotificationProps {
   playerAvatar?: string;
   photoUrls?: string[];
   onHeaderPress?: () => void;
+  reactionsFooter?: ReactNode;
 }
 
 // Медиа на всю ширину карточки (карточка: marginHorizontal 16)
@@ -181,6 +182,7 @@ const PhotoAddedNotification = React.memo(function PhotoAddedNotification({
   playerAvatar,
   photoUrls = [],
   onHeaderPress,
+  reactionsFooter,
 }: PhotoAddedNotificationProps) {
   const { t } = useLanguage();
   const [activeIndex, setActiveIndex] = useState(0);
@@ -196,7 +198,7 @@ const PhotoAddedNotification = React.memo(function PhotoAddedNotification({
 
   useEffect(() => {
     if (!playerId || !playerAvatar) return;
-    void updateAvatarGlobally(playerId, playerAvatar);
+    void ensureAvatarCached(playerId, playerAvatar);
   }, [playerId, playerAvatar]);
 
   useEffect(() => {
@@ -350,7 +352,9 @@ const PhotoAddedNotification = React.memo(function PhotoAddedNotification({
             <Text style={styles.badgeText}>+{photosCount}</Text>
           </View>
         )}
-      </View>
+
+        {reactionsFooter}
+    </View>
     </BlurOrSolid>
   );
 });

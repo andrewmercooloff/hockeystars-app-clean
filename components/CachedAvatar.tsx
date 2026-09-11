@@ -1,5 +1,6 @@
 import React from 'react';
 import { Image } from 'expo-image';
+import { getSupabaseOriginVersion, subscribeSupabaseOrigin } from '../utils/supabase';
 import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAvatarCache } from '../utils/AvatarCache';
@@ -19,9 +20,17 @@ interface CachedAvatarProps {
   imagePriority?: 'low' | 'normal' | 'high';
 }
 
-/** URL без query — для сравнения «тот же файл или нет». */
+/**
+ * Идентичность файла: путь + параметры версии, без хоста (direct ↔ proxy — тот же файл).
+ * ?v=/_v= входят в идентичность: перезаписанный под тем же именем файл — уже другой аватар.
+ */
 function avatarUriBase(url: string | null | undefined): string {
   if (!url) return '';
+  return url.replace(/^https?:\/\/[^/]+/, '');
+}
+
+/** URL без параметров — последний шанс взять файл из дискового кеша. */
+function stripQuery(url: string): string {
   return url.split('?')[0];
 }
 
@@ -45,7 +54,14 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
   const [retryNonce, setRetryNonce] = React.useState(0);
   const retryCountRef = React.useRef(0);
   const prevUrlRef = React.useRef<string | null>(null);
-  const lastGoodUrlRef = React.useRef<string | null>(null);
+  // Failover direct ↔ proxy: URL пересчитывается через rewriteSupabasePublicUrl при рендере,
+  // поэтому достаточно форсировать рендер — иначе картинка висит на мёртвом origin.
+  const [, setOriginVersion] = React.useState(getSupabaseOriginVersion);
+  // URL, который РЕАЛЬНО загрузился (а не просто был назначен) — им затыкаем сбои сети.
+  const lastLoadedUrlRef = React.useRef<string | null>(null);
+  // Принудительная замена URL после сбоев: сначала «голый» URL без версии (он чаще всего
+  // уже лежит на диске), потом последний удачно загруженный.
+  const [overrideUrl, setOverrideUrl] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const currentUrl = rewriteSupabasePublicUrl(cachedAvatarUrl || fallbackAvatarUrl);
@@ -65,6 +81,7 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
       }
       setImageError(false);
       setPreferFallback(false);
+      setOverrideUrl(null);
       retryCountRef.current = 0;
     }
   }, [cachedAvatarUrl, fallbackAvatarUrl]);
@@ -103,13 +120,13 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
     return url;
   }, [cachedAvatarUrl, fallbackAvatarUrl, urlTimestamp, preferFallback]);
 
-  if (effectiveAvatarUrl) {
-    lastGoodUrlRef.current = effectiveAvatarUrl;
-  }
+  const displayAvatarUrl = overrideUrl || effectiveAvatarUrl || lastLoadedUrlRef.current;
 
-  const displayAvatarUrl = effectiveAvatarUrl || lastGoodUrlRef.current;
-
+  const loadedRef = React.useRef(false);
+  const sourceUriRef = React.useRef<string | null>(null);
   const handleLoad = React.useCallback(() => {
+    loadedRef.current = true;
+    if (sourceUriRef.current) lastLoadedUrlRef.current = sourceUriRef.current;
     setImageError(false);
     retryCountRef.current = 0;
     onLoad?.();
@@ -136,11 +153,23 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
       setRetryNonce((n) => n + 1);
       return;
     }
-    if (!lastGoodUrlRef.current) {
-      setImageError(true);
-      onError?.();
+    const current = overrideUrl || url;
+    const bare = current ? stripQuery(current) : '';
+    if (current && isRemote && current !== bare && overrideUrl !== bare) {
+      // Версионный URL (_v=/r=) не пришёл — пробуем тот же файл без параметров: его
+      // показывают другие экраны, и он почти наверняка есть в дисковом кеше.
+      setOverrideUrl(bare);
+      setImageError(false);
+      return;
     }
-  }, [effectiveAvatarUrl, fallbackAvatarUrl, cachedAvatarUrl, preferFallback, onError]);
+    if (lastLoadedUrlRef.current && lastLoadedUrlRef.current !== current) {
+      setOverrideUrl(lastLoadedUrlRef.current);
+      setImageError(false);
+      return;
+    }
+    setImageError(true);
+    onError?.();
+  }, [effectiveAvatarUrl, fallbackAvatarUrl, cachedAvatarUrl, preferFallback, overrideUrl, onError]);
 
   const imageStyle = React.useMemo(
     () => {
@@ -159,10 +188,46 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
 
   const sourceUri = React.useMemo(() => {
     if (!displayAvatarUrl) return displayAvatarUrl;
-    if (retryNonce === 0) return displayAvatarUrl;
+    // Для «аварийных» URL (голый / последний удачный) параметр повтора не добавляем —
+    // иначе снова получится уникальный URL, которого нет в кеше.
+    if (retryNonce === 0 || overrideUrl) return displayAvatarUrl;
     const separator = displayAvatarUrl.includes('?') ? '&' : '?';
     return `${displayAvatarUrl}${separator}r=${retryNonce}`;
-  }, [displayAvatarUrl, retryNonce]);
+  }, [displayAvatarUrl, retryNonce, overrideUrl]);
+  sourceUriRef.current = sourceUri ?? null;
+
+  // handleError меняет идентичность на каждый setState, а сторожок ниже должен
+  // перезапускаться только от смены URL — иначе он сбрасывает «картинка загружена»
+  // на ровном месте и через 8 с подменяет URL уже показанному аватару.
+  const handleErrorRef = React.useRef(handleError);
+  handleErrorRef.current = handleError;
+
+  // Смена origin (direct ↔ proxy) прилетает фоновым probe'ом через секунду после
+  // старта. Уже показанный аватар трогать нельзя: он загрузился, значит его хост
+  // жив, а перерисовка увела бы все шайбы разом на новый URL — сеть встаёт колом,
+  // аватары мигают, шайбы дёргаются. Перерешиваем только то, что ещё не загрузилось.
+  React.useEffect(
+    () =>
+      subscribeSupabaseOrigin(() => {
+        if (loadedRef.current) return;
+        retryCountRef.current = 0;
+        setOriginVersion(getSupabaseOriginVersion());
+      }),
+    []
+  );
+
+  // Сторожок зависшей загрузки: у expo-image нет таймаута, а недоступный origin
+  // (например, прокси за VPN) держит запрос минутами — шайба остаётся чёрной.
+  React.useEffect(() => {
+    const isRemote = !!sourceUri && (sourceUri.startsWith('http://') || sourceUri.startsWith('https://'));
+    if (!isRemote) return;
+    if (lastLoadedUrlRef.current === sourceUri) return;
+    loadedRef.current = false;
+    const tid = setTimeout(() => {
+      if (!loadedRef.current) handleErrorRef.current();
+    }, 8000);
+    return () => clearTimeout(tid);
+  }, [sourceUri]);
 
   if (status === 'scout') {
     return (
@@ -199,7 +264,7 @@ const CachedAvatar: React.FC<CachedAvatarProps> = React.memo(({
   return (
     <View style={[imageStyle, { backgroundColor: 'rgba(255, 255, 255, 0.12)', overflow: 'hidden' }]}>
       <Image
-        source={{ uri: sourceUri }}
+        source={{ uri: sourceUri ?? undefined }}
         style={imageStyle}
         contentFit="cover"
         onError={handleError}

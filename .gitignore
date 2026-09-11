@@ -90,3 +90,14 @@ website/vendor/
 *.MOV
 *.mov
 scripts/broadcast-log.txt
+
+# Secrets / keys / bytecode
+hockeystars
+hockeystars.pub
+*.pem
+id_rsa*
+google-service-account.json
+__pycache__/
+*.pyc
+*.pyo
+db_cluster*.backup

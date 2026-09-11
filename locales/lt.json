@@ -30,7 +30,10 @@
     "left": "kairė",
     "right": "dešinė",
     "offline": "Nėra ryšio",
-    "and": "ir"
+    "and": "ir",
+    "info": "Informacija",
+    "continue": "Tęsti",
+    "warning": "Dėmesio"
   },
   "winger": "Krašto puolėjas",
   "center": "Centro į priekį",
@@ -220,7 +223,9 @@
       "saveError": "Nepavyko pažymėti pratimo kaip atlikto",
       "generalError": "Išsaugant įvyko klaida",
       "times": "vieną kartą",
-      "timesPlural": "kartų"
+      "timesPlural": "kartų",
+      "loginRequired": "Prisijunkite, kad atliktumėte pratimus",
+      "title": "Pratimas"
     },
     "difficulty": {
       "Начинающий": "Pradžia",
@@ -3105,7 +3110,8 @@
         "difficulty": "Начинающий",
         "duration": "10 мин"
       }
-    }
+    },
+    "timesPlural": "kartus"
   },
   "items": {
     "autograph": "autografas",
@@ -3199,7 +3205,13 @@
     "errorProcessFriendRequest": "Nepavyko apdoroti jūsų užklausos draugauti.",
     "errorProcessRequest": "Nepavyko apdoroti jūsų užklausos",
     "errorSendMessage": "Nepavyko išsiųsti pranešimo",
-    "phoneOrEmailPlaceholderShort": "+370… arba el. paštas"
+    "phoneOrEmailPlaceholderShort": "+370… arba el. paštas",
+    "email": "El. paštas",
+    "errorSwitchingToEmail": "Nepavyko perjungti į prisijungimą el. paštu",
+    "smsRateLimited": "Kodas šiuo numeriu išsiųstas mažiau nei prieš minutę. Įveskite jį arba paprašykite naujo, kai baigsis laikmatis.",
+    "smsServerUnreachable": "Nepavyksta pasiekti HockeyStars serverio. Patikrinkite ryšį (VPN gali blokuoti) ir spauskite „Siųsti dar kartą“.",
+    "smsEmailOnly": "JAV ir Kanadai — prisijungimas el. paštu.",
+    "smsProviderFailed": "Operatorius nepriėmė SMS. Patikrinkite numerį arba bandykite po minutės."
   },
   "profile": {
     "addFriend": "Pridėti kaip draugą",
@@ -3494,7 +3506,32 @@
     "city": "Miestas",
     "addAddress": "Pridėti adresą",
     "addressesHint": "Galite nurodyti kelis adresus",
-    "previousSeason": "Previous season"
+    "previousSeason": "Previous season",
+    "cover": "Viršelis",
+    "changeCover": "Keisti viršelį",
+    "removeCover": "Pašalinti viršelį",
+    "teamLogo": "Komandos logotipas",
+    "uploadTeamLogo": "Įkelti logotipą",
+    "coverUpdated": "Viršelis atnaujintas",
+    "teamLogoUpdated": "Komandos logotipas atnaujintas",
+    "coverUploadFailed": "Nepavyko įkelti vaizdo",
+    "scoutPrivacyNote": "Kiti naudotojai nematys jūsų nuotraukos ir vardo – jiems esate „Skautas“.",
+    "positionCover": "Nustatykite viršelį",
+    "positionCoverHint": "Vilkite vienu pirštu, priartinkite dviem, kol kadras tilps",
+    "allTime": "Iš viso",
+    "seasonsCount": "{count} sez.",
+    "currentSeasonHint": "Dabartinis sezonas",
+    "fullScreen": "Visas ekranas",
+    "heightWithUnit": "Ūgis (cm)",
+    "individualTraining": "Individualios treniruotės",
+    "playerNumber": "Žaidėjo numeris",
+    "playerNumberPlaceholder": "Numeris ant aprangos",
+    "selectBirthDate": "Pasirinkite gimimo datą",
+    "skateServices": "Paslaugos",
+    "weightWithUnit": "Svoris (kg)",
+    "videoUploaded": "Vaizdo įrašas pridėtas prie profilio",
+    "videoUploadSaveReminder": "Vaizdo įrašas įkeltas. Paspauskite «Išsaugoti», kad jis liktų profilyje.",
+    "removeFromFriendsConfirm": "Pašalinti {name} iš draugų?"
   },
   "register": {
     "title": "Registracija",
@@ -3545,7 +3582,32 @@
     "fillRequiredFields": "Prašome užpildyti visus privalomus laukus",
     "fillAllFields": "Prašome užpildyti visus laukus",
     "phoneFormatError": "Prašome įvesti galiojantį telefono numerį su šalies kodu (pvz., +1234567890)",
-    "parentEmailFormatError": "Prašome įvesti galiojantį tėvo el. pašto adresą"
+    "parentEmailFormatError": "Prašome įvesti galiojantį tėvo el. pašto adresą",
+    "scoutPrivacyNote": "Kiti nemato skauto nuotraukos ir vardo – rodomi kaip „Skautas“.",
+    "emailFormatError": "Įveskite teisingą el. pašto adresą",
+    "registrationFailed": "Registracija nepavyko",
+    "detailsHint": "Neprivaloma: numeris, laikymas, ūgis ir svoris padeda skautams ir draugams jus rasti. Galėsite užpildyti vėliau profilyje.",
+    "skipForNow": "Praleisti",
+    "parentEmailSendFailed": "Nepavyko išsiųsti el. laiško tėvams. Patikrinkite adresą ir bandykite vėliau.",
+    "step": {
+      "contact": "1 žingsnis · Kontaktai",
+      "code": "2 žingsnis · Patvirtinimas",
+      "profile": "1 žingsnis · Profilis",
+      "details": "2 žingsnis · Žaidėjo duomenys"
+    },
+    "currentTeam": "Dabartinė komanda",
+    "currentTeamHint": "Per komandą susiejami komandos draugai, viršelis ir komandos puslapis. Pradėkite rašyti, kad rastumėte esamą.",
+    "teamPlaceholder": "pvz., Dinamo Minsk 2012",
+    "teamWillBeCreated": "Tokios komandos dar nėra — sukursime ją jums.",
+    "consentByContinuing": "Paspausdami „Tęsti“ sutinkate su",
+    "haveAccount": "Jau turite paskyrą?",
+    "signIn": "Prisijungti",
+    "entryTitle": "Į ledą",
+    "entrySubtitle": "Įveskite telefono numerį. Prijungsime jus arba sukursime paskyrą.",
+    "codeSubtitle": "Įveskite kodą iš žinutės",
+    "whoAreYou": "Kas jūs?",
+    "useEmailInstead": "Naudoti el. paštą",
+    "usePhoneInstead": "Naudoti telefono numerį"
   },
   "navigation": {
     "home": "Pradžia",
@@ -3603,7 +3665,13 @@
     "errorCreatingUser": "Nepavyko sukurti vartotojo",
     "fillRequiredFields": "Užpildykite visus privalomus laukus.",
     "enterValidPhone": "Įveskite galiojantį telefono numerį su šalies kodu.",
-    "requiredForPlayers": "Žaidėjams ir žvaigždėms privaloma nurodyti gimimo datą ir poziciją"
+    "requiredForPlayers": "Žaidėjams ir žvaigždėms privaloma nurodyti gimimo datą ir poziciją",
+    "adminPanel": "Administratoriaus skydelis",
+    "login": "Prisijungti",
+    "loginAsUser": "Prisijungti kaip naudotojas",
+    "loginAsUserConfirm": "Tikrai norite prisijungti kaip {name}?",
+    "loginAsUserError": "Nepavyko prisijungti kaip naudotojas",
+    "loginAsUserSuccess": "Prisijungėte kaip {name}"
   },
   "adminGifts": {
     "sendGift": "Siųsti dovaną",
@@ -3815,9 +3883,13 @@
     "topBySV": "Top SV%",
     "shareRating": "Dalintis reitingu",
     "shareRatingFooter": "hockeystars.com",
+    "shareRatingSeason": "{season} sezonas",
     "ratingPointsLabel": "taškų",
     "allCountries": "Visos šalys",
-    "allYears": "Visi metai"
+    "allYears": "Visi metai",
+    "filters": "Filtrai",
+    "shareNewcomers": "Dalintis naujokais",
+    "shareNewcomersCount": "{count} žaidėjų"
   },
   "messages": {
     "title": "Žinutės",
@@ -3832,7 +3904,8 @@
     "massSend": "Masinis siuntimas",
     "recipients": "Gavėjai",
     "typeMessage": "Įveskite žinutę...",
-    "send": "Siųsti"
+    "send": "Siųsti",
+    "searchHistoryLoading": "Ieškoma žinučių istorijoje…"
   },
   "notifications": {
     "title": "Pranešimai",
@@ -3870,6 +3943,14 @@
     },
     "photo_liked": {
       "grouped": "{name} pamėgo {count} jūsų nuotraukas"
+    },
+    "profile_reaction": {
+      "title": "Nauja reakcija",
+      "messageGrouped": "{name} atsiuntė {reactions}"
+    },
+    "activity_reaction": {
+      "title": "Reakcija į jūsų atnaujinimą",
+      "message": "{name} sureagavo {emoji} į jūsų atnaujinimą"
     }
   },
   "editProfile": {
@@ -3951,7 +4032,9 @@
     "noFriendsToForward": "Nėra draugų persiųsti",
     "messageForwarded": "Žinutė persiųsta",
     "forwardedTo": "Persiųsta",
-    "forwardError": "Nepavyko persiųsti"
+    "forwardError": "Nepavyko persiųsti",
+    "user": "Naudotojas",
+    "you": "Jūs"
   },
   "createUser": {
     "title": "Vartotojo kūrimas",
@@ -3993,7 +4076,10 @@
     "error": "Klaida",
     "fillRequiredFields": "Užpildykite visus privalomus laukus.",
     "enterValidPhone": "Įveskite galiojantį telefono numerį su šalies kodu.",
-    "requiredForPlayers": "Žaidėjams ir žvaigždėms privaloma nurodyti gimimo datą ir poziciją"
+    "requiredForPlayers": "Žaidėjams ir žvaigždėms privaloma nurodyti gimimo datą ir poziciją",
+    "errorCreatingUser": "Nepavyko sukurti naudotojo",
+    "success": "Pavyko",
+    "userCreated": "Naudotojas {name} sukurtas"
   },
   "puckSpeed": {
     "title": "Ritulio greičio matavimas",
@@ -4042,7 +4128,13 @@
     "deleteError": "Klaida",
     "deleteErrorMessage": "Nepavyko ištrinti įrašo",
     "speedExceedsLimit": "Greitis viršija 120 km/h, matavimas neįskaitomas",
-    "needMicrophone": "Reikalingas prieiga prie mikrofono"
+    "needMicrophone": "Reikalingas prieiga prie mikrofono",
+    "micPosition": {
+      "label": "Kur padėtas telefonas",
+      "shooter": "Prie metiko",
+      "middle": "Viduryje",
+      "target": "Prie borto"
+    }
   },
   "logout": "Atsijungti",
   "logoutConfirm": "Atsijungti nuo profilio",
@@ -4084,17 +4176,41 @@
     "giftReceivedFromStar": "Gavote dovaną iš {starName}: {giftName}",
     "giftReceivedPush": "🎁 Gauta dovana!",
     "giftReceivedFromAdminPush": "Gavote dovaną iš administratoriaus: {giftName}",
-    "giftReceivedFromStarPush": "Gavote dovaną iš {starName}: {giftName}"
+    "giftReceivedFromStarPush": "Gavote dovaną iš {starName}: {giftName}",
+    "addGift": "Pridėti dovaną",
+    "characters": "simbolių",
+    "customGift": "Paprašyti dovanos",
+    "failedToSendRequest": "Nepavyko išsiųsti užklausos",
+    "invalidGift": "netinkama dovana",
+    "noImage": "be paveikslėlio",
+    "pleaseWriteMessage": "Parašykite žinutę prie užklausos",
+    "requestGift": "Paprašyti dovanos",
+    "requestInfo": "Išsiuntus užklausą žvaigždė gaus pranešimą ir galės ją priimti arba atmesti. Jei užklausa bus priimta, dovana atsiras jūsų Dovanų muziejuje.",
+    "requestItem": "Paprašyti: {itemType}",
+    "requestMessage": "Užklausos žinutė",
+    "requestMessageHelper": "Parašykite mandagią žinutę, kodėl norite gauti šią dovaną",
+    "requestMessagePlaceholder": "Pavyzdžiui: Sveiki! Esu didelis jūsų žaidimo gerbėjas ir norėčiau gauti autografą savo kolekcijai...",
+    "requestSent": "Užklausa išsiųsta!",
+    "requestSentMessage": "Jūsų užklausa ({itemType}) išsiųsta. Laukite atsakymo.",
+    "selectGiftType": "Pasirinkite dovanos tipą",
+    "selectGiftTypeMessage": "Kokio tipo dovaną norite sukurti?",
+    "sendRequest": "Siųsti užklausą",
+    "sending": "Siunčiama..."
   },
   "videoNotification": {
     "added": "pridėjo",
     "oneVideo": "naują vaizdo įrašą",
     "multipleVideos": "{count} naujų vaizdo įrašų",
     "video": "vaizdo įrašas",
-    "videos": "vaizdo įrašai"
+    "videos": "vaizdo įrašai",
+    "fullScreen": "Visas ekranas"
   },
   "avatarNotification": {
     "changed": "pakeitė avatarą"
+  },
+  "coverNotification": {
+    "title": "Naujas viršelis",
+    "changed": "atnaujino profilio viršelį"
   },
   "puckSpeedNotification": {
     "title": "Naujas greičio rekordas",
@@ -4154,5 +4270,39 @@
     "scanQr": "Nuskaitykite telefonu — atsidarys App Store arba Google Play",
     "appStoreCta": "Atsisiųsti iš App Store",
     "playStoreCta": "Atsisiųsti iš Google Play"
+  },
+  "ota": {
+    "resurfacing": "Atnaujiname ledą…",
+    "updating": "Diegiame atnaujinimą",
+    "updated": "Šviežias ledas — programa atnaujinta"
+  },
+  "goalie": "Vartininkas",
+  "referral": {
+    "leaderboard": "Daugiausiai pakvietę",
+    "noInvites": "Kol kas niekas nepakvietė draugų",
+    "points": "taškų"
+  },
+  "socialLinks": {
+    "cannotOpenLink": "Nepavyksta atidaryti {platform} nuorodos",
+    "error": "Klaida",
+    "instagram": "Instagram",
+    "instagramPlaceholder": "@vardas arba nuoroda",
+    "openError": "Klaida atidarant nuorodą",
+    "tiktok": "TikTok",
+    "tiktokPlaceholder": "@vardas arba nuoroda",
+    "vk": "VK",
+    "vkPlaceholder": "@vardas arba nuoroda",
+    "website": "Svetainė arba nuoroda",
+    "websitePlaceholder": "example.com"
+  },
+  "reactions": {
+    "respect": "pagarba",
+    "like": "patinka",
+    "strength": "stiprumas",
+    "highFive": "duok penkis",
+    "fire": "ugnis",
+    "lightning": "žaibas",
+    "sendBack": "Atsakyti",
+    "whoReacted": "Kas reagavo"
   }
 }

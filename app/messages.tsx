@@ -4,6 +4,8 @@ import React, { useCallback, useEffect, useState, useMemo, useRef } from 'react'
 import { useScreenContext } from '../contexts/ScreenContext';
 import {
     ActivityIndicator,
+    AppState,
+    type AppStateStatus,
     FlatList,
     RefreshControl,
     StyleSheet,
@@ -18,6 +20,7 @@ import EmptyState from '../components/EmptyState';
 import { displayName } from '../utils/displayName';
 import { colors } from '../theme/colors';
 import { BlurOrSolid } from '../components/BlurOrSolid';
+import { onInboxRefresh } from '../utils/inboxEvents';
 import CachedAvatar from '../components/CachedAvatar';
 import { platformCardShadow } from '../utils/androidShadow';
 // Убираем все анимации переходов
@@ -1091,6 +1094,36 @@ export default function MessagesScreen() {
     }, 600);
   }, [loadChatsData]);
 
+  /** Немедленная тихая перезагрузка (без debounce) — для фокуса, возврата из фона и пуша. */
+  const refreshInboxNow = useCallback(() => {
+    if (silentLoadDebounceRef.current) {
+      clearTimeout(silentLoadDebounceRef.current);
+      silentLoadDebounceRef.current = null;
+    }
+    void loadChatsData({ silent: true }).catch((error) => {
+      console.error('❌ Ошибка обновления инбокса:', error);
+    });
+  }, [loadChatsData]);
+
+  // Возврат из фона: realtime мог пропустить сообщения, пока сокет был закрыт
+  useEffect(() => {
+    if (!currentUser) return;
+    let last: AppStateStatus = AppState.currentState;
+    const sub = AppState.addEventListener('change', (next) => {
+      if ((last === 'background' || last === 'inactive') && next === 'active') {
+        refreshInboxNow();
+      }
+      last = next;
+    });
+    return () => sub.remove();
+  }, [currentUser, refreshInboxNow]);
+
+  // Пуш о сообщении пришёл (в фоне или на переднем плане) — перечитываем список
+  useEffect(() => {
+    if (!currentUser) return;
+    return onInboxRefresh(() => refreshInboxNow());
+  }, [currentUser, refreshInboxNow]);
+
   // Быстро применяем черновики к уже загруженному списку чатов (без ожидания загрузки из БД)
   const applyDraftsToExistingChats = useCallback(async () => {
     if (!currentUser) return;
@@ -1244,17 +1277,18 @@ export default function MessagesScreen() {
           !bgSyncRunningRef.current
         ) {
           void runBackgroundInboxSync(loadGenerationRef.current);
-        } else if (inboxReady && chatsRef.current.length > 0) {
-          silentLoadChats();
+        } else if (inboxReady) {
+          refreshInboxNow();
         }
       })();
 
       return () => {
         cancelled = true;
-        setCurrentScreen(null);
+        setCurrentScreen(null, 'messages');
       };
     }, [
       silentLoadChats,
+      refreshInboxNow,
       setCurrentScreen,
       applyDraftsToExistingChats,
       hydrateInboxFromCache,
@@ -1342,17 +1376,20 @@ export default function MessagesScreen() {
 
   // Empty component
   const ListEmptyComponent = useCallback(() => (
-    <View style={styles.emptyContainer}>
-      {!inboxReady ? (
-        <SkeletonList rows={7} rowHeight={76} />
-      ) : (
+    !inboxReady ? (
+      // Top-aligned: a centered column overflows upward under the fixed header.
+      <View style={styles.skeletonContainer}>
+        <SkeletonList rows={5} rowHeight={76} />
+      </View>
+    ) : (
+      <View style={styles.emptyContainer}>
         <EmptyState
           icon="chatbubble-outline"
           title={t('messages.noMessages')}
           subtitle={t('messages.startConversation')}
         />
-      )}
-    </View>
+      </View>
+    )
   ), [t, inboxReady]);
 
   const listFooterElement = useMemo(
@@ -1415,7 +1452,7 @@ export default function MessagesScreen() {
               </TouchableOpacity>
               <Text style={styles.pageTitle}>{t('messages.title')}</Text>
             </View>
-            <SkeletonList rows={7} rowHeight={76} />
+            <SkeletonList rows={7} rowHeight={76} topInset={52} />
           </View>
         </CachedBackground>
       </View>
@@ -1603,6 +1640,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 60,
+  },
+  skeletonContainer: {
+    width: '100%',
+    alignSelf: 'stretch',
   },
   emptyContent: {
     backgroundColor: 'rgba(22, 22, 26, 0.86)',

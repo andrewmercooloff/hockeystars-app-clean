@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, type ReactNode } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from './BlurOrSolid';
@@ -20,6 +20,7 @@ interface StatsChangeNotificationProps {
   playerId?: string;
   playerAvatar?: string;
   timestamp: number;
+  reactionsFooter?: ReactNode;
 }
 
 const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
@@ -27,7 +28,8 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
   playerName,
   playerId,
   timestamp,
-  playerAvatar
+  playerAvatar,
+  reactionsFooter,
 }) => {
   const { t } = useLanguage();
 
@@ -85,6 +87,7 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
       style={styles.containerBlur}
     >
       <View style={styles.container}>
+        <View style={styles.bodyRow}>
         {/* Аватар слева */}
         <View style={styles.avatarContainer}>
         {(playerAvatar || playerId) ? (
@@ -134,6 +137,9 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
           </View>
       </View>
       </View>
+
+      {reactionsFooter}
+    </View>
     </BlurOrSolid>
   );
 });
@@ -158,6 +164,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.06)',
     borderRadius: 16,
     padding: 16,
+  },
+  bodyRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
   },

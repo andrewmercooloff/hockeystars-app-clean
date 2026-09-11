@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from './BlurOrSolid';
@@ -12,6 +12,7 @@ interface AchievementAddedNotificationProps {
   achievementsCount: number;
   timestamp: string;
   playerAvatar?: string;
+  reactionsFooter?: ReactNode;
 }
 
 const AchievementAddedNotification = React.memo(function AchievementAddedNotification({
@@ -19,7 +20,8 @@ const AchievementAddedNotification = React.memo(function AchievementAddedNotific
   playerId,
   achievementsCount,
   timestamp,
-  playerAvatar
+  playerAvatar,
+  reactionsFooter,
 }: AchievementAddedNotificationProps) {
   const { t } = useLanguage();
 
@@ -56,6 +58,7 @@ const AchievementAddedNotification = React.memo(function AchievementAddedNotific
       style={styles.containerBlur}
     >
       <View style={styles.container}>
+        <View style={styles.bodyRow}>
         <View style={styles.avatarContainer}>
         {playerId ? (
           <CachedAvatar
@@ -94,6 +97,9 @@ const AchievementAddedNotification = React.memo(function AchievementAddedNotific
         </View>
       </View>
       </View>
+
+      {reactionsFooter}
+    </View>
     </BlurOrSolid>
   );
 });
@@ -120,6 +126,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.06)',
     borderRadius: 16,
     padding: 16,
+  },
+  bodyRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
   },

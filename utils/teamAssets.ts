@@ -1,0 +1,267 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Image } from 'expo-image';
+import * as ImageManipulator from 'expo-image-manipulator';
+import { getStoragePublicUrl, supabase } from './supabase';
+
+/**
+ * Team logos and profile covers are convention-addressed files in the public
+ * `avatars` bucket — no DB columns, so the feature ships over OTA and admins
+ * can fill logos in gradually (in-app or via scripts/upload-team-logos.mjs).
+ *
+ *   team_logo_{teamId}.png   — transparent PNG, ~512px
+ *   cover_{playerId}.jpg     — custom profile cover, ~1200px wide
+ */
+
+const BUCKET = 'avatars';
+const VERSIONS_KEY = 'hs_asset_versions_v1';
+
+export const teamLogoFileName = (teamId: string) => `team_logo_${teamId}.png`;
+export const playerCoverFileName = (playerId: string) => `cover_${playerId}.jpg`;
+
+// ---- cache-busting versions (uploads overwrite the same path) -----------------
+
+let versions: Record<string, number> = {};
+let versionsLoaded: Promise<void> | null = null;
+
+const loadVersions = () => {
+  if (!versionsLoaded) {
+    versionsLoaded = AsyncStorage.getItem(VERSIONS_KEY)
+      .then((raw) => {
+        if (raw) versions = { ...JSON.parse(raw), ...versions };
+      })
+      .catch(() => {});
+  }
+  return versionsLoaded;
+};
+void loadVersions();
+
+const bumpVersion = (fileName: string) => {
+  versions[fileName] = Date.now();
+  forgetMissing(fileName);
+  AsyncStorage.setItem(VERSIONS_KEY, JSON.stringify(versions)).catch(() => {});
+};
+
+/**
+ * Files we already know are absent (404). Persisted with a TTL so a profile
+ * without a cover renders its wallpaper instantly on the next launch too,
+ * instead of waiting for a network round-trip to fail.
+ */
+const MISSING_KEY = 'hs_asset_missing_v1';
+const MISSING_TTL_MS = 6 * 60 * 60 * 1000;
+let missingAt: Record<string, number> = {};
+const missing = new Set<string>();
+let missingLoaded: Promise<void> | null = null;
+const loadMissing = () => {
+  if (!missingLoaded) {
+    missingLoaded = AsyncStorage.getItem(MISSING_KEY)
+      .then((raw) => {
+        if (!raw) return;
+        const now = Date.now();
+        for (const [name, ts] of Object.entries(JSON.parse(raw) as Record<string, number>)) {
+          if (now - ts < MISSING_TTL_MS) {
+            missingAt[name] = ts;
+            missing.add(name);
+          }
+        }
+      })
+      .catch(() => {});
+  }
+  return missingLoaded;
+};
+void loadMissing();
+const persistMissing = () => {
+  AsyncStorage.setItem(MISSING_KEY, JSON.stringify(missingAt)).catch(() => {});
+};
+const fileNameOf = (url: string) => url.split('?')[0].split('/').pop();
+
+export const markAssetMissing = (url: string) => {
+  const name = fileNameOf(url);
+  if (!name) return;
+  missing.add(name);
+  missingAt[name] = Date.now();
+  persistMissing();
+};
+export const isAssetKnownMissing = (url: string) => {
+  const name = fileNameOf(url);
+  return !!name && missing.has(name);
+};
+const forgetMissing = (name: string) => {
+  missing.delete(name);
+  delete missingAt[name];
+  persistMissing();
+};
+
+/** Remembered wallpaper for a profile — instant fallback on the next open. */
+export type CoverLayerKind = 'photo' | 'logo' | 'teamname' | 'stars';
+
+export type CachedCoverState = {
+  kind: CoverLayerKind;
+  teamId?: string;
+};
+
+const LAYER_KEY = 'hs_cover_layer_v1';
+let coverLayers: Record<string, CachedCoverState> = {};
+let layersLoaded: Promise<void> | null = null;
+
+const loadLayers = () => {
+  if (!layersLoaded) {
+    layersLoaded = AsyncStorage.getItem(LAYER_KEY)
+      .then((raw) => {
+        if (raw) coverLayers = { ...JSON.parse(raw), ...coverLayers };
+      })
+      .catch(() => {});
+  }
+  return layersLoaded;
+};
+void loadLayers();
+
+const persistLayers = () => {
+  AsyncStorage.setItem(LAYER_KEY, JSON.stringify(coverLayers)).catch(() => {});
+};
+
+export const getCachedCoverState = (playerId: string): CachedCoverState | null =>
+  coverLayers[playerId] ?? null;
+
+export const setCachedCoverState = (playerId: string, state: CachedCoverState) => {
+  coverLayers[playerId] = state;
+  persistLayers();
+};
+
+export const clearCachedCoverState = (playerId: string) => {
+  delete coverLayers[playerId];
+  persistLayers();
+};
+
+/** Resolve whether all asset caches are hydrated (call before first cover render if you can). */
+export const teamAssetsReady = () =>
+  Promise.all([loadVersions(), loadMissing(), loadLayers()]).then(() => undefined);
+
+/**
+ * Warm the disk cache for a cover / logo while the profile data is still loading.
+ * A miss is remembered, so the wallpaper fallback shows without waiting.
+ */
+const warmedUrls = new Map<string, boolean>();
+
+export const isAssetWarmed = (url: string) => warmedUrls.get(url) === true;
+
+const warm = async (url: string): Promise<boolean> => {
+  await teamAssetsReady();
+  if (isAssetKnownMissing(url)) return false;
+  if (warmedUrls.get(url) === true) return true;
+  try {
+    const ok = await Image.prefetch(url, { cachePolicy: 'memory-disk' });
+    warmedUrls.set(url, ok);
+    if (!ok) markAssetMissing(url);
+    return ok;
+  } catch {
+    warmedUrls.set(url, false);
+    markAssetMissing(url);
+    return false;
+  }
+};
+export const prefetchPlayerCover = (playerId: string) => warm(getPlayerCoverUrl(playerId));
+export const prefetchTeamLogo = (teamId: string) => warm(getTeamLogoUrl(teamId));
+
+export type AssetPresence = 'present' | 'missing';
+
+/** Probe storage once; warms disk cache on hit and remembers 404 on miss. */
+export const resolveAssetUrl = async (url: string): Promise<AssetPresence> => {
+  const ok = await warm(url);
+  return ok ? 'present' : 'missing';
+};
+
+const publicUrl = (fileName: string) => {
+  const base = getStoragePublicUrl(BUCKET, fileName);
+  const v = versions[fileName];
+  return v ? `${base}?v=${v}` : base;
+};
+
+export const getTeamLogoUrl = (teamId: string) => publicUrl(teamLogoFileName(teamId));
+export const getPlayerCoverUrl = (playerId: string) => publicUrl(playerCoverFileName(playerId));
+
+// ---- uploads -----------------------------------------------------------------
+
+type Format = 'png' | 'jpeg';
+
+const uploadProcessed = async (
+  uri: string,
+  fileName: string,
+  width: number,
+  format: Format
+): Promise<string | null> => {
+  const contentType = format === 'png' ? 'image/png' : 'image/jpeg';
+  let processed = uri;
+  try {
+    const result = await ImageManipulator.manipulateAsync(uri, [{ resize: { width } }], {
+      compress: format === 'png' ? 1 : 0.85,
+      format: format === 'png' ? ImageManipulator.SaveFormat.PNG : ImageManipulator.SaveFormat.JPEG,
+    });
+    processed = result.uri;
+  } catch (e) {
+    console.warn('teamAssets: manipulate failed, uploading original', e);
+  }
+
+  let body: FormData | ArrayBuffer;
+  if (processed.startsWith('file://') || processed.startsWith('content://')) {
+    const form = new FormData();
+    form.append('file', { uri: processed, type: contentType, name: fileName } as any);
+    body = form;
+  } else {
+    const res = await fetch(processed);
+    if (!res.ok) return null;
+    body = await res.arrayBuffer();
+  }
+
+  const { data, error } = await supabase.storage
+    .from(BUCKET)
+    // URL всегда с ?v=<ts> после загрузки — можно кэшировать на CDN/устройстве надолго
+    .upload(fileName, body, { contentType, upsert: true, cacheControl: '31536000' });
+  if (error || !data) {
+    console.error('teamAssets: upload failed', error);
+    return null;
+  }
+  bumpVersion(fileName);
+  return publicUrl(fileName);
+};
+
+/** Admin: upload a team emblem (keeps transparency). */
+export const uploadTeamLogo = (uri: string, teamId: string) =>
+  uploadProcessed(uri, teamLogoFileName(teamId), 512, 'png');
+
+/** Player: upload a custom profile cover. */
+export const uploadPlayerCover = async (uri: string, playerId: string) => {
+  const url = await uploadProcessed(uri, playerCoverFileName(playerId), 1200, 'jpeg');
+  if (url) {
+    warmedUrls.set(url, true);
+    setCachedCoverState(playerId, { kind: 'photo' });
+  }
+  return url;
+};
+
+export const removePlayerCover = async (playerId: string): Promise<boolean> => {
+  const name = playerCoverFileName(playerId);
+  const { error } = await supabase.storage.from(BUCKET).remove([name]);
+  if (error) {
+    console.error('teamAssets: remove failed', error);
+    return false;
+  }
+  delete versions[name];
+  missing.add(name);
+  missingAt[name] = Date.now();
+  persistMissing();
+  AsyncStorage.setItem(VERSIONS_KEY, JSON.stringify(versions)).catch(() => {});
+  clearCachedCoverState(playerId);
+  return true;
+};
+
+export const removeTeamLogo = async (teamId: string): Promise<boolean> => {
+  const name = teamLogoFileName(teamId);
+  const { error } = await supabase.storage.from(BUCKET).remove([name]);
+  if (error) return false;
+  delete versions[name];
+  missing.add(name);
+  missingAt[name] = Date.now();
+  persistMissing();
+  AsyncStorage.setItem(VERSIONS_KEY, JSON.stringify(versions)).catch(() => {});
+  return true;
+};

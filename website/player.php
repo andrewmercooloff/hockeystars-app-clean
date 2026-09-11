@@ -53,7 +53,9 @@ if ($playerId === '') {
 
 $player = hs_fetch_public_player($playerId);
 $prettyPath = hs_player_pretty_path($playerId, $player['name'] ?? null, $lang);
-$canonicalUrl = HS_SITE_URL . $prettyPath;
+// Переведены только ru/en: остальные языки канонизируем в ru, чтобы не плодить дубли.
+$seoLang = hs_seo_canonical_lang($lang);
+$canonicalUrl = HS_SITE_URL . hs_player_pretty_path($playerId, $player['name'] ?? null, $seoLang);
 
 // Consolidate duplicate URLs for crawlers (UUID / wrong lang prefix → pretty path).
 $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: '';
@@ -65,7 +67,7 @@ if ($player && $requestPath !== $prettyNorm) {
 }
 
 $altUrls = [];
-foreach (hs_supported_langs() as $altLang) {
+foreach (hs_seo_langs() as $altLang) {
     $altUrls[$altLang] = HS_SITE_URL . hs_player_pretty_path($playerId, $player['name'] ?? null, $altLang);
 }
 $webAppProfileUrl = rtrim(HS_WEB_APP_URL, '/') . $prettyPath;
@@ -85,6 +87,24 @@ $pageDescription = $player
         : 'HockeyStars — social network for hockey players. Register to view full profiles.');
 $ogImage = $player ? hs_player_avatar_url($player['avatar'] ?? null) : HS_SITE_URL . '/logo.png';
 $jsonLd = $player ? hs_player_json_ld($player, $canonicalUrl, $lang) : '';
+$seasons = $player ? hs_player_seasons($player) : [];
+$totals = $player ? hs_player_season_stats($player) : ['points' => 0, 'goals' => 0, 'assists' => 0, 'games' => 0, 'ppg' => null];
+$achievements = $player ? hs_player_achievements($player) : [];
+$related = $player ? hs_fetch_related_players($player, 8) : [];
+$birthYear = $player ? hs_player_birth_year($player) : null;
+$positionLabel = $player ? hs_localize_player_position($player['position'] ?? null, $lang) : '';
+$teamLabel = $player ? hs_player_seo_team($player, $lang) : '';
+$isEn = $lang === 'en';
+$playersDirUrl = '/search?lang=' . $seoLang . ($birthYear ? '&year=' . $birthYear : '');
+$breadcrumbLd = $player ? json_encode([
+    '@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => [
+        ['@type' => 'ListItem', 'position' => 1, 'name' => 'HockeyStars', 'item' => HS_SITE_URL . ($isEn ? '/en' : '/')],
+        ['@type' => 'ListItem', 'position' => 2, 'name' => $isEn ? 'Players' : 'Игроки', 'item' => HS_SITE_URL . $playersDirUrl],
+        ['@type' => 'ListItem', 'position' => 3, 'name' => $player['name'] ?? '', 'item' => $canonicalUrl],
+    ],
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : '';
 
 $ogLocales = [
     'ru' => 'ru_RU', 'en' => 'en_US', 'lt' => 'lt_LT', 'lv' => 'lv_LV', 'pl' => 'pl_PL',
@@ -123,13 +143,16 @@ $ogLocale = $ogLocales[$lang] ?? 'ru_RU';
     <?php if ($jsonLd !== ''): ?>
     <script type="application/ld+json"><?php echo $jsonLd; ?></script>
     <?php endif; ?>
+    <?php if ($breadcrumbLd !== ''): ?>
+    <script type="application/ld+json"><?php echo $breadcrumbLd; ?></script>
+    <?php endif; ?>
 
     <base href="/">
     <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="shortcut icon" href="/favicon.ico">
     <meta name="theme-color" content="#050008">
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/styles.css?v=20260909b">
     <style>
         .profile-seo-card {
             max-width: 720px;
@@ -191,6 +214,30 @@ $ogLocale = $ogLocales[$lang] ?? 'ru_RU';
         }
         .cta-primary { background: #e10600; color: #fff; }
         .cta-secondary { background: rgba(255,255,255,0.12); color: #fff; }
+        .profile-breadcrumb { max-width: 720px; margin: 28px auto -24px; font-size: 0.85rem; opacity: 0.7; }
+        .profile-breadcrumb a { color: #fff; text-decoration: none; }
+        .profile-breadcrumb a:hover { color: #fa2f40; }
+        .profile-section { text-align: left; margin-top: 26px; }
+        .profile-section h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: 1.5px; color: #fa2f40; margin: 0 0 10px; }
+        .stats-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        .stats-table th, .stats-table td { padding: 8px 10px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .stats-table th:first-child, .stats-table td:first-child { text-align: left; }
+        .stats-table th { font-weight: 700; opacity: 0.75; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .stats-table tr.total td { font-weight: 700; border-bottom: none; }
+        .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+        .fact { padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(250,47,64,0.28); }
+        .fact-label { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.65; }
+        .fact-value { font-weight: 700; }
+        .ach-list { list-style: none; padding: 0; margin: 0; }
+        .ach-list li { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .ach-list li:last-child { border-bottom: none; }
+        .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+        .related-card { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(250,47,64,0.28); color: #fff; text-decoration: none; }
+        .related-card:hover { border-color: #fa2f40; }
+        .related-card img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex: none; }
+        .related-name { font-weight: 700; font-size: 0.9rem; line-height: 1.2; }
+        .related-pos { font-size: 0.75rem; opacity: 0.7; }
+        .dir-link { display: inline-block; margin-top: 14px; color: #fa2f40; font-weight: 700; text-decoration: none; }
     </style>
     <script>
         (function() {
@@ -229,8 +276,8 @@ $ogLocale = $ogLocales[$lang] ?? 'ru_RU';
             <div class="header-content">
                 <a href="/"><img src="/logo.png" alt="HockeyStars" class="logo"></a>
                 <div class="language-switcher">
-                    <a class="lang-btn" href="?id=<?php echo urlencode($playerId); ?>&lang=en">EN</a>
-                    <a class="lang-btn active" href="?id=<?php echo urlencode($playerId); ?>&lang=ru">RU</a>
+                    <a class="lang-btn<?php echo $isEn ? ' active' : ''; ?>" href="<?php echo htmlspecialchars($altUrls['en'], ENT_QUOTES, 'UTF-8'); ?>">EN</a>
+                    <a class="lang-btn<?php echo $isEn ? '' : ' active'; ?>" href="<?php echo htmlspecialchars($altUrls['ru'], ENT_QUOTES, 'UTF-8'); ?>">RU</a>
                 </div>
             </div>
         </div>
@@ -238,6 +285,13 @@ $ogLocale = $ogLocales[$lang] ?? 'ru_RU';
 
     <main class="main">
         <div class="container">
+            <?php if ($player): ?>
+            <nav class="profile-breadcrumb" aria-label="breadcrumb">
+                <a href="<?php echo $isEn ? '/en' : '/'; ?>">HockeyStars</a> ›
+                <a href="<?php echo htmlspecialchars($playersDirUrl, ENT_QUOTES, 'UTF-8'); ?>"><?php echo $isEn ? 'Players' : 'Игроки'; ?><?php echo $birthYear ? ' ' . $birthYear : ''; ?></a> ›
+                <span><?php echo htmlspecialchars($player['name'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
+            </nav>
+            <?php endif; ?>
             <article class="profile-seo-card">
                 <?php if ($player): ?>
                 <img class="profile-avatar" src="<?php echo htmlspecialchars($ogImage, ENT_QUOTES, 'UTF-8'); ?>"
@@ -246,25 +300,99 @@ $ogLocale = $ogLocales[$lang] ?? 'ru_RU';
                 <p class="profile-meta">
                     <?php
                     $meta = array_filter([
-                        $player['position'] ?? null,
-                        $player['team'] ?? null,
-                        $player['country'] ?? null,
-                        isset($player['age']) && $player['age'] !== '' ? ($lang === 'en' ? 'Age ' : 'Возраст ') . $player['age'] : null,
+                        $positionLabel !== '' ? $positionLabel : null,
+                        $teamLabel !== '' ? $teamLabel : null,
+                        $player['city'] ?? null,
+                        hs_localize_country($player['country'] ?? null, $lang) ?: null,
+                        $birthYear ? ($isEn ? 'Born ' : 'Год рождения ') . $birthYear : null,
                     ]);
                     echo htmlspecialchars(implode(' · ', $meta), ENT_QUOTES, 'UTF-8');
                     ?>
                 </p>
+                <?php if ($totals['games'] > 0): ?>
                 <div class="profile-stats">
-                    <?php if (!empty($player['goals'])): ?>
-                    <span class="profile-stat"><?php echo $lang === 'en' ? 'Goals' : 'Голы'; ?>: <?php echo htmlspecialchars((string) $player['goals'], ENT_QUOTES, 'UTF-8'); ?></span>
-                    <?php endif; ?>
-                    <?php if (!empty($player['assists'])): ?>
-                    <span class="profile-stat"><?php echo $lang === 'en' ? 'Assists' : 'Передачи'; ?>: <?php echo htmlspecialchars((string) $player['assists'], ENT_QUOTES, 'UTF-8'); ?></span>
-                    <?php endif; ?>
-                    <?php if (!empty($player['games'])): ?>
-                    <span class="profile-stat"><?php echo $lang === 'en' ? 'Games' : 'Игры'; ?>: <?php echo htmlspecialchars((string) $player['games'], ENT_QUOTES, 'UTF-8'); ?></span>
-                    <?php endif; ?>
+                    <span class="profile-stat"><?php echo $isEn ? 'Games' : 'Игры'; ?>: <?php echo (int) $totals['games']; ?></span>
+                    <span class="profile-stat"><?php echo $isEn ? 'Goals' : 'Голы'; ?>: <?php echo (int) $totals['goals']; ?></span>
+                    <span class="profile-stat"><?php echo $isEn ? 'Assists' : 'Передачи'; ?>: <?php echo (int) $totals['assists']; ?></span>
+                    <span class="profile-stat"><?php echo $isEn ? 'Points' : 'Очки'; ?>: <?php echo (int) $totals['points']; ?></span>
                 </div>
+                <?php endif; ?>
+
+                <?php if (count($seasons) > 0): ?>
+                <section class="profile-section">
+                    <h2><?php echo $isEn ? 'Statistics by season' : 'Статистика по сезонам'; ?></h2>
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th><?php echo $isEn ? 'Season' : 'Сезон'; ?></th>
+                                <th><?php echo $isEn ? 'GP' : 'И'; ?></th>
+                                <th><?php echo $isEn ? 'G' : 'Г'; ?></th>
+                                <th><?php echo $isEn ? 'A' : 'П'; ?></th>
+                                <th><?php echo $isEn ? 'PTS' : 'О'; ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($seasons as $seasonKey => $block): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars((string) $seasonKey, ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo (int) $block['games']; ?></td>
+                                <td><?php echo (int) $block['goals']; ?></td>
+                                <td><?php echo (int) $block['assists']; ?></td>
+                                <td><?php echo (int) $block['points']; ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                            <?php if (count($seasons) > 1): ?>
+                            <tr class="total">
+                                <td><?php echo $isEn ? 'Total' : 'Всего'; ?></td>
+                                <td><?php echo (int) $totals['games']; ?></td>
+                                <td><?php echo (int) $totals['goals']; ?></td>
+                                <td><?php echo (int) $totals['assists']; ?></td>
+                                <td><?php echo (int) $totals['points']; ?></td>
+                            </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </section>
+                <?php endif; ?>
+
+                <?php
+                $facts = [];
+                if ($positionLabel !== '') $facts[$isEn ? 'Position' : 'Позиция'] = $positionLabel;
+                if (!empty($player['number'])) $facts[$isEn ? 'Number' : 'Номер'] = '#' . $player['number'];
+                if (!empty($player['grip'])) $facts[$isEn ? 'Shoots' : 'Хват'] = $player['grip'];
+                if (!empty($player['height']) && (int) $player['height'] > 0) $facts[$isEn ? 'Height' : 'Рост'] = ((int) $player['height']) . ' ' . ($isEn ? 'cm' : 'см');
+                if (!empty($player['weight']) && (int) $player['weight'] > 0) $facts[$isEn ? 'Weight' : 'Вес'] = ((int) $player['weight']) . ' ' . ($isEn ? 'kg' : 'кг');
+                if (!empty($player['hockey_start_date']) && preg_match('/(\d{4})/', (string) $player['hockey_start_date'], $hm)) $facts[$isEn ? 'Playing since' : 'В хоккее с'] = $hm[1];
+                if ($totals['ppg'] !== null) $facts[$isEn ? 'Points per game' : 'Очков за игру'] = (string) $totals['ppg'];
+                ?>
+                <?php if ($facts): ?>
+                <section class="profile-section">
+                    <h2><?php echo $isEn ? 'Player profile' : 'Профиль игрока'; ?></h2>
+                    <div class="facts">
+                        <?php foreach ($facts as $label => $value): ?>
+                        <div class="fact">
+                            <span class="fact-label"><?php echo htmlspecialchars($label, ENT_QUOTES, 'UTF-8'); ?></span>
+                            <span class="fact-value"><?php echo htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'); ?></span>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                </section>
+                <?php endif; ?>
+
+                <?php if ($achievements): ?>
+                <section class="profile-section">
+                    <h2><?php echo $isEn ? 'Achievements' : 'Достижения'; ?></h2>
+                    <ul class="ach-list">
+                        <?php foreach (array_slice($achievements, 0, 12) as $ach): ?>
+                        <li>
+                            <?php echo htmlspecialchars($ach['competition'], ENT_QUOTES, 'UTF-8'); ?>
+                            <?php if ($ach['year']): ?> · <?php echo (int) $ach['year']; ?><?php endif; ?>
+                            <?php if ($ach['place']): ?> · <?php echo $isEn ? 'place ' : 'место '; ?><?php echo (int) $ach['place']; ?><?php endif; ?>
+                        </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </section>
+                <?php endif; ?>
                 <?php else: ?>
                 <img src="/logo.png" alt="HockeyStars" class="profile-avatar" width="120" height="120">
                 <h1 class="profile-name">HockeyStars</h1>
@@ -290,6 +418,26 @@ $ogLocale = $ogLocales[$lang] ?? 'ru_RU';
                         <?php echo $lang === 'en' ? 'Install mobile app' : 'Установить приложение'; ?>
                     </button>
                 </div>
+
+                <?php if ($related): ?>
+                <section class="profile-section">
+                    <h2><?php echo $isEn
+                        ? ('More players' . ($birthYear ? ' born in ' . $birthYear : '') . (!empty($player['country']) ? ' from ' . htmlspecialchars(hs_localize_country($player['country'], 'en'), ENT_QUOTES, 'UTF-8') : ''))
+                        : ('Другие игроки' . ($birthYear ? ' ' . $birthYear . ' года' : '') . (!empty($player['country']) ? ', ' . htmlspecialchars($player['country'], ENT_QUOTES, 'UTF-8') : '')); ?></h2>
+                    <div class="related-grid">
+                        <?php foreach ($related as $rel): ?>
+                        <a class="related-card" href="<?php echo htmlspecialchars(hs_player_pretty_path($rel['id'], $rel['name'], $seoLang), ENT_QUOTES, 'UTF-8'); ?>">
+                            <img src="<?php echo htmlspecialchars(hs_player_avatar_url($rel['avatar']), ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($rel['name'], ENT_QUOTES, 'UTF-8'); ?>" width="40" height="40" loading="lazy">
+                            <span>
+                                <span class="related-name"><?php echo htmlspecialchars($rel['name'], ENT_QUOTES, 'UTF-8'); ?></span><br>
+                                <span class="related-pos"><?php echo htmlspecialchars(hs_localize_player_position($rel['position'], $lang), ENT_QUOTES, 'UTF-8'); ?></span>
+                            </span>
+                        </a>
+                        <?php endforeach; ?>
+                    </div>
+                    <a class="dir-link" href="<?php echo htmlspecialchars($playersDirUrl, ENT_QUOTES, 'UTF-8'); ?>"><?php echo $isEn ? 'All players →' : 'Все игроки →'; ?></a>
+                </section>
+                <?php endif; ?>
             </article>
         </div>
     </main>

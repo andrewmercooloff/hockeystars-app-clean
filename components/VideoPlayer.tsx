@@ -6,6 +6,7 @@ import {
   Text,
   ActivityIndicator,
   Pressable,
+  useWindowDimensions,
 } from 'react-native';
 import { NativeViewGestureHandler } from 'react-native-gesture-handler';
 import { Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
@@ -29,6 +30,11 @@ interface VideoPlayerProps {
   isActive?: boolean;
   /** Заполнить родительский контейнер (модалка на весь экран) */
   fullscreen?: boolean;
+  /** Модалка профиля: высота экрана в приоритете, без фиксированного 16:9 */
+  layoutMode?: 'default' | 'modal';
+  /** Кнопка «на весь экран» (профиль) */
+  onRequestFullscreen?: () => void;
+  fullscreenButtonLabel?: string;
 }
 
 const getVideoType = (url: string): 'youtube' | 'vk' | 'direct' => {
@@ -148,12 +154,33 @@ const VideoSeekBar: React.FC<{
 };
 
 /** Единый mp4-плеер: тап — play/pause, seek вынесен из слоя тапа, loop */
+function modalBoxSize(
+  screenW: number,
+  screenH: number,
+  aspectRatio: number
+): { width: number; height: number } {
+  const maxH = screenH * 0.78;
+  const maxW = screenW * 0.92;
+  const ar = aspectRatio > 0.05 && aspectRatio < 20 ? aspectRatio : 9 / 16;
+  if (ar >= 1) {
+    const width = maxW;
+    const height = Math.min(maxH, Math.round(maxW / ar));
+    return { width, height };
+  }
+  const height = maxH;
+  const width = Math.min(maxW, Math.round(maxH * ar));
+  return { width, height };
+}
+
 const DirectVideoPlayer: React.FC<{
   url: string;
   onClose?: () => void;
   embedded?: boolean;
   autoPlay?: boolean;
   fullscreen?: boolean;
+  layoutMode?: 'default' | 'modal';
+  onRequestFullscreen?: () => void;
+  fullscreenButtonLabel?: string;
   onScrubActiveChange?: (active: boolean) => void;
   isActive?: boolean;
 }> = ({
@@ -162,9 +189,13 @@ const DirectVideoPlayer: React.FC<{
   embedded,
   autoPlay,
   fullscreen,
+  layoutMode = 'default',
+  onRequestFullscreen,
+  fullscreenButtonLabel = 'Full screen',
   onScrubActiveChange,
   isActive = true,
 }) => {
+  const { width: screenW, height: screenH } = useWindowDimensions();
   const videoRef = useRef<Video>(null);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoPlayStartedRef = useRef(false);
@@ -178,6 +209,7 @@ const DirectVideoPlayer: React.FC<{
   const [durationMs, setDurationMs] = useState(0);
   const [isScrubbing, setIsScrubbing] = useState(false);
   const [scrubMs, setScrubMs] = useState(0);
+  const [naturalAspect, setNaturalAspect] = useState<number | null>(null);
 
   const clearHideTimer = useCallback(() => {
     if (hideTimerRef.current) {
@@ -228,7 +260,13 @@ const DirectVideoPlayer: React.FC<{
     setScrubMs(0);
     setPositionMs(0);
     setDurationMs(0);
+    setNaturalAspect(null);
   }, [url]);
+
+  const modalSize =
+    layoutMode === 'modal' && !fullscreen && !embedded
+      ? modalBoxSize(screenW, screenH, naturalAspect ?? 9 / 16)
+      : null;
 
   const play = useCallback(async () => {
     if (!videoRef.current || error) return;
@@ -305,10 +343,30 @@ const DirectVideoPlayer: React.FC<{
     [embedded, isPlaying, onScrubActiveChange, scheduleHideUi],
   );
 
+  const overlayControls = layoutMode === 'modal' || !!fullscreen;
   const showSeekBar = embedded ? durationMs > 0 && !error : (showUi || !isPlaying) && durationMs > 0 && !error;
   const showCenterPlay = !isPlaying && !isLoading && !error && !isScrubbing;
   const sliderValue = isScrubbing ? scrubMs : positionMs;
   const progress = durationMs > 0 ? positionMs / durationMs : 0;
+  const seekBar = showSeekBar ? (
+    <VideoSeekBar
+      durationMs={durationMs}
+      positionMs={sliderValue}
+      onScrubStart={beginScrub}
+      onScrubChange={changeScrub}
+      onScrubEnd={(ms) => { void endScrub(ms); }}
+    />
+  ) : null;
+
+  const handleLoad = (status: AVPlaybackStatus) => {
+    setIsLoading(false);
+    if (status.isLoaded && status.naturalSize) {
+      const { width, height } = status.naturalSize;
+      if (width > 0 && height > 0) {
+        setNaturalAspect(width / height);
+      }
+    }
+  };
 
   return (
     <View
@@ -316,6 +374,7 @@ const DirectVideoPlayer: React.FC<{
         dvStyles.container,
         embedded && dvStyles.containerEmbedded,
         fullscreen && dvStyles.containerFullscreen,
+        modalSize && { width: modalSize.width, height: modalSize.height, aspectRatio: undefined },
       ]}
     >
       <View style={[dvStyles.videoArea, embedded && dvStyles.videoAreaEmbedded]}>
@@ -328,7 +387,7 @@ const DirectVideoPlayer: React.FC<{
           isLooping
           shouldPlay={false}
           onLoadStart={() => setIsLoading(true)}
-          onLoad={() => setIsLoading(false)}
+          onLoad={handleLoad}
           onError={() => {
             setIsLoading(false);
             setError(true);
@@ -338,7 +397,13 @@ const DirectVideoPlayer: React.FC<{
         />
 
         {!isScrubbing && (
-          <Pressable style={dvStyles.touchOverlay} onPress={onVideoTap} />
+          <Pressable
+            style={[
+              dvStyles.touchOverlay,
+              overlayControls && dvStyles.touchOverlayAboveSeek,
+            ]}
+            onPress={onVideoTap}
+          />
         )}
 
         {onClose && !embedded && (
@@ -346,6 +411,26 @@ const DirectVideoPlayer: React.FC<{
             <Ionicons name="close" size={28} color="#fff" />
           </TouchableOpacity>
         )}
+
+        {onRequestFullscreen && !embedded && !fullscreen && (
+          <TouchableOpacity
+            style={[
+              dvStyles.expandBtn,
+              overlayControls && dvStyles.expandBtnAboveSeek,
+            ]}
+            onPress={onRequestFullscreen}
+            accessibilityRole="button"
+            accessibilityLabel={fullscreenButtonLabel}
+          >
+            <Ionicons name="expand" size={22} color="#fff" />
+          </TouchableOpacity>
+        )}
+
+        {seekBar && overlayControls ? (
+          <View style={dvStyles.seekBarOverlay} pointerEvents="box-none">
+            {seekBar}
+          </View>
+        ) : null}
 
         {isLoading && !error && (
           <View style={dvStyles.loadingOverlay} pointerEvents="none">
@@ -373,15 +458,7 @@ const DirectVideoPlayer: React.FC<{
         )}
       </View>
 
-      {showSeekBar && (
-        <VideoSeekBar
-          durationMs={durationMs}
-          positionMs={sliderValue}
-          onScrubStart={beginScrub}
-          onScrubChange={changeScrub}
-          onScrubEnd={(ms) => { void endScrub(ms); }}
-        />
-      )}
+      {seekBar && !overlayControls ? seekBar : null}
     </View>
   );
 };
@@ -419,6 +496,19 @@ const dvStyles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     zIndex: 4,
   },
+  touchOverlayAboveSeek: {
+    bottom: 48,
+  },
+  seekBarOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 28,
+  },
+  expandBtnAboveSeek: {
+    bottom: 56,
+  },
   video: {
     width: '100%',
     height: '100%',
@@ -434,6 +524,15 @@ const dvStyles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
     borderRadius: 16,
     padding: 4,
+  },
+  expandBtn: {
+    position: 'absolute',
+    bottom: 8,
+    right: 8,
+    zIndex: 30,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    borderRadius: 8,
+    padding: 6,
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -521,6 +620,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   autoPlay,
   onScrubActiveChange,
   fullscreen,
+  layoutMode,
+  onRequestFullscreen,
+  fullscreenButtonLabel,
   isActive,
 }) => {
   const videoType = getVideoType(url);
@@ -533,6 +635,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       embedded={embedded}
       autoPlay={autoPlay}
       fullscreen={fullscreen}
+      layoutMode={layoutMode}
+      onRequestFullscreen={onRequestFullscreen}
+      fullscreenButtonLabel={fullscreenButtonLabel}
       onScrubActiveChange={onScrubActiveChange}
       isActive={isActive}
     />

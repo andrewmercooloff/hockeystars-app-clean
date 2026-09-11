@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   View,
   Text,
@@ -30,6 +30,7 @@ interface VideoAddedNotificationProps {
   videoUrls?: string[];
   onHeaderPress?: () => void;
   onScrubActiveChange?: (active: boolean) => void;
+  reactionsFooter?: ReactNode;
 }
 
 // Медиа на всю ширину карточки (карточка: marginHorizontal 16)
@@ -136,6 +137,7 @@ const VideoAddedNotification = React.memo(function VideoAddedNotification({
   videoUrls = [],
   onHeaderPress,
   onScrubActiveChange,
+  reactionsFooter,
 }: VideoAddedNotificationProps) {
   const { t } = useLanguage();
   const insets = useSafeAreaInsets();
@@ -282,6 +284,8 @@ const VideoAddedNotification = React.memo(function VideoAddedNotification({
             <Text style={styles.badgeText}>+{displayCount}</Text>
           </View>
         )}
+
+        {reactionsFooter}
       </View>
 
       <Modal

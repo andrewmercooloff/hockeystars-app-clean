@@ -30,7 +30,10 @@
     "left": "Pa kreisi",
     "right": "Pareizi",
     "offline": "Nav savienojuma",
-    "and": "un"
+    "and": "un",
+    "info": "Informācija",
+    "continue": "Turpināt",
+    "warning": "Uzmanību"
   },
   "winger": "Malējais uzbrucējs",
   "center": "Centra uzbrucējs",
@@ -220,7 +223,9 @@
       "saveError": "Vingrinājumu nevar atzīmēt kā pabeigtu",
       "generalError": "Saglabāšanas laikā radās kļūda",
       "times": "vienreiz",
-      "timesPlural": "reizes"
+      "timesPlural": "reizes",
+      "loginRequired": "Piesakieties, lai veiktu vingrinājumus",
+      "title": "Vingrinājums"
     },
     "difficulty": {
       "Начинающий": "Sākums",
@@ -3105,7 +3110,8 @@
         "difficulty": "Начинающий",
         "duration": "10 мин"
       }
-    }
+    },
+    "timesPlural": "reizes"
   },
   "items": {
     "autograph": "autogrāfs",
@@ -3199,7 +3205,13 @@
     "errorProcessFriendRequest": "Nevar apstrādāt jūsu draudzības pieprasījumu.",
     "errorProcessRequest": "Neizdevās apstrādāt jūsu pieprasījumu",
     "errorSendMessage": "Neizdevās nosūtīt ziņojumu",
-    "phoneOrEmailPlaceholderShort": "+371… vai e-pasts"
+    "phoneOrEmailPlaceholderShort": "+371… vai e-pasts",
+    "email": "E-pasts",
+    "errorSwitchingToEmail": "Neizdevās pārslēgties uz pieteikšanos ar e-pastu",
+    "smsRateLimited": "Kods uz šo numuru nosūtīts mazāk nekā minūti atpakaļ. Ievadiet to vai pieprasiet jaunu, kad beigsies taimeris.",
+    "smsServerUnreachable": "Nevar sasniegt HockeyStars serveri. Pārbaudiet savienojumu (VPN var bloķēt) un pieskarieties “Sūtīt vēlreiz”.",
+    "smsEmailOnly": "ASV un Kanādai — pieslēgšanās ar e-pastu.",
+    "smsProviderFailed": "Operators nepieņēma SMS. Pārbaudiet numuru vai mēģiniet pēc minūtes."
   },
   "profile": {
     "addFriend": "Pievienot kā draugu",
@@ -3494,7 +3506,32 @@
     "city": "Pilsēta",
     "addAddress": "Pievienot adresi",
     "addressesHint": "Var norādīt vairākas adreses",
-    "previousSeason": "Previous season"
+    "previousSeason": "Previous season",
+    "cover": "Vāka attēls",
+    "changeCover": "Mainīt vāku",
+    "removeCover": "Noņemt vāku",
+    "teamLogo": "Komandas logotips",
+    "uploadTeamLogo": "Augšupielādēt logotipu",
+    "coverUpdated": "Vāks atjaunināts",
+    "teamLogoUpdated": "Komandas logotips atjaunināts",
+    "coverUploadFailed": "Neizdevās augšupielādēt attēlu",
+    "scoutPrivacyNote": "Citi lietotāji neredzēs jūsu fotoattēlu un vārdu — viņiem jūs esat “Skauts”.",
+    "positionCover": "Novietojiet vāku",
+    "positionCoverHint": "Velciet ar vienu pirkstu, tuviniet ar diviem, līdz kadrs iederas",
+    "allTime": "Kopā",
+    "seasonsCount": "{count} sez.",
+    "currentSeasonHint": "Pašreizējā sezona",
+    "fullScreen": "Pilnekrāns",
+    "heightWithUnit": "Augums (cm)",
+    "individualTraining": "Individuālie treniņi",
+    "playerNumber": "Spēlētāja numurs",
+    "playerNumberPlaceholder": "Numurs uz krekla",
+    "selectBirthDate": "Izvēlieties dzimšanas datumu",
+    "skateServices": "Pakalpojumi",
+    "weightWithUnit": "Svars (kg)",
+    "videoUploaded": "Video pievienots profilam",
+    "videoUploadSaveReminder": "Video augšupielādēts. Nospiediet «Saglabāt», lai tas paliktu profilā.",
+    "removeFromFriendsConfirm": "Noņemt {name} no draugiem?"
   },
   "register": {
     "title": "Reģistrācija",
@@ -3545,7 +3582,32 @@
     "fillRequiredFields": "Lūdzu, aizpildiet visus obligātos laukus",
     "fillAllFields": "Lūdzu, aizpildiet visus laukus",
     "phoneFormatError": "Lūdzu, ievadiet derīgu tālruņa numuru ar valsts kodu (piem., +1234567890)",
-    "parentEmailFormatError": "Lūdzu, ievadiet derīgu vecāka e-pasta adresi"
+    "parentEmailFormatError": "Lūdzu, ievadiet derīgu vecāka e-pasta adresi",
+    "scoutPrivacyNote": "Citi neredz skauta fotoattēlu un vārdu — jūs tiekat rādīts kā “Skauts”.",
+    "emailFormatError": "Ievadiet derīgu e-pasta adresi",
+    "registrationFailed": "Reģistrācija neizdevās",
+    "detailsHint": "Neobligāti: numurs, tvēriens, augums un svars palīdz skautiem un draugiem jūs atrast. Varēsiet aizpildīt vēlāk profilā.",
+    "skipForNow": "Izlaist",
+    "parentEmailSendFailed": "Neizdevās nosūtīt e-pastu vecākiem. Pārbaudiet adresi un mēģiniet vēlāk.",
+    "step": {
+      "contact": "1. solis · Kontakti",
+      "code": "2. solis · Apstiprinājums",
+      "profile": "1. solis · Profils",
+      "details": "2. solis · Spēlētāja dati"
+    },
+    "currentTeam": "Pašreizējā komanda",
+    "currentTeamHint": "Caur komandu tiek saistīti komandas biedri, vāks un komandas lapa. Sāciet rakstīt, lai atrastu esošu.",
+    "teamPlaceholder": "piem., Dinamo Minsk 2012",
+    "teamWillBeCreated": "Šādas komandas vēl nav — mēs to izveidosim jums.",
+    "consentByContinuing": "Nospiežot “Turpināt”, jūs piekrītat",
+    "haveAccount": "Jau ir konts?",
+    "signIn": "Pieslēgties",
+    "entryTitle": "Uz ledu",
+    "entrySubtitle": "Ievadiet tālruņa numuru. Mēs jūs pieslēgsim vai izveidosim kontu.",
+    "codeSubtitle": "Ievadiet kodu no ziņas",
+    "whoAreYou": "Kas jūs esat?",
+    "useEmailInstead": "Izmantot e-pastu",
+    "usePhoneInstead": "Izmantot tālruņa numuru"
   },
   "navigation": {
     "home": "Sākums",
@@ -3604,7 +3666,12 @@
     "errorCreatingUser": "Neizdevās izveidot lietotāju",
     "fillRequiredFields": "Lūdzu, aizpildiet visus obligātos laukus.",
     "enterValidPhone": "Lūdzu, ievadiet derīgu tālruņa numuru ar valsts kodu.",
-    "requiredForPlayers": "Spēlētājiem un zvaigznēm obligāti jānorāda dzimšanas datums un pozīcija"
+    "requiredForPlayers": "Spēlētājiem un zvaigznēm obligāti jānorāda dzimšanas datums un pozīcija",
+    "adminPanel": "Administratora panelis",
+    "login": "Pieslēgties",
+    "loginAsUserConfirm": "Vai tiešām vēlaties pieslēgties kā {name}?",
+    "loginAsUserError": "Neizdevās pieslēgties kā lietotājs",
+    "loginAsUserSuccess": "Jūs esat pieslēdzies kā {name}"
   },
   "museum": {
     "title": "Muzejs",
@@ -3811,9 +3878,13 @@
     "topBySV": "Top SV%",
     "shareRating": "Dalīties ar reitingu",
     "shareRatingFooter": "hockeystars.com",
+    "shareRatingSeason": "{season}. sezona",
     "ratingPointsLabel": "punktu",
     "allCountries": "Visas valstis",
-    "allYears": "Visi gadi"
+    "allYears": "Visi gadi",
+    "filters": "Filtri",
+    "shareNewcomers": "Dalīties ar jaunpienācējiem",
+    "shareNewcomersCount": "{count} spēlētāji"
   },
   "messages": {
     "title": "Ziņojumi",
@@ -3828,7 +3899,8 @@
     "massSend": "Masveida sūtīšana",
     "recipients": "Saņēmēji",
     "typeMessage": "Ievadiet ziņojumu...",
-    "send": "Nosūtīt"
+    "send": "Nosūtīt",
+    "searchHistoryLoading": "Meklē ziņu vēsturē…"
   },
   "notifications": {
     "title": "Paziņojumi",
@@ -3865,6 +3937,14 @@
     },
     "photo_liked": {
       "grouped": "{name} atzīmēja ar patīk {count} jūsu foto"
+    },
+    "profile_reaction": {
+      "title": "Jauna reakcija",
+      "messageGrouped": "{name} nosūtīja {reactions}"
+    },
+    "activity_reaction": {
+      "title": "Reakcija uz jūsu atjauninājumu",
+      "message": "{name} reaģēja {emoji} uz jūsu atjauninājumu"
     }
   },
   "editProfile": {
@@ -3946,7 +4026,9 @@
     "noFriendsToForward": "Nav draugu, kam pārsūtīt",
     "messageForwarded": "Ziņa pārsūtīta",
     "forwardedTo": "Pārsūtīts",
-    "forwardError": "Pārsūtīšana neizdevās"
+    "forwardError": "Pārsūtīšana neizdevās",
+    "user": "Lietotājs",
+    "you": "Jūs"
   },
   "createUser": {
     "title": "Lietotāja izveide",
@@ -4110,7 +4192,8 @@
     "giftReceivedFromStar": "Jūs saņēmāt dāvanu no {starName}: {giftName}",
     "giftReceivedPush": "🎁 Saņemta dāvana!",
     "giftReceivedFromAdminPush": "Jūs saņēmāt dāvanu no administratora: {giftName}",
-    "giftReceivedFromStarPush": "Jūs saņēmāt dāvanu no {starName}: {giftName}"
+    "giftReceivedFromStarPush": "Jūs saņēmāt dāvanu no {starName}: {giftName}",
+    "customGift": "Lūgt dāvanu"
   },
   "TEMP_DELETE_ME": {
     "title": "Standarti",
@@ -4281,7 +4364,13 @@
     "deleteError": "Kļūda",
     "deleteErrorMessage": "Neizdevās dzēst ierakstu",
     "speedExceedsLimit": "Ātrums pārsniedz 120 km/h, mērījums netiek skaitīts",
-    "needMicrophone": "Nepieciešama piekļuve mikrofonam"
+    "needMicrophone": "Nepieciešama piekļuve mikrofonam",
+    "micPosition": {
+      "label": "Kur atrodas telefons",
+      "shooter": "Pie metēja",
+      "middle": "Vidū",
+      "target": "Pie apmales"
+    }
   },
   "logout": "Iziet",
   "logoutConfirm": "Iziet no sava profila",
@@ -4296,10 +4385,15 @@
     "oneVideo": "jaunu video",
     "multipleVideos": "{count} jaunus video",
     "video": "video",
-    "videos": "video"
+    "videos": "video",
+    "fullScreen": "Pilnekrāns"
   },
   "avatarNotification": {
     "changed": "mainīja avataru"
+  },
+  "coverNotification": {
+    "title": "Jauns vāka attēls",
+    "changed": "atjaunināja profila vāka attēlu"
   },
   "puckSpeedNotification": {
     "title": "Jauns ātruma rekords",
@@ -4351,5 +4445,26 @@
     "scanQr": "Noskenējiet ar tālruni — atvērsies App Store vai Google Play",
     "appStoreCta": "Lejupielādēt App Store",
     "playStoreCta": "Lejupielādēt Google Play"
+  },
+  "ota": {
+    "resurfacing": "Atjaunojam ledu…",
+    "updating": "Instalējam atjauninājumu",
+    "updated": "Svaigs ledus — lietotne atjaunināta"
+  },
+  "goalie": "Vārtsargs",
+  "referral": {
+    "leaderboard": "Labākie ielūdzēji",
+    "noInvites": "Neviens vēl nav uzaicinājis draugus",
+    "points": "punkti"
+  },
+  "reactions": {
+    "respect": "cieņa",
+    "like": "patīk",
+    "strength": "spēks",
+    "highFive": "dod pieci",
+    "fire": "uguns",
+    "lightning": "zibens",
+    "sendBack": "Atbildēt",
+    "whoReacted": "Kas reaģēja"
   }
 }

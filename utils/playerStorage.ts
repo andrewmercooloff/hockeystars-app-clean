@@ -5,9 +5,10 @@ import {
   throwIfSupabaseNetworkError,
   ensureSupabaseRouting,
 } from './supabase';
-import { avatarCache, updateAvatarGlobally, preloadPlayerAvatars, seedPlayerAvatarUrls } from './AvatarCache';
+import { avatarCache, updateAvatarGlobally, ensureAvatarCached, isSameAvatarFile, preloadPlayerAvatars, seedPlayerAvatarUrls } from './AvatarCache';
 import { dataCache, CACHE_KEYS } from './DataCache';
 import { addActivityPoints } from '../services/activityService';
+import { normalizeVerificationContact } from './emailService';
 import {
   getDisplayGoalieBlock,
   getDisplaySeasonPoints,
@@ -296,7 +297,8 @@ export interface Player {
   // Поля для заточки коньков
   skate_services?: string[]; // услуги заточки коньков
   // Рейтинг активности
-  activityRating?: number; // рейтинг активности игрока
+  /** @deprecated Season activity rating — no longer shown in UI. */
+  activityRating?: number;
   profileViewsToday?: number;
   profileViewsTotal?: number;
   // Дата создания
@@ -537,8 +539,9 @@ const convertSupabaseToPlayer = (supabasePlayer: SupabasePlayer): Player => {
     // Онлайн статус
     isOnline: supabasePlayer.is_online ?? false,
     lastSeen: supabasePlayer.last_seen || undefined,
-  // Скрытие профиля
-  is_hidden: supabasePlayer.is_hidden ?? false,
+  // Скрытие профиля. Детский аккаунт до согласия родителя всегда скрыт,
+  // даже если флаг в БД по какой-то причине не выставлен.
+  is_hidden: (supabasePlayer.is_hidden ?? false) || supabasePlayer.status === 'pending_verification',
   // YouTube game videos for AI analysis
   gameVideos: (() => {
     if (!supabasePlayer.game_videos) return undefined;
@@ -659,23 +662,41 @@ export const searchTeams = async (searchTerm: string, language: string = 'ru'): 
 };
 
 // Создание новой команды
+/** Год/сезон в названии («Динамо 2008», «Лида 2014-2015») — это возрастная группа, а не другая команда. */
+const TEAM_YEAR_RE = /\s*[-–/]?\s*(19|20)\d{2}(\s*[-/–]\s*(19|20)?\d{2})?/g;
+
+export const cleanTeamName = (name: string): string =>
+  name.replace(TEAM_YEAR_RE, ' ').replace(/\s+/g, ' ').trim();
+
+/** Ключ для сравнения команд: регистр, ё/е, дефисы, кавычки и годы не важны. */
+export const normalizeTeamKey = (name: string): string =>
+  cleanTeamName(name)
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/[^a-zа-я0-9]+/gi, ' ')
+    .trim();
+
 export const createTeam = async (teamData: Omit<Team, 'id'>): Promise<Team | null> => {
   try {
-    
-    // Сначала проверяем, существует ли уже команда с таким названием
-    const { data: existingTeam, error: checkError } = await supabase
+    const cleanName = cleanTeamName(teamData.name) || teamData.name.trim();
+    const key = normalizeTeamKey(cleanName);
+
+    // Ищем существующую команду с тем же нормализованным названием, чтобы не плодить
+    // «СКА Стрельна» / «Ска-стрельна» / «СКА Стрельна 2012».
+    const stem = cleanName.split(/\s+/)[0]?.replace(/[^a-zа-я0-9ё]/gi, '') || cleanName;
+    const { data: candidates, error: checkError } = await supabase
       .from('teams')
       .select('*')
-      .eq('name', teamData.name)
-      .single();
-    
-    if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows returned
+      .ilike('name', `%${escapeIlikeTerm(stem)}%`)
+      .limit(60);
+
+    if (checkError) {
       console.error('❌ Ошибка проверки существующей команды:', checkError);
       return null;
     }
-    
-    if (existingTeam) {
 
+    const existingTeam = (candidates || []).find((t: any) => normalizeTeamKey(t.name) === key);
+    if (existingTeam) {
       return {
         id: existingTeam.id,
         name: existingTeam.name,
@@ -688,7 +709,7 @@ export const createTeam = async (teamData: Omit<Team, 'id'>): Promise<Team | nul
     const { data, error } = await supabase
       .from('teams')
       .insert({
-        name: teamData.name,
+        name: cleanName,
         type: teamData.type,
         country: teamData.country,
         city: teamData.city
@@ -758,8 +779,7 @@ const batchLoadPlayerTeamsForPlayerIds = async (
     });
   };
 
-  for (let i = 0; i < playerIds.length; i += CHUNK) {
-    const chunk = playerIds.slice(i, i + CHUNK);
+  const loadChunk = async (chunk: string[]) => {
     const { data, error } = await supabase
       .from('player_teams')
       .select(`
@@ -783,15 +803,27 @@ const batchLoadPlayerTeamsForPlayerIds = async (
 
     if (error) {
       console.error('❌ batchLoadPlayerTeamsForPlayerIds:', error);
-      continue;
+      return [];
     }
+    return data || [];
+  };
 
-    for (const row of data || []) {
-      const pid = row.player_id as string;
-      if (!pid) continue;
-      const pt = mapRow(row);
-      if (!byPlayer.has(pid)) byPlayer.set(pid, []);
-      byPlayer.get(pid)!.push(pt);
+  const chunks: string[][] = [];
+  for (let i = 0; i < playerIds.length; i += CHUNK) {
+    chunks.push(playerIds.slice(i, i + CHUNK));
+  }
+  // По три пачки за раз: строго по очереди весь каталог растягивается на секунды,
+  // и каждый ответ разбирается ровно тогда, когда шайбы уже едут.
+  for (let i = 0; i < chunks.length; i += 3) {
+    const results = await Promise.all(chunks.slice(i, i + 3).map(loadChunk));
+    for (const rows of results) {
+      for (const row of rows) {
+        const pid = row.player_id as string;
+        if (!pid) continue;
+        const pt = mapRow(row);
+        if (!byPlayer.has(pid)) byPlayer.set(pid, []);
+        byPlayer.get(pid)!.push(pt);
+      }
     }
   }
 
@@ -1093,6 +1125,68 @@ export const getPlayerTeamsAsPastTeams = async (playerId: string): Promise<PastT
     console.error('❌ Ошибка получения команд игрока:', error);
     return [];
   }
+};
+
+const TEAMS_MEMORY_TTL_MS = 10 * 60 * 1000;
+
+/** In-memory teams for instant profile header (same TTL as getPlayerTeams). */
+export function peekPlayerTeamsSync(playerId: string): PastTeam[] | null {
+  const memCached = teamsMemoryCache.get(playerId);
+  if (!memCached || Date.now() - memCached.timestamp >= TEAMS_MEMORY_TTL_MS) {
+    return null;
+  }
+  return memCached.teams.map(convertPlayerTeamToPastTeam);
+}
+
+export function splitPastTeams(teams: PastTeam[]): { current: PastTeam[]; past: PastTeam[] } {
+  return {
+    current: teams.filter((t) => t.isCurrent),
+    past: teams.filter((t) => !t.isCurrent),
+  };
+}
+
+/** Teams embedded on a cached Player row (home/search list). */
+export function pastTeamsFromPlayerRecord(player: Player | null | undefined): PastTeam[] | null {
+  if (!player?.teams?.length) return null;
+  return player.teams.map(convertPlayerTeamToPastTeam);
+}
+
+/** Sync hydrate: memory cache, then player.teams from list/bootstrap cache. */
+export function getInstantProfileTeams(
+  playerId: string,
+  player?: Player | null
+): { current: PastTeam[]; past: PastTeam[]; all: PastTeam[] } | null {
+  const fromMem = peekPlayerTeamsSync(playerId);
+  if (fromMem?.length) {
+    const split = splitPastTeams(fromMem);
+    return { ...split, all: fromMem };
+  }
+  const fromPlayer = pastTeamsFromPlayerRecord(player);
+  if (fromPlayer?.length) {
+    seedPlayerTeamsBootstrapCache(
+      playerId,
+      player!.teams!.map((t) => ({
+        teamId: t.teamId,
+        teamName: t.teamName,
+        teamNameRu: t.teamNameRu,
+        teamType: t.teamType,
+        teamCountry: t.teamCountry,
+        teamCity: t.teamCity,
+        isPrimary: t.isPrimary,
+        joinedDate: t.joinedDate,
+        startYear: t.startYear,
+        endYear: t.endYear,
+        teamOrder: t.teamOrder,
+      }))
+    );
+    const split = splitPastTeams(fromPlayer);
+    return { ...split, all: fromPlayer };
+  }
+  return null;
+}
+
+export const prefetchPlayerTeams = (playerId: string) => {
+  void getPlayerTeamsAsPastTeams(playerId);
 };
 
 // Синхронизация команд игрока с базой данных через Edge Function (обходит RLS)
@@ -1455,23 +1549,18 @@ async function enrichPlayersMeta(
 ): Promise<void> {
   const AsyncStorage = require('@react-native-async-storage/async-storage').default;
   try {
-    const { getPlayersActivityRatings } = await import('../services/activityService');
-    const playerIds = players.map((p) => p.id);
-    const [activityRatings, teamsByPlayer] = await Promise.all([
-      getPlayersActivityRatings(playerIds),
-      batchLoadPlayerTeamsForPlayerIds(playerIds),
-    ]);
+    // Рейтинг активности сюда не входит намеренно: суммировать activity_log по всему
+    // каталогу — это десятки запросов подряд, и они приходятся ровно на первые секунды
+    // главной, где шайбы уже едут. Показывает его только поиск, и он берёт его сам.
+    const teamsByPlayer = await batchLoadPlayerTeamsForPlayerIds(players.map((p) => p.id));
     players.forEach((player) => {
-      if (activityRatings[player.id] !== undefined) {
-        player.activityRating = activityRatings[player.id];
-      }
       player.teams = teamsByPlayer.get(player.id) ?? [];
     });
     await AsyncStorage.setItem(cacheKey, JSON.stringify({ players, timestamp: Date.now() }));
     onUpdated?.(players);
   } catch (metaErr) {
-    console.warn('⚠️ Ошибка догрузки рейтингов/команд:', metaErr);
-    // Сеть с рейтингами не удалась, но свежий список игроков всё равно кешируем,
+    console.warn('⚠️ Ошибка догрузки команд:', metaErr);
+    // Сеть с командами не удалась, но свежий список игроков всё равно кешируем,
     // если вызывающая сторона отложила запись кеша до этого места.
     if (writeCacheOnFailure) {
       try {
@@ -1563,10 +1652,8 @@ export const loadPlayers = async (
           if (Date.now() - timestamp < cacheTime) {
             console.log('💾 Загрузили игроков из кеша', cacheKey);
             warmPlayerAvatarsFromList(players);
-            const needsRatings = players.some(
-              (player: Player) => player.activityRating === undefined || player.activityRating === null
-            );
-            if (needsRatings) {
+            const needsTeams = players.some((player: Player) => player.teams === undefined);
+            if (needsTeams) {
               void enrichPlayersMeta(players, cacheKey, onUpdated);
             }
             return players;
@@ -1677,6 +1764,7 @@ export const clearAllFriendsCache = async (): Promise<void> => {
 // Очистка кеша команд при изменении команд игрока
 export const clearTeamsCache = async (playerId: string): Promise<void> => {
   try {
+    teamsMemoryCache.delete(playerId);
     const AsyncStorage = require('@react-native-async-storage/async-storage').default;
     const cacheKey = `teams_${playerId}`;
     await AsyncStorage.removeItem(cacheKey);
@@ -2327,10 +2415,16 @@ export function mergePlayerFromPlayersRealtimeRow(
   const next: Player = { ...cur };
   const str = (v: unknown) => (v != null ? String(v) : '');
 
-  if (row.avatar !== undefined && row.avatar !== cur.avatar) {
-    next.avatar = row.avatar as string;
-    changed = true;
-    invalidatePlayersListCache = true;
+  // Realtime отдаёт URL таким, каким он лежит в БД, а в списке аватар уже переписан
+  // на активный origin. Сравнение строк объявляло бы смену аватара на каждом
+  // обновлении строки (онлайн, last_seen) и сбрасывало бы кеш картинки.
+  if (row.avatar !== undefined) {
+    const nextAvatar = rewriteSupabasePublicUrl(row.avatar as string | null);
+    if (!isSameAvatarFile(nextAvatar, cur.avatar)) {
+      next.avatar = nextAvatar as string;
+      changed = true;
+      invalidatePlayersListCache = true;
+    }
   }
 
   const statPairs: [keyof Player, string][] = [
@@ -2504,17 +2598,8 @@ export const updatePlayer = async (playerId: string, updateData: Partial<Player>
     
     // Проверяем изменение аватара и обновляем глобальный кеш
     if (oldPlayer && oldPlayer.avatar !== updatedPlayer.avatar) {
-      // Очищаем старый аватар из всех кешей
-      if (oldPlayer.avatar) {
-        try {
-          const { Image } = await import('expo-image');
-          // Инвалидируем кеш старого аватара
-          await Image.clearMemoryCache();
-          await Image.clearDiskCache();
-        } catch (error) {
-          console.error('❌ Ошибка очистки кеша изображений:', error);
-        }
-      }
+      // Не чистим общий кеш expo-image: это выбрасывало аватары всех игроков.
+      // Новый файл подхватится через _v=timestamp в updateAvatarGlobally.
       
       // Очищаем AvatarCache для этого игрока перед обновлением
       avatarCache.clearAvatar(playerId);
@@ -2786,7 +2871,7 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
             }
           }
           if (user?.avatar && user?.id) {
-            void updateAvatarGlobally(user.id, user.avatar);
+            void ensureAvatarCached(user.id, user.avatar);
           }
           return user as Player;
         }
@@ -2845,7 +2930,7 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
         if (nextAvatar && nextAvatar !== user.avatar) {
           user.avatar = nextAvatar;
           try {
-            await updateAvatarGlobally(user.id, nextAvatar);
+            await ensureAvatarCached(user.id, nextAvatar);
           } catch {
             // ignore
           }
@@ -2874,7 +2959,7 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
       user.avatar = storedAvatar;
     }
     if (user.avatar && user.id) {
-      void updateAvatarGlobally(user.id, user.avatar);
+      void ensureAvatarCached(user.id, user.avatar);
     }
     await AsyncStorage.setItem(cacheKey, JSON.stringify({
       user,
@@ -5252,51 +5337,38 @@ export const getPlayerByEmail = async (email: string): Promise<Player | null> =>
 // Поиск игрока по телефону
 export const getPlayerByPhone = async (phone: string, isAdminAccess: boolean = false): Promise<Player | null> => {
   try {
-    
-    // Если это доступ администратора, ищем любого пользователя с этим номером
-    // Если есть несколько пользователей с одним телефоном, берем самого нового
-    if (isAdminAccess) {
-      const { data, error } = await supabase
+    const normalized = normalizeVerificationContact(phone);
+    const phoneVariants = [...new Set(
+      normalized.startsWith('+')
+        ? [normalized, normalized.slice(1)]
+        : [`+${normalized}`, normalized]
+    )];
+
+    for (const variant of phoneVariants) {
+      const { data: matches, error } = await supabase
         .from('players')
         .select('*')
-        .eq('phone', phone)
+        .eq('phone', variant)
         .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      
+        .limit(isAdminAccess ? 1 : 5);
+
       if (error) {
         throwIfSupabaseNetworkError(error);
-        console.error('❌ Ошибка поиска игрока (admin access):', error);
+        console.error('❌ Ошибка поиска игрока:', error);
         throw error;
       }
-      
-      if (data) {
-        return convertSupabaseToPlayer(data);
+
+      if (!matches || matches.length === 0) continue;
+
+      if (isAdminAccess) {
+        return convertSupabaseToPlayer(matches[0]);
       }
-      
-      return null;
-    }
-    
-    // Один запрос вместо двух: приоритет admin, иначе самый новый профиль
-    const { data: matches, error } = await supabase
-      .from('players')
-      .select('*')
-      .eq('phone', phone)
-      .order('created_at', { ascending: false })
-      .limit(5);
 
-    if (error) {
-      throwIfSupabaseNetworkError(error);
-      console.error('❌ Ошибка поиска игрока:', error);
-      throw error;
+      const adminMatch = matches.find((row) => row.status === 'admin');
+      return convertSupabaseToPlayer(adminMatch ?? matches[0]);
     }
 
-    if (!matches || matches.length === 0) {
-      return null;
-    }
-
-    const adminMatch = matches.find((row) => row.status === 'admin');
-    return convertSupabaseToPlayer(adminMatch ?? matches[0]);
+    return null;
   } catch (error) {
     throwIfSupabaseNetworkError(error);
     console.error('❌ Ошибка поиска игрока по телефону:', error);
@@ -6267,6 +6339,82 @@ export const notifyFriendsAboutAvatarChange = async (
     
   } catch (error) {
     console.error('❌ Ошибка отправки уведомлений об аватаре:', error);
+  }
+};
+
+const recentCoverNotifyByPlayer = new Map<string, number>();
+const COVER_NOTIFY_COOLDOWN_MS = 2 * 60 * 1000;
+
+/**
+ * Игрок сменил обложку профиля: друзьям — карточка в ленте (раздел «Медиа»)
+ * и push на их языке с переходом в профиль.
+ */
+export const notifyFriendsAboutCover = async (
+  playerId: string,
+  playerName: string,
+  coverUrl: string,
+): Promise<void> => {
+  try {
+    const now = Date.now();
+    const last = recentCoverNotifyByPlayer.get(playerId);
+    if (last != null && now - last < COVER_NOTIFY_COOLDOWN_MS) return;
+    recentCoverNotifyByPlayer.set(playerId, now);
+
+    const friends = await getFriends(playerId);
+    if (friends.length === 0) return;
+
+    const { getUserLanguages, loadTranslations } = await import('./languageHelper');
+    const { sendNotificationToUser } = await import('./notificationService');
+    const friendLanguages = await getUserLanguages(friends.map((f) => f.id));
+    const en = loadTranslations('en');
+    const timestamp = new Date().toISOString();
+
+    const rows = friends.map((friend) => {
+      const lang = friendLanguages.get(friend.id) || 'en';
+      const tr = loadTranslations(lang);
+      const title = tr?.coverNotification?.title || en?.coverNotification?.title || 'New cover';
+      const changed = tr?.coverNotification?.changed || en?.coverNotification?.changed || 'updated the profile cover';
+      return {
+        user_id: friend.id,
+        type: 'cover_changed',
+        title,
+        message: `${playerName} ${changed}`,
+        data: {
+          changedPlayerId: playerId,
+          changedPlayerName: playerName,
+          coverUrl,
+          timestamp,
+        },
+        created_at: timestamp,
+        is_read: false,
+      };
+    });
+
+    const { error } = await supabase.from('notifications').insert(rows);
+    if (error) {
+      console.error('❌ Ошибка сохранения уведомлений об обложке:', error);
+      return;
+    }
+
+    for (const row of rows) {
+      try {
+        await sendNotificationToUser(row.user_id, '🖼️ ' + row.title, row.message, {
+          type: 'cover_changed',
+          player_id: playerId,
+          action: 'open_player',
+          deepLink: `/player/${playerId}`,
+        });
+      } catch (e) {
+        console.error('⚠️ Ошибка push/cover_changed:', e);
+      }
+      try {
+        await supabase.rpc('increment_unread_notifications', { user_id: row.user_id });
+      } catch {
+        // счётчик не критичен
+      }
+    }
+  } catch (error) {
+    console.error('❌ Ошибка уведомлений об обложке:', error);
   }
 };
 
@@ -7951,7 +8099,12 @@ export const notifyFriendsAboutScoutReport = async (playerId: string, playerName
       const title = tr?.pushTitles?.scoutReport || SCOUT_REPORT_TITLE[lang] || SCOUT_REPORT_TITLE.en;
       try {
         const { sendNotificationToUser } = await import('./notificationService');
-        await sendNotificationToUser(friend.id, '📋 ' + title, `${playerName} ${received}`, { type: 'scout_report', player_id: playerId, action: 'open_player' });
+        await sendNotificationToUser(friend.id, '📋 ' + title, `${playerName} ${received}`, {
+          type: 'scout_report',
+          player_id: playerId,
+          action: 'open_player',
+          deepLink: `/player/${playerId}?scrollToAnalysis=true`,
+        });
         await supabase.rpc('increment_unread_notifications', { user_id: friend.id });
       } catch (e) {
         console.error('⚠️ Ошибка push/scout_report:', e);
@@ -8641,8 +8794,9 @@ export const getSmartPlayerSelection = (
 ): Player[] => {
   try {
     // 0. Константы
-    const MAX_BASE_PLAYERS = 24; // +3 для топ-лидеров по рейтингу
-    const MAX_TOTAL_WITH_SCOUT = 25;
+    // 24 → 18: на телефоне 30 шайб перекрывали друг друга, лёд не читался
+    const MAX_BASE_PLAYERS = 18; // +3 для топ-лидеров по рейтингу
+    const MAX_TOTAL_WITH_SCOUT = 19;
 
     // 1. Фильтруем скрытые профили (кроме текущего пользователя и админов)
     const visiblePlayers = players.filter(player => {

@@ -28,7 +28,11 @@
     "left": "Vänster",
     "right": "Rätt",
     "offline": "Ingen anslutning",
-    "and": "och"
+    "and": "och",
+    "info": "Info",
+    "continue": "Fortsätt",
+    "retry": "Försök igen",
+    "warning": "Varning"
   },
   "winger": "Ytter",
   "center": "Center framåt",
@@ -56,7 +60,9 @@
   },
   "achievementNotification": {
     "added": "lagt till",
-    "oneAchievement": "ny prestation"
+    "oneAchievement": "ny prestation",
+    "multipleAchievements": "{count} nya prestationer",
+    "received": "fick"
   },
   "friendshipNotification": {
     "title": "Ny vänskap",
@@ -201,7 +207,9 @@
       "saveError": "Det gick inte att markera övningen som avslutad",
       "generalError": "Ett fel uppstod när du sparade",
       "times": "en gång",
-      "timesPlural": "gånger"
+      "timesPlural": "gånger",
+      "loginRequired": "Logga in för att göra övningar",
+      "title": "Övning"
     },
     "difficulty": {
       "Начинающий": "Början",
@@ -3092,7 +3100,8 @@
         "difficulty": "Начинающий",
         "duration": "10 мин"
       }
-    }
+    },
+    "timesPlural": "gånger"
   },
   "items": {
     "autograph": "autograf",
@@ -3186,7 +3195,13 @@
     "errorProcessFriendRequest": "Det gick inte att behandla din vänförfrågan.",
     "errorProcessRequest": "Det gick inte att behandla din begäran",
     "errorSendMessage": "Det gick inte att skicka meddelandet",
-    "phoneOrEmailPlaceholderShort": "+46… eller e-post"
+    "phoneOrEmailPlaceholderShort": "+46… eller e-post",
+    "email": "E-post",
+    "errorSwitchingToEmail": "Kunde inte byta till e-postinloggning",
+    "smsRateLimited": "En kod skickades till det här numret för mindre än en minut sedan. Ange den eller begär en ny när timern är slut.",
+    "smsServerUnreachable": "Kan inte nå HockeyStars-servern. Kontrollera anslutningen (VPN kan blockera) och tryck på ”Skicka igen”.",
+    "smsEmailOnly": "För USA och Kanada, logga in med e-post.",
+    "smsProviderFailed": "Operatören tog inte emot SMS:et. Kontrollera numret eller försök igen om en minut."
   },
   "profile": {
     "addFriend": "Lägg till som vän",
@@ -3480,7 +3495,34 @@
     "city": "Stad",
     "addAddress": "Lägg till adress",
     "addressesHint": "Du kan ange flera adresser",
-    "previousSeason": "Previous season"
+    "previousSeason": "Previous season",
+    "cover": "Omslag",
+    "changeCover": "Byt omslag",
+    "removeCover": "Ta bort omslag",
+    "teamLogo": "Lagets logotyp",
+    "uploadTeamLogo": "Ladda upp logotyp",
+    "coverUpdated": "Omslaget uppdaterat",
+    "teamLogoUpdated": "Lagets logotyp uppdaterad",
+    "coverUploadFailed": "Kunde inte ladda upp bilden",
+    "scoutPrivacyNote": "Andra användare ser varken ditt foto eller namn – för dem är du ”Scout”.",
+    "positionCover": "Placera omslaget",
+    "positionCoverHint": "Dra med ett finger, nyp för att zooma tills ramen passar",
+    "allTime": "Totalt",
+    "seasonsCount": "{count} säsonger",
+    "currentSeasonHint": "Aktuell säsong",
+    "fullScreen": "Helskärm",
+    "heightWithUnit": "Längd (cm)",
+    "noPermission": "Ingen åtkomst till galleriet",
+    "playerNumber": "Spelarnummer",
+    "playerNumberPlaceholder": "Nummer på tröjan",
+    "savedToGallery": "Sparad i galleriet",
+    "selectBirthDate": "Välj födelsedatum",
+    "shareError": "Fel vid skapande av bild",
+    "skateServices": "Tjänster",
+    "weightWithUnit": "Vikt (kg)",
+    "videoUploaded": "Video tillagt i profilen",
+    "videoUploadSaveReminder": "Video uppladdat. Tryck på «Spara» för att behålla det i profilen.",
+    "removeFromFriendsConfirm": "Ta bort {name} från vänner?"
   },
   "register": {
     "title": "Registrering",
@@ -3531,7 +3573,32 @@
     "fillRequiredFields": "Vänligen fyll i alla obligatoriska fält",
     "fillAllFields": "Vänligen fyll i alla fält",
     "phoneFormatError": "Vänligen ange ett giltigt telefonnummer med landskod (t.ex. +1234567890)",
-    "parentEmailFormatError": "Vänligen ange en giltig förälders e-postadress"
+    "parentEmailFormatError": "Vänligen ange en giltig förälders e-postadress",
+    "scoutPrivacyNote": "Andra ser inte en scouts foto eller namn – du visas som ”Scout”.",
+    "emailFormatError": "Ange en giltig e-postadress",
+    "registrationFailed": "Registreringen misslyckades",
+    "detailsHint": "Valfritt: nummer, fattning, längd och vikt hjälper scouter och vänner att hitta dig. Du kan fylla i dem senare i profilen.",
+    "skipForNow": "Hoppa över",
+    "parentEmailSendFailed": "Det gick inte att skicka e-post till föräldern. Kontrollera adressen och försök igen senare.",
+    "step": {
+      "contact": "Steg 1 · Kontakt",
+      "code": "Steg 2 · Bekräftelse",
+      "profile": "Steg 1 · Profil",
+      "details": "Steg 2 · Spelaruppgifter"
+    },
+    "currentTeam": "Nuvarande lag",
+    "currentTeamHint": "Lagkamrater, omslag och lagsida kopplas via laget. Börja skriva för att hitta ett befintligt lag.",
+    "teamPlaceholder": "t.ex. Dinamo Minsk 2012",
+    "teamWillBeCreated": "Laget finns inte ännu — vi skapar det åt dig.",
+    "consentByContinuing": "Genom att trycka på ”Fortsätt” godkänner du",
+    "haveAccount": "Har du redan ett konto?",
+    "signIn": "Logga in",
+    "entryTitle": "Ut på isen",
+    "entrySubtitle": "Ange ditt telefonnummer. Vi loggar in dig eller skapar ett konto.",
+    "codeSubtitle": "Ange koden från meddelandet",
+    "whoAreYou": "Vem är du?",
+    "useEmailInstead": "Använd e-post i stället",
+    "usePhoneInstead": "Använd telefonnummer i stället"
   },
   "navigation": {
     "home": "Hem",
@@ -3590,7 +3657,12 @@
     "errorCreatingUser": "Det gick inte att skapa användare",
     "fillRequiredFields": "Vänligen fyll i alla obligatoriska fält.",
     "enterValidPhone": "Ange ett giltigt telefonnummer med landskod.",
-    "requiredForPlayers": "För spelare och stjärnor är det obligatoriskt att ange födelsedatum och position"
+    "requiredForPlayers": "För spelare och stjärnor är det obligatoriskt att ange födelsedatum och position",
+    "adminPanel": "Adminpanel",
+    "login": "Logga in",
+    "loginAsUserConfirm": "Vill du verkligen logga in som {name}?",
+    "loginAsUserError": "Kunde inte logga in som användare",
+    "loginAsUserSuccess": "Du är nu inloggad som {name}"
   },
   "museum": {
     "title": "Museum",
@@ -3771,7 +3843,8 @@
   "settings": {
     "title": "Inställningar",
     "language": "Språk",
-    "selectLanguage": "Välj språk"
+    "selectLanguage": "Välj språk",
+    "autoLanguage": "Auto"
   },
   "search": {
     "title": "Söka",
@@ -3795,9 +3868,13 @@
     "topBySV": "Top SV%",
     "shareRating": "Dela ranking",
     "shareRatingFooter": "hockeystars.com",
+    "shareRatingSeason": "Säsong {season}",
     "ratingPointsLabel": "poäng",
     "allCountries": "Alla länder",
-    "allYears": "Alla år"
+    "allYears": "Alla år",
+    "filters": "Filter",
+    "shareNewcomers": "Dela nykomlingar",
+    "shareNewcomersCount": "{count} spelare"
   },
   "messages": {
     "title": "Meddelanden",
@@ -3812,7 +3889,8 @@
     "massSend": "Massutskick",
     "recipients": "Mottagare",
     "typeMessage": "Skriv ett meddelande...",
-    "send": "Skicka"
+    "send": "Skicka",
+    "searchHistoryLoading": "Söker i meddelandehistoriken…"
   },
   "notifications": {
     "title": "Aviseringar",
@@ -3848,6 +3926,14 @@
     },
     "photo_liked": {
       "grouped": "{name} gillade {count} av dina foton"
+    },
+    "profile_reaction": {
+      "title": "Ny reaktion",
+      "messageGrouped": "{name} skickade {reactions}"
+    },
+    "activity_reaction": {
+      "title": "Reaktion på din uppdatering",
+      "message": "{name} reagerade {emoji} på din uppdatering"
     }
   },
   "editProfile": {
@@ -3927,7 +4013,9 @@
     "noFriendsToForward": "Inga vänner att vidarebefordra till",
     "messageForwarded": "Meddelande vidarebefordrat",
     "forwardedTo": "Vidarebefordrat",
-    "forwardError": "Vidarebefordran misslyckades"
+    "forwardError": "Vidarebefordran misslyckades",
+    "user": "Användare",
+    "you": "Du"
   },
   "createUser": {
     "title": "Skapa en användare",
@@ -4074,7 +4162,24 @@
     "seconds": "sek",
     "times": "en gång",
     "sprint": "100 meter streck",
-    "_cache_clear": "2024-01-16-9"
+    "_cache_clear": "2024-01-16-9",
+    "customGift": "Be om present",
+    "deleteGiftConfirm": "Vill du verkligen ta bort den här presenten?",
+    "errorGiftAlreadyExists": "Spelaren {playerName} har redan den här presenten.\n\nVälj en annan present eller skapa en ny.",
+    "errorGiftNotDeleted": "Presenten togs inte bort",
+    "errorGiftNotFound": "Presenten hittades inte",
+    "errorPermissionDenied": "Du har inte behörighet att ta bort den här presenten",
+    "errorSelectOrCreate": "Välj en present eller skapa en ny",
+    "errorSendingGift": "Kunde inte skicka presenten",
+    "fromAdmin": "Admin",
+    "fromStar": "från {starName}",
+    "giftReceived": "Present mottagen!",
+    "giftReceivedFromAdmin": "Du fick en present från admin: {giftName}",
+    "giftReceivedFromAdminPush": "Du fick en present från admin: {giftName}",
+    "giftReceivedFromStar": "Du fick en present från {starName}: {giftName}",
+    "giftReceivedFromStarPush": "Du fick en present från {starName}: {giftName}",
+    "giftReceivedPush": "🎁 Present mottagen!",
+    "successGiftSent": "Present skickad till {playerName}!"
   },
   "TEMP_DELETE_ME": {
     "title": "Standarder",
@@ -4245,7 +4350,13 @@
     "deleteError": "Fel",
     "deleteErrorMessage": "Kunde inte radera posten",
     "speedExceedsLimit": "Hastigheten överstiger 120 km/h, mätningen räknas inte",
-    "needMicrophone": "Mikrofonåtkomst krävs"
+    "needMicrophone": "Mikrofonåtkomst krävs",
+    "micPosition": {
+      "label": "Var telefonen ligger",
+      "shooter": "Vid skytten",
+      "middle": "I mitten",
+      "target": "Vid sargen"
+    }
   },
   "logout": "Utgång",
   "logoutConfirm": "Logga ut från din profil",
@@ -4290,5 +4401,46 @@
     "scanQr": "Skanna med telefonen — App Store eller Google Play öppnas",
     "appStoreCta": "Ladda ner från App Store",
     "playStoreCta": "Ladda ner från Google Play"
+  },
+  "videoNotification": {
+    "fullScreen": "Helskärm",
+    "added": "lade till",
+    "multipleVideos": "{count} nya videor",
+    "oneVideo": "ny video"
+  },
+  "coverNotification": {
+    "title": "Ny omslagsbild",
+    "changed": "uppdaterade profilens omslagsbild"
+  },
+  "ota": {
+    "resurfacing": "Isen spolas…",
+    "updating": "Installerar uppdateringen",
+    "updated": "Ny is — appen är uppdaterad"
+  },
+  "avatarNotification": {
+    "changed": "bytte profilbild"
+  },
+  "cm": "cm",
+  "height": "längd",
+  "kg": "kg",
+  "referral": {
+    "leaderboard": "Bästa inbjudare",
+    "noInvites": "Ingen har bjudit in vänner än",
+    "points": "poäng"
+  },
+  "statsNotification": {
+    "physicalData": "fysiska data",
+    "updated": "uppdaterade"
+  },
+  "weight": "vikt",
+  "reactions": {
+    "respect": "respekt",
+    "like": "gilla",
+    "strength": "styrka",
+    "highFive": "high five",
+    "fire": "eld",
+    "lightning": "blixt",
+    "sendBack": "Svara tillbaka",
+    "whoReacted": "Vem reagerade"
   }
 }

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, type ReactNode } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from './BlurOrSolid';
@@ -6,6 +6,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import CachedAvatar from './CachedAvatar';
 import { formatPrize } from '../data/hockeyQuiz/utils';
 import type { Language } from '../contexts/LanguageContext';
+import { NOTIFICATION_CARD, NOTIFICATION_CARD_BLUR } from '../utils/notificationCard';
 
 interface GameFirstPlaceNotificationProps {
   playerName: string;
@@ -15,6 +16,7 @@ interface GameFirstPlaceNotificationProps {
   timestamp: number;
   variant: 'game' | 'quiz';
   prizeAmount?: number;
+  reactionsFooter?: ReactNode;
 }
 
 const GameFirstPlaceNotification = React.memo<GameFirstPlaceNotificationProps>(({
@@ -25,6 +27,7 @@ const GameFirstPlaceNotification = React.memo<GameFirstPlaceNotificationProps>((
   timestamp,
   variant,
   prizeAmount,
+  reactionsFooter,
 }) => {
   const { t, language } = useLanguage();
 
@@ -53,6 +56,7 @@ const GameFirstPlaceNotification = React.memo<GameFirstPlaceNotificationProps>((
   return (
     <BlurOrSolid intensity={55} tint="dark" style={styles.containerBlur}>
       <View style={styles.container}>
+        <View style={styles.bodyRow}>
         <View style={styles.avatarContainer}>
           {(playerAvatar || playerId) ? (
             <CachedAvatar playerId={playerId || ''} fallbackAvatarUrl={playerAvatar} size={50} style={styles.playerAvatar} />
@@ -70,23 +74,23 @@ const GameFirstPlaceNotification = React.memo<GameFirstPlaceNotificationProps>((
           <Text style={styles.message}>{displayMessage}</Text>
         </View>
       </View>
+
+      {reactionsFooter}
+    </View>
     </BlurOrSolid>
   );
 });
 
 const styles = StyleSheet.create({
   containerBlur: {
-    marginHorizontal: 0,
-    marginVertical: 0,
+    ...NOTIFICATION_CARD_BLUR,
   },
   container: {
-    backgroundColor: 'transparent',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
+    ...NOTIFICATION_CARD,
+  },
+  bodyRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   avatarContainer: { marginRight: 12 },
   avatarPlaceholder: {
