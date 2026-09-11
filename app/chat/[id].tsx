@@ -144,6 +144,7 @@ export default function ChatScreen() {
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const [contextMenuMessage, setContextMenuMessage] = useState<Message | null>(null);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+  const [contextMenuReactionPosition, setContextMenuReactionPosition] = useState({ x: 0, y: 0 });
   const [isReportingChat, setIsReportingChat] = useState(false);
   const [chatMenuVisible, setChatMenuVisible] = useState(false);
   const [chatMenuPosition, setChatMenuPosition] = useState({ x: 0, y: 0 });
@@ -1348,19 +1349,26 @@ export default function ChatScreen() {
         const isMyMessage = message.senderId === currentUser?.id;
         const menuWidth = 160;
         const menuHeight = 120;
+        const reactionBarWidth = 132;
+        const reactionBarHeight = 44;
 
         let menuX: number;
         let menuY: number;
+        let reactionX: number;
 
         if (isMyMessage) {
           menuX = Math.max(10, pageX + width - menuWidth);
+          reactionX = Math.max(10, pageX + width - reactionBarWidth);
         } else {
           menuX = Math.min(screenWidth - menuWidth - 10, pageX);
+          reactionX = Math.min(screenWidth - reactionBarWidth - 10, pageX);
         }
 
         menuY = Math.min(screenHeight - menuHeight - 10, pageY + height + 5);
+        const reactionY = Math.max(60, pageY - reactionBarHeight - 6);
 
         setContextMenuPosition({ x: menuX, y: menuY });
+        setContextMenuReactionPosition({ x: reactionX, y: reactionY });
         setContextMenuMessage(message);
         setContextMenuVisible(true);
 
@@ -1403,6 +1411,10 @@ export default function ChatScreen() {
     setContextMenuVisible(false);
     setContextMenuMessage(null);
   };
+
+  const handleContextMenuReactionPicked = useCallback(() => {
+    handleCloseContextMenu();
+  }, []);
   
   const handleContextMenuAction = async (action: 'reply' | 'forward' | 'delete' | 'copy') => {
     if (!contextMenuMessage) return;
@@ -1911,25 +1923,59 @@ export default function ChatScreen() {
             </View>
           </Animated.View>
 
-          {/* Кастомное меню в стиле Telegram */}
+          {/* Long-press menu + reaction picker (Telegram-style) */}
           <Modal
             visible={contextMenuVisible}
             transparent={true}
             animationType="fade"
             onRequestClose={handleCloseContextMenu}
           >
-            <TouchableOpacity
-              style={styles.contextMenuOverlay}
-              activeOpacity={1}
-              onPress={handleCloseContextMenu}
-            >
+            <View style={styles.contextMenuOverlay}>
+              <TouchableWithoutFeedback onPress={handleCloseContextMenu}>
+                <View style={StyleSheet.absoluteFill} />
+              </TouchableWithoutFeedback>
+
+              {contextMenuMessage &&
+              currentUser &&
+              contextMenuMessage.senderId !== currentUser.id ? (
+                <View
+                  style={[
+                    styles.contextReactionPicker,
+                    {
+                      left: contextMenuReactionPosition.x,
+                      top: contextMenuReactionPosition.y,
+                    },
+                  ]}
+                  pointerEvents="box-none"
+                >
+                  <MessageReactionsBar
+                    variant="picker"
+                    summary={messageReactions[contextMenuMessage.id] ?? EMPTY_FEED_REACTION_SUMMARY}
+                    viewerId={currentUser.id}
+                    messageOwnerId={contextMenuMessage.senderId}
+                    onSummaryChange={(next) =>
+                      setMessageReactions((prev) => ({ ...prev, [contextMenuMessage.id]: next }))
+                    }
+                    onToggle={(type) =>
+                      toggleMessageReaction(
+                        contextMenuMessage.id,
+                        currentUser.id,
+                        type,
+                        contextMenuMessage.senderId
+                      )
+                    }
+                    onPicked={handleContextMenuReactionPicked}
+                  />
+                </View>
+              ) : null}
+
               <View
                 style={[
                   styles.contextMenu,
                   {
                     left: contextMenuPosition.x,
                     top: contextMenuPosition.y,
-                  }
+                  },
                 ]}
               >
                 <TouchableOpacity
@@ -1970,7 +2016,7 @@ export default function ChatScreen() {
                   </Text>
                 </TouchableOpacity>
               </View>
-            </TouchableOpacity>
+            </View>
           </Modal>
 
           {/* Меню чата */}
@@ -2502,7 +2548,11 @@ const styles = StyleSheet.create({
   },
   contextMenuOverlay: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: 'rgba(0, 0, 0, 0.42)',
+  },
+  contextReactionPicker: {
+    position: 'absolute',
+    zIndex: 2,
   },
   contextMenu: {
     position: 'absolute',
@@ -2893,6 +2943,7 @@ const ChatMessageRow = React.memo(function ChatMessageRow({
             </View>
           </View>
           <MessageReactionsBar
+            variant="inline"
             summary={reactionSummary}
             viewerId={currentUserId}
             messageOwnerId={message.senderId}
