@@ -51,6 +51,7 @@ import { dataCache, CACHE_KEYS } from '../utils/DataCache';
 import { safeHideSplashScreen } from '../utils/splashScreenUtils';
 import { isHomeSceneMounted, isHomeSceneReady, subscribeHomeScene } from '../utils/homeSceneSignal';
 import { useOtaUpdates } from '../hooks/useOtaUpdates';
+import { persistOtaUpdateId, shouldSkipSplashAfterOta } from '../utils/otaLaunch';
 import { emitInboxRefresh, isMessagePushType } from '../utils/inboxEvents';
 import AnimatedSplash from '../components/AnimatedSplash';
 import OtaResurfaceOverlay from '../components/OtaResurfaceOverlay';
@@ -382,7 +383,24 @@ export default function RootLayout() {
   const [userLoaded, setUserLoaded] = React.useState<boolean>(false);
   const splashOpacity = React.useRef(new Animated.Value(1)).current;
   const splashStartTime = React.useRef<number>(Date.now());
-  
+
+  // Silent OTA reload remounts JS like a cold start — skip launch splash + logo flash.
+  React.useLayoutEffect(() => {
+    void shouldSkipSplashAfterOta().then((skip) => {
+      if (!skip) return;
+      setShowSplash(false);
+      setAppReady(true);
+      splashOpacity.setValue(0);
+      void safeHideSplashScreen();
+    });
+  }, [splashOpacity]);
+
+  React.useEffect(() => {
+    if (!showSplash && appReady) {
+      void persistOtaUpdateId();
+    }
+  }, [showSplash, appReady]);
+
   React.useEffect(() => {
     // AppState только для мобильных платформ
     if (Platform.OS === 'web') {
