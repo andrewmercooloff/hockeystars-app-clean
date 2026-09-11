@@ -80,7 +80,7 @@ export default function CompactReactionBar({
             disabled={!viewerId || viewerId === recipientId}
             hitSlop={6}
           >
-            <ReactionIcon type={type} size={18} active={active} />
+            <ReactionIcon type={type} size={17} active={active} />
             {count > 0 ? <Text style={[styles.count, active && styles.countActive]}>{count}</Text> : null}
           </Pressable>
         );

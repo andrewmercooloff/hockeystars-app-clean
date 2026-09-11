@@ -1,8 +1,11 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import type { FeedReactionType, ProfileReactionType } from '../utils/reactions';
+import {
+  FEED_REACTIONS,
+  PROFILE_REACTIONS,
+  type FeedReactionType,
+  type ProfileReactionType,
+} from '../utils/reactions';
 
 export type ReactionIconType = ProfileReactionType | FeedReactionType;
 
@@ -12,56 +15,32 @@ type ReactionIconProps = {
   active?: boolean;
 };
 
-const VECTOR_ICONS: Record<
-  Exclude<ReactionIconType, 'respect'>,
-  { family: 'ionicons' | 'mci'; name: string }
-> = {
-  like: { family: 'ionicons', name: 'thumbs-up' },
-  strength: { family: 'mci', name: 'arm-flex' },
-  high_five: { family: 'ionicons', name: 'hand-left' },
-  fire: { family: 'ionicons', name: 'flame' },
-  lightning: { family: 'ionicons', name: 'flash' },
-};
-
-function RespectFistsIcon({ size, active }: { size: number; active: boolean }) {
-  return (
-    <Text
-      style={[
-        styles.fists,
-        { fontSize: Math.round(size * 0.72), lineHeight: size + 2 },
-        active && styles.fistsActive,
-      ]}
-      allowFontScaling={false}
-    >
-      🤜🤛
-    </Text>
-  );
+function emojiForType(type: ReactionIconType): string {
+  const profile = PROFILE_REACTIONS.find((r) => r.type === type);
+  if (profile) return profile.emoji;
+  const feed = FEED_REACTIONS.find((r) => r.type === type);
+  return feed?.emoji ?? '👍🏻';
 }
 
 export default function ReactionIcon({ type, size = 18, active = false }: ReactionIconProps) {
-  if (type === 'respect') {
-    return <RespectFistsIcon size={size} active={active} />;
-  }
-
-  const spec = VECTOR_ICONS[type];
-  const tint = active ? '#fa2f40' : 'rgba(255,255,255,0.88)';
-
-  if (spec.family === 'mci') {
-    return (
-      <MaterialCommunityIcons
-        name={spec.name as keyof typeof MaterialCommunityIcons.glyphMap}
-        size={size}
-        color={tint}
-      />
-    );
-  }
+  const glyph = emojiForType(type);
+  const isPair = glyph.length > 2;
 
   return (
-    <Ionicons
-      name={spec.name as keyof typeof Ionicons.glyphMap}
-      size={size}
-      color={tint}
-    />
+    <Text
+      style={[
+        styles.glyph,
+        {
+          fontSize: isPair ? Math.round(size * 0.78) : size,
+          lineHeight: size + 4,
+        },
+        isPair && styles.glyphPair,
+        active ? styles.glyphActive : styles.glyphIdle,
+      ]}
+      allowFontScaling={false}
+    >
+      {glyph}
+    </Text>
   );
 }
 
@@ -74,12 +53,16 @@ export function ReactionIconBadge({ type, size = 20 }: { type: ReactionIconType;
 }
 
 const styles = StyleSheet.create({
-  fists: {
+  glyph: {
     textAlign: 'center',
-    opacity: 0.92,
-    letterSpacing: -2,
   },
-  fistsActive: {
+  glyphPair: {
+    letterSpacing: -3,
+  },
+  glyphIdle: {
+    opacity: 0.55,
+  },
+  glyphActive: {
     opacity: 1,
     transform: [{ scale: 1.06 }],
   },

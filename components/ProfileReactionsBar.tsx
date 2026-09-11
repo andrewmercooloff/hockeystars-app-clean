@@ -77,7 +77,7 @@ export default function ProfileReactionsBar({
                 disabled={disabled || !viewerId}
                 hitSlop={8}
               >
-                <ReactionIcon type={type} size={22} active={active} />
+                <ReactionIcon type={type} size={20} active={active} />
               </Pressable>
               {count > 0 ? (
                 <Text style={[styles.count, active && styles.countActive]}>{count}</Text>
