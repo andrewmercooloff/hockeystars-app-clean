@@ -75,10 +75,81 @@ export function emptyFeedReactionSummary(): FeedReactionSummary {
   };
 }
 
+export const EMPTY_FEED_REACTION_SUMMARY: FeedReactionSummary = {
+  counts: { respect: 0, fire: 0, strength: 0, lightning: 0 },
+  mine: null,
+};
+
 export function profileReactionEmoji(type: ProfileReactionType): string {
   return PROFILE_REACTIONS.find((r) => r.type === type)?.emoji ?? '👍🏻';
 }
 
 export function feedReactionEmoji(type: FeedReactionType): string {
   return FEED_REACTIONS.find((r) => r.type === type)?.emoji ?? '🔥';
+}
+
+function cloneProfileSummary(summary: ProfileReactionSummary): ProfileReactionSummary {
+  return {
+    counts: { ...summary.counts },
+    mine: new Set(summary.mine),
+    sendersByType: {
+      respect: [...summary.sendersByType.respect],
+      like: [...summary.sendersByType.like],
+      strength: [...summary.sendersByType.strength],
+      high_five: [...summary.sendersByType.high_five],
+    },
+  };
+}
+
+export function optimisticToggleProfileReaction(
+  summary: ProfileReactionSummary,
+  reactionType: ProfileReactionType,
+  viewerId: string,
+  viewer?: ReactionSender | null
+): ProfileReactionSummary {
+  const next = cloneProfileSummary(summary);
+  const had = next.mine.has(reactionType);
+
+  if (had) {
+    next.mine.delete(reactionType);
+    next.counts[reactionType] = Math.max(0, next.counts[reactionType] - 1);
+    next.sendersByType[reactionType] = next.sendersByType[reactionType].filter(
+      (s) => s.id !== viewerId
+    );
+    return next;
+  }
+
+  next.mine.add(reactionType);
+  next.counts[reactionType] += 1;
+  if (viewer?.id) {
+    const exists = next.sendersByType[reactionType].some((s) => s.id === viewer.id);
+    if (!exists) {
+      next.sendersByType[reactionType].push(viewer);
+    }
+  }
+  return next;
+}
+
+export function optimisticSetFeedReaction(
+  summary: FeedReactionSummary,
+  reactionType: FeedReactionType
+): FeedReactionSummary {
+  const next: FeedReactionSummary = {
+    counts: { ...summary.counts },
+    mine: summary.mine,
+  };
+
+  if (next.mine === reactionType) {
+    next.counts[reactionType] = Math.max(0, next.counts[reactionType] - 1);
+    next.mine = null;
+    return next;
+  }
+
+  if (next.mine) {
+    next.counts[next.mine] = Math.max(0, next.counts[next.mine] - 1);
+  }
+
+  next.mine = reactionType;
+  next.counts[reactionType] += 1;
+  return next;
 }

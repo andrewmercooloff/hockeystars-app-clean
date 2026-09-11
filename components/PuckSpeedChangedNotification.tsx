@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from './BlurOrSolid';
@@ -12,6 +12,7 @@ interface PuckSpeedChangedNotificationProps {
   playerAvatar?: string;
   newMaxSpeed: number;
   timestamp: string;
+  reactionsFooter?: ReactNode;
 }
 
 const PuckSpeedChangedNotification = React.memo(function PuckSpeedChangedNotification({
@@ -20,7 +21,8 @@ const PuckSpeedChangedNotification = React.memo(function PuckSpeedChangedNotific
   playerAvatar,
   newMaxSpeed,
   timestamp
-}: PuckSpeedChangedNotificationProps) {
+,
+  reactionsFooter}: PuckSpeedChangedNotificationProps) {
   const { t } = useLanguage();
 
   const formatTime = (timestamp: string): string => {
@@ -48,6 +50,7 @@ const PuckSpeedChangedNotification = React.memo(function PuckSpeedChangedNotific
       style={styles.containerBlur}
     >
       <View style={styles.container}>
+        <View style={styles.bodyRow}>
         <View style={styles.avatarContainer}>
         <CachedAvatar
           playerId={playerId}
@@ -78,6 +81,9 @@ const PuckSpeedChangedNotification = React.memo(function PuckSpeedChangedNotific
         </View>
       </View>
       </View>
+
+      {reactionsFooter}
+    </View>
     </BlurOrSolid>
   );
 });
@@ -92,6 +98,10 @@ const styles = StyleSheet.create({
     ...NOTIFICATION_CARD,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  bodyRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
   avatarContainer: {
     width: 50,

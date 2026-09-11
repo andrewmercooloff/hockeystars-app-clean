@@ -1,18 +1,21 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import {
   FEED_REACTIONS,
   type FeedReactionType,
   emptyFeedReactionSummary,
+  optimisticSetFeedReaction,
 } from '../utils/reactions';
 import { loadFeedReactions, setFeedReaction } from '../services/reactionService';
-import { useLanguage } from '../contexts/LanguageContext';
+import ReactionIcon from './ReactionIcon';
+import { NOTIFICATION_REACTIONS_INSET } from '../utils/notificationCard';
 
 type CompactReactionBarProps = {
   notificationId: string;
   notificationType: string;
   recipientId: string;
   viewerId?: string | null;
+  embedded?: boolean;
 };
 
 export default function CompactReactionBar({
@@ -20,10 +23,11 @@ export default function CompactReactionBar({
   notificationType,
   recipientId,
   viewerId,
+  embedded = true,
 }: CompactReactionBarProps) {
-  const { t } = useLanguage();
   const [summary, setSummary] = useState(emptyFeedReactionSummary());
-  const [loadingType, setLoadingType] = useState<FeedReactionType | null>(null);
+  const summaryRef = useRef(summary);
+  summaryRef.current = summary;
 
   const refresh = useCallback(async () => {
     const next = await loadFeedReactions(notificationId, viewerId);
@@ -34,43 +38,39 @@ export default function CompactReactionBar({
     void refresh();
   }, [refresh]);
 
-  const onPress = async (type: FeedReactionType) => {
-    if (!viewerId || loadingType || viewerId === recipientId) return;
-    setLoadingType(type);
-    try {
-      const next = await setFeedReaction(
-        notificationId,
-        viewerId,
-        type,
-        recipientId,
-        notificationType
-      );
-      if (next) setSummary(next);
-    } finally {
-      setLoadingType(null);
-    }
+  const onPress = (type: FeedReactionType) => {
+    if (!viewerId || viewerId === recipientId) return;
+
+    const prev = summaryRef.current;
+    const optimistic = optimisticSetFeedReaction(prev, type);
+    setSummary(optimistic);
+
+    void setFeedReaction(
+      notificationId,
+      viewerId,
+      type,
+      recipientId,
+      notificationType
+    ).then((ok) => {
+      if (!ok) setSummary(prev);
+    });
   };
 
   return (
-    <View style={styles.bar}>
-      {FEED_REACTIONS.map(({ type, emoji }) => {
+    <View style={[styles.bar, embedded && styles.barEmbedded, embedded && NOTIFICATION_REACTIONS_INSET]}>
+      {FEED_REACTIONS.map(({ type }) => {
         const active = summary.mine === type;
         const count = summary.counts[type];
         return (
           <Pressable
             key={type}
             style={[styles.chip, active && styles.chipActive]}
-            onPress={() => void onPress(type)}
+            onPress={() => onPress(type)}
             disabled={!viewerId || viewerId === recipientId}
+            hitSlop={6}
           >
-            {loadingType === type ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <>
-                <Text style={styles.emoji}>{emoji}</Text>
-                {count > 0 ? <Text style={styles.count}>{count}</Text> : null}
-              </>
-            )}
+            <ReactionIcon type={type} size={13} active={active} />
+            {count > 0 ? <Text style={[styles.count, active && styles.countActive]}>{count}</Text> : null}
           </Pressable>
         );
       })}
@@ -82,37 +82,31 @@ const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-    marginTop: 10,
-    paddingTop: 8,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: 'rgba(255,255,255,0.08)',
+    gap: 6,
+  },
+  barEmbedded: {
+    marginTop: 0,
   },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    minWidth: 44,
-    minHeight: 34,
+    gap: 3,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    minHeight: 26,
     justifyContent: 'center',
   },
   chipActive: {
-    backgroundColor: 'rgba(250, 47, 64, 0.15)',
-    borderColor: 'rgba(250, 47, 64, 0.4)',
-  },
-  emoji: {
-    fontSize: 16,
-    lineHeight: 20,
+    backgroundColor: 'rgba(250, 47, 64, 0.12)',
   },
   count: {
-    color: 'rgba(255,255,255,0.7)',
-    fontSize: 11,
+    color: 'rgba(255,255,255,0.55)',
+    fontSize: 10,
     fontFamily: 'Gilroy-Bold',
+  },
+  countActive: {
+    color: '#fa2f40',
   },
 });

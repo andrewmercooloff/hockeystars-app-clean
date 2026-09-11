@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, type ReactNode } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from './BlurOrSolid';
@@ -16,6 +16,7 @@ interface GameFirstPlaceNotificationProps {
   timestamp: number;
   variant: 'game' | 'quiz';
   prizeAmount?: number;
+  reactionsFooter?: ReactNode;
 }
 
 const GameFirstPlaceNotification = React.memo<GameFirstPlaceNotificationProps>(({
@@ -26,6 +27,7 @@ const GameFirstPlaceNotification = React.memo<GameFirstPlaceNotificationProps>((
   timestamp,
   variant,
   prizeAmount,
+  reactionsFooter,
 }) => {
   const { t, language } = useLanguage();
 
@@ -54,6 +56,7 @@ const GameFirstPlaceNotification = React.memo<GameFirstPlaceNotificationProps>((
   return (
     <BlurOrSolid intensity={55} tint="dark" style={styles.containerBlur}>
       <View style={styles.container}>
+        <View style={styles.bodyRow}>
         <View style={styles.avatarContainer}>
           {(playerAvatar || playerId) ? (
             <CachedAvatar playerId={playerId || ''} fallbackAvatarUrl={playerAvatar} size={50} style={styles.playerAvatar} />
@@ -71,6 +74,9 @@ const GameFirstPlaceNotification = React.memo<GameFirstPlaceNotificationProps>((
           <Text style={styles.message}>{displayMessage}</Text>
         </View>
       </View>
+
+      {reactionsFooter}
+    </View>
     </BlurOrSolid>
   );
 });
@@ -83,6 +89,10 @@ const styles = StyleSheet.create({
     ...NOTIFICATION_CARD,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  bodyRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
   avatarContainer: { marginRight: 12 },
   avatarPlaceholder: {

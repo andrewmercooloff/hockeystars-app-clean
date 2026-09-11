@@ -1,32 +1,35 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import {
   PROFILE_REACTIONS,
   type ProfileReactionSummary,
   type ProfileReactionType,
   emptyProfileReactionSummary,
+  optimisticToggleProfileReaction,
 } from '../utils/reactions';
 import { loadProfileReactions, toggleProfileReaction } from '../services/reactionService';
 import ReactionWhoModal from './ReactionWhoModal';
-import { useLanguage } from '../contexts/LanguageContext';
+import ReactionIcon from './ReactionIcon';
 
 type ProfileReactionsBarProps = {
   targetPlayerId: string;
   viewerId?: string | null;
+  viewerName?: string;
+  viewerAvatar?: string | null;
   disabled?: boolean;
 };
 
 export default function ProfileReactionsBar({
   targetPlayerId,
   viewerId,
+  viewerName,
+  viewerAvatar,
   disabled,
 }: ProfileReactionsBarProps) {
-  const { t } = useLanguage();
   const [summary, setSummary] = useState<ProfileReactionSummary>(emptyProfileReactionSummary());
-  const [loadingType, setLoadingType] = useState<ProfileReactionType | null>(null);
-  const [whoModal, setWhoModal] = useState<{ type: ProfileReactionType; title: string } | null>(
-    null
-  );
+  const [whoModalType, setWhoModalType] = useState<ProfileReactionType | null>(null);
+  const summaryRef = useRef(summary);
+  summaryRef.current = summary;
 
   const refresh = useCallback(async () => {
     const next = await loadProfileReactions(targetPlayerId, viewerId);
@@ -37,55 +40,59 @@ export default function ProfileReactionsBar({
     void refresh();
   }, [refresh]);
 
-  const onPress = async (type: ProfileReactionType) => {
-    if (disabled || !viewerId || loadingType) return;
-    setLoadingType(type);
-    try {
-      const next = await toggleProfileReaction(targetPlayerId, viewerId, type);
-      if (next) setSummary(next);
-    } finally {
-      setLoadingType(null);
-    }
+  const onPress = (type: ProfileReactionType) => {
+    if (disabled || !viewerId) return;
+
+    const prev = summaryRef.current;
+    const optimistic = optimisticToggleProfileReaction(prev, type, viewerId, {
+      id: viewerId,
+      name: viewerName || 'You',
+      avatar: viewerAvatar,
+    });
+    setSummary(optimistic);
+
+    void toggleProfileReaction(targetPlayerId, viewerId, type).then((ok) => {
+      if (!ok) setSummary(prev);
+    });
   };
 
-  const onLongPress = (type: ProfileReactionType, label: string) => {
-    const senders = summary.sendersByType[type];
-    if (!senders.length) return;
-    setWhoModal({ type, title: label });
+  const onLongPress = (type: ProfileReactionType) => {
+    if (!summary.sendersByType[type].length) return;
+    setWhoModalType(type);
   };
 
   return (
     <>
       <View style={styles.bar}>
-        {PROFILE_REACTIONS.map(({ type, emoji, labelKey }) => {
+        {PROFILE_REACTIONS.map(({ type }) => {
           const active = summary.mine.has(type);
           const count = summary.counts[type];
-          const label = t(labelKey) || type;
           return (
             <View key={type} style={styles.cell}>
               <Pressable
                 style={[styles.button, active && styles.buttonActive]}
-                onPress={() => void onPress(type)}
-                onLongPress={() => onLongPress(type, label)}
-                delayLongPress={350}
+                onPress={() => onPress(type)}
+                onLongPress={() => onLongPress(type)}
+                delayLongPress={320}
                 disabled={disabled || !viewerId}
+                hitSlop={8}
               >
-                {loadingType === type ? (
-                  <ActivityIndicator size="small" color="#fff" />
-                ) : (
-                  <Text style={styles.emoji}>{emoji}</Text>
-                )}
+                <ReactionIcon type={type} size={15} active={active} />
               </Pressable>
-              <Text style={[styles.count, count > 0 && styles.countVisible]}>{count || ' '}</Text>
+              {count > 0 ? (
+                <Text style={[styles.count, active && styles.countActive]}>{count}</Text>
+              ) : (
+                <Text style={styles.countPlaceholder}> </Text>
+              )}
             </View>
           );
         })}
       </View>
       <ReactionWhoModal
-        visible={!!whoModal}
-        title={whoModal?.title ?? ''}
-        senders={whoModal ? summary.sendersByType[whoModal.type] : []}
-        onClose={() => setWhoModal(null)}
+        visible={!!whoModalType}
+        reactionType={whoModalType}
+        senders={whoModalType ? summary.sendersByType[whoModalType] : []}
+        onClose={() => setWhoModalType(null)}
       />
     </>
   );
@@ -95,40 +102,37 @@ const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10,
-    paddingHorizontal: 4,
+    marginBottom: 8,
+    paddingHorizontal: 8,
+    gap: 4,
   },
   cell: {
     flex: 1,
     alignItems: 'center',
   },
   button: {
-    width: 56,
-    height: 44,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    width: 34,
+    height: 22,
     alignItems: 'center',
     justifyContent: 'center',
   },
   buttonActive: {
-    backgroundColor: 'rgba(250, 47, 64, 0.18)',
-    borderColor: 'rgba(250, 47, 64, 0.45)',
-  },
-  emoji: {
-    fontSize: 22,
-    lineHeight: 28,
+    opacity: 1,
   },
   count: {
-    marginTop: 4,
-    minHeight: 16,
-    color: 'rgba(255,255,255,0.55)',
-    fontSize: 12,
+    marginTop: 2,
+    minHeight: 12,
+    color: 'rgba(255,255,255,0.45)',
+    fontSize: 10,
     fontFamily: 'Gilroy-Bold',
     textAlign: 'center',
   },
-  countVisible: {
+  countActive: {
     color: '#fa2f40',
+  },
+  countPlaceholder: {
+    marginTop: 2,
+    minHeight: 12,
+    fontSize: 10,
   },
 });

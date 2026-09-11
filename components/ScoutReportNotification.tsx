@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, type ReactNode } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from './BlurOrSolid';
@@ -12,6 +12,7 @@ interface ScoutReportNotificationProps {
   playerAvatar?: string;
   message: string;
   timestamp: number;
+  reactionsFooter?: ReactNode;
 }
 
 const ScoutReportNotification = React.memo<ScoutReportNotificationProps>(({
@@ -20,6 +21,7 @@ const ScoutReportNotification = React.memo<ScoutReportNotificationProps>(({
   playerAvatar,
   message,
   timestamp,
+  reactionsFooter,
 }) => {
   const { t } = useLanguage();
 
@@ -35,6 +37,7 @@ const ScoutReportNotification = React.memo<ScoutReportNotificationProps>(({
   return (
     <BlurOrSolid intensity={55} tint="dark" style={styles.containerBlur}>
       <View style={styles.container}>
+        <View style={styles.bodyRow}>
         <View style={styles.avatarContainer}>
           {(playerAvatar || playerId) ? (
             <CachedAvatar playerId={playerId || ''} fallbackAvatarUrl={playerAvatar} size={50} style={styles.playerAvatar} />
@@ -52,6 +55,9 @@ const ScoutReportNotification = React.memo<ScoutReportNotificationProps>(({
           <Text style={styles.message}>{message}</Text>
         </View>
       </View>
+
+      {reactionsFooter}
+    </View>
     </BlurOrSolid>
   );
 });
@@ -64,6 +70,10 @@ const styles = StyleSheet.create({
     ...NOTIFICATION_CARD,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  bodyRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
   avatarContainer: { marginRight: 12 },
   avatarPlaceholder: {

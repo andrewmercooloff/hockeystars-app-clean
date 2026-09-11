@@ -53,6 +53,16 @@ import { supabase } from '../../utils/supabase';
 import CachedBackground from '../../components/CachedBackground';
 import CachedAvatar from '../../components/CachedAvatar';
 import { addActivityPoints } from '../../services/activityService';
+import MessageReactionsBar from '../../components/MessageReactionsBar';
+import {
+  loadMessageReactionsBatch,
+  toggleMessageReaction,
+} from '../../services/reactionService';
+import {
+  type FeedReactionSummary,
+  type FeedReactionType,
+  EMPTY_FEED_REACTION_SUMMARY,
+} from '../../utils/reactions';
 import * as Clipboard from 'expo-clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -122,6 +132,7 @@ export default function ChatScreen() {
   const [otherPlayer, setOtherPlayer] = useState<Player | null>(null);
   const [currentUser, setCurrentUser] = useState<Player | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [messageReactions, setMessageReactions] = useState<Record<string, FeedReactionSummary>>({});
   const [newMessage, setNewMessage] = useState('');
   const newMessageRef = useRef<string>(''); // актуальный текст (для сохранения черновика без зависимостей)
   const [loading, setLoading] = useState(true);
@@ -683,6 +694,11 @@ export default function ChatScreen() {
           
           return parsedConversation;
         });
+
+        void loadMessageReactionsBatch(
+          parsedConversation.map((m) => m.id),
+          currentUser.id
+        ).then(setMessageReactions);
         
         lastMessageIdsRef.current = currentMessageIds;
         
@@ -1774,6 +1790,13 @@ export default function ChatScreen() {
                           onReplyPreviewPress={scrollReplyPreviewTarget}
                           youLabel={chatYouLabel}
                           otherLabel={chatOtherLabel}
+                          reactionSummary={messageReactions[message.id] ?? EMPTY_FEED_REACTION_SUMMARY}
+                          onReactionSummaryChange={(next) =>
+                            setMessageReactions((prev) => ({ ...prev, [message.id]: next }))
+                          }
+                          onReactionToggle={(type) =>
+                            toggleMessageReaction(message.id, currentUser.id, type, message.senderId)
+                          }
                         />
                       ))}
                     </View>
@@ -2719,6 +2742,9 @@ type ChatMessageRowProps = {
   onReplyPreviewPress: () => void;
   youLabel: string;
   otherLabel: string;
+  reactionSummary: FeedReactionSummary;
+  onReactionSummaryChange: (next: FeedReactionSummary) => void;
+  onReactionToggle: (type: FeedReactionType) => Promise<boolean>;
 };
 
 function areChatMessageRowPropsEqual(prev: ChatMessageRowProps, next: ChatMessageRowProps): boolean {
@@ -2738,6 +2764,9 @@ function areChatMessageRowPropsEqual(prev: ChatMessageRowProps, next: ChatMessag
   if (prev.onLongPress !== next.onLongPress) return false;
   if (prev.setMessageBubbleRef !== next.setMessageBubbleRef) return false;
   if (prev.onReplyPreviewPress !== next.onReplyPreviewPress) return false;
+  if (prev.reactionSummary !== next.reactionSummary) return false;
+  if (prev.onReactionSummaryChange !== next.onReactionSummaryChange) return false;
+  if (prev.onReactionToggle !== next.onReactionToggle) return false;
   return true;
 }
 
@@ -2759,6 +2788,9 @@ const ChatMessageRow = React.memo(function ChatMessageRow({
   onReplyPreviewPress,
   youLabel,
   otherLabel,
+  reactionSummary,
+  onReactionSummaryChange,
+  onReactionToggle,
 }: ChatMessageRowProps) {
   const isMyMessage = message.senderId === currentUserId;
 
@@ -2860,6 +2892,14 @@ const ChatMessageRow = React.memo(function ChatMessageRow({
               )}
             </View>
           </View>
+          <MessageReactionsBar
+            summary={reactionSummary}
+            viewerId={currentUserId}
+            messageOwnerId={message.senderId}
+            alignRight={isMyMessage}
+            onSummaryChange={onReactionSummaryChange}
+            onToggle={onReactionToggle}
+          />
         </View>
       </TouchableOpacity>
     </Swipeable>

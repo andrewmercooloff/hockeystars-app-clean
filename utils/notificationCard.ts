@@ -23,3 +23,19 @@ export const NOTIFICATION_CARD: ViewStyle = {
   borderRadius: 16,
   padding: 16,
 };
+
+export const NOTIFICATION_CARD_COLUMN: ViewStyle = {
+  ...NOTIFICATION_CARD,
+};
+
+export const NOTIFICATION_CARD_ROW: ViewStyle = {
+  flexDirection: 'row',
+  alignItems: 'flex-start',
+};
+
+export const NOTIFICATION_REACTIONS_INSET: ViewStyle = {
+  marginTop: 10,
+  paddingTop: 8,
+  borderTopWidth: 0.5,
+  borderTopColor: 'rgba(255, 255, 255, 0.08)',
+};

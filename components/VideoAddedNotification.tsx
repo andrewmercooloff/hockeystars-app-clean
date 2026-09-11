@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   View,
   Text,
@@ -30,6 +30,7 @@ interface VideoAddedNotificationProps {
   videoUrls?: string[];
   onHeaderPress?: () => void;
   onScrubActiveChange?: (active: boolean) => void;
+  reactionsFooter?: ReactNode;
 }
 
 // Медиа на всю ширину карточки (карточка: marginHorizontal 16)
@@ -136,6 +137,7 @@ const VideoAddedNotification = React.memo(function VideoAddedNotification({
   videoUrls = [],
   onHeaderPress,
   onScrubActiveChange,
+  reactionsFooter,
 }: VideoAddedNotificationProps) {
   const { t } = useLanguage();
   const insets = useSafeAreaInsets();
@@ -205,6 +207,7 @@ const VideoAddedNotification = React.memo(function VideoAddedNotification({
   return (
     <BlurOrSolid intensity={55} tint="dark" style={styles.containerBlur}>
       <View style={styles.container}>
+        <View style={styles.bodyRow}>
         {onHeaderPress ? (
           <TouchableOpacity onPress={onHeaderPress} activeOpacity={0.7}>
             {header}
@@ -282,6 +285,8 @@ const VideoAddedNotification = React.memo(function VideoAddedNotification({
             <Text style={styles.badgeText}>+{displayCount}</Text>
           </View>
         )}
+        </View>
+        {reactionsFooter}
       </View>
 
       <Modal
@@ -340,6 +345,10 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.06)',
     borderRadius: 16,
     overflow: 'hidden',
+  },
+  bodyRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
   header: {
     flexDirection: 'row',

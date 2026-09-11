@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,6 +13,7 @@ interface AvatarChangedNotificationProps {
   playerAvatar?: string;
   newAvatarUrl?: string;
   timestamp: string;
+  reactionsFooter?: ReactNode;
 }
 
 const CARD_HORIZONTAL_INSET = 16 * 2 + 14 * 2;
@@ -27,7 +28,8 @@ const AvatarChangedNotification = React.memo(function AvatarChangedNotification(
   playerAvatar,
   newAvatarUrl,
   timestamp,
-}: AvatarChangedNotificationProps) {
+,
+  reactionsFooter}: AvatarChangedNotificationProps) {
   const { t } = useLanguage();
   const previewAvatar = React.useMemo(() => {
     const base = rewriteSupabasePublicUrl(newAvatarUrl || playerAvatar);
@@ -57,6 +59,7 @@ const AvatarChangedNotification = React.memo(function AvatarChangedNotification(
   return (
     <BlurOrSolid intensity={55} tint="dark" style={styles.containerBlur}>
       <View style={styles.container}>
+        <View style={styles.bodyRow}>
         <View style={styles.topRow}>
           <View style={styles.avatarContainer}>
             {previewAvatar ? (
@@ -107,6 +110,9 @@ const AvatarChangedNotification = React.memo(function AvatarChangedNotification(
           </View>
         ) : null}
       </View>
+
+      {reactionsFooter}
+    </View>
     </BlurOrSolid>
   );
 });
@@ -133,6 +139,10 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.06)',
     borderRadius: 16,
     padding: 14,
+  },
+  bodyRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
   topRow: {
     flexDirection: 'row',

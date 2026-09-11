@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
   View,
   Text,
@@ -34,6 +34,7 @@ interface PhotoAddedNotificationProps {
   playerAvatar?: string;
   photoUrls?: string[];
   onHeaderPress?: () => void;
+  reactionsFooter?: ReactNode;
 }
 
 // Медиа на всю ширину карточки (карточка: marginHorizontal 16)
@@ -181,6 +182,7 @@ const PhotoAddedNotification = React.memo(function PhotoAddedNotification({
   playerAvatar,
   photoUrls = [],
   onHeaderPress,
+  reactionsFooter,
 }: PhotoAddedNotificationProps) {
   const { t } = useLanguage();
   const [activeIndex, setActiveIndex] = useState(0);
@@ -285,6 +287,7 @@ const PhotoAddedNotification = React.memo(function PhotoAddedNotification({
   return (
     <BlurOrSolid intensity={55} tint="dark" style={styles.containerBlur}>
       <View style={styles.container}>
+        <View style={styles.bodyRow}>
         {onHeaderPress ? (
           <TouchableOpacity onPress={onHeaderPress} activeOpacity={0.7}>
             {header}
@@ -351,6 +354,9 @@ const PhotoAddedNotification = React.memo(function PhotoAddedNotification({
           </View>
         )}
       </View>
+
+      {reactionsFooter}
+    </View>
     </BlurOrSolid>
   );
 });
@@ -377,6 +383,10 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.06)',
     borderRadius: 16,
     overflow: 'hidden',
+  },
+  bodyRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
   header: {
     flexDirection: 'row',

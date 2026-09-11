@@ -4,12 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from './BlurOrSolid';
 import { platformCardShadow } from '../utils/androidShadow';
 import CachedAvatar from './CachedAvatar';
-import {
-  profileReactionEmoji,
-  feedReactionEmoji,
-  type ProfileReactionType,
-  type FeedReactionType,
-} from '../utils/reactions';
+import { type ProfileReactionType, type FeedReactionType } from '../utils/reactions';
+import ReactionIcon, { type ReactionIconType } from './ReactionIcon';
 import { useLanguage } from '../contexts/LanguageContext';
 
 type ReactionReceivedNotificationProps = {
@@ -37,18 +33,11 @@ export default function ReactionReceivedNotification({
 }: ReactionReceivedNotificationProps) {
   const { t } = useLanguage();
 
-  const emojiForType = (type: string): string => {
-    if (type === 'fire' || type === 'lightning') {
-      return feedReactionEmoji(type as FeedReactionType);
-    }
-    return profileReactionEmoji(type as ProfileReactionType);
-  };
-
-  const emojiLine = reactions?.length
-    ? reactions.map((r) => emojiForType(r)).join(' ')
+  const iconTypes: ReactionIconType[] = reactions?.length
+    ? reactions
     : reactionType
-      ? emojiForType(reactionType)
-      : '🤜🏻🤛🏻';
+      ? [reactionType as ReactionIconType]
+      : ['respect'];
 
   const formatTime = (ts: string): string => {
     const diff = Math.floor((Date.now() - new Date(ts).getTime()) / 60000);
@@ -76,7 +65,11 @@ export default function ReactionReceivedNotification({
         </Text>
         <Text style={styles.time}>{formatTime(timestamp)}</Text>
       </View>
-      <Text style={styles.emojiBadge}>{emojiLine}</Text>
+      <View style={styles.emojiBadge}>
+        {iconTypes.map((type) => (
+          <ReactionIcon key={type} type={type} size={16} active />
+        ))}
+      </View>
     </TouchableOpacity>
   );
 
@@ -136,7 +129,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   emojiBadge: {
-    fontSize: 20,
+    flexDirection: 'row',
+    gap: 4,
     marginLeft: 8,
   },
   message: {

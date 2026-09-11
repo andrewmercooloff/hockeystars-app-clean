@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from './BlurOrSolid';
@@ -12,6 +12,7 @@ interface PhysicalDataChangedNotificationProps {
   playerAvatar?: string;
   changes: { field: 'height' | 'weight', oldValue: number, newValue: number }[];
   timestamp: string;
+  reactionsFooter?: ReactNode;
 }
 
 const PhysicalDataChangedNotification = React.memo(function PhysicalDataChangedNotification({
@@ -20,7 +21,8 @@ const PhysicalDataChangedNotification = React.memo(function PhysicalDataChangedN
   playerAvatar,
   changes,
   timestamp
-}: PhysicalDataChangedNotificationProps) {
+,
+  reactionsFooter}: PhysicalDataChangedNotificationProps) {
   const { t } = useLanguage();
 
   const formatTime = (timestamp: string): string => {
@@ -60,6 +62,7 @@ const PhysicalDataChangedNotification = React.memo(function PhysicalDataChangedN
       style={styles.containerBlur}
     >
       <View style={styles.container}>
+        <View style={styles.bodyRow}>
         <View style={styles.avatarContainer}>
         <CachedAvatar
           playerId={playerId}
@@ -98,6 +101,9 @@ const PhysicalDataChangedNotification = React.memo(function PhysicalDataChangedN
         </View>
       </View>
       </View>
+
+      {reactionsFooter}
+    </View>
     </BlurOrSolid>
   );
 });
@@ -112,6 +118,10 @@ const styles = StyleSheet.create({
     ...NOTIFICATION_CARD,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  bodyRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
   avatarContainer: {
     width: 50,

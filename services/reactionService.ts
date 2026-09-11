@@ -269,8 +269,8 @@ export async function toggleProfileReaction(
   targetPlayerId: string,
   senderId: string,
   reactionType: ProfileReactionType
-): Promise<ProfileReactionSummary | null> {
-  if (!targetPlayerId || !senderId || targetPlayerId === senderId) return null;
+): Promise<boolean> {
+  if (!targetPlayerId || !senderId || targetPlayerId === senderId) return false;
 
   try {
     const { data: existing } = await supabase
@@ -282,35 +282,38 @@ export async function toggleProfileReaction(
       .maybeSingle();
 
     if (existing?.id) {
-      await supabase.from('profile_reactions').delete().eq('id', existing.id);
-      return loadProfileReactions(targetPlayerId, senderId);
+      const { error } = await supabase.from('profile_reactions').delete().eq('id', existing.id);
+      if (error) throw error;
+      return true;
     }
 
-    await supabase.from('profile_reactions').insert({
+    const { error } = await supabase.from('profile_reactions').insert({
       target_player_id: targetPlayerId,
       sender_id: senderId,
       reaction_type: reactionType,
     });
+    if (error) throw error;
 
-    const sender = await getPlayerById(senderId);
-    if (sender) {
-      await notifyProfileReactionGrouped(
-        targetPlayerId,
-        senderId,
-        sender.name,
-        sender.avatar,
-        reactionType
-      );
-    }
+    void getPlayerById(senderId).then((sender) => {
+      if (sender) {
+        void notifyProfileReactionGrouped(
+          targetPlayerId,
+          senderId,
+          sender.name,
+          sender.avatar,
+          reactionType
+        );
+      }
+    });
 
-    return loadProfileReactions(targetPlayerId, senderId);
+    return true;
   } catch (e) {
     if (isMissingTableError(e)) {
       console.warn('profile_reactions table missing — run database/create_reactions_tables.sql');
     } else {
       console.error('toggleProfileReaction:', e);
     }
-    return null;
+    return false;
   }
 }
 
@@ -356,8 +359,8 @@ export async function setFeedReaction(
   reactionType: FeedReactionType,
   recipientId: string,
   sourceNotificationType: string
-): Promise<FeedReactionSummary | null> {
-  if (!notificationId || !senderId || !recipientId || senderId === recipientId) return null;
+): Promise<boolean> {
+  if (!notificationId || !senderId || !recipientId || senderId === recipientId) return false;
 
   try {
     const { data: existing } = await supabase
@@ -368,47 +371,142 @@ export async function setFeedReaction(
       .maybeSingle();
 
     if (existing?.id && existing.reaction_type === reactionType) {
-      await supabase.from('notification_reactions').delete().eq('id', existing.id);
-      return loadFeedReactions(notificationId, senderId);
+      const { error } = await supabase.from('notification_reactions').delete().eq('id', existing.id);
+      if (error) throw error;
+      return true;
     }
 
     const isNewReaction = !existing?.id;
 
     if (existing?.id) {
-      await supabase
+      const { error } = await supabase
         .from('notification_reactions')
         .update({ reaction_type: reactionType })
         .eq('id', existing.id);
+      if (error) throw error;
     } else {
-      await supabase.from('notification_reactions').insert({
+      const { error } = await supabase.from('notification_reactions').insert({
         notification_id: notificationId,
         sender_id: senderId,
         reaction_type: reactionType,
       });
+      if (error) throw error;
     }
 
     if (isNewReaction) {
-      const sender = await getPlayerById(senderId);
-      if (sender) {
-        await notifyActivityReaction(
-          recipientId,
-          senderId,
-          sender.name,
-          sender.avatar,
-          reactionType,
-          notificationId,
-          sourceNotificationType
-        );
-      }
+      void getPlayerById(senderId).then((sender) => {
+        if (sender) {
+          void notifyActivityReaction(
+            recipientId,
+            senderId,
+            sender.name,
+            sender.avatar,
+            reactionType,
+            notificationId,
+            sourceNotificationType
+          );
+        }
+      });
     }
 
-    return loadFeedReactions(notificationId, senderId);
+    return true;
   } catch (e) {
     if (isMissingTableError(e)) {
       console.warn('notification_reactions table missing — run database/create_reactions_tables.sql');
     } else {
       console.error('setFeedReaction:', e);
     }
-    return null;
+    return false;
+  }
+}
+
+export async function loadMessageReactionsBatch(
+  messageIds: string[],
+  viewerId?: string | null
+): Promise<Record<string, FeedReactionSummary>> {
+  const out: Record<string, FeedReactionSummary> = {};
+  if (!messageIds.length) return out;
+
+  for (const id of messageIds) {
+    out[id] = emptyFeedReactionSummary();
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('message_reactions')
+      .select('message_id, reaction_type, sender_id')
+      .in('message_id', messageIds);
+
+    if (error) {
+      if (!isMissingTableError(error)) {
+        console.warn('loadMessageReactionsBatch:', error.message);
+      }
+      return out;
+    }
+
+    for (const row of data ?? []) {
+      const messageId = row.message_id as string;
+      const type = row.reaction_type as FeedReactionType;
+      const summary = out[messageId] ?? emptyFeedReactionSummary();
+      summary.counts[type] += 1;
+      if (viewerId && row.sender_id === viewerId) {
+        summary.mine = type;
+      }
+      out[messageId] = summary;
+    }
+  } catch (e) {
+    if (!isMissingTableError(e)) {
+      console.warn('loadMessageReactionsBatch failed:', e);
+    }
+  }
+
+  return out;
+}
+
+export async function toggleMessageReaction(
+  messageId: string,
+  senderId: string,
+  reactionType: FeedReactionType,
+  messageOwnerId: string
+): Promise<boolean> {
+  if (!messageId || !senderId || senderId === messageOwnerId) return false;
+
+  try {
+    const { data: existing } = await supabase
+      .from('message_reactions')
+      .select('id, reaction_type')
+      .eq('message_id', messageId)
+      .eq('sender_id', senderId)
+      .maybeSingle();
+
+    if (existing?.id && existing.reaction_type === reactionType) {
+      const { error } = await supabase.from('message_reactions').delete().eq('id', existing.id);
+      if (error) throw error;
+      return true;
+    }
+
+    if (existing?.id) {
+      const { error } = await supabase
+        .from('message_reactions')
+        .update({ reaction_type: reactionType })
+        .eq('id', existing.id);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase.from('message_reactions').insert({
+        message_id: messageId,
+        sender_id: senderId,
+        reaction_type: reactionType,
+      });
+      if (error) throw error;
+    }
+
+    return true;
+  } catch (e) {
+    if (isMissingTableError(e)) {
+      console.warn('message_reactions table missing');
+    } else {
+      console.error('toggleMessageReaction:', e);
+    }
+    return false;
   }
 }

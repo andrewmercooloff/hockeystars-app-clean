@@ -36,7 +36,7 @@ import FriendRequestNotification from '../components/FriendRequestNotification';
 import GiftRequestNotification from '../components/GiftRequestNotification';
 import GiftAcceptedNotification from '../components/GiftAcceptedNotification';
 import ReactionReceivedNotification from '../components/ReactionReceivedNotification';
-import FeedReactionFooter from '../components/FeedReactionFooter';
+import CompactReactionBar from '../components/CompactReactionBar';
 import { REACTABLE_NOTIFICATION_TYPES } from '../utils/reactions';
 import VideoAddedNotification from '../components/VideoAddedNotification';
 import { sortVideoUrlsNewestFirst } from '../utils/videoUrls';
@@ -109,18 +109,17 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
   const feedReactionRecipientId =
     notification.data?.changedPlayerId || notification.data?.playerId || notification.playerId;
 
-  const renderFeedReactions = () => {
-    if (!REACTABLE_NOTIFICATION_TYPES.has(notification.type)) return null;
-    if (!feedReactionRecipientId || !currentUserId) return null;
-    return (
-      <FeedReactionFooter
+  const feedReactionsFooter = REACTABLE_NOTIFICATION_TYPES.has(notification.type) &&
+    feedReactionRecipientId &&
+    currentUserId ? (
+      <CompactReactionBar
         notificationId={notification.id}
         notificationType={notification.type}
         recipientId={feedReactionRecipientId}
         viewerId={currentUserId}
+        embedded
       />
-    );
-  };
+    ) : null;
 
   const handleReactionSendBack = React.useCallback(() => {
     const senderId = notification.data?.senderId || notification.playerId;
@@ -195,7 +194,6 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
   return (
     <AnimatedNotification key={notification.id} index={index} isNew={isNew}>
         {(notification.type === 'stats_change' || notification.type === 'normative_changed') && notification.data && notification.data.changes ? (
-          <>
             <PressableScale
               onPress={handlePress}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -206,12 +204,10 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 playerId={notification.data.changedPlayerId}
                 playerAvatar={notification.data.changedPlayerAvatar}
                 timestamp={notification.timestamp}
+                reactionsFooter={feedReactionsFooter}
               />
             </PressableScale>
-            {renderFeedReactions()}
-          </>
         ) : notification.type === 'photo_added' ? (
-          <>
             <PhotoAddedNotification
               playerName={notification.data.changedPlayerName || 'Игрок'}
               playerId={notification.data.changedPlayerId}
@@ -220,9 +216,8 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
               photoUrls={notification.data.photoUrls || []}
               onHeaderPress={handlePress}
+              reactionsFooter={feedReactionsFooter}
             />
-            {renderFeedReactions()}
-          </>
         ) : notification.type === 'new_friendship' ? (
           <FriendshipNotification
             friend1Name={notification.data.friend1Name || 'Игрок 1'}
@@ -247,7 +242,6 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
             }}
           />
         ) : notification.type === 'exercise_completed' ? (
-          <>
             <PressableScale
               onPress={handlePress}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -258,10 +252,9 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
                 exerciseId={notification.data.exerciseId || 'unknown'}
                 timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+                reactionsFooter={feedReactionsFooter}
               />
             </PressableScale>
-            {renderFeedReactions()}
-          </>
         ) : notification.type === 'gift_received' ? (
           <PressableScale
             onPress={handlePress}
@@ -339,7 +332,6 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
             onAcknowledge={() => onSuperAction(notification)}
           />
         ) : notification.type === 'video_added' ? (
-          <>
             <VideoAddedNotification
               playerName={notification.data.changedPlayerName || 'Игрок'}
               playerId={notification.data.changedPlayerId}
@@ -349,11 +341,9 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               videoUrls={sortVideoUrlsNewestFirst(notification.data.videoUrls || [])}
               onHeaderPress={handlePress}
               onScrubActiveChange={onVideoScrubActiveChange}
+              reactionsFooter={feedReactionsFooter}
             />
-            {renderFeedReactions()}
-          </>
         ) : notification.type === 'cover_changed' ? (
-          <>
             <PressableScale
               onPress={handlePress}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -364,12 +354,10 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 playerAvatar={notification.playerAvatar}
                 coverUrl={notification.data?.coverUrl}
                 timestamp={notification.data?.timestamp || new Date(notification.timestamp).toISOString()}
+                reactionsFooter={feedReactionsFooter}
               />
             </PressableScale>
-            {renderFeedReactions()}
-          </>
         ) : notification.type === 'avatar_changed' ? (
-          <>
             <PressableScale
               onPress={handlePress}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -380,12 +368,10 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
                 newAvatarUrl={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
                 timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+                reactionsFooter={feedReactionsFooter}
               />
             </PressableScale>
-            {renderFeedReactions()}
-          </>
         ) : notification.type === 'achievement_added' ? (
-          <>
             <PressableScale
               onPress={handlePress}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -396,12 +382,10 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 achievementsCount={notification.data.addedAchievementsCount || 1}
                 timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
                 playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
+                reactionsFooter={feedReactionsFooter}
               />
             </PressableScale>
-            {renderFeedReactions()}
-          </>
         ) : notification.type === 'physical_data_changed' ? (
-          <>
             <PressableScale
               onPress={handlePress}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -412,12 +396,10 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
                 changes={notification.data.changes || []}
                 timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+                reactionsFooter={feedReactionsFooter}
               />
             </PressableScale>
-            {renderFeedReactions()}
-          </>
         ) : notification.type === 'puck_speed_changed' ? (
-          <>
             <PressableScale
               onPress={handlePress}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -428,12 +410,10 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
                 newMaxSpeed={notification.data.newMaxSpeed || 0}
                 timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+                reactionsFooter={feedReactionsFooter}
               />
             </PressableScale>
-            {renderFeedReactions()}
-          </>
         ) : notification.type === 'scout_report' ? (
-          <>
             <PressableScale
               onPress={handlePress}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -444,12 +424,10 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 playerAvatar={notification.data.changedPlayerAvatar}
                 message={notification.message || ''}
                 timestamp={typeof notification.timestamp === 'string' ? new Date(notification.timestamp).getTime() : (notification.timestamp || Date.now())}
+                reactionsFooter={feedReactionsFooter}
               />
             </PressableScale>
-            {renderFeedReactions()}
-          </>
         ) : notification.type === 'game_first_place' || notification.type === 'quiz_first_place' ? (
-          <>
             <PressableScale
               onPress={handlePress}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -462,10 +440,9 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 variant={notification.type === 'quiz_first_place' ? 'quiz' : 'game'}
                 prizeAmount={notification.data?.prizeAmount}
                 timestamp={typeof notification.timestamp === 'string' ? new Date(notification.timestamp).getTime() : (notification.timestamp || Date.now())}
+                reactionsFooter={feedReactionsFooter}
               />
             </PressableScale>
-            {renderFeedReactions()}
-          </>
         ) : notification.type === 'profile_reaction' || notification.type === 'activity_reaction' ? (
           <ReactionReceivedNotification
             senderName={notification.data?.senderName || notification.playerName || t('profile.player')}
@@ -522,7 +499,6 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
             />
           </PressableScale>
         ) : (
-        <>
           <PressableScale
             key={notification.id}
             onPress={handlePress}
@@ -535,6 +511,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                 style={styles.notificationItemBlur}
               >
                 <View style={styles.notificationItem}>
+              <View style={styles.notificationItemRow}>
               <View style={styles.notificationIcon}>
                 <Ionicons 
                   name={getNotificationIcon(notification.type) as any} 
@@ -587,11 +564,11 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               )}
               </View>
               </View>
+              {feedReactionsFooter}
+              </View>
               </BlurOrSolid>
             </View>
           </PressableScale>
-          {renderFeedReactions()}
-        </>
         )}
       </AnimatedNotification>
   );
@@ -2487,8 +2464,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   notificationItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: 'column',
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderRadius: 16,
@@ -2496,6 +2472,10 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.06)',
     minHeight: 80,
     backgroundColor: '#1c1c21',
+  },
+  notificationItemRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
   notificationGradientShadow: {
     marginHorizontal: 16,

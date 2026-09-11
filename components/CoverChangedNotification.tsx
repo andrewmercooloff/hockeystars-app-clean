@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +14,7 @@ interface Props {
   playerAvatar?: string;
   coverUrl?: string;
   timestamp: string;
+  reactionsFooter?: ReactNode;
 }
 
 /** Feed card: "<name> updated the profile cover" with a wide preview of the new cover. */
@@ -23,6 +24,7 @@ const CoverChangedNotification = React.memo(function CoverChangedNotification({
   playerAvatar,
   coverUrl,
   timestamp,
+  reactionsFooter,
 }: Props) {
   const { t } = useLanguage();
   const preview = React.useMemo(() => {
@@ -71,6 +73,7 @@ const CoverChangedNotification = React.memo(function CoverChangedNotification({
             recyclingKey={`cover-notif-${playerId}-${preview.split('?')[0]}`}
           />
         ) : null}
+        {reactionsFooter}
       </View>
     </BlurOrSolid>
   );

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurOrSolid } from './BlurOrSolid';
@@ -12,6 +12,7 @@ interface ExerciseNotificationProps {
   playerAvatar?: string;
   exerciseId: string;
   timestamp: string;
+  reactionsFooter?: ReactNode;
 }
 
 export default function ExerciseNotification({
@@ -20,6 +21,7 @@ export default function ExerciseNotification({
   playerAvatar,
   exerciseId,
   timestamp,
+  reactionsFooter,
 }: ExerciseNotificationProps) {
   const { t } = useLanguage();
 
@@ -59,6 +61,7 @@ export default function ExerciseNotification({
       style={styles.containerBlur}
     >
       <View style={styles.container}>
+        <View style={styles.bodyRow}>
         <View style={styles.avatarContainer}>
         <CachedAvatar
           playerId={playerId}
@@ -88,6 +91,9 @@ export default function ExerciseNotification({
         </View>
       </View>
       </View>
+
+      {reactionsFooter}
+    </View>
     </BlurOrSolid>
   );
 }
@@ -98,8 +104,10 @@ const styles = StyleSheet.create({
   },
   container: {
     ...NOTIFICATION_CARD,
+  },
+  bodyRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   avatarContainer: {
     width: 50,
