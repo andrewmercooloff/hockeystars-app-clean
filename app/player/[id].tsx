@@ -5336,7 +5336,7 @@ export default function PlayerProfile() {
                   )}
                 </View>
               
-                <ActivityRating player={player} />
+                <ActivityRating player={player} hideZero />
               </View>
               
               <View style={[styles.profileMetaColumn, isDesktop && styles.profileMetaColumnDesktop]}>
