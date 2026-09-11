@@ -4154,5 +4154,22 @@
     "scanQr": "Nuskaitykite telefonu — atsidarys App Store arba Google Play",
     "appStoreCta": "Atsisiųsti iš App Store",
     "playStoreCta": "Atsisiųsti iš Google Play"
+  },
+  "socialLinks": {
+    "cannotOpenLink": "Nepavyksta atidaryti {platform} nuorodos",
+    "error": "Klaida",
+    "instagram": "Instagram",
+    "instagramPlaceholder": "@vardas arba nuoroda",
+    "openError": "Klaida atidarant nuorodą",
+    "tiktok": "TikTok",
+    "tiktokPlaceholder": "@vardas arba nuoroda",
+    "vk": "VK",
+    "vkPlaceholder": "@vardas arba nuoroda",
+    "website": "Svetainė arba nuoroda",
+    "websitePlaceholder": "example.com arba eliteprospects.com",
+    "enterInstagram": "Įveskite Instagram",
+    "enterTiktok": "Įveskite TikTok",
+    "enterVk": "Įveskite VK",
+    "enterWebsite": "Įveskite svetainę arba nuorodą"
   }
 }
