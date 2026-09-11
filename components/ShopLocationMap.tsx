@@ -83,7 +83,7 @@ export default function ShopLocationMap({
   return (
     <WebView
       key={stablePayload}
-      source={{ html }}
+      source={{ html, baseUrl: 'https://hockey-stars.com/' }}
       style={[styles.map, { height }]}
       javaScriptEnabled
       domStorageEnabled
@@ -98,8 +98,24 @@ export default function ShopLocationMap({
 function buildMapHtml(addresses: string[], city: string, cartoApiKey: string): string {
   const addressesJson = JSON.stringify(addresses);
   const cityJson = JSON.stringify(city || '');
-  const cartoKeyParam = cartoApiKey ? `?key=${encodeURIComponent(cartoApiKey)}` : '';
-  const tileUrl = `https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png${cartoKeyParam}`;
+  const hasCartoKey = Boolean(cartoApiKey);
+  const cartoKeyParam = hasCartoKey ? `?key=${encodeURIComponent(cartoApiKey)}` : '';
+  const cartoTileUrl = `https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png${cartoKeyParam}`;
+  const mapLibreScripts = hasCartoKey
+    ? ''
+    : `
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.20/leaflet-maplibre-gl.js"></script>`;
+  const basemapInit = hasCartoKey
+    ? `L.tileLayer(${JSON.stringify(cartoTileUrl)}, {
+        attribution: '',
+        maxZoom: 19,
+        subdomains: 'abcd'
+      }).addTo(map);`
+    : `L.maplibreGL({
+        style: 'https://tiles.openfreemap.org/styles/dark'
+      }).addTo(map);`;
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -122,8 +138,8 @@ function buildMapHtml(addresses: string[], city: string, cartoApiKey: string): s
       overflow: hidden !important;
     }
   </style>
-  <link rel="stylesheet" href="/vendor/leaflet/leaflet.css" />
-  <script src="/vendor/leaflet/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>${mapLibreScripts}
 </head>
 <body>
   <div id="map"></div>
@@ -134,13 +150,9 @@ function buildMapHtml(addresses: string[], city: string, cartoApiKey: string): s
       var map = L.map('map', {
         attributionControl: false,
         zoomControl: true
-      }).setView([53.9, 27.6], 11);
+      }).setView([59.93, 30.33], 11);
 
-      L.tileLayer(${JSON.stringify(tileUrl)}, {
-        attribution: '',
-        maxZoom: 19,
-        subdomains: 'abcd'
-      }).addTo(map);
+      ${basemapInit}
 
       function queryFor(addr) {
         if (city && addr.toLowerCase().indexOf(city.toLowerCase()) === -1) {
