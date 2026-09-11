@@ -24,6 +24,21 @@ let globalUserCache: Player | null = null;
 const playersMemoryCache = new Map<string, { player: Player; timestamp: number; fullProfile: boolean }>();
 const teamsMemoryCache = new Map<string, { teams: PlayerTeam[], timestamp: number }>();
 
+/** In-memory full players list — survives lazy tab unmount (home/scout share loadPlayers). */
+let allPlayersListMemoryCache: Player[] | null = null;
+
+function rememberPlayersList(players: Player[]): Player[] {
+  if (Array.isArray(players) && players.length > 0) {
+    allPlayersListMemoryCache = players;
+  }
+  return players;
+}
+
+/** Instant scout/home list when AsyncStorage/network hasn't resolved yet. */
+export function peekCachedPlayersList(): Player[] | null {
+  return allPlayersListMemoryCache;
+}
+
 /** Кеш списка игроков (loadPlayers). v2 включает player.teams для поиска по командам. */
 export const ALL_PLAYERS_LIST_CACHE_KEY = 'all_players_v5';
 
@@ -1598,19 +1613,19 @@ async function fetchPlayersFromNetwork(
         if (Array.isArray(players) && players.length > 0) {
           console.log('💾 Используем кеш игроков после ошибки сети');
           warmPlayerAvatarsFromList(players);
-          return players;
+          return rememberPlayersList(players);
         }
       }
       if (staleFallback && staleFallback.length > 0) {
         console.log('💾 Используем устаревший кеш игроков после ошибки сети');
         warmPlayerAvatarsFromList(staleFallback);
-        return staleFallback;
+        return rememberPlayersList(staleFallback);
       }
     return [];
   }
 
   if (!data) {
-    return staleFallback && staleFallback.length > 0 ? staleFallback : [];
+    return staleFallback && staleFallback.length > 0 ? rememberPlayersList(staleFallback) : [];
   }
 
   const players = data.map(convertSupabaseToPlayer);
@@ -1623,7 +1638,7 @@ async function fetchPlayersFromNetwork(
   }
 
   void enrichPlayersMeta(players, cacheKey, onUpdated, true);
-  return players;
+  return rememberPlayersList(players);
 }
 
 export const loadPlayers = async (
@@ -1656,13 +1671,13 @@ export const loadPlayers = async (
             if (needsTeams) {
               void enrichPlayersMeta(players, cacheKey, onUpdated);
             }
-            return players;
+            return rememberPlayersList(players);
           }
           staleCachedPlayers = players;
           console.log('💾 Устаревший кеш — показываем сразу, обновляем в фоне');
           warmPlayerAvatarsFromList(staleCachedPlayers);
           void fetchPlayersFromNetwork(cacheKey, false, staleCachedPlayers, onUpdated);
-          return staleCachedPlayers;
+          return rememberPlayersList(staleCachedPlayers);
         }
       }
     }
@@ -1681,13 +1696,13 @@ export const loadPlayers = async (
         if (Array.isArray(players) && players.length > 0) {
           console.log('💾 Используем кеш игроков после исключения');
           warmPlayerAvatarsFromList(players);
-          return players;
+          return rememberPlayersList(players);
         }
       }
       if (staleCachedPlayers && staleCachedPlayers.length > 0) {
         console.log('💾 Используем устаревший кеш игроков после исключения');
         warmPlayerAvatarsFromList(staleCachedPlayers);
-        return staleCachedPlayers;
+        return rememberPlayersList(staleCachedPlayers);
       }
     } catch {
       // ignore
@@ -1729,6 +1744,7 @@ export const clearAllPlayersCache = async (): Promise<void> => {
     if (playerCacheKeys.length > 0) {
       await AsyncStorage.multiRemove(playerCacheKeys);
     }
+    allPlayersListMemoryCache = null;
   } catch (error) {
     console.error('❌ Ошибка очистки кеша игроков:', error);
   }

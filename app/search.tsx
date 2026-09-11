@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } from 'react';
 import {
     FlatList,
     StyleSheet,
@@ -39,8 +39,11 @@ import {
   PlayerTeam,
   isGoalkeeperPosition,
   ALL_PLAYERS_LIST_CACHE_KEYS,
+  ALL_PLAYERS_LIST_CACHE_KEY,
   mergePlayerFromPlayersRealtimeRow,
+  peekCachedPlayersList,
 } from '../utils/playerStorage';
+import { applyActivityRatingsToPlayers } from '../services/activityService';
 import PlayerStarBadge from '../components/ActivityRating';
 import { isSameAvatarFile, updateAvatarGlobally } from '../utils/AvatarCache';
 import { getAllTimeBlock } from '../utils/seasonStats';
@@ -81,6 +84,22 @@ const SCOUT_ROW_HEIGHT_SCALE = 0.8;
 const SEARCH_PANEL_TOP = 41;
 /** Стартовая высота панели до первого onLayout (поиск + 3 ряда фильтров + кнопка). */
 const SEARCH_PANEL_DEFAULT_HEIGHT = 62;
+
+type ScoutListSessionCache = {
+  cacheKey: string;
+  players: Player[];
+};
+
+let scoutListSessionCache: ScoutListSessionCache | null = null;
+
+function scoutSessionKey(userId: string | undefined, isAdmin: boolean): string {
+  return `${userId ?? 'guest'}:${isAdmin ? 'admin' : 'user'}`;
+}
+
+function filterPlayersForScout(allPlayers: Player[], isAdmin: boolean): Player[] {
+  if (isAdmin) return allPlayers;
+  return allPlayers.filter((player) => isPlayerInSearchDirectory(player, isAdmin));
+}
 
 type ScoutListRow =
   | { key: string; kind: 'full'; player: Player }
@@ -553,9 +572,25 @@ export default function SearchScreen() {
     }
   };
   
+  const sessionKey = scoutSessionKey(currentUser?.id, isAdmin);
+
   // Состояния для фильтрации и поиска
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [players, setPlayers] = useState<Player[]>(() => {
+    if (scoutListSessionCache?.cacheKey === sessionKey && scoutListSessionCache.players.length > 0) {
+      return scoutListSessionCache.players;
+    }
+    const mem = peekCachedPlayersList();
+    if (mem?.length) {
+      return filterPlayersForScout(mem, isAdmin);
+    }
+    return [];
+  });
+  const [loading, setLoading] = useState(() => {
+    if (scoutListSessionCache?.cacheKey === sessionKey && scoutListSessionCache.players.length > 0) {
+      return false;
+    }
+    return !(peekCachedPlayersList()?.length);
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [filtersPanelHeight, setFiltersPanelHeight] = useState(SEARCH_PANEL_DEFAULT_HEIGHT);
   // Фильтры свёрнуты по умолчанию — панель компактная, раскрывается по кнопке
@@ -618,69 +653,83 @@ export default function SearchScreen() {
     }
   }, [openFilters, openFilter, closeFilter]);
 
-  // Загрузка пользователя и данных
+  const applySearchPlayers = useCallback(
+    (allPlayers: Player[]) => {
+      setPlayers((prevPlayers) => {
+        const prevRatings = new Map(
+          prevPlayers.map((p) => [p.id, p.activityRating] as const)
+        );
+        const next = filterPlayersForScout(allPlayers, isAdmin).map((player) => ({
+          ...player,
+          activityRating: player.activityRating ?? prevRatings.get(player.id) ?? player.activityRating,
+        }));
+        if (next.length === 0 && prevPlayers.length > 0) {
+          return prevPlayers;
+        }
+        return next;
+      });
+    },
+    [isAdmin]
+  );
+
+  useEffect(() => {
+    if (players.length > 0 && currentUser) {
+      scoutListSessionCache = { cacheKey: sessionKey, players };
+    }
+  }, [players, sessionKey, currentUser]);
+
+  // Hydrate from disk when memory/session empty (first open after cold start).
+  useLayoutEffect(() => {
+    if (!currentUser || players.length > 0) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const raw =
+          (await AsyncStorage.getItem(ALL_PLAYERS_LIST_CACHE_KEY)) ||
+          (await AsyncStorage.getItem('all_players_v4'));
+        if (!raw || cancelled) return;
+        const parsed = JSON.parse(raw) as { players?: Player[] };
+        const list = Array.isArray(parsed.players) ? parsed.players : [];
+        const filtered = filterPlayersForScout(list, isAdmin);
+        if (filtered.length > 0 && !cancelled) {
+          setPlayers(filtered);
+          setLoading(false);
+        }
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [currentUser, isAdmin, players.length]);
+
+  // Загрузка / фоновое обновление списка
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Принудительно применяем шрифт Gilroy
         forceGilroyFont();
-        
-        // Используем пользователя из UserContext
-        if (!canBrowse) {
-          // Не вызываем router.replace здесь, так как это может вызвать ошибку навигации
-          // Вместо этого просто возвращаемся
-          return;
-        }
-
-        // Админам нужен сетевой свежий список (в т.ч. скрытые); остальным достаточно кеша loadPlayers при открытии
-        const filterForSearch = (allPlayers: Player[]): Player[] => {
-          if (isAdmin) {
-            return allPlayers;
-          }
-          return allPlayers.filter(player =>
-            player.status === 'player' ||
-            player.status === 'admin' ||
-            player.status === 'star' ||
-            player.status === 'coach' ||
-            player.status === 'scout' ||
-            player.status === 'shop' ||
-            player.status === 'skateSharpening'
-          );
-        };
-
-        const applySearchPlayers = (allPlayers: Player[]) => {
-          setPlayers((prevPlayers) => {
-            const next = filterForSearch(allPlayers);
-            // Защита от "фликера": если пришёл пустой ответ (временная сет. ошибка/таймаут/плохой кеш),
-            // не затираем уже показанный список "нет игроков".
-            if (next.length === 0 && prevPlayers.length > 0) {
-              return prevPlayers;
-            }
-            return next;
-          });
-        };
+if (!canBrowse) return;
 
         const allPlayers = await loadPlayers(isAdmin, {
-          onUpdated: applySearchPlayers,
+          onUpdated: (fresh) => {
+            void applyActivityRatingsToPlayers(fresh).then(() => applySearchPlayers(fresh));
+          },
         });
-
         applySearchPlayers(allPlayers);
-        
+        void applyActivityRatingsToPlayers(allPlayers).then(() => applySearchPlayers(allPlayers));
       } catch (error) {
         console.error('❌ Ошибка загрузки поиска:', error);
-        // Не вызываем router.replace здесь, так как это может вызвать ошибку навигации
-        // Вместо этого просто логируем ошибку
       } finally {
         await safeHideSplashScreen();
         setLoading(false);
       }
     };
 
-    // Запускаем загрузку только если currentUser определен и не null
     if (canBrowse) {
       loadData();
     }
-  }, [router, currentUser]);
+  }, [router, currentUser, isAdmin, canBrowse, applySearchPlayers]);
 
   useFocusEffect(
     useCallback(() => {
@@ -1658,8 +1707,8 @@ export default function SearchScreen() {
     return null;
   }
 
-  // Если загружаем данные
-  if (loading) {
+  // Skeleton только при первом заходе без кеша
+  if (loading && players.length === 0) {
     return (
       <View style={styles.container}>
         <CachedBackground
