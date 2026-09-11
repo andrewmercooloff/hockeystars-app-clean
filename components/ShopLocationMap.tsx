@@ -55,9 +55,11 @@ export default function ShopLocationMap({
     }
   }, [stablePayload]);
 
+  const cartoApiKey = process.env.EXPO_PUBLIC_CARTO_API_KEY?.trim() || '';
+
   const html = useMemo(
-    () => buildMapHtml(parsed.list, parsed.city),
-    [parsed.list, parsed.city]
+    () => buildMapHtml(parsed.list, parsed.city, cartoApiKey),
+    [parsed.list, parsed.city, cartoApiKey]
   );
 
   if (!parsed.list.length) return null;
@@ -93,9 +95,11 @@ export default function ShopLocationMap({
   );
 }
 
-function buildMapHtml(addresses: string[], city: string): string {
+function buildMapHtml(addresses: string[], city: string, cartoApiKey: string): string {
   const addressesJson = JSON.stringify(addresses);
   const cityJson = JSON.stringify(city || '');
+  const cartoKeyParam = cartoApiKey ? `?key=${encodeURIComponent(cartoApiKey)}` : '';
+  const tileUrl = `https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png${cartoKeyParam}`;
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -132,7 +136,7 @@ function buildMapHtml(addresses: string[], city: string): string {
         zoomControl: true
       }).setView([53.9, 27.6], 11);
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      L.tileLayer(${JSON.stringify(tileUrl)}, {
         attribution: '',
         maxZoom: 19,
         subdomains: 'abcd'
