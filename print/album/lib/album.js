@@ -244,7 +244,7 @@ ${cardCss(size)}
 .slot .corner.tr{right:-.35mm;top:-.35mm;border-left:0;border-bottom:0;}
 .slot .corner.bl{left:-.35mm;bottom:-.35mm;border-right:0;border-top:0;}
 .slot .corner.br{right:-.35mm;bottom:-.35mm;border-left:0;border-top:0;}
-.slot .ghost{position:absolute;left:${-size.bleed}mm;top:${-size.bleed}mm;filter:blur(.25mm);opacity:.17;}
+.slot .ghost{position:absolute;left:${-size.bleed}mm;top:${-size.bleed}mm;filter:blur(.55mm);opacity:.17;}
 .slot .ghost::after{content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(140deg,color-mix(in srgb,var(--secondary) 55%,transparent) 0%,color-mix(in srgb,var(--accent) 35%,transparent) 55%,transparent 100%);
   mix-blend-mode:overlay;opacity:.28;}
