@@ -5770,6 +5770,8 @@ export default function PlayerProfile() {
                 <ProfileReactionsBar
                   targetPlayerId={player.id}
                   viewerId={currentUser.id}
+                  viewerName={currentUser.name}
+                  viewerAvatar={currentUser.avatar}
                   disabled={isUserBlockedState}
                 />
               </View>
