@@ -35,7 +35,9 @@ export const NOTIFICATION_CARD_ROW: ViewStyle = {
 
 export const NOTIFICATION_REACTIONS_INSET: ViewStyle = {
   marginTop: 10,
-  paddingTop: 8,
+  paddingTop: 10,
   borderTopWidth: 0.5,
   borderTopColor: 'rgba(255, 255, 255, 0.08)',
+  width: '100%',
+  alignSelf: 'stretch',
 };

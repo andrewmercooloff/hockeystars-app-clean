@@ -141,8 +141,6 @@ const styles = StyleSheet.create({
     padding: 14,
   },
   bodyRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
   },
   topRow: {
     flexDirection: 'row',

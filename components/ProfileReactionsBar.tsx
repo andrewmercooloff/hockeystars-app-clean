@@ -77,7 +77,7 @@ export default function ProfileReactionsBar({
                 disabled={disabled || !viewerId}
                 hitSlop={8}
               >
-                <ReactionIcon type={type} size={15} active={active} />
+                <ReactionIcon type={type} size={20} active={active} />
               </Pressable>
               {count > 0 ? (
                 <Text style={[styles.count, active && styles.countActive]}>{count}</Text>
@@ -103,21 +103,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 8,
-    paddingHorizontal: 8,
-    gap: 4,
+    paddingHorizontal: 6,
+    gap: 2,
   },
   cell: {
     flex: 1,
     alignItems: 'center',
   },
   button: {
-    width: 34,
-    height: 22,
+    minWidth: 36,
+    height: 28,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 2,
   },
   buttonActive: {
-    opacity: 1,
+    transform: [{ scale: 1.05 }],
   },
   count: {
     marginTop: 2,

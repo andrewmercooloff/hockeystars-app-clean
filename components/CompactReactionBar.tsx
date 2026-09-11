@@ -57,7 +57,7 @@ export default function CompactReactionBar({
   };
 
   return (
-    <View style={[styles.bar, embedded && styles.barEmbedded, embedded && NOTIFICATION_REACTIONS_INSET]}>
+    <View style={[styles.bar, embedded && NOTIFICATION_REACTIONS_INSET]}>
       {FEED_REACTIONS.map(({ type }) => {
         const active = summary.mine === type;
         const count = summary.counts[type];
@@ -69,7 +69,7 @@ export default function CompactReactionBar({
             disabled={!viewerId || viewerId === recipientId}
             hitSlop={6}
           >
-            <ReactionIcon type={type} size={13} active={active} />
+            <ReactionIcon type={type} size={17} active={active} />
             {count > 0 ? <Text style={[styles.count, active && styles.countActive]}>{count}</Text> : null}
           </Pressable>
         );
@@ -82,28 +82,27 @@ const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 6,
-  },
-  barEmbedded: {
-    marginTop: 0,
+    gap: 8,
+    alignSelf: 'stretch',
+    width: '100%',
   },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    minHeight: 26,
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    minHeight: 30,
     justifyContent: 'center',
   },
   chipActive: {
-    backgroundColor: 'rgba(250, 47, 64, 0.12)',
+    backgroundColor: 'rgba(250, 47, 64, 0.14)',
   },
   count: {
-    color: 'rgba(255,255,255,0.55)',
-    fontSize: 10,
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 11,
     fontFamily: 'Gilroy-Bold',
   },
   countActive: {

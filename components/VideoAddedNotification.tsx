@@ -207,7 +207,6 @@ const VideoAddedNotification = React.memo(function VideoAddedNotification({
   return (
     <BlurOrSolid intensity={55} tint="dark" style={styles.containerBlur}>
       <View style={styles.container}>
-        <View style={styles.bodyRow}>
         {onHeaderPress ? (
           <TouchableOpacity onPress={onHeaderPress} activeOpacity={0.7}>
             {header}
@@ -345,10 +344,6 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.06)',
     borderRadius: 16,
     overflow: 'hidden',
-  },
-  bodyRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
   },
   header: {
     flexDirection: 'row',

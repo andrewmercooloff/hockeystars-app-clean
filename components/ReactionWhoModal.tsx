@@ -72,7 +72,7 @@ export default function ReactionWhoModal({
           <View style={styles.handle} />
           {reactionType ? (
             <View style={styles.iconWrap}>
-              <ReactionIcon type={reactionType} size={18} active />
+              <ReactionIcon type={reactionType} size={24} active />
             </View>
           ) : null}
           <ScrollView
@@ -117,8 +117,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
     borderColor: 'rgba(255,255,255,0.08)',
     paddingTop: 8,
-    paddingBottom: 20,
-    maxHeight: '42%',
+    paddingBottom: 16,
+    maxHeight: '36%',
   },
   handle: {
     alignSelf: 'center',

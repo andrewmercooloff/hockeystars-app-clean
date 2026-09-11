@@ -164,8 +164,6 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.06)',
     borderRadius: 16,
     padding: 16,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
   },
   bodyRow: {
     flexDirection: 'row',

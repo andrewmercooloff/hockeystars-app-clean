@@ -54,12 +54,7 @@ export default function MessageReactionsBar({
             disabled={!viewerId || disabled || viewerId === messageOwnerId}
             hitSlop={4}
           >
-            <ReactionIcon
-              type={type}
-              size={12}
-              active={active}
-              color={active ? '#fa2f40' : 'rgba(255,255,255,0.42)'}
-            />
+            <ReactionIcon type={type} size={15} active={active} />
             {count > 0 ? <Text style={[styles.count, active && styles.countActive]}>{count}</Text> : null}
           </Pressable>
         );

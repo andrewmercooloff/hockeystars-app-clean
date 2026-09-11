@@ -87,8 +87,6 @@ const styles = StyleSheet.create({
   },
   container: {
     ...NOTIFICATION_CARD,
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   bodyRow: {
     flexDirection: 'row',
