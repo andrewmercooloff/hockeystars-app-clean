@@ -8,7 +8,10 @@ import {
 } from '../utils/reactions';
 import { loadFeedReactions, setFeedReaction } from '../services/reactionService';
 import ReactionIcon from './ReactionIcon';
-import { NOTIFICATION_REACTIONS_INSET } from '../utils/notificationCard';
+import {
+  NOTIFICATION_REACTIONS_INSET,
+  NOTIFICATION_REACTIONS_INSET_PADDED,
+} from '../utils/notificationCard';
 
 type CompactReactionBarProps = {
   notificationId: string;
@@ -16,6 +19,8 @@ type CompactReactionBarProps = {
   recipientId: string;
   viewerId?: string | null;
   embedded?: boolean;
+  /** Cards with outer padding (stats, physical data) — skip extra horizontal inset. */
+  paddedCard?: boolean;
 };
 
 export default function CompactReactionBar({
@@ -24,6 +29,7 @@ export default function CompactReactionBar({
   recipientId,
   viewerId,
   embedded = true,
+  paddedCard = false,
 }: CompactReactionBarProps) {
   const [summary, setSummary] = useState(emptyFeedReactionSummary());
   const summaryRef = useRef(summary);
@@ -57,7 +63,12 @@ export default function CompactReactionBar({
   };
 
   return (
-    <View style={[styles.bar, embedded && NOTIFICATION_REACTIONS_INSET]}>
+    <View
+      style={[
+        styles.bar,
+        embedded && (paddedCard ? NOTIFICATION_REACTIONS_INSET_PADDED : NOTIFICATION_REACTIONS_INSET),
+      ]}
+    >
       {FEED_REACTIONS.map(({ type }) => {
         const active = summary.mine === type;
         const count = summary.counts[type];
@@ -69,7 +80,7 @@ export default function CompactReactionBar({
             disabled={!viewerId || viewerId === recipientId}
             hitSlop={6}
           >
-            <ReactionIcon type={type} size={17} active={active} />
+            <ReactionIcon type={type} size={18} active={active} />
             {count > 0 ? <Text style={[styles.count, active && styles.countActive]}>{count}</Text> : null}
           </Pressable>
         );
@@ -81,21 +92,22 @@ export default function CompactReactionBar({
 const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+    flexWrap: 'nowrap',
+    gap: 6,
     alignSelf: 'stretch',
     width: '100%',
   },
   chip: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    minHeight: 30,
     justifyContent: 'center',
+    gap: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 6,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    minHeight: 32,
   },
   chipActive: {
     backgroundColor: 'rgba(250, 47, 64, 0.14)',

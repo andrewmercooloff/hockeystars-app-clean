@@ -36,6 +36,19 @@ export const NOTIFICATION_CARD_ROW: ViewStyle = {
 export const NOTIFICATION_REACTIONS_INSET: ViewStyle = {
   marginTop: 10,
   paddingTop: 10,
+  paddingHorizontal: 14,
+  paddingBottom: 10,
+  borderTopWidth: 0.5,
+  borderTopColor: 'rgba(255, 255, 255, 0.08)',
+  width: '100%',
+  alignSelf: 'stretch',
+};
+
+/** For cards that already have inner padding (stats, physical data, etc.). */
+export const NOTIFICATION_REACTIONS_INSET_PADDED: ViewStyle = {
+  marginTop: 10,
+  paddingTop: 10,
+  paddingBottom: 2,
   borderTopWidth: 0.5,
   borderTopColor: 'rgba(255, 255, 255, 0.08)',
   width: '100%',

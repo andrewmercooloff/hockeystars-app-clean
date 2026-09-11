@@ -284,7 +284,7 @@ const VideoAddedNotification = React.memo(function VideoAddedNotification({
             <Text style={styles.badgeText}>+{displayCount}</Text>
           </View>
         )}
-        </View>
+
         {reactionsFooter}
       </View>
 

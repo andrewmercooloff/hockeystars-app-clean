@@ -1,11 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import {
-  FEED_REACTIONS,
-  PROFILE_REACTIONS,
-  type FeedReactionType,
-  type ProfileReactionType,
-} from '../utils/reactions';
+import { StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import type { FeedReactionType, ProfileReactionType } from '../utils/reactions';
 
 export type ReactionIconType = ProfileReactionType | FeedReactionType;
 
@@ -15,28 +12,38 @@ type ReactionIconProps = {
   active?: boolean;
 };
 
-function emojiForType(type: ReactionIconType): string {
-  const profile = PROFILE_REACTIONS.find((r) => r.type === type);
-  if (profile) return profile.emoji;
-  const feed = FEED_REACTIONS.find((r) => r.type === type);
-  return feed?.emoji ?? '👍🏻';
-}
+const ICONS: Record<
+  ReactionIconType,
+  { family: 'ionicons' | 'mci'; name: string }
+> = {
+  respect: { family: 'mci', name: 'handshake' },
+  like: { family: 'ionicons', name: 'thumbs-up' },
+  strength: { family: 'mci', name: 'arm-flex' },
+  high_five: { family: 'ionicons', name: 'hand-left' },
+  fire: { family: 'ionicons', name: 'flame' },
+  lightning: { family: 'ionicons', name: 'flash' },
+};
 
 export default function ReactionIcon({ type, size = 18, active = false }: ReactionIconProps) {
-  const glyph = emojiForType(type);
-  const compact = glyph.length > 2;
+  const spec = ICONS[type];
+  const tint = active ? '#fa2f40' : 'rgba(255,255,255,0.88)';
+
+  if (spec.family === 'mci') {
+    return (
+      <MaterialCommunityIcons
+        name={spec.name as keyof typeof MaterialCommunityIcons.glyphMap}
+        size={size}
+        color={tint}
+      />
+    );
+  }
 
   return (
-    <Text
-      style={[
-        styles.glyph,
-        { fontSize: compact ? size - 2 : size, lineHeight: size + 4 },
-        active && styles.glyphActive,
-      ]}
-      allowFontScaling={false}
-    >
-      {glyph}
-    </Text>
+    <Ionicons
+      name={spec.name as keyof typeof Ionicons.glyphMap}
+      size={size}
+      color={tint}
+    />
   );
 }
 
@@ -49,14 +56,6 @@ export function ReactionIconBadge({ type, size = 20 }: { type: ReactionIconType;
 }
 
 const styles = StyleSheet.create({
-  glyph: {
-    textAlign: 'center',
-    opacity: 0.92,
-  },
-  glyphActive: {
-    opacity: 1,
-    transform: [{ scale: 1.06 }],
-  },
   badge: {
     minWidth: 28,
     minHeight: 28,

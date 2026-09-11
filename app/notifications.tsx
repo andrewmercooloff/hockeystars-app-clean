@@ -109,6 +109,21 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
   const feedReactionRecipientId =
     notification.data?.changedPlayerId || notification.data?.playerId || notification.playerId;
 
+  const feedReactionUsesPaddedInset = new Set([
+    'stats_change',
+    'normative_changed',
+    'physical_data_changed',
+    'puck_speed_changed',
+    'achievement_added',
+    'achievement',
+    'scout_report',
+    'exercise_completed',
+    'game_first_place',
+    'quiz_first_place',
+    'avatar_changed',
+    'cover_changed',
+  ]).has(notification.type);
+
   const feedReactionsFooter = REACTABLE_NOTIFICATION_TYPES.has(notification.type) &&
     feedReactionRecipientId &&
     currentUserId ? (
@@ -118,6 +133,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
         recipientId={feedReactionRecipientId}
         viewerId={currentUserId}
         embedded
+        paddedCard={feedReactionUsesPaddedInset}
       />
     ) : null;
 
