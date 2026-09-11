@@ -4,34 +4,31 @@ import {
   Modal,
   Pressable,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
 import {
-  PROFILE_REACTIONS,
-  type ProfileReactionSummary,
-  type ProfileReactionType,
+  FEED_REACTIONS,
+  type FeedReactionSummary,
+  type FeedReactionType,
 } from '../utils/reactions';
 import ReactionIcon from './ReactionIcon';
 
-type ProfileReactionsSheetProps = {
+type FeedReactionPickerSheetProps = {
   visible: boolean;
-  summary: ProfileReactionSummary;
+  summary: FeedReactionSummary;
   disabled?: boolean;
   onClose: () => void;
-  onToggle: (type: ProfileReactionType) => void;
-  onLongPress: (type: ProfileReactionType) => void;
+  onSelect: (type: FeedReactionType) => void;
 };
 
-export default function ProfileReactionsSheet({
+export default function FeedReactionPickerSheet({
   visible,
   summary,
   disabled,
   onClose,
-  onToggle,
-  onLongPress,
-}: ProfileReactionsSheetProps) {
-  const translateY = useRef(new Animated.Value(280)).current;
+  onSelect,
+}: FeedReactionPickerSheetProps) {
+  const translateY = useRef(new Animated.Value(220)).current;
   const backdrop = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -55,7 +52,7 @@ export default function ProfileReactionsSheet({
 
     Animated.parallel([
       Animated.timing(translateY, {
-        toValue: 280,
+        toValue: 220,
         duration: 180,
         useNativeDriver: true,
       }),
@@ -77,22 +74,21 @@ export default function ProfileReactionsSheet({
         <Animated.View style={[styles.sheet, { transform: [{ translateY }] }]}>
           <View style={styles.handle} />
           <View style={styles.row}>
-            {PROFILE_REACTIONS.map(({ type }) => {
-              const active = summary.mine.has(type);
-              const count = summary.counts[type];
+            {FEED_REACTIONS.map(({ type }) => {
+              const active = summary.mine === type;
               return (
                 <Pressable
                   key={type}
-                  style={[styles.cell, active && styles.cellActive]}
-                  onPress={() => onToggle(type)}
-                  onLongPress={() => onLongPress(type)}
-                  delayLongPress={320}
+                  style={styles.cell}
+                  onPress={() => {
+                    onSelect(type);
+                    onClose();
+                  }}
                   disabled={disabled}
                 >
                   <View style={[styles.iconCircle, active && styles.iconCircleActive]}>
                     <ReactionIcon type={type} size={22} active={active} />
                   </View>
-                  <Text style={[styles.count, active && styles.countActive]}>{count}</Text>
                 </Pressable>
               );
             })}
@@ -133,15 +129,12 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 8,
+    justifyContent: 'center',
+    gap: 16,
   },
   cell: {
-    flex: 1,
     alignItems: 'center',
-    gap: 6,
   },
-  cellActive: {},
   iconCircle: {
     width: 52,
     height: 52,
@@ -155,13 +148,5 @@ const styles = StyleSheet.create({
   },
   iconCircleActive: {
     borderColor: 'rgba(250, 47, 64, 0.55)',
-  },
-  count: {
-    color: 'rgba(255,255,255,0.55)',
-    fontSize: 12,
-    fontFamily: 'Gilroy-Bold',
-  },
-  countActive: {
-    color: '#fa2f40',
   },
 });

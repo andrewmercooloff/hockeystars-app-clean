@@ -34,23 +34,19 @@ export const NOTIFICATION_CARD_ROW: ViewStyle = {
 };
 
 export const NOTIFICATION_REACTIONS_INSET: ViewStyle = {
-  marginTop: 6,
-  paddingTop: 6,
+  marginTop: 8,
+  paddingTop: 0,
   paddingHorizontal: 14,
-  paddingBottom: 6,
-  borderTopWidth: 0.5,
-  borderTopColor: 'rgba(255, 255, 255, 0.08)',
+  paddingBottom: 2,
   width: '100%',
   alignSelf: 'stretch',
 };
 
 /** For cards that already have inner padding (stats, physical data, etc.). */
 export const NOTIFICATION_REACTIONS_INSET_PADDED: ViewStyle = {
-  marginTop: 6,
-  paddingTop: 6,
+  marginTop: 8,
+  paddingTop: 0,
   paddingBottom: 0,
-  borderTopWidth: 0.5,
-  borderTopColor: 'rgba(255, 255, 255, 0.08)',
   width: '100%',
   alignSelf: 'stretch',
 };

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import {
   PROFILE_REACTIONS,
   type ProfileReactionSummary,
@@ -9,6 +10,7 @@ import {
 } from '../utils/reactions';
 import { loadProfileReactions, toggleProfileReaction } from '../services/reactionService';
 import ReactionWhoModal from './ReactionWhoModal';
+import ProfileReactionsSheet from './ProfileReactionsSheet';
 import ReactionIcon from './ReactionIcon';
 
 type ProfileReactionsBarProps = {
@@ -27,6 +29,7 @@ export default function ProfileReactionsBar({
   disabled,
 }: ProfileReactionsBarProps) {
   const [summary, setSummary] = useState<ProfileReactionSummary>(emptyProfileReactionSummary());
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [whoModalType, setWhoModalType] = useState<ProfileReactionType | null>(null);
   const summaryRef = useRef(summary);
   summaryRef.current = summary;
@@ -58,13 +61,17 @@ export default function ProfileReactionsBar({
 
   const onLongPress = (type: ProfileReactionType) => {
     if (!summary.sendersByType[type].length) return;
+    setSheetOpen(false);
     setWhoModalType(type);
   };
+
+  const visibleReactions = PROFILE_REACTIONS.filter(({ type }) => summary.counts[type] > 0);
+  const canReact = !disabled && !!viewerId;
 
   return (
     <>
       <View style={styles.bar}>
-        {PROFILE_REACTIONS.map(({ type }) => {
+        {visibleReactions.map(({ type }) => {
           const active = summary.mine.has(type);
           const count = summary.counts[type];
           return (
@@ -74,17 +81,35 @@ export default function ProfileReactionsBar({
               onPress={() => onPress(type)}
               onLongPress={() => onLongPress(type)}
               delayLongPress={320}
-              disabled={disabled || !viewerId}
+              disabled={!canReact}
               hitSlop={6}
             >
-              <ReactionIcon type={type} size={18} active={active} />
-              {count > 0 ? (
-                <Text style={[styles.count, active && styles.countActive]}>{count}</Text>
-              ) : null}
+              <ReactionIcon type={type} size={16} active={active} />
+              <Text style={[styles.count, active && styles.countActive]}>{count}</Text>
             </Pressable>
           );
         })}
+
+        {canReact ? (
+          <Pressable
+            style={styles.addButton}
+            onPress={() => setSheetOpen(true)}
+            hitSlop={6}
+            accessibilityLabel="Add reaction"
+          >
+            <Ionicons name="add" size={16} color="rgba(255,255,255,0.75)" />
+          </Pressable>
+        ) : null}
       </View>
+
+      <ProfileReactionsSheet
+        visible={sheetOpen}
+        summary={summary}
+        disabled={!canReact}
+        onClose={() => setSheetOpen(false)}
+        onToggle={onPress}
+        onLongPress={onLongPress}
+      />
       <ReactionWhoModal
         visible={!!whoModalType}
         reactionType={whoModalType}
@@ -98,33 +123,40 @@ export default function ProfileReactionsBar({
 const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
-    marginTop: 2,
+    flexWrap: 'wrap',
+    marginTop: 6,
     marginBottom: 2,
     gap: 6,
-    alignSelf: 'stretch',
-    width: '100%',
+    alignItems: 'center',
   },
   chip: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     gap: 4,
-    paddingHorizontal: 6,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.14)',
-    backgroundColor: 'transparent',
-    minHeight: 28,
+    borderColor: 'rgba(255,255,255,0.16)',
+    backgroundColor: 'rgba(255,255,255,0.06)',
     overflow: 'visible',
   },
   chipActive: {
     borderColor: 'rgba(250, 47, 64, 0.55)',
   },
+  addButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.16)',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   count: {
-    color: 'rgba(255,255,255,0.6)',
-    fontSize: 10,
+    color: 'rgba(255,255,255,0.65)',
+    fontSize: 11,
     fontFamily: 'Gilroy-Bold',
   },
   countActive: {

@@ -52,7 +52,9 @@ const CoverChangedNotification = React.memo(function CoverChangedNotification({
               <Text style={styles.playerName} numberOfLines={1}>
                 {playerName}
               </Text>
-              <Text style={styles.time}>{formatTime(timestamp)}</Text>
+              {!reactionsFooter ? (
+                <Text style={styles.time}>{formatTime(timestamp)}</Text>
+              ) : null}
             </View>
             <View style={styles.actionRow}>
               <Text style={styles.actionText}>{t('coverNotification.changed')}</Text>

@@ -69,7 +69,9 @@ const GameFirstPlaceNotification = React.memo<GameFirstPlaceNotificationProps>((
         <View style={styles.contentContainer}>
           <View style={styles.header}>
             <Text style={styles.playerName}>{playerName}</Text>
-            <Text style={styles.timeText}>{formatTime(timestamp)}</Text>
+            {!reactionsFooter ? (
+              <Text style={styles.timeText}>{formatTime(timestamp)}</Text>
+            ) : null}
           </View>
           <Text style={styles.message}>{displayMessage}</Text>
         </View>

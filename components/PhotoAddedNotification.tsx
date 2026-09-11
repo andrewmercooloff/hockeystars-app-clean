@@ -278,7 +278,9 @@ const PhotoAddedNotification = React.memo(function PhotoAddedNotification({
         <Text style={styles.headerLine} numberOfLines={1}>
           <Text style={styles.playerName}>{playerName}</Text>
           <Text style={styles.actionText}> · {t('photoNotification.added')} {getPhotoText(photosCount)}</Text>
-          <Text style={styles.timeText}> · {formatTime(timestamp)}</Text>
+          {!reactionsFooter ? (
+            <Text style={styles.timeText}> · {formatTime(timestamp)}</Text>
+          ) : null}
         </Text>
       </View>
     </View>

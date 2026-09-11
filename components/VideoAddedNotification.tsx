@@ -198,7 +198,9 @@ const VideoAddedNotification = React.memo(function VideoAddedNotification({
         <Text style={styles.headerLine} numberOfLines={1}>
           <Text style={styles.playerName}>{playerName}</Text>
           <Text style={styles.actionText}> · {t('videoNotification.added')} {getVideoText(displayCount)}</Text>
-          <Text style={styles.timeText}> · {formatTime(timestamp)}</Text>
+          {!reactionsFooter ? (
+            <Text style={styles.timeText}> · {formatTime(timestamp)}</Text>
+          ) : null}
         </Text>
       </View>
     </View>

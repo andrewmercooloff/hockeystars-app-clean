@@ -123,6 +123,29 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
     'cover_changed',
   ]).has(notification.type);
 
+  const formatTime = React.useCallback((timestamp: number | string) => {
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) {
+      return t('justNow');
+    }
+
+    const diffInMinutes = Math.floor((Date.now() - date.getTime()) / (1000 * 60));
+    if (diffInMinutes < 1) {
+      return t('justNow');
+    }
+    if (diffInMinutes < 60) {
+      return t('minutesAgo', { minutes: diffInMinutes });
+    }
+    if (diffInMinutes < 1440) {
+      return t('hoursAgo', { hours: Math.floor(diffInMinutes / 60) });
+    }
+    return t('daysAgo', { days: Math.floor(diffInMinutes / 1440) });
+  }, [t]);
+
+  const reactionFooterTime = formatTime(
+    notification.data?.timestamp || notification.timestamp
+  );
+
   const feedReactionsFooter = REACTABLE_NOTIFICATION_TYPES.has(notification.type) &&
     feedReactionRecipientId &&
     currentUserId ? (
@@ -131,6 +154,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
         notificationType={notification.type}
         recipientId={feedReactionRecipientId}
         viewerId={currentUserId}
+        footerTime={reactionFooterTime}
         embedded
         paddedCard={feedReactionUsesPaddedInset}
       />
@@ -173,36 +197,6 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
         return 'information-circle';
       default:
         return 'notifications';
-    }
-  };
-
-  const formatTime = (timestamp: number | string) => {
-    let date: Date;
-    
-    if (typeof timestamp === 'string') {
-      date = new Date(timestamp);
-    } else {
-      date = new Date(timestamp);
-    }
-    
-    if (isNaN(date.getTime())) {
-      return 'Недавно';
-    }
-    
-    const now = new Date();
-    const diffInMinutes = (now.getTime() - date.getTime()) / (1000 * 60);
-    
-    if (diffInMinutes < 1) {
-      return 'Только что';
-    } else if (diffInMinutes < 60) {
-      return `${Math.floor(diffInMinutes)} мин назад`;
-    } else if (diffInMinutes < 1440) {
-      return `${Math.floor(diffInMinutes / 60)} ч назад`;
-    } else {
-      return date.toLocaleDateString('ru-RU', { 
-        day: '2-digit', 
-        month: '2-digit' 
-      });
     }
   };
 

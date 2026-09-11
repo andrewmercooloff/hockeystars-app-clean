@@ -81,9 +81,11 @@ const AvatarChangedNotification = React.memo(function AvatarChangedNotification(
               <Text style={styles.playerName} numberOfLines={1}>
                 {playerName}
               </Text>
-              <Text style={styles.timeText}>
-                {formatTime(timestamp)}
-              </Text>
+              {!reactionsFooter ? (
+                <Text style={styles.timeText}>
+                  {formatTime(timestamp)}
+                </Text>
+              ) : null}
             </View>
 
             <View style={styles.avatarItem}>

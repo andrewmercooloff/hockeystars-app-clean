@@ -108,7 +108,9 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
       <View style={styles.contentContainer}>
         <View style={styles.header}>
           <Text style={styles.playerName}>{playerName}</Text>
-          <Text style={styles.timeText}>{formatTime(timestamp)}</Text>
+          {!reactionsFooter ? (
+            <Text style={styles.timeText}>{formatTime(timestamp)}</Text>
+          ) : null}
         </View>
         
         <View style={styles.changesContainer}>
