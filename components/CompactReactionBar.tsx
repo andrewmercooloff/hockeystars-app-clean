@@ -72,7 +72,7 @@ export default function CompactReactionBar({
             disabled={!viewerId || viewerId === recipientId}
             hitSlop={4}
           >
-            <ReactionIcon type={type} size={inline ? 13 : 17} active={active} />
+            <ReactionIcon type={type} size={inline ? 14 : 17} active={active} />
             {!inline && count > 0 ? (
               <Text style={[styles.count, active && styles.countActive]}>{count}</Text>
             ) : null}
