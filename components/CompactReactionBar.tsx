@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import {
   FEED_REACTIONS,
   type FeedReactionType,
@@ -9,7 +8,6 @@ import {
 } from '../utils/reactions';
 import { loadFeedReactions, setFeedReaction } from '../services/reactionService';
 import ReactionIcon from './ReactionIcon';
-import FeedReactionPickerSheet from './FeedReactionPickerSheet';
 import {
   NOTIFICATION_REACTIONS_INSET,
   NOTIFICATION_REACTIONS_INSET_PADDED,
@@ -36,7 +34,6 @@ export default function CompactReactionBar({
   paddedCard = false,
 }: CompactReactionBarProps) {
   const [summary, setSummary] = useState(emptyFeedReactionSummary());
-  const [pickerOpen, setPickerOpen] = useState(false);
   const summaryRef = useRef(summary);
   summaryRef.current = summary;
 
@@ -69,63 +66,42 @@ export default function CompactReactionBar({
     });
   };
 
-  const visibleReactions = FEED_REACTIONS.filter(({ type }) => summary.counts[type] > 0);
-
   return (
-    <>
-      <View
-        style={[
-          styles.footerRow,
-          embedded && (paddedCard ? NOTIFICATION_REACTIONS_INSET_PADDED : NOTIFICATION_REACTIONS_INSET),
-        ]}
-      >
-        {footerTime ? (
-          <Text style={styles.footerTime} numberOfLines={1}>
-            {footerTime}
-          </Text>
-        ) : (
-          <View />
-        )}
+    <View
+      style={[
+        styles.footerRow,
+        embedded && (paddedCard ? NOTIFICATION_REACTIONS_INSET_PADDED : NOTIFICATION_REACTIONS_INSET),
+      ]}
+    >
+      {footerTime ? (
+        <Text style={styles.footerTime} numberOfLines={1}>
+          {footerTime}
+        </Text>
+      ) : (
+        <View />
+      )}
 
-        <View style={styles.footerRight}>
-          {visibleReactions.map(({ type }) => {
-            const active = summary.mine === type;
-            const count = summary.counts[type];
-            return (
-              <Pressable
-                key={type}
-                style={[styles.chip, active && styles.chipActive]}
-                onPress={() => onPress(type)}
-                disabled={!canReact}
-                hitSlop={4}
-              >
-                <ReactionIcon type={type} size={15} active={active} />
-                <Text style={[styles.count, active && styles.countActive]}>{count}</Text>
-              </Pressable>
-            );
-          })}
-
-          {canReact ? (
+      <View style={styles.footerRight}>
+        {FEED_REACTIONS.map(({ type }) => {
+          const active = summary.mine === type;
+          const count = summary.counts[type];
+          return (
             <Pressable
-              style={styles.addButton}
-              onPress={() => setPickerOpen(true)}
-              hitSlop={6}
-              accessibilityLabel="Add reaction"
+              key={type}
+              style={[styles.chip, active ? styles.chipActive : styles.chipIdle]}
+              onPress={() => onPress(type)}
+              disabled={!canReact}
+              hitSlop={4}
             >
-              <Ionicons name="add" size={16} color="rgba(255,255,255,0.75)" />
+              <ReactionIcon type={type} size={14} active={active} />
+              {count > 0 ? (
+                <Text style={[styles.count, active && styles.countActive]}>{count}</Text>
+              ) : null}
             </Pressable>
-          ) : null}
-        </View>
+          );
+        })}
       </View>
-
-      <FeedReactionPickerSheet
-        visible={pickerOpen}
-        summary={summary}
-        disabled={!canReact}
-        onClose={() => setPickerOpen(false)}
-        onSelect={onPress}
-      />
-    </>
+    </View>
   );
 }
 
@@ -135,7 +111,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 8,
-    minHeight: 28,
+    minHeight: 26,
   },
   footerTime: {
     color: '#71717a',
@@ -147,42 +123,37 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    gap: 6,
+    gap: 4,
     flex: 1,
     flexWrap: 'wrap',
   },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 14,
+    gap: 2,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.16)',
-    backgroundColor: 'rgba(255,255,255,0.06)',
     overflow: 'visible',
+  },
+  chipIdle: {
+    borderColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    opacity: 0.55,
   },
   chipActive: {
     borderColor: 'rgba(250, 47, 64, 0.55)',
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    opacity: 1,
   },
   count: {
     color: 'rgba(255,255,255,0.65)',
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: 'Gilroy-Bold',
-    minWidth: 10,
+    minWidth: 8,
   },
   countActive: {
     color: '#fa2f40',
-  },
-  addButton: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.16)',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
