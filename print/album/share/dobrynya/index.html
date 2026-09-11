@@ -205,8 +205,10 @@
       position: fixed; inset: 0; z-index: 100;
       background: rgba(4, 12, 24, 0.96);
       display: none; flex-direction: column;
+      touch-action: none;
     }
     .zoom-overlay.open { display: flex; }
+    body.zoom-open main { touch-action: none; }
     .zoom-toolbar {
       flex: 0 0 auto;
       display: flex; align-items: center; justify-content: space-between;
@@ -322,7 +324,7 @@
 
   <script>
     (function () {
-      const REV = 'ea531cb';
+      const REV = '5875d5a';
       const RAW = 'https://raw.githubusercontent.com/andrewmercooloff/hockeystars-app-clean/cursor/hockey-card-album-generator-a9a3/print/album';
       const IMG = (file) => RAW + '/print-ready/dobrynya/pages/' + file + '?v=' + REV;
 
