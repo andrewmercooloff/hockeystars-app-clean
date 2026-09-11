@@ -25,22 +25,26 @@ function emojiForType(type: ReactionIconType): string {
 export default function ReactionIcon({ type, size = 18, active = false }: ReactionIconProps) {
   const glyph = emojiForType(type);
   const isPair = glyph.length > 2;
+  const fontSize = isPair ? Math.round(size * 0.78) : size;
+  const boxHeight = size + 6;
 
   return (
-    <Text
-      style={[
-        styles.glyph,
-        {
-          fontSize: isPair ? Math.round(size * 0.78) : size,
-          lineHeight: size,
-        },
-        isPair && styles.glyphPair,
-        active ? styles.glyphActive : styles.glyphIdle,
-      ]}
-      allowFontScaling={false}
-    >
-      {glyph}
-    </Text>
+    <View style={[styles.wrap, { height: boxHeight, minWidth: size + 2 }]}>
+      <Text
+        style={[
+          styles.glyph,
+          {
+            fontSize,
+            lineHeight: boxHeight,
+          },
+          isPair && styles.glyphPair,
+          active ? styles.glyphActive : styles.glyphIdle,
+        ]}
+        allowFontScaling={false}
+      >
+        {glyph}
+      </Text>
+    </View>
   );
 }
 
@@ -53,8 +57,14 @@ export function ReactionIconBadge({ type, size = 20 }: { type: ReactionIconType;
 }
 
 const styles = StyleSheet.create({
+  wrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'visible',
+  },
   glyph: {
     textAlign: 'center',
+    includeFontPadding: false,
   },
   glyphPair: {
     letterSpacing: -3,
@@ -70,9 +80,12 @@ const styles = StyleSheet.create({
     minWidth: 28,
     minHeight: 28,
     borderRadius: 14,
-    backgroundColor: 'rgba(250, 47, 64, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(250, 47, 64, 0.35)',
+    backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 4,
+    overflow: 'visible',
   },
 });

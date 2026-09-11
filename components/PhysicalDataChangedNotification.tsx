@@ -12,7 +12,7 @@ interface PhysicalDataChangedNotificationProps {
   playerAvatar?: string;
   changes: { field: 'height' | 'weight', oldValue: number, newValue: number }[];
   timestamp: string;
-  reactionsInline?: ReactNode;
+  reactionsFooter?: ReactNode;
 }
 
 const PhysicalDataChangedNotification = React.memo(function PhysicalDataChangedNotification({
@@ -21,7 +21,7 @@ const PhysicalDataChangedNotification = React.memo(function PhysicalDataChangedN
   playerAvatar,
   changes,
   timestamp,
-  reactionsInline,
+  reactionsFooter,
 }: PhysicalDataChangedNotificationProps) {
   const { t } = useLanguage();
 
@@ -88,22 +88,21 @@ const PhysicalDataChangedNotification = React.memo(function PhysicalDataChangedN
               <Text style={styles.actionText}>
                 {getFieldName(change.field)}: {change.newValue} {getUnit(change.field)}
               </Text>
-              <View style={styles.trailingGroup}>
-                {index === changes.length - 1 ? reactionsInline : null}
-                <View style={[
-                  styles.physicalBadge,
-                  { backgroundColor: getChangeValue(change) > 0 ? '#fa2f40' : '#FF9800' }
-                ]}>
-                  <Text style={styles.badgeText}>
-                    {getChangeValue(change) > 0 ? '+' : ''}{getChangeValue(change)}
-                  </Text>
-                </View>
+              <View style={[
+                styles.physicalBadge,
+                { backgroundColor: getChangeValue(change) > 0 ? '#fa2f40' : '#FF9800' }
+              ]}>
+                <Text style={styles.badgeText}>
+                  {getChangeValue(change) > 0 ? '+' : ''}{getChangeValue(change)}
+                </Text>
               </View>
             </View>
           ))}
         </View>
       </View>
       </View>
+
+      {reactionsFooter}
     </View>
     </BlurOrSolid>
   );
@@ -170,10 +169,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Gilroy-Regular',
     flex: 1,
-  },
-  trailingGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   physicalBadge: {
     flexDirection: 'row',

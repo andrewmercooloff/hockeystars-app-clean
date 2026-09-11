@@ -6,11 +6,9 @@ import {
   type ProfileReactionType,
   emptyProfileReactionSummary,
   optimisticToggleProfileReaction,
-  totalProfileReactionCount,
 } from '../utils/reactions';
 import { loadProfileReactions, toggleProfileReaction } from '../services/reactionService';
 import ReactionWhoModal from './ReactionWhoModal';
-import ProfileReactionsSheet from './ProfileReactionsSheet';
 import ReactionIcon from './ReactionIcon';
 
 type ProfileReactionsBarProps = {
@@ -19,8 +17,6 @@ type ProfileReactionsBarProps = {
   viewerName?: string;
   viewerAvatar?: string | null;
   disabled?: boolean;
-  /** Compact respect trigger for the message row (1/4 width). */
-  compactTrigger?: boolean;
 };
 
 export default function ProfileReactionsBar({
@@ -29,10 +25,8 @@ export default function ProfileReactionsBar({
   viewerName,
   viewerAvatar,
   disabled,
-  compactTrigger = false,
 }: ProfileReactionsBarProps) {
   const [summary, setSummary] = useState<ProfileReactionSummary>(emptyProfileReactionSummary());
-  const [sheetOpen, setSheetOpen] = useState(false);
   const [whoModalType, setWhoModalType] = useState<ProfileReactionType | null>(null);
   const summaryRef = useRef(summary);
   summaryRef.current = summary;
@@ -64,40 +58,8 @@ export default function ProfileReactionsBar({
 
   const onLongPress = (type: ProfileReactionType) => {
     if (!summary.sendersByType[type].length) return;
-    setSheetOpen(false);
     setWhoModalType(type);
   };
-
-  const total = totalProfileReactionCount(summary);
-
-  if (compactTrigger) {
-    return (
-      <>
-        <Pressable
-          style={[styles.respectButton, disabled && styles.respectButtonDisabled]}
-          onPress={() => setSheetOpen(true)}
-          disabled={disabled || !viewerId}
-        >
-          <ReactionIcon type="respect" size={18} active={summary.mine.has('respect')} />
-          <Text style={styles.respectCount}>{total}</Text>
-        </Pressable>
-        <ProfileReactionsSheet
-          visible={sheetOpen}
-          summary={summary}
-          disabled={disabled || !viewerId}
-          onClose={() => setSheetOpen(false)}
-          onToggle={onPress}
-          onLongPress={onLongPress}
-        />
-        <ReactionWhoModal
-          visible={!!whoModalType}
-          reactionType={whoModalType}
-          senders={whoModalType ? summary.sendersByType[whoModalType] : []}
-          onClose={() => setWhoModalType(null)}
-        />
-      </>
-    );
-  }
 
   return (
     <>
@@ -134,25 +96,6 @@ export default function ProfileReactionsBar({
 }
 
 const styles = StyleSheet.create({
-  respectButton: {
-    flex: 1,
-    minHeight: 44,
-    borderRadius: 8,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 2,
-    paddingVertical: 6,
-  },
-  respectButtonDisabled: {
-    opacity: 0.45,
-  },
-  respectCount: {
-    color: 'rgba(255,255,255,0.65)',
-    fontSize: 11,
-    fontFamily: 'Gilroy-Bold',
-    lineHeight: 12,
-  },
   bar: {
     flexDirection: 'row',
     marginTop: 2,
@@ -168,13 +111,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 4,
     paddingHorizontal: 6,
-    paddingVertical: 3,
+    paddingVertical: 4,
     borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    minHeight: 26,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.14)',
+    backgroundColor: 'transparent',
+    minHeight: 28,
+    overflow: 'visible',
   },
   chipActive: {
-    backgroundColor: 'rgba(250, 47, 64, 0.14)',
+    borderColor: 'rgba(250, 47, 64, 0.55)',
   },
   count: {
     color: 'rgba(255,255,255,0.6)',

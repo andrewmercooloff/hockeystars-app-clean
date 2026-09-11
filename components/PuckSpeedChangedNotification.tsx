@@ -12,7 +12,7 @@ interface PuckSpeedChangedNotificationProps {
   playerAvatar?: string;
   newMaxSpeed: number;
   timestamp: string;
-  reactionsInline?: ReactNode;
+  reactionsFooter?: ReactNode;
 }
 
 const PuckSpeedChangedNotification = React.memo(function PuckSpeedChangedNotification({
@@ -21,7 +21,7 @@ const PuckSpeedChangedNotification = React.memo(function PuckSpeedChangedNotific
   playerAvatar,
   newMaxSpeed,
   timestamp,
-  reactionsInline,
+  reactionsFooter,
 }: PuckSpeedChangedNotificationProps) {
   const { t } = useLanguage();
 
@@ -74,16 +74,15 @@ const PuckSpeedChangedNotification = React.memo(function PuckSpeedChangedNotific
           <Text style={styles.actionText}>
             {t('puckSpeedNotification.message', { playerName, speed: Math.round(newMaxSpeed).toString() })}
           </Text>
-          <View style={styles.trailingGroup}>
-            {reactionsInline}
-            <View style={styles.speedBadge}>
-              <Ionicons name="speedometer-outline" size={14} color="#fff" />
-              <Text style={styles.speedText}>{Math.round(newMaxSpeed)}</Text>
-            </View>
+          <View style={styles.speedBadge}>
+            <Ionicons name="speedometer-outline" size={14} color="#fff" />
+            <Text style={styles.speedText}>{Math.round(newMaxSpeed)}</Text>
           </View>
         </View>
       </View>
       </View>
+
+      {reactionsFooter}
     </View>
     </BlurOrSolid>
   );
@@ -148,10 +147,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Gilroy-Regular',
     flex: 1,
-  },
-  trailingGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   speedBadge: {
     flexDirection: 'row',

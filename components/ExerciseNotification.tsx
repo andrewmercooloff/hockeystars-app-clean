@@ -12,7 +12,7 @@ interface ExerciseNotificationProps {
   playerAvatar?: string;
   exerciseId: string;
   timestamp: string;
-  reactionsInline?: ReactNode;
+  reactionsFooter?: ReactNode;
 }
 
 export default function ExerciseNotification({
@@ -21,7 +21,7 @@ export default function ExerciseNotification({
   playerAvatar,
   exerciseId,
   timestamp,
-  reactionsInline,
+  reactionsFooter,
 }: ExerciseNotificationProps) {
   const { t } = useLanguage();
 
@@ -85,15 +85,14 @@ export default function ExerciseNotification({
                <Text style={styles.actionText}>
                  {t('exerciseNotification.completed')} "{getLocalizedExerciseName(exerciseId)}"
                </Text>
-          <View style={styles.trailingGroup}>
-            {reactionsInline}
-            <View style={styles.exerciseBadge}>
-              <Ionicons name="barbell-outline" size={16} color="#000" />
-            </View>
+          <View style={styles.exerciseBadge}>
+            <Ionicons name="barbell-outline" size={16} color="#000" />
           </View>
         </View>
       </View>
       </View>
+
+      {reactionsFooter}
     </View>
     </BlurOrSolid>
   );
@@ -155,10 +154,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Gilroy-Regular',
     flex: 1,
-  },
-  trailingGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   exerciseBadge: {
     flexDirection: 'row',

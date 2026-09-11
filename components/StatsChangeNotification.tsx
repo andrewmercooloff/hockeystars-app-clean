@@ -20,7 +20,7 @@ interface StatsChangeNotificationProps {
   playerId?: string;
   playerAvatar?: string;
   timestamp: number;
-  reactionsInline?: ReactNode;
+  reactionsFooter?: ReactNode;
 }
 
 const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
@@ -29,7 +29,7 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
   playerId,
   timestamp,
   playerAvatar,
-  reactionsInline,
+  reactionsFooter,
 }) => {
   const { t } = useLanguage();
 
@@ -123,7 +123,6 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
               <Text style={styles.newValue}>
                   {formatValue(change.newValue, change.field)}
               </Text>
-              {index === changes.length - 1 ? reactionsInline : null}
               <View style={[
                   styles.changeBadge,
                   { backgroundColor: change.change > 0 ? '#FF4444' : '#FF9800' }
@@ -138,6 +137,8 @@ const StatsChangeNotification = React.memo<StatsChangeNotificationProps>(({
           </View>
       </View>
       </View>
+
+      {reactionsFooter}
     </View>
     </BlurOrSolid>
   );

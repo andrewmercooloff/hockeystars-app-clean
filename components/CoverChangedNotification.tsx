@@ -14,7 +14,7 @@ interface Props {
   playerAvatar?: string;
   coverUrl?: string;
   timestamp: string;
-  reactionsInline?: ReactNode;
+  reactionsFooter?: ReactNode;
 }
 
 /** Feed card: "<name> updated the profile cover" with a wide preview of the new cover. */
@@ -24,7 +24,7 @@ const CoverChangedNotification = React.memo(function CoverChangedNotification({
   playerAvatar,
   coverUrl,
   timestamp,
-  reactionsInline,
+  reactionsFooter,
 }: Props) {
   const { t } = useLanguage();
   const preview = React.useMemo(() => {
@@ -56,11 +56,8 @@ const CoverChangedNotification = React.memo(function CoverChangedNotification({
             </View>
             <View style={styles.actionRow}>
               <Text style={styles.actionText}>{t('coverNotification.changed')}</Text>
-              <View style={styles.trailingGroup}>
-                {reactionsInline}
-                <View style={styles.badge}>
-                  <Ionicons name="image-outline" size={14} color="#fff" />
-                </View>
+              <View style={styles.badge}>
+                <Ionicons name="image-outline" size={14} color="#fff" />
               </View>
             </View>
           </View>
@@ -76,6 +73,7 @@ const CoverChangedNotification = React.memo(function CoverChangedNotification({
             recyclingKey={`cover-notif-${playerId}-${preview.split('?')[0]}`}
           />
         ) : null}
+        {reactionsFooter}
       </View>
     </BlurOrSolid>
   );
@@ -90,8 +88,7 @@ const styles = StyleSheet.create({
   playerName: { flex: 1, color: '#fff', fontSize: 15, fontFamily: 'Gilroy-Bold', marginRight: 8 },
   time: { color: 'rgba(255,255,255,0.45)', fontSize: 12, fontFamily: 'Gilroy-Regular' },
   actionRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  actionText: { color: 'rgba(255,255,255,0.75)', fontSize: 13, fontFamily: 'Gilroy-Regular', flex: 1 },
-  trailingGroup: { flexDirection: 'row', alignItems: 'center' },
+  actionText: { color: 'rgba(255,255,255,0.75)', fontSize: 13, fontFamily: 'Gilroy-Regular' },
   badge: {
     width: 22,
     height: 22,

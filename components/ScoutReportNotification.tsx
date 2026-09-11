@@ -12,7 +12,7 @@ interface ScoutReportNotificationProps {
   playerAvatar?: string;
   message: string;
   timestamp: number;
-  reactionsInline?: ReactNode;
+  reactionsFooter?: ReactNode;
 }
 
 const ScoutReportNotification = React.memo<ScoutReportNotificationProps>(({
@@ -21,7 +21,7 @@ const ScoutReportNotification = React.memo<ScoutReportNotificationProps>(({
   playerAvatar,
   message,
   timestamp,
-  reactionsInline,
+  reactionsFooter,
 }) => {
   const { t } = useLanguage();
 
@@ -50,15 +50,13 @@ const ScoutReportNotification = React.memo<ScoutReportNotificationProps>(({
         <View style={styles.contentContainer}>
           <View style={styles.header}>
             <Text style={styles.playerName}>{playerName}</Text>
-            <View style={styles.headerTrailing}>
-              {reactionsInline}
-              <Text style={styles.timeText}>{formatTime(timestamp)}</Text>
-            </View>
+            <Text style={styles.timeText}>{formatTime(timestamp)}</Text>
           </View>
           <Text style={styles.message}>{message}</Text>
         </View>
       </View>
 
+      {reactionsFooter}
     </View>
     </BlurOrSolid>
   );
@@ -87,7 +85,6 @@ const styles = StyleSheet.create({
   contentContainer: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: 2 },
   playerName: { fontSize: 16, fontFamily: 'Gilroy-Bold', color: '#fff', flex: 1 },
-  headerTrailing: { flexDirection: 'row', alignItems: 'center' },
   timeText: { fontSize: 12, fontFamily: 'Gilroy-Regular', color: '#a1a1aa', marginLeft: 8 },
   message: { fontSize: 14, fontFamily: 'Gilroy-Regular', color: '#d4d4d8' },
   playerAvatar: { width: 50, height: 50, borderRadius: 25 },

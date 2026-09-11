@@ -30,7 +30,7 @@ interface VideoAddedNotificationProps {
   videoUrls?: string[];
   onHeaderPress?: () => void;
   onScrubActiveChange?: (active: boolean) => void;
-  reactionsInline?: ReactNode;
+  reactionsFooter?: ReactNode;
 }
 
 // Медиа на всю ширину карточки (карточка: marginHorizontal 16)
@@ -137,7 +137,7 @@ const VideoAddedNotification = React.memo(function VideoAddedNotification({
   videoUrls = [],
   onHeaderPress,
   onScrubActiveChange,
-  reactionsInline,
+  reactionsFooter,
 }: VideoAddedNotificationProps) {
   const { t } = useLanguage();
   const insets = useSafeAreaInsets();
@@ -201,7 +201,6 @@ const VideoAddedNotification = React.memo(function VideoAddedNotification({
           <Text style={styles.timeText}> · {formatTime(timestamp)}</Text>
         </Text>
       </View>
-      {reactionsInline}
     </View>
   );
 
@@ -286,6 +285,7 @@ const VideoAddedNotification = React.memo(function VideoAddedNotification({
           </View>
         )}
 
+        {reactionsFooter}
       </View>
 
       <Modal

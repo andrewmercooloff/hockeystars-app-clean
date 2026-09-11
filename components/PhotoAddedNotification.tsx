@@ -34,7 +34,7 @@ interface PhotoAddedNotificationProps {
   playerAvatar?: string;
   photoUrls?: string[];
   onHeaderPress?: () => void;
-  reactionsInline?: ReactNode;
+  reactionsFooter?: ReactNode;
 }
 
 // Медиа на всю ширину карточки (карточка: marginHorizontal 16)
@@ -182,7 +182,7 @@ const PhotoAddedNotification = React.memo(function PhotoAddedNotification({
   playerAvatar,
   photoUrls = [],
   onHeaderPress,
-  reactionsInline,
+  reactionsFooter,
 }: PhotoAddedNotificationProps) {
   const { t } = useLanguage();
   const [activeIndex, setActiveIndex] = useState(0);
@@ -281,7 +281,6 @@ const PhotoAddedNotification = React.memo(function PhotoAddedNotification({
           <Text style={styles.timeText}> · {formatTime(timestamp)}</Text>
         </Text>
       </View>
-      {reactionsInline}
     </View>
   );
 
@@ -354,6 +353,7 @@ const PhotoAddedNotification = React.memo(function PhotoAddedNotification({
           </View>
         )}
 
+        {reactionsFooter}
     </View>
     </BlurOrSolid>
   );
