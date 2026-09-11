@@ -534,9 +534,11 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
                   <Text style={styles.notificationTitle} numberOfLines={2}>
                     {notification.title}
                   </Text>
-                  <Text style={styles.notificationTime}>
-                    {formatTime(notification.timestamp)}
-                  </Text>
+                  {!feedReactionsFooter ? (
+                    <Text style={styles.notificationTime}>
+                      {formatTime(notification.timestamp)}
+                    </Text>
+                  ) : null}
                 </View>
                 
                 <Text style={styles.notificationMessage}>
