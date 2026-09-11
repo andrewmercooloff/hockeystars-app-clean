@@ -68,21 +68,20 @@ export default function ProfileReactionsBar({
           const active = summary.mine.has(type);
           const count = summary.counts[type];
           return (
-            <View key={type} style={styles.cell}>
-              <Pressable
-                style={[styles.button, active && styles.buttonActive]}
-                onPress={() => onPress(type)}
-                onLongPress={() => onLongPress(type)}
-                delayLongPress={320}
-                disabled={disabled || !viewerId}
-                hitSlop={8}
-              >
-                <ReactionIcon type={type} size={20} active={active} />
-              </Pressable>
+            <Pressable
+              key={type}
+              style={[styles.chip, active && styles.chipActive]}
+              onPress={() => onPress(type)}
+              onLongPress={() => onLongPress(type)}
+              delayLongPress={320}
+              disabled={disabled || !viewerId}
+              hitSlop={6}
+            >
+              <ReactionIcon type={type} size={18} active={active} />
               {count > 0 ? (
                 <Text style={[styles.count, active && styles.countActive]}>{count}</Text>
               ) : null}
-            </View>
+            </Pressable>
           );
         })}
       </View>
@@ -99,34 +98,31 @@ export default function ProfileReactionsBar({
 const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     marginTop: 2,
     marginBottom: 2,
-    paddingHorizontal: 6,
-    gap: 2,
+    gap: 6,
+    alignSelf: 'stretch',
+    width: '100%',
   },
-  cell: {
+  chip: {
     flex: 1,
-    alignItems: 'center',
-  },
-  button: {
-    minWidth: 32,
-    height: 22,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 2,
+    gap: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    minHeight: 26,
   },
-  buttonActive: {
-    transform: [{ scale: 1.05 }],
+  chipActive: {
+    backgroundColor: 'rgba(250, 47, 64, 0.14)',
   },
   count: {
-    marginTop: 0,
-    minHeight: 10,
-    color: 'rgba(255,255,255,0.45)',
-    fontSize: 9,
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 10,
     fontFamily: 'Gilroy-Bold',
-    textAlign: 'center',
-    lineHeight: 10,
   },
   countActive: {
     color: '#fa2f40',
