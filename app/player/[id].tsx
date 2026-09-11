@@ -5754,7 +5754,7 @@ export default function PlayerProfile() {
 
                 {/* Кнопка написать сообщение */}
                 <TouchableOpacity 
-                  style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#fff', marginBottom: 10 }]} 
+                  style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#fff', marginBottom: 4 }]} 
                   onPress={() => {
                     router.push({ 
                       pathname: '/chat/[id]', 

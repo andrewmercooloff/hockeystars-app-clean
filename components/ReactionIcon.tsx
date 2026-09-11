@@ -32,7 +32,7 @@ export default function ReactionIcon({ type, size = 18, active = false }: Reacti
         styles.glyph,
         {
           fontSize: isPair ? Math.round(size * 0.78) : size,
-          lineHeight: size + 4,
+          lineHeight: size,
         },
         isPair && styles.glyphPair,
         active ? styles.glyphActive : styles.glyphIdle,

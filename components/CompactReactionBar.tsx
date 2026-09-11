@@ -104,10 +104,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 4,
     paddingHorizontal: 6,
-    paddingVertical: 6,
-    borderRadius: 14,
+    paddingVertical: 3,
+    borderRadius: 12,
     backgroundColor: 'rgba(255,255,255,0.06)',
-    minHeight: 32,
+    minHeight: 26,
   },
   chipActive: {
     backgroundColor: 'rgba(250, 47, 64, 0.14)',

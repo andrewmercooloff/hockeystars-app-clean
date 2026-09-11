@@ -81,9 +81,7 @@ export default function ProfileReactionsBar({
               </Pressable>
               {count > 0 ? (
                 <Text style={[styles.count, active && styles.countActive]}>{count}</Text>
-              ) : (
-                <Text style={styles.countPlaceholder}> </Text>
-              )}
+              ) : null}
             </View>
           );
         })}
@@ -102,7 +100,8 @@ const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginTop: 2,
+    marginBottom: 2,
     paddingHorizontal: 6,
     gap: 2,
   },
@@ -111,8 +110,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
-    minWidth: 36,
-    height: 28,
+    minWidth: 32,
+    height: 22,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 2,
@@ -121,19 +120,15 @@ const styles = StyleSheet.create({
     transform: [{ scale: 1.05 }],
   },
   count: {
-    marginTop: 2,
-    minHeight: 12,
+    marginTop: 0,
+    minHeight: 10,
     color: 'rgba(255,255,255,0.45)',
-    fontSize: 10,
+    fontSize: 9,
     fontFamily: 'Gilroy-Bold',
     textAlign: 'center',
+    lineHeight: 10,
   },
   countActive: {
     color: '#fa2f40',
-  },
-  countPlaceholder: {
-    marginTop: 2,
-    minHeight: 12,
-    fontSize: 10,
   },
 });
