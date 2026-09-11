@@ -3521,7 +3521,8 @@
     "skateServices": "Tjänster",
     "weightWithUnit": "Vikt (kg)",
     "videoUploaded": "Video tillagt i profilen",
-    "videoUploadSaveReminder": "Video uppladdat. Tryck på «Spara» för att behålla det i profilen."
+    "videoUploadSaveReminder": "Video uppladdat. Tryck på «Spara» för att behålla det i profilen.",
+    "removeFromFriendsConfirm": "Ta bort {name} från vänner?"
   },
   "register": {
     "title": "Registrering",
@@ -3925,6 +3926,14 @@
     },
     "photo_liked": {
       "grouped": "{name} gillade {count} av dina foton"
+    },
+    "profile_reaction": {
+      "title": "Ny reaktion",
+      "messageGrouped": "{name} skickade {reactions}"
+    },
+    "activity_reaction": {
+      "title": "Reaktion på din uppdatering",
+      "message": "{name} reagerade {emoji} på din uppdatering"
     }
   },
   "editProfile": {
@@ -4423,5 +4432,15 @@
     "physicalData": "fysiska data",
     "updated": "uppdaterade"
   },
-  "weight": "vikt"
+  "weight": "vikt",
+  "reactions": {
+    "respect": "respekt",
+    "like": "gilla",
+    "strength": "styrka",
+    "highFive": "high five",
+    "fire": "eld",
+    "lightning": "blixt",
+    "sendBack": "Svara tillbaka",
+    "whoReacted": "Vem reagerade"
+  }
 }

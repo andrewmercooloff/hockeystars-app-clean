@@ -3521,7 +3521,8 @@
     "skateServices": "Servizi",
     "weightWithUnit": "Peso (kg)",
     "videoUploaded": "Video aggiunto al profilo",
-    "videoUploadSaveReminder": "Video caricato. Tocca «Salva» per mantenerlo nel profilo."
+    "videoUploadSaveReminder": "Video caricato. Tocca «Salva» per mantenerlo nel profilo.",
+    "removeFromFriendsConfirm": "Rimuovere {name} dagli amici?"
   },
   "register": {
     "title": "Registrazione",
@@ -3925,6 +3926,14 @@
     },
     "photo_liked": {
       "grouped": "A {name} sono piaciute {count} tue foto"
+    },
+    "profile_reaction": {
+      "title": "Nuova reazione",
+      "messageGrouped": "{name} ha inviato {reactions}"
+    },
+    "activity_reaction": {
+      "title": "Reazione al tuo aggiornamento",
+      "message": "{name} ha reagito {emoji} al tuo aggiornamento"
     }
   },
   "editProfile": {
@@ -4423,5 +4432,15 @@
     "physicalData": "dati fisici",
     "updated": "ha aggiornato"
   },
-  "weight": "peso"
+  "weight": "peso",
+  "reactions": {
+    "respect": "rispetto",
+    "like": "mi piace",
+    "strength": "forza",
+    "highFive": "dammi il cinque",
+    "fire": "fuoco",
+    "lightning": "fulmine",
+    "sendBack": "Rispondi",
+    "whoReacted": "Chi ha reagito"
+  }
 }

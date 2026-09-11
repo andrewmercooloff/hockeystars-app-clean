@@ -3514,7 +3514,8 @@
     "skateServices": "Palvelut",
     "weightWithUnit": "Paino (kg)",
     "videoUploaded": "Video lisätty profiiliin",
-    "videoUploadSaveReminder": "Video ladattu. Napauta «Tallenna», jotta se jää profiiliin."
+    "videoUploadSaveReminder": "Video ladattu. Napauta «Tallenna», jotta se jää profiiliin.",
+    "removeFromFriendsConfirm": "Poistetaanko {name} ystävistä?"
   },
   "register": {
     "title": "Rekisteröinti",
@@ -3918,6 +3919,14 @@
     },
     "photo_liked": {
       "grouped": "{name} tykkäsi {count} kuvastasi"
+    },
+    "profile_reaction": {
+      "title": "Uusi reaktio",
+      "messageGrouped": "{name} lähetti {reactions}"
+    },
+    "activity_reaction": {
+      "title": "Reaktio päivitykseesi",
+      "message": "{name} reagoi {emoji} päivitykseesi"
     }
   },
   "editProfile": {
@@ -4416,5 +4425,15 @@
     "physicalData": "fyysiset tiedot",
     "updated": "päivitti"
   },
-  "weight": "paino"
+  "weight": "paino",
+  "reactions": {
+    "respect": "kunnioitus",
+    "like": "tykkäys",
+    "strength": "voima",
+    "highFive": "anna ylävitonen",
+    "fire": "tuli",
+    "lightning": "salama",
+    "sendBack": "Vastaa takaisin",
+    "whoReacted": "Kuka reagoi"
+  }
 }

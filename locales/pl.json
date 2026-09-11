@@ -3309,7 +3309,8 @@
     "skateServices": "Usługi",
     "weightWithUnit": "Waga (kg)",
     "videoUploaded": "Wideo dodano do profilu",
-    "videoUploadSaveReminder": "Wideo wgrane. Naciśnij «Zapisz», aby zachować je w profilu."
+    "videoUploadSaveReminder": "Wideo wgrane. Naciśnij «Zapisz», aby zachować je w profilu.",
+    "removeFromFriendsConfirm": "Usunąć {name} z przyjaciół?"
   },
   "register": {
     "title": "Rejestracja",
@@ -3720,6 +3721,14 @@
         "many": "Dzisiaj Twój profil obejrzano {{count}} razy.",
         "other": "Dzisiaj Twój profil obejrzano {{count}} razy."
       }
+    },
+    "profile_reaction": {
+      "title": "Nowa reakcja",
+      "messageGrouped": "{name} wysłał {reactions}"
+    },
+    "activity_reaction": {
+      "title": "Reakcja na Twoją aktualizację",
+      "message": "{name} zareagował {emoji} na Twoją aktualizację"
     }
   },
   "editProfile": {
@@ -4230,5 +4239,15 @@
     "leaderboard": "Najlepsi zapraszający",
     "noInvites": "Nikt jeszcze nie zaprosił znajomych",
     "points": "punktów"
+  },
+  "reactions": {
+    "respect": "szacunek",
+    "like": "lajk",
+    "strength": "siła",
+    "highFive": "daj piątkę",
+    "fire": "ogień",
+    "lightning": "błyskawica",
+    "sendBack": "Odpowiedz",
+    "whoReacted": "Kto zareagował"
   }
 }

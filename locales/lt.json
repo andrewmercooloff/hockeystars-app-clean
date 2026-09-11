@@ -3530,7 +3530,8 @@
     "skateServices": "Paslaugos",
     "weightWithUnit": "Svoris (kg)",
     "videoUploaded": "Vaizdo įrašas pridėtas prie profilio",
-    "videoUploadSaveReminder": "Vaizdo įrašas įkeltas. Paspauskite «Išsaugoti», kad jis liktų profilyje."
+    "videoUploadSaveReminder": "Vaizdo įrašas įkeltas. Paspauskite «Išsaugoti», kad jis liktų profilyje.",
+    "removeFromFriendsConfirm": "Pašalinti {name} iš draugų?"
   },
   "register": {
     "title": "Registracija",
@@ -3942,6 +3943,14 @@
     },
     "photo_liked": {
       "grouped": "{name} pamėgo {count} jūsų nuotraukas"
+    },
+    "profile_reaction": {
+      "title": "Nauja reakcija",
+      "messageGrouped": "{name} atsiuntė {reactions}"
+    },
+    "activity_reaction": {
+      "title": "Reakcija į jūsų atnaujinimą",
+      "message": "{name} sureagavo {emoji} į jūsų atnaujinimą"
     }
   },
   "editProfile": {
@@ -4285,5 +4294,15 @@
     "vkPlaceholder": "@vardas arba nuoroda",
     "website": "Svetainė arba nuoroda",
     "websitePlaceholder": "example.com"
+  },
+  "reactions": {
+    "respect": "pagarba",
+    "like": "patinka",
+    "strength": "stiprumas",
+    "highFive": "duok penkis",
+    "fire": "ugnis",
+    "lightning": "žaibas",
+    "sendBack": "Atsakyti",
+    "whoReacted": "Kas reagavo"
   }
 }

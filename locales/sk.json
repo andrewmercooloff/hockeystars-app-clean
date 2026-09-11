@@ -3514,7 +3514,8 @@
     "skateServices": "Služby",
     "weightWithUnit": "Váha (kg)",
     "videoUploaded": "Video bolo pridané do profilu",
-    "videoUploadSaveReminder": "Video nahrané. Klepnite na «Uložiť», aby zostalo v profile."
+    "videoUploadSaveReminder": "Video nahrané. Klepnite na «Uložiť», aby zostalo v profile.",
+    "removeFromFriendsConfirm": "Odstrániť {name} z priateľov?"
   },
   "register": {
     "title": "Registrácia",
@@ -3920,6 +3921,14 @@
     },
     "photo_liked": {
       "grouped": "{name} olajkoval {count} vašich fotiek"
+    },
+    "profile_reaction": {
+      "title": "Nová reakcia",
+      "messageGrouped": "{name} poslal {reactions}"
+    },
+    "activity_reaction": {
+      "title": "Reakcia na vašu aktualizáciu",
+      "message": "{name} reagoval {emoji} na vašu aktualizáciu"
     }
   },
   "editProfile": {
@@ -4418,5 +4427,15 @@
     "physicalData": "fyzické údaje",
     "updated": "aktualizoval"
   },
-  "weight": "váha"
+  "weight": "váha",
+  "reactions": {
+    "respect": "respekt",
+    "like": "lajk",
+    "strength": "sila",
+    "highFive": "daj päť",
+    "fire": "oheň",
+    "lightning": "blesk",
+    "sendBack": "Odpovedať",
+    "whoReacted": "Kto reagoval"
+  }
 }

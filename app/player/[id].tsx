@@ -78,6 +78,7 @@ import PlayerMuseum from '../../components/PlayerMuseum';
 import StarGiftModal from '../../components/StarGiftModal';
 import AdminGiftModal from '../../components/AdminGiftModal';
 import CachedAvatar from '../../components/CachedAvatar';
+import ProfileReactionsBar from '../../components/ProfileReactionsBar';
 import LoadingCenter from '../../components/LoadingCenter';
 import { birthDateToLocalDate } from '../../utils/birthDate';
 import { ICE_BACKGROUND } from '../../utils/iceBackground';
@@ -3111,8 +3112,7 @@ export default function PlayerProfile() {
 
   const handleReportUser = React.useCallback(() => {
     // Нельзя пожаловаться на админа или быть админом и жаловаться на кого-то
-    if (!currentUser || !player || currentUser.id === player.id || 
-        player.status === 'admin' || currentUser.status === 'admin') {
+    if (!currentUser || !player || currentUser.id === player.id || player.status === 'admin') {
       return;
     }
 
@@ -3171,9 +3171,8 @@ export default function PlayerProfile() {
 
   // Обработчик блокировки пользователя
   const handleBlockUser = React.useCallback(async () => {
-    // Нельзя блокировать админа или быть админом и блокировать кого-то
     if (!currentUser || !player || currentUser.id === player.id || isBlockingUser || 
-        player.status === 'admin' || currentUser.status === 'admin') {
+        player.status === 'admin') {
       return;
     }
 
@@ -3215,9 +3214,8 @@ export default function PlayerProfile() {
 
   // Обработчик разблокировки пользователя
   const handleUnblockUser = React.useCallback(async () => {
-    // Нельзя разблокировать админа или быть админом и разблокировать кого-то
     if (!currentUser || !player || currentUser.id === player.id || isBlockingUser || 
-        player.status === 'admin' || currentUser.status === 'admin') {
+        player.status === 'admin') {
       return;
     }
 
@@ -3357,6 +3355,44 @@ export default function PlayerProfile() {
     }
   };
 
+  const handleRemoveFriend = React.useCallback(async () => {
+    if (!currentUser || !player || friendLoading) return;
+    handleCloseProfileMenu();
+    Alert.alert(
+      t('profile.removeFromFriends'),
+      t('profile.removeFromFriendsConfirm', { name: player.name }) ||
+        `Remove ${player.name} from friends?`,
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('profile.removeFromFriends'),
+          style: 'destructive',
+          onPress: () => {
+            const cacheKey = `${Math.min(currentUser.id, player.id)}_${Math.max(currentUser.id, player.id)}`;
+            const previousStatus = friendshipStatus;
+            setFriendLoading(true);
+            setFriendshipStatus('none');
+            setFriendshipStatusCache((prev) => ({ ...prev, [cacheKey]: 'none' }));
+            void removeFriend(currentUser.id, player.id)
+              .then((success) => {
+                if (!success) {
+                  setFriendshipStatus(previousStatus);
+                  setFriendshipStatusCache((prev) => ({ ...prev, [cacheKey]: previousStatus }));
+                  showCustomAlert(t('common.error'), t('profile.removeFriendError'), 'error');
+                }
+              })
+              .catch(() => {
+                setFriendshipStatus(previousStatus);
+                setFriendshipStatusCache((prev) => ({ ...prev, [cacheKey]: previousStatus }));
+                showCustomAlert(t('common.error'), t('profile.removeFriendError'), 'error');
+              })
+              .finally(() => setFriendLoading(false));
+          },
+        },
+      ]
+    );
+  }, [currentUser, player, friendLoading, friendshipStatus, t, handleCloseProfileMenu]);
+
   const handleAddFriend = async () => {
     console.log('🔘 handleAddFriend вызван:', {
       friendLoading,
@@ -3391,25 +3427,7 @@ export default function PlayerProfile() {
       releaseFriendLoading();
     };
           
-    if (friendshipStatus === 'friends') {
-      // Удаляем из друзей - сразу показываем "добавить"
-          setFriendshipStatus('none');
-      setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: 'none' }));
-      
-      removeFriend(currentUser.id, player.id).then(success => {
-        if (!success) {
-          // Откатываем при ошибке
-          setFriendshipStatus(previousStatus);
-          setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: previousStatus }));
-          showCustomAlert(t('common.error'), t('profile.removeFriendError'), 'error');
-        }
-      }).catch(error => {
-        setFriendshipStatus(previousStatus);
-        setFriendshipStatusCache(prev => ({ ...prev, [cacheKey]: previousStatus }));
-        showCustomAlert(t('common.error'), t('profile.removeFriendError'), 'error');
-      }).finally(doneFriendAction);
-      
-      } else if (friendshipStatus === 'none') {
+    if (friendshipStatus === 'none') {
       // КРИТИЧЕСКАЯ ПРОВЕРКА перед отправкой запроса
       if (!currentUser?.id || !player?.id) {
         console.error('❌ [FRIEND_REQUEST] КРИТИЧЕСКАЯ ОШИБКА: currentUser.id или player.id пустые!', {
@@ -5212,9 +5230,7 @@ export default function PlayerProfile() {
               {/* Для чужих профилей: показывается всегда (кроме админов) */}
               {/* Для своего профиля: показывается только в режиме редактирования */}
               {currentUser && player && 
-               ((currentUser.id !== player.id && 
-                 player.status !== 'admin' && 
-                 currentUser.status !== 'admin') ||
+               ((currentUser.id !== player.id && player.status !== 'admin') ||
                 (currentUser.id === player.id && currentUser.status !== 'admin' && isEditing)) && (
                 <TouchableOpacity
                   ref={profileMenuButtonRef}
@@ -5458,22 +5474,17 @@ export default function PlayerProfile() {
                           <Text style={styles.actionButtonText}>{friendLoading ? t('common.loading') : t('notifications.decline')}</Text>
                         </TouchableOpacity>
                       </>
-                    ) : friendshipStatus === 'friends' ? (
-                      <TouchableOpacity style={[styles.actionButton, styles.actionButtonDesktop, { backgroundColor: '#fa2f40' }]} onPress={handleAddFriend} disabled={friendLoading}>
-                        <Ionicons name="person-remove-outline" size={18} color="#fff" />
-                        <Text style={styles.actionButtonText}>{friendLoading ? t('common.loading') : t('profile.removeFromFriends')}</Text>
-                      </TouchableOpacity>
                     ) : (friendshipStatus === 'sent_request' || friendshipStatus === 'pending') ? (
                       <TouchableOpacity style={[styles.actionButton, styles.actionButtonDesktop, { backgroundColor: '#FF9800' }]} onPress={handleAddFriend} disabled={friendLoading}>
                         <Ionicons name="close-outline" size={18} color="#fff" />
                         <Text style={styles.actionButtonText}>{friendLoading ? t('common.loading') : t('profile.cancelRequest')}</Text>
                       </TouchableOpacity>
-                    ) : (
+                    ) : friendshipStatus !== 'friends' ? (
                       <TouchableOpacity style={[styles.actionButton, styles.actionButtonDesktop, { backgroundColor: '#fa2f40' }]} onPress={handleAddFriend} disabled={friendLoading}>
                         <Ionicons name="person-add-outline" size={18} color="#fff" />
                         <Text style={styles.actionButtonText}>{friendLoading ? t('common.loading') : t('profile.addFriend')}</Text>
                       </TouchableOpacity>
-                    )
+                    ) : null
                   ) : friendshipStatus === 'received_request' ? (
                     <>
                       <TouchableOpacity style={[styles.actionButton, styles.actionButtonDesktop, { backgroundColor: '#4CAF50' }]} onPress={handleAddFriend} disabled={friendLoading}>
@@ -5485,22 +5496,17 @@ export default function PlayerProfile() {
                         <Text style={styles.actionButtonText}>{friendLoading ? t('common.loading') : t('notifications.decline')}</Text>
                       </TouchableOpacity>
                     </>
-                  ) : friendshipStatus === 'friends' ? (
-                    <TouchableOpacity style={[styles.actionButton, styles.actionButtonDesktop, { backgroundColor: '#fa2f40' }]} onPress={handleAddFriend} disabled={friendLoading}>
-                      <Ionicons name="person-remove-outline" size={18} color="#fff" />
-                      <Text style={styles.actionButtonText}>{friendLoading ? t('common.loading') : t('profile.removeFromFriends')}</Text>
-                    </TouchableOpacity>
                   ) : (friendshipStatus === 'sent_request' || friendshipStatus === 'pending') ? (
                     <TouchableOpacity style={[styles.actionButton, styles.actionButtonDesktop, { backgroundColor: '#FF9800' }]} onPress={handleAddFriend} disabled={friendLoading}>
                       <Ionicons name="close-outline" size={18} color="#fff" />
                       <Text style={styles.actionButtonText}>{friendLoading ? t('common.loading') : t('profile.cancelRequest')}</Text>
                     </TouchableOpacity>
-                  ) : (
+                  ) : friendshipStatus !== 'friends' ? (
                     <TouchableOpacity style={[styles.actionButton, styles.actionButtonDesktop, { backgroundColor: '#fa2f40' }]} onPress={handleAddFriend} disabled={friendLoading}>
                       <Ionicons name="person-add-outline" size={18} color="#fff" />
                       <Text style={styles.actionButtonText}>{friendLoading ? t('common.loading') : t('profile.addFriend')}</Text>
                     </TouchableOpacity>
-                  )}
+                  ) : null}
                   <TouchableOpacity
                     style={[styles.actionButton, styles.actionButtonDesktop, { backgroundColor: '#fff' }]}
                     onPress={() => router.push({ pathname: '/chat/[id]', params: { id: player.id } })}
@@ -5508,6 +5514,11 @@ export default function PlayerProfile() {
                     <Ionicons name="chatbubble-outline" size={18} color="rgb(1,0,0)" />
                     <Text style={[styles.actionButtonText, { color: 'rgb(1,0,0)' }]}>{t('profile.sendMessage')}</Text>
                   </TouchableOpacity>
+                  <ProfileReactionsBar
+                    targetPlayerId={player.id}
+                    viewerId={currentUser.id}
+                    disabled={isUserBlockedState}
+                  />
                 </View>
               )}
               </View>
@@ -5660,17 +5671,6 @@ export default function PlayerProfile() {
                           </Text>
                         </TouchableOpacity>
                       </View>
-                    ) : friendshipStatus === 'friends' ? (
-                      <TouchableOpacity 
-                        style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#fa2f40', marginBottom: 10 }]} 
-                        onPress={handleAddFriend}
-                        disabled={friendLoading}
-                      >
-                        <Ionicons name="person-remove-outline" size={20} color="#fff" />
-                        <Text style={styles.actionButtonText}>
-                          {friendLoading ? t('common.loading') : t('profile.removeFromFriends')}
-                        </Text>
-                      </TouchableOpacity>
                     ) : (friendshipStatus === 'sent_request' || friendshipStatus === 'pending') ? (
                       <TouchableOpacity 
                         style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#FF9800', marginBottom: 10 }]} 
@@ -5682,7 +5682,7 @@ export default function PlayerProfile() {
                           {friendLoading ? t('common.loading') : t('profile.cancelRequest')}
                         </Text>
                       </TouchableOpacity>
-                    ) : (
+                    ) : friendshipStatus !== 'friends' ? (
                       <TouchableOpacity 
                         style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#fa2f40', marginBottom: 10 }]} 
                         onPress={handleAddFriend}
@@ -5693,7 +5693,7 @@ export default function PlayerProfile() {
                           {friendLoading ? t('common.loading') : t('profile.addFriend')}
                         </Text>
                       </TouchableOpacity>
-                    )}
+                    ) : null}
                   </>
                 )}
 
@@ -5724,17 +5724,6 @@ export default function PlayerProfile() {
                           </Text>
                         </TouchableOpacity>
                       </View>
-                    ) : friendshipStatus === 'friends' ? (
-                      <TouchableOpacity 
-                        style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#fa2f40', marginBottom: 10 }]} 
-                        onPress={handleAddFriend}
-                        disabled={friendLoading}
-                      >
-                        <Ionicons name="person-remove-outline" size={20} color="#fff" />
-                        <Text style={styles.actionButtonText}>
-                          {friendLoading ? t('common.loading') : t('profile.removeFromFriends')}
-                        </Text>
-                      </TouchableOpacity>
                     ) : (friendshipStatus === 'sent_request' || friendshipStatus === 'pending') ? (
                       <TouchableOpacity 
                         style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#FF9800', marginBottom: 10 }]} 
@@ -5746,7 +5735,7 @@ export default function PlayerProfile() {
                           {friendLoading ? t('common.loading') : t('profile.cancelRequest')}
                         </Text>
                       </TouchableOpacity>
-                    ) : (
+                    ) : friendshipStatus !== 'friends' ? (
                       <TouchableOpacity 
                         style={[styles.actionButton, isDesktop && styles.actionButtonDesktop, { backgroundColor: '#fa2f40', marginBottom: 10 }]} 
                         onPress={handleAddFriend}
@@ -5757,7 +5746,7 @@ export default function PlayerProfile() {
                           {friendLoading ? t('common.loading') : t('profile.addFriend')}
                         </Text>
                       </TouchableOpacity>
-                    )}
+                    ) : null}
                   </>
                 )}
 
@@ -5776,6 +5765,11 @@ export default function PlayerProfile() {
                     {t('profile.sendMessage')}
                   </Text>
                 </TouchableOpacity>
+                <ProfileReactionsBar
+                  targetPlayerId={player.id}
+                  viewerId={currentUser.id}
+                  disabled={isUserBlockedState}
+                />
               </View>
             )}
 
@@ -8058,6 +8052,21 @@ export default function PlayerProfile() {
             ) : (
               /* Меню для чужого профиля */
               <>
+                {friendshipStatus === 'friends' && !isUserBlockedState ? (
+                  <>
+                    <TouchableOpacity
+                      style={styles.profileMenuItem}
+                      onPress={handleRemoveFriend}
+                      activeOpacity={0.7}
+                    >
+                      <Ionicons name="person-remove-outline" size={18} color="#fff" style={styles.profileMenuIcon} />
+                      <Text style={styles.profileMenuText}>
+                        {t('profile.removeFromFriends')}
+                      </Text>
+                    </TouchableOpacity>
+                    <View style={styles.profileMenuDivider} />
+                  </>
+                ) : null}
                 {isUserBlockedState ? (
                   <>
                     <TouchableOpacity

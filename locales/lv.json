@@ -3530,7 +3530,8 @@
     "skateServices": "Pakalpojumi",
     "weightWithUnit": "Svars (kg)",
     "videoUploaded": "Video pievienots profilam",
-    "videoUploadSaveReminder": "Video augšupielādēts. Nospiediet «Saglabāt», lai tas paliktu profilā."
+    "videoUploadSaveReminder": "Video augšupielādēts. Nospiediet «Saglabāt», lai tas paliktu profilā.",
+    "removeFromFriendsConfirm": "Noņemt {name} no draugiem?"
   },
   "register": {
     "title": "Reģistrācija",
@@ -3936,6 +3937,14 @@
     },
     "photo_liked": {
       "grouped": "{name} atzīmēja ar patīk {count} jūsu foto"
+    },
+    "profile_reaction": {
+      "title": "Jauna reakcija",
+      "messageGrouped": "{name} nosūtīja {reactions}"
+    },
+    "activity_reaction": {
+      "title": "Reakcija uz jūsu atjauninājumu",
+      "message": "{name} reaģēja {emoji} uz jūsu atjauninājumu"
     }
   },
   "editProfile": {
@@ -4447,5 +4456,15 @@
     "leaderboard": "Labākie ielūdzēji",
     "noInvites": "Neviens vēl nav uzaicinājis draugus",
     "points": "punkti"
+  },
+  "reactions": {
+    "respect": "cieņa",
+    "like": "patīk",
+    "strength": "spēks",
+    "highFive": "dod pieci",
+    "fire": "uguns",
+    "lightning": "zibens",
+    "sendBack": "Atbildēt",
+    "whoReacted": "Kas reaģēja"
   }
 }

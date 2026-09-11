@@ -35,6 +35,9 @@ import GiftReceivedNotification from '../components/GiftReceivedNotification';
 import FriendRequestNotification from '../components/FriendRequestNotification';
 import GiftRequestNotification from '../components/GiftRequestNotification';
 import GiftAcceptedNotification from '../components/GiftAcceptedNotification';
+import ReactionReceivedNotification from '../components/ReactionReceivedNotification';
+import FeedReactionFooter from '../components/FeedReactionFooter';
+import { REACTABLE_NOTIFICATION_TYPES } from '../utils/reactions';
 import VideoAddedNotification from '../components/VideoAddedNotification';
 import { sortVideoUrlsNewestFirst } from '../utils/videoUrls';
 import AvatarChangedNotification from '../components/AvatarChangedNotification';
@@ -97,10 +100,34 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
 }) => {
   const { t } = useLanguage();
   const isDesktop = useIsDesktopLayout();
+  const router = useRouter();
 
   const handlePress = React.useCallback(() => {
     onPress(notification);
   }, [notification, onPress]);
+
+  const feedReactionRecipientId =
+    notification.data?.changedPlayerId || notification.data?.playerId || notification.playerId;
+
+  const renderFeedReactions = () => {
+    if (!REACTABLE_NOTIFICATION_TYPES.has(notification.type)) return null;
+    if (!feedReactionRecipientId || !currentUserId) return null;
+    return (
+      <FeedReactionFooter
+        notificationId={notification.id}
+        notificationType={notification.type}
+        recipientId={feedReactionRecipientId}
+        viewerId={currentUserId}
+      />
+    );
+  };
+
+  const handleReactionSendBack = React.useCallback(() => {
+    const senderId = notification.data?.senderId || notification.playerId;
+    if (senderId) {
+      navigateToPlayerProfile(router, { playerId: senderId, returnTo: 'notifications' });
+    }
+  }, [notification, router]);
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -125,6 +152,9 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
       case 'game_first_place':
       case 'quiz_first_place':
         return 'trophy';
+      case 'profile_reaction':
+      case 'activity_reaction':
+        return 'heart';
       case 'system':
         return 'information-circle';
       default:
@@ -165,19 +195,23 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
   return (
     <AnimatedNotification key={notification.id} index={index} isNew={isNew}>
         {(notification.type === 'stats_change' || notification.type === 'normative_changed') && notification.data && notification.data.changes ? (
-          <PressableScale
-            onPress={handlePress}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <StatsChangeNotification
-              changes={notification.data.changes}
-              playerName={notification.data.changedPlayerName || 'Игрок'}
-              playerId={notification.data.changedPlayerId}
-              playerAvatar={notification.data.changedPlayerAvatar}
-              timestamp={notification.timestamp}
-            />
-          </PressableScale>
+          <>
+            <PressableScale
+              onPress={handlePress}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <StatsChangeNotification
+                changes={notification.data.changes}
+                playerName={notification.data.changedPlayerName || 'Игрок'}
+                playerId={notification.data.changedPlayerId}
+                playerAvatar={notification.data.changedPlayerAvatar}
+                timestamp={notification.timestamp}
+              />
+            </PressableScale>
+            {renderFeedReactions()}
+          </>
         ) : notification.type === 'photo_added' ? (
+          <>
             <PhotoAddedNotification
               playerName={notification.data.changedPlayerName || 'Игрок'}
               playerId={notification.data.changedPlayerId}
@@ -187,6 +221,8 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               photoUrls={notification.data.photoUrls || []}
               onHeaderPress={handlePress}
             />
+            {renderFeedReactions()}
+          </>
         ) : notification.type === 'new_friendship' ? (
           <FriendshipNotification
             friend1Name={notification.data.friend1Name || 'Игрок 1'}
@@ -211,18 +247,21 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
             }}
           />
         ) : notification.type === 'exercise_completed' ? (
-          <PressableScale
-            onPress={handlePress}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <ExerciseNotification
-              playerName={notification.data.playerName || 'Игрок'}
-              playerId={notification.data.playerId}
-              playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
-              exerciseId={notification.data.exerciseId || 'unknown'}
-              timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-            />
-          </PressableScale>
+          <>
+            <PressableScale
+              onPress={handlePress}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <ExerciseNotification
+                playerName={notification.data.playerName || 'Игрок'}
+                playerId={notification.data.playerId}
+                playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
+                exerciseId={notification.data.exerciseId || 'unknown'}
+                timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+              />
+            </PressableScale>
+            {renderFeedReactions()}
+          </>
         ) : notification.type === 'gift_received' ? (
           <PressableScale
             onPress={handlePress}
@@ -300,6 +339,7 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
             onAcknowledge={() => onSuperAction(notification)}
           />
         ) : notification.type === 'video_added' ? (
+          <>
             <VideoAddedNotification
               playerName={notification.data.changedPlayerName || 'Игрок'}
               playerId={notification.data.changedPlayerId}
@@ -310,99 +350,134 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
               onHeaderPress={handlePress}
               onScrubActiveChange={onVideoScrubActiveChange}
             />
+            {renderFeedReactions()}
+          </>
         ) : notification.type === 'cover_changed' ? (
-          <PressableScale
-            onPress={handlePress}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <CoverChangedNotification
-              playerName={notification.data?.changedPlayerName || 'Игрок'}
-              playerId={notification.data?.changedPlayerId}
-              playerAvatar={notification.playerAvatar}
-              coverUrl={notification.data?.coverUrl}
-              timestamp={notification.data?.timestamp || new Date(notification.timestamp).toISOString()}
-            />
-          </PressableScale>
+          <>
+            <PressableScale
+              onPress={handlePress}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <CoverChangedNotification
+                playerName={notification.data?.changedPlayerName || 'Игрок'}
+                playerId={notification.data?.changedPlayerId}
+                playerAvatar={notification.playerAvatar}
+                coverUrl={notification.data?.coverUrl}
+                timestamp={notification.data?.timestamp || new Date(notification.timestamp).toISOString()}
+              />
+            </PressableScale>
+            {renderFeedReactions()}
+          </>
         ) : notification.type === 'avatar_changed' ? (
-          <PressableScale
-            onPress={handlePress}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <AvatarChangedNotification
-              playerName={notification.data.changedPlayerName || 'Игрок'}
-              playerId={notification.data.changedPlayerId}
-              playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
-              newAvatarUrl={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
-              timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-            />
-          </PressableScale>
+          <>
+            <PressableScale
+              onPress={handlePress}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <AvatarChangedNotification
+                playerName={notification.data.changedPlayerName || 'Игрок'}
+                playerId={notification.data.changedPlayerId}
+                playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
+                newAvatarUrl={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
+                timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+              />
+            </PressableScale>
+            {renderFeedReactions()}
+          </>
         ) : notification.type === 'achievement_added' ? (
-          <PressableScale
-            onPress={handlePress}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <AchievementAddedNotification
-              playerName={notification.data.changedPlayerName || 'Игрок'}
-              playerId={notification.data.changedPlayerId}
-              achievementsCount={notification.data.addedAchievementsCount || 1}
-              timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-              playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
-            />
-          </PressableScale>
+          <>
+            <PressableScale
+              onPress={handlePress}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <AchievementAddedNotification
+                playerName={notification.data.changedPlayerName || 'Игрок'}
+                playerId={notification.data.changedPlayerId}
+                achievementsCount={notification.data.addedAchievementsCount || 1}
+                timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+                playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
+              />
+            </PressableScale>
+            {renderFeedReactions()}
+          </>
         ) : notification.type === 'physical_data_changed' ? (
-          <PressableScale
-            onPress={handlePress}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <PhysicalDataChangedNotification
-              playerName={notification.data.changedPlayerName || 'Игрок'}
-              playerId={notification.data.changedPlayerId}
-              playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
-              changes={notification.data.changes || []}
-              timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-            />
-          </PressableScale>
+          <>
+            <PressableScale
+              onPress={handlePress}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <PhysicalDataChangedNotification
+                playerName={notification.data.changedPlayerName || 'Игрок'}
+                playerId={notification.data.changedPlayerId}
+                playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
+                changes={notification.data.changes || []}
+                timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+              />
+            </PressableScale>
+            {renderFeedReactions()}
+          </>
         ) : notification.type === 'puck_speed_changed' ? (
-          <PressableScale
-            onPress={handlePress}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <PuckSpeedChangedNotification
-              playerName={notification.data.changedPlayerName || 'Игрок'}
-              playerId={notification.data.changedPlayerId}
-              playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
-              newMaxSpeed={notification.data.newMaxSpeed || 0}
-              timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
-            />
-          </PressableScale>
+          <>
+            <PressableScale
+              onPress={handlePress}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <PuckSpeedChangedNotification
+                playerName={notification.data.changedPlayerName || 'Игрок'}
+                playerId={notification.data.changedPlayerId}
+                playerAvatar={notification.data.changedPlayerAvatar || notification.data.playerAvatar}
+                newMaxSpeed={notification.data.newMaxSpeed || 0}
+                timestamp={notification.data.timestamp || new Date(notification.timestamp).toISOString()}
+              />
+            </PressableScale>
+            {renderFeedReactions()}
+          </>
         ) : notification.type === 'scout_report' ? (
-          <PressableScale
-            onPress={handlePress}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <ScoutReportNotification
-              playerName={notification.data.changedPlayerName || notification.message?.split(' ')[0] || 'Игрок'}
-              playerId={notification.data.changedPlayerId}
-              playerAvatar={notification.data.changedPlayerAvatar}
-              message={notification.message || ''}
-              timestamp={typeof notification.timestamp === 'string' ? new Date(notification.timestamp).getTime() : (notification.timestamp || Date.now())}
-            />
-          </PressableScale>
+          <>
+            <PressableScale
+              onPress={handlePress}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <ScoutReportNotification
+                playerName={notification.data.changedPlayerName || notification.message?.split(' ')[0] || 'Игрок'}
+                playerId={notification.data.changedPlayerId}
+                playerAvatar={notification.data.changedPlayerAvatar}
+                message={notification.message || ''}
+                timestamp={typeof notification.timestamp === 'string' ? new Date(notification.timestamp).getTime() : (notification.timestamp || Date.now())}
+              />
+            </PressableScale>
+            {renderFeedReactions()}
+          </>
         ) : notification.type === 'game_first_place' || notification.type === 'quiz_first_place' ? (
-          <PressableScale
-            onPress={handlePress}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <GameFirstPlaceNotification
-              playerName={notification.data.changedPlayerName || notification.message?.split(' ')[0] || 'Игрок'}
-              playerId={notification.data.changedPlayerId}
-              playerAvatar={notification.data.changedPlayerAvatar}
-              message={notification.message || ''}
-              variant={notification.type === 'quiz_first_place' ? 'quiz' : 'game'}
-              prizeAmount={notification.data?.prizeAmount}
-              timestamp={typeof notification.timestamp === 'string' ? new Date(notification.timestamp).getTime() : (notification.timestamp || Date.now())}
-            />
-          </PressableScale>
+          <>
+            <PressableScale
+              onPress={handlePress}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <GameFirstPlaceNotification
+                playerName={notification.data.changedPlayerName || notification.message?.split(' ')[0] || 'Игрок'}
+                playerId={notification.data.changedPlayerId}
+                playerAvatar={notification.data.changedPlayerAvatar}
+                message={notification.message || ''}
+                variant={notification.type === 'quiz_first_place' ? 'quiz' : 'game'}
+                prizeAmount={notification.data?.prizeAmount}
+                timestamp={typeof notification.timestamp === 'string' ? new Date(notification.timestamp).getTime() : (notification.timestamp || Date.now())}
+              />
+            </PressableScale>
+            {renderFeedReactions()}
+          </>
+        ) : notification.type === 'profile_reaction' || notification.type === 'activity_reaction' ? (
+          <ReactionReceivedNotification
+            senderName={notification.data?.senderName || notification.playerName || t('profile.player')}
+            senderId={notification.data?.senderId || notification.playerId}
+            senderAvatar={notification.data?.senderAvatar || notification.playerAvatar}
+            message={notification.message}
+            timestamp={new Date(notification.timestamp).toISOString()}
+            reactions={notification.data?.reactions}
+            reactionType={notification.data?.reactionType || notification.data?.lastReactionType}
+            onSendBack={handleReactionSendBack}
+            onHeaderPress={handlePress}
+          />
         ) : notification.type === 'video_liked' || notification.type === 'photo_liked' ? (
           <PressableScale
             onPress={handlePress}
@@ -447,74 +522,76 @@ const NotificationItem = React.memo(({ notification, index, isNew, onPress, onSu
             />
           </PressableScale>
         ) : (
-        <PressableScale
-          key={notification.id}
-          onPress={handlePress}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <View style={[styles.notificationGradientShadow, isDesktop && styles.notificationGradientShadowDesktop]}>
-            <BlurOrSolid
-              intensity={55}
-              tint="dark"
-              style={styles.notificationItemBlur}
-            >
-              <View style={styles.notificationItem}>
-            <View style={styles.notificationIcon}>
-              <Ionicons 
-                name={getNotificationIcon(notification.type) as any} 
-                size={24} 
-                color="#fa2f40" 
-              />
-            </View>
-            
-            <View style={styles.notificationContent}>
-              <View style={styles.notificationHeader}>
-                <Text style={styles.notificationTitle} numberOfLines={2}>
-                  {notification.title}
-                </Text>
-                <Text style={styles.notificationTime}>
-                  {formatTime(notification.timestamp)}
-                </Text>
+        <>
+          <PressableScale
+            key={notification.id}
+            onPress={handlePress}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <View style={[styles.notificationGradientShadow, isDesktop && styles.notificationGradientShadowDesktop]}>
+              <BlurOrSolid
+                intensity={55}
+                tint="dark"
+                style={styles.notificationItemBlur}
+              >
+                <View style={styles.notificationItem}>
+              <View style={styles.notificationIcon}>
+                <Ionicons 
+                  name={getNotificationIcon(notification.type) as any} 
+                  size={24} 
+                  color="#fa2f40" 
+                />
               </View>
               
-              <Text style={styles.notificationMessage}>
-                {notification.message}
-              </Text>
-            
-            {notification.playerAvatar && (
-              <View style={styles.playerInfo}>
-                <CachedAvatar
-                  playerId={notification.playerId || ''}
-                  fallbackAvatarUrl={undefined} // Не используем старый аватар из уведомления
-                  size={32}
-                  style={styles.playerAvatar}
-                  onError={() => {
-                    console.log('Ошибка загрузки аватарки для:', notification.playerName);
-                  }}
-                />
-                <Text style={styles.playerName} numberOfLines={1} ellipsizeMode="tail">
-                  {notification.playerName}
+              <View style={styles.notificationContent}>
+                <View style={styles.notificationHeader}>
+                  <Text style={styles.notificationTitle} numberOfLines={2}>
+                    {notification.title}
+                  </Text>
+                  <Text style={styles.notificationTime}>
+                    {formatTime(notification.timestamp)}
+                  </Text>
+                </View>
+                
+                <Text style={styles.notificationMessage}>
+                  {notification.message}
                 </Text>
+              
+              {notification.playerAvatar && (
+                <View style={styles.playerInfo}>
+                  <CachedAvatar
+                    playerId={notification.playerId || ''}
+                    fallbackAvatarUrl={undefined}
+                    size={32}
+                    style={styles.playerAvatar}
+                    onError={() => {
+                      console.log('Ошибка загрузки аватарки для:', notification.playerName);
+                    }}
+                  />
+                  <Text style={styles.playerName} numberOfLines={1} ellipsizeMode="tail">
+                    {notification.playerName}
+                  </Text>
+                </View>
+              )}
+              
+              {notification.isActionable && (
+                <View style={styles.superActionContainer}>
+                  <TouchableOpacity
+                    style={styles.superActionButton}
+                    onPress={() => onSuperAction(notification)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.superActionButtonText}>{t('common.super') || 'Супер!'}</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
               </View>
-            )}
-            
-            {/* Кнопка "Супер" для actionable уведомлений */}
-            {notification.isActionable && (
-              <View style={styles.superActionContainer}>
-                <TouchableOpacity
-                  style={styles.superActionButton}
-                  onPress={() => onSuperAction(notification)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.superActionButtonText}>{t('common.super') || 'Супер!'}</Text>
-                </TouchableOpacity>
               </View>
-            )}
+              </BlurOrSolid>
             </View>
-            </View>
-            </BlurOrSolid>
-          </View>
-        </PressableScale>
+          </PressableScale>
+          {renderFeedReactions()}
+        </>
         )}
       </AnimatedNotification>
   );
@@ -546,7 +623,7 @@ const getItemTypeName = (type: string) => {
 
 interface NotificationItem {
   id: string;
-  type: 'friend_request' | 'friend_accepted' | 'autograph_request' | 'stick_request' | 'gift_request' | 'gift_accepted' | 'system' | 'achievement' | 'team_invite' | 'stats_change' | 'photo_added' | 'new_friendship' | 'exercise_completed' | 'gift_received' | 'friend_gift_received' | 'video_added' | 'avatar_changed' | 'cover_changed' | 'achievement_added' | 'physical_data_changed' | 'puck_speed_changed';
+  type: 'friend_request' | 'friend_accepted' | 'autograph_request' | 'stick_request' | 'gift_request' | 'gift_accepted' | 'system' | 'achievement' | 'team_invite' | 'stats_change' | 'photo_added' | 'new_friendship' | 'exercise_completed' | 'gift_received' | 'friend_gift_received' | 'video_added' | 'avatar_changed' | 'cover_changed' | 'achievement_added' | 'physical_data_changed' | 'puck_speed_changed' | 'profile_reaction' | 'activity_reaction' | 'normative_changed' | 'scout_report' | 'game_first_place' | 'quiz_first_place' | 'video_liked' | 'photo_liked' | 'user_report';
   title: string;
   message: string;
   timestamp: number;
@@ -786,7 +863,7 @@ export default function NotificationsScreen() {
   const FILTER_TYPES: Record<string, string[]> = {
     all: [],
     media: ['video_added', 'video_liked', 'photo_added', 'photo_liked', 'avatar_changed', 'cover_changed'],
-    friends: ['friend_request', 'friend_accepted', 'new_friendship'],
+    friends: ['friend_request', 'friend_accepted', 'new_friendship', 'profile_reaction', 'activity_reaction'],
     gifts: ['gift_received', 'friend_gift_received', 'gift_accepted', 'gift_request', 'autograph_request', 'stick_request'],
     stats: ['stats_change', 'normative_changed', 'physical_data_changed', 'puck_speed_changed', 'achievement_added', 'achievement', 'scout_report'],
     exercises: ['exercise_completed', 'game_first_place', 'quiz_first_place'],
@@ -890,7 +967,9 @@ export default function NotificationsScreen() {
             notification.type === 'user_report' ||
             notification.type === 'scout_report' ||
             notification.type === 'game_first_place' ||
-            notification.type === 'quiz_first_place') {
+            notification.type === 'quiz_first_place' ||
+            notification.type === 'profile_reaction' ||
+            notification.type === 'activity_reaction') {
           return notification.user_id === currentUser.id || notification.playerId === currentUser.id;
         }
         
@@ -920,12 +999,18 @@ export default function NotificationsScreen() {
           // Для gift_request используем requesterId из data, для остальных - стандартную логику
           playerId: notification.type === 'gift_request' 
             ? (notification.data?.requesterId || notification.data?.playerId || notification.player_id || notification.playerId)
+            : notification.type === 'profile_reaction' || notification.type === 'activity_reaction'
+            ? (notification.data?.senderId || notification.data?.sender_id || notification.player_id || notification.playerId)
             : (notification.data?.sender_id || notification.data?.playerId || notification.player_id || notification.playerId),
           playerName: notification.type === 'gift_request'
             ? (notification.data?.requesterName || notification.data?.playerName || notification.player_name || notification.playerName)
+            : notification.type === 'profile_reaction' || notification.type === 'activity_reaction'
+            ? (notification.data?.senderName || notification.data?.sender_name || notification.player_name || notification.playerName)
             : (notification.data?.sender_name || notification.data?.playerName || notification.player_name || notification.playerName),
           playerAvatar: notification.type === 'gift_request'
             ? (notification.data?.requesterAvatar || notification.data?.playerAvatar || notification.player_avatar || notification.playerAvatar)
+            : notification.type === 'profile_reaction' || notification.type === 'activity_reaction'
+            ? (notification.data?.senderAvatar || notification.data?.sender_avatar || notification.player_avatar || notification.playerAvatar)
             : (notification.data?.sender_avatar || notification.data?.playerAvatar || notification.player_avatar || notification.playerAvatar),
           receiverId: notification.receiver_id || notification.receiverId,
           // Помечаем уведомления как actionable, если они требуют действия
@@ -1734,6 +1819,11 @@ export default function NotificationsScreen() {
         // Для уведомлений о запросе подарка переходим на профиль игрока для отправки подарка
         if (notification.data && notification.data.requesterId) {
           navigateToPlayerProfile(router, { playerId: notification.data.requesterId, returnTo: 'notifications', scrollToGift: 'true' });
+        }
+      } else if (notification.type === 'profile_reaction' || notification.type === 'activity_reaction') {
+        const senderId = notification.data?.senderId || notification.playerId;
+        if (senderId) {
+          navigateToPlayerProfile(router, { playerId: senderId, returnTo: 'notifications' });
         }
       } else if (notification.type === 'system') {
         // Для системных уведомлений остаемся в разделе уведомлений

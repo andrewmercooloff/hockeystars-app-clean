@@ -3597,7 +3597,8 @@
     "errorEnterYear": "Enter the year",
     "fullScreen": "Full screen",
     "videoUploaded": "Video added to profile",
-    "videoUploadSaveReminder": "Video uploaded. Tap Save to keep it on your profile."
+    "videoUploadSaveReminder": "Video uploaded. Tap Save to keep it on your profile.",
+    "removeFromFriendsConfirm": "Remove {name} from friends?"
   },
   "register": {
     "title": "Registration",
@@ -4040,6 +4041,14 @@
         "one": "Today your profile was viewed {{count}} time.",
         "other": "Today your profile was viewed {{count}} times."
       }
+    },
+    "profile_reaction": {
+      "title": "New reaction",
+      "messageGrouped": "{name} sent {reactions}"
+    },
+    "activity_reaction": {
+      "title": "Reaction to your update",
+      "message": "{name} reacted {emoji} to your update"
     }
   },
   "gifts": {
@@ -4591,5 +4600,15 @@
     "resurfacing": "Resurfacing the ice…",
     "updating": "Installing the update",
     "updated": "Fresh ice — app updated"
+  },
+  "reactions": {
+    "respect": "respect",
+    "like": "like",
+    "strength": "strength",
+    "highFive": "high five",
+    "fire": "fire",
+    "lightning": "lightning",
+    "sendBack": "Send back",
+    "whoReacted": "Who reacted"
   }
 }
