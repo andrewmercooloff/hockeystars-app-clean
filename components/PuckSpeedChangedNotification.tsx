@@ -20,9 +20,9 @@ const PuckSpeedChangedNotification = React.memo(function PuckSpeedChangedNotific
   playerId,
   playerAvatar,
   newMaxSpeed,
-  timestamp
-,
-  reactionsFooter}: PuckSpeedChangedNotificationProps) {
+  timestamp,
+  reactionsFooter,
+}: PuckSpeedChangedNotificationProps) {
   const { t } = useLanguage();
 
   const formatTime = (timestamp: string): string => {

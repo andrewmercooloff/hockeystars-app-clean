@@ -20,9 +20,9 @@ const AchievementAddedNotification = React.memo(function AchievementAddedNotific
   playerId,
   achievementsCount,
   timestamp,
-  playerAvatar
-,
-  reactionsFooter}: AchievementAddedNotificationProps) {
+  playerAvatar,
+  reactionsFooter,
+}: AchievementAddedNotificationProps) {
   const { t } = useLanguage();
 
   const formatTime = (timestamp: string): string => {

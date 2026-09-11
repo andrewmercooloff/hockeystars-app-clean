@@ -28,8 +28,8 @@ const AvatarChangedNotification = React.memo(function AvatarChangedNotification(
   playerAvatar,
   newAvatarUrl,
   timestamp,
-,
-  reactionsFooter}: AvatarChangedNotificationProps) {
+  reactionsFooter,
+}: AvatarChangedNotificationProps) {
   const { t } = useLanguage();
   const previewAvatar = React.useMemo(() => {
     const base = rewriteSupabasePublicUrl(newAvatarUrl || playerAvatar);

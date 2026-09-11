@@ -20,9 +20,9 @@ const PhysicalDataChangedNotification = React.memo(function PhysicalDataChangedN
   playerId,
   playerAvatar,
   changes,
-  timestamp
-,
-  reactionsFooter}: PhysicalDataChangedNotificationProps) {
+  timestamp,
+  reactionsFooter,
+}: PhysicalDataChangedNotificationProps) {
   const { t } = useLanguage();
 
   const formatTime = (timestamp: string): string => {
