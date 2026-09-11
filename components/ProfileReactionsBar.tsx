@@ -9,7 +9,6 @@ import {
 } from '../utils/reactions';
 import { loadProfileReactions, toggleProfileReaction } from '../services/reactionService';
 import ReactionWhoModal from './ReactionWhoModal';
-import ReactionIcon from './ReactionIcon';
 
 type ProfileReactionsBarProps = {
   targetPlayerId: string;
@@ -66,9 +65,10 @@ export default function ProfileReactionsBar({
   return (
     <>
       <View style={styles.bar}>
-        {PROFILE_REACTIONS.map(({ type }) => {
+        {PROFILE_REACTIONS.map(({ type, emoji }) => {
           const active = summary.mine.has(type);
           const count = summary.counts[type];
+          const isPair = emoji.length > 2;
           return (
             <Pressable
               key={type}
@@ -77,12 +77,15 @@ export default function ProfileReactionsBar({
               onLongPress={() => onLongPress(type)}
               delayLongPress={320}
               disabled={!canReact}
-              hitSlop={6}
+              hitSlop={4}
             >
-              <ReactionIcon type={type} size={15} active={active} />
-              {count > 0 ? (
-                <Text style={[styles.count, active && styles.countActive]}>{count}</Text>
-              ) : null}
+              <Text
+                style={[styles.emoji, isPair && styles.emojiPair]}
+                allowFontScaling={false}
+              >
+                {emoji}
+              </Text>
+              <Text style={styles.count}>{count}</Text>
             </Pressable>
           );
         })}
@@ -100,38 +103,44 @@ export default function ProfileReactionsBar({
 const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 6,
+    alignSelf: 'stretch',
+    width: '100%',
+    gap: 6,
+    marginTop: 8,
     marginBottom: 2,
-    gap: 5,
-    alignItems: 'center',
   },
   chip: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    borderWidth: 1,
+    justifyContent: 'center',
+    gap: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 7,
+    borderRadius: 14,
+    minHeight: 34,
     overflow: 'visible',
   },
   chipIdle: {
-    borderColor: 'rgba(255,255,255,0.1)',
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    opacity: 0.55,
+    backgroundColor: 'rgba(255,255,255,0.08)',
   },
   chipActive: {
-    borderColor: 'rgba(250, 47, 64, 0.55)',
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    opacity: 1,
+    backgroundColor: '#fa2f40',
+  },
+  emoji: {
+    fontSize: 15,
+    lineHeight: 18,
+    textAlign: 'center',
+    includeFontPadding: false,
+  },
+  emojiPair: {
+    fontSize: 13,
+    letterSpacing: -2,
   },
   count: {
-    color: 'rgba(255,255,255,0.65)',
-    fontSize: 10,
+    color: '#fff',
+    fontSize: 12,
     fontFamily: 'Gilroy-Bold',
-  },
-  countActive: {
-    color: '#fa2f40',
+    minWidth: 8,
   },
 });

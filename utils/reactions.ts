@@ -6,10 +6,10 @@ export const PROFILE_REACTIONS: readonly {
   emoji: string;
   labelKey: string;
 }[] = [
-  { type: 'respect', emoji: '🤜🏻🤛🏻', labelKey: 'reactions.respect' },
-  { type: 'like', emoji: '👍🏻', labelKey: 'reactions.like' },
-  { type: 'strength', emoji: '💪🏻', labelKey: 'reactions.strength' },
-  { type: 'high_five', emoji: '✋🏻', labelKey: 'reactions.highFive' },
+  { type: 'respect', emoji: '🤜🤛', labelKey: 'reactions.respect' },
+  { type: 'like', emoji: '👍', labelKey: 'reactions.like' },
+  { type: 'strength', emoji: '💪', labelKey: 'reactions.strength' },
+  { type: 'high_five', emoji: '✋', labelKey: 'reactions.highFive' },
 ];
 
 export const FEED_REACTIONS: readonly {

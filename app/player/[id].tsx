@@ -5440,6 +5440,16 @@ export default function PlayerProfile() {
                   })}
                 </View>
               )}
+
+              {!isEditing && currentUser && player && currentUser.id !== player.id && !isUserBlockedState && (
+                <ProfileReactionsBar
+                  targetPlayerId={player.id}
+                  viewerId={currentUser.id}
+                  viewerName={currentUser.name}
+                  viewerAvatar={currentUser.avatar}
+                  disabled={isUserBlockedState}
+                />
+              )}
               
               {/* Опыт в хоккее */}
               {player.status === 'player' && player.hockeyStartDate && (
@@ -5505,13 +5515,6 @@ export default function PlayerProfile() {
                     <Ionicons name="chatbubble-outline" size={18} color="rgb(1,0,0)" />
                     <Text style={[styles.actionButtonText, { color: 'rgb(1,0,0)' }]}>{t('profile.sendMessage')}</Text>
                   </TouchableOpacity>
-                  <ProfileReactionsBar
-                    targetPlayerId={player.id}
-                    viewerId={currentUser.id}
-                    viewerName={currentUser.name}
-                    viewerAvatar={currentUser.avatar}
-                    disabled={isUserBlockedState}
-                  />
                 </View>
               )}
               </View>
@@ -5757,13 +5760,6 @@ export default function PlayerProfile() {
                     {t('profile.sendMessage')}
                   </Text>
                 </TouchableOpacity>
-                <ProfileReactionsBar
-                  targetPlayerId={player.id}
-                  viewerId={currentUser.id}
-                  viewerName={currentUser.name}
-                  viewerAvatar={currentUser.avatar}
-                  disabled={isUserBlockedState}
-                />
               </View>
             )}
 
@@ -8859,7 +8855,7 @@ const styles = StyleSheet.create({
     marginTop: 0,
     marginBottom: 4,
     paddingHorizontal: 24,
-    paddingVertical: 20,
+    paddingVertical: 14,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 24,
     borderWidth: 1,
@@ -8872,7 +8868,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     alignItems: 'center',
     gap: 10,
-    marginTop: 14,
+    marginTop: 8,
     width: '100%',
   },
   profileHeroInfoDesktop: {
@@ -8908,6 +8904,9 @@ const styles = StyleSheet.create({
   },
   profileMetaColumn: {
     alignItems: 'center',
+    alignSelf: 'stretch',
+    width: '100%',
+    marginTop: -2,
   },
   profileMetaColumnDesktop: {
     flex: 1,
@@ -8916,7 +8915,8 @@ const styles = StyleSheet.create({
     minWidth: 0,
     paddingTop: 0,
     marginLeft: 32,
-    gap: 8,
+    marginTop: 0,
+    gap: 4,
   },
   nameRowDesktop: {
     justifyContent: 'flex-start',
@@ -9119,17 +9119,17 @@ const styles = StyleSheet.create({
   },
   profileSection: {
     alignItems: 'center',
-    marginBottom: 30,
-    marginTop: 20,
+    marginBottom: 22,
+    marginTop: 12,
     position: 'relative',
   },
   // Шапка — фон всего верхнего блока (аватар → имя → статус → команды → стаж):
   // стартует у верха контента и уходит за края горизонтального паддинга 20.
   profileSectionWithCover: {
-    marginTop: 8,
-    marginBottom: 18,
-    paddingTop: 16,
-    paddingBottom: 18,
+    marginTop: 4,
+    marginBottom: 12,
+    paddingTop: 10,
+    paddingBottom: 12,
   },
   coverBand: {
     position: 'absolute',
@@ -9154,6 +9154,7 @@ const styles = StyleSheet.create({
   avatarContainer: {
     position: 'relative',
     alignItems: 'center',
+    marginBottom: -4,
   },
   profileBackButton: {
     position: 'absolute',
@@ -9240,7 +9241,7 @@ const styles = StyleSheet.create({
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 2,
+    marginBottom: 0,
     flexWrap: 'wrap',
     justifyContent: 'center',
   },
@@ -9282,19 +9283,19 @@ const styles = StyleSheet.create({
   },
   statusContainer: {
     paddingHorizontal: 8,
-    paddingVertical: 4,
-    marginBottom: 5,
+    paddingVertical: 2,
+    marginBottom: 2,
     alignSelf: 'center',
   },
   playerStatus: {
-    fontSize: 20,
+    fontSize: 18,
     fontFamily: 'Gilroy-Bold',
     color: '#fa2f40',
   },
   playerTeam: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: 'Gilroy-Regular',
-    color: '#fff',
+    color: '#a1a1aa',
   },
   scoutPrivacyNote: {
     flexDirection: 'row',
@@ -9317,9 +9318,11 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 0,
+    marginBottom: 0,
   },
   hockeyExperienceContainer: {
-    marginTop: 5,
+    marginTop: 4,
     alignItems: 'center',
   },
   hockeyExperienceText: {
@@ -9334,8 +9337,8 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   actionsSectionTop: {
-    marginTop: 10,
-    marginBottom: 20,
+    marginTop: 6,
+    marginBottom: 16,
     paddingHorizontal: 20,
     gap: 10,
   },
