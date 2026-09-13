@@ -5,7 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Modal,
-  FlatList,
+  ScrollView,
   Image,
   Alert,
   ActivityIndicator,
@@ -24,6 +24,8 @@ import {
   invalidateAdminGiftItemsCache,
   loadAdminGiftItems,
 } from '../utils/adminGiftItemsCache';
+import { giftImageThumbUrl, prefetchGiftImages } from '../utils/giftImage';
+import CachedImage from './CachedImage';
 
 interface AdminGiftModalProps {
   visible: boolean;
@@ -57,6 +59,7 @@ const AdminGiftModal: React.FC<AdminGiftModalProps> = ({
     if (cached) {
       setAdminItems(cached);
       setLoadingItems(false);
+      void prefetchGiftImages(cached.map((item) => item.image_url));
     } else {
       setLoadingItems(true);
     }
@@ -124,7 +127,7 @@ const AdminGiftModal: React.FC<AdminGiftModalProps> = ({
       uri,
       [{ resize: { width: 600 } }],
       {
-        compress: 1.0,
+        compress: 0.85,
         format: ImageManipulator.SaveFormat.PNG,
       },
     );
@@ -300,115 +303,6 @@ const AdminGiftModal: React.FC<AdminGiftModalProps> = ({
     }
   };
 
-  const renderGiftItem = ({ item }: { item: AdminGiftItem }) => (
-    <View style={styles.itemCardWrapper}>
-      <TouchableOpacity
-        style={[styles.itemCard, selectedItem?.id === item.id && styles.selectedItemCard]}
-        onPress={() => {
-          setSelectedItem(item);
-          setCustomGiftName('');
-          setImageUri(null);
-        }}
-      >
-        {item.image_url ? (
-          <Image source={{ uri: item.image_url }} style={styles.itemImage} />
-        ) : (
-          <View style={styles.placeholderImage}>
-            <Ionicons name={getItemTypeIcon(item.item_type)} size={24} color="#fa2f40" />
-          </View>
-        )}
-        <Text style={styles.itemName} numberOfLines={2}>
-          {item.name}
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.deleteItemButton} onPress={() => deleteAdminItem(item.id)}>
-        <Ionicons name="trash-outline" size={16} color="#fff" />
-      </TouchableOpacity>
-    </View>
-  );
-
-  const listHeader = (
-    <View style={styles.listHeader}>
-      <Text style={styles.sectionTitle}>{t('gifts.selectExistingGift')}</Text>
-
-      {adminItems.length > 0 ? (
-        <View style={styles.searchRow}>
-          <Ionicons name="search-outline" size={18} color="#888" />
-          <TextInput
-            style={styles.searchInput}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholder={t('gifts.searchByName') || 'Поиск по имени…'}
-            placeholderTextColor="#888"
-            autoCorrect={false}
-            autoCapitalize="none"
-            clearButtonMode="while-editing"
-          />
-          {searchQuery.trim() ? (
-            <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={8}>
-              <Ionicons name="close-circle" size={18} color="#888" />
-            </TouchableOpacity>
-          ) : null}
-        </View>
-      ) : null}
-
-      {loadingItems && adminItems.length === 0 ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="small" color="#fa2f40" />
-          <Text style={styles.loadingText}>{t('common.loading') || 'Загрузка...'}</Text>
-        </View>
-      ) : null}
-
-      {!loadingItems && adminItems.length === 0 ? (
-        <Text style={styles.emptyText}>{t('gifts.noGiftsUploaded')}</Text>
-      ) : null}
-
-      {searchQuery.trim() && filteredItems.length === 0 && adminItems.length > 0 ? (
-        <Text style={styles.emptyText}>{t('gifts.noSearchResults') || 'Ничего не найдено'}</Text>
-      ) : null}
-    </View>
-  );
-
-  const listFooter = (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{t('gifts.orCreateNew')}</Text>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>{t('gifts.giftName')}</Text>
-        <TextInput
-          style={styles.input}
-          value={customGiftName}
-          onChangeText={setCustomGiftName}
-          placeholder={t('gifts.giftNamePlaceholder')}
-          placeholderTextColor="#888"
-          onFocus={() => setSelectedItem(null)}
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>{t('gifts.uploadImage')}</Text>
-        <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-          {imageUri ? (
-            <Image
-              source={{ uri: imageUri }}
-              style={[
-                styles.previewImage,
-                imageUri.toLowerCase().includes('.png') && styles.pngPreviewImage,
-              ]}
-            />
-          ) : (
-            <View style={styles.imagePlaceholder}>
-              <Ionicons name="camera" size={40} color="#888" />
-              <Text style={styles.imagePlaceholderText}>
-                {t('gifts.selectImage') || 'Выберите изображение'}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
       <View style={styles.container}>
@@ -419,20 +313,123 @@ const AdminGiftModal: React.FC<AdminGiftModalProps> = ({
           </TouchableOpacity>
         </View>
 
-        <FlatList
-          data={filteredItems}
-          keyExtractor={(item) => item.id}
-          renderItem={renderGiftItem}
-          numColumns={3}
-          columnWrapperStyle={styles.giftRow}
-          contentContainerStyle={styles.listContent}
-          ListHeaderComponent={listHeader}
-          ListFooterComponent={listFooter}
-          keyboardShouldPersistTaps="handled"
-          initialNumToRender={12}
-          maxToRenderPerBatch={12}
-          windowSize={5}
-        />
+        <ScrollView style={styles.content} keyboardShouldPersistTaps="handled">
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{t('gifts.selectExistingGift')}</Text>
+
+            {adminItems.length > 0 ? (
+              <View style={styles.searchRow}>
+                <Ionicons name="search-outline" size={18} color="#888" />
+                <TextInput
+                  style={styles.searchInput}
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  placeholder={t('gifts.searchByName')}
+                  placeholderTextColor="#888"
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  clearButtonMode="while-editing"
+                />
+                {searchQuery.trim() ? (
+                  <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={8}>
+                    <Ionicons name="close-circle" size={18} color="#888" />
+                  </TouchableOpacity>
+                ) : null}
+              </View>
+            ) : null}
+
+            {loadingItems && adminItems.length === 0 ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="small" color="#fa2f40" />
+                <Text style={styles.loadingText}>{t('common.loading') || 'Загрузка...'}</Text>
+              </View>
+            ) : filteredItems.length > 0 ? (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.itemsScroll}>
+                {filteredItems.map((item) => (
+                  <View key={item.id} style={styles.itemCardWrapper}>
+                    <TouchableOpacity
+                      style={[
+                        styles.itemCard,
+                        selectedItem?.id === item.id && styles.selectedItemCard,
+                      ]}
+                      onPress={() => {
+                        setSelectedItem(item);
+                        setCustomGiftName('');
+                        setImageUri(null);
+                      }}
+                    >
+                      {item.image_url ? (
+                        <CachedImage
+                          imageUrl={giftImageThumbUrl(item.image_url)}
+                          style={styles.itemImage}
+                          resizeMode="contain"
+                          fallbackIcon={getItemTypeIcon(item.item_type)}
+                          fallbackSize={24}
+                          fallbackColor="#fa2f40"
+                        />
+                      ) : (
+                        <View style={styles.placeholderImage}>
+                          <Ionicons name={getItemTypeIcon(item.item_type)} size={24} color="#fa2f40" />
+                        </View>
+                      )}
+                      <Text style={styles.itemName} numberOfLines={2}>
+                        {item.name}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.deleteItemButton}
+                      onPress={() => deleteAdminItem(item.id)}
+                    >
+                      <Ionicons name="trash-outline" size={16} color="#fff" />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </ScrollView>
+            ) : adminItems.length > 0 ? (
+              <Text style={styles.emptyText}>{t('gifts.noSearchResults')}</Text>
+            ) : (
+              <Text style={styles.emptyText}>{t('gifts.noGiftsUploaded')}</Text>
+            )}
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{t('gifts.orCreateNew')}</Text>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>{t('gifts.giftName')}</Text>
+              <TextInput
+                style={styles.input}
+                value={customGiftName}
+                onChangeText={setCustomGiftName}
+                placeholder={t('gifts.giftNamePlaceholder')}
+                placeholderTextColor="#888"
+                onFocus={() => setSelectedItem(null)}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>{t('gifts.uploadImage')}</Text>
+              <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+                {imageUri ? (
+                  <Image
+                    source={{ uri: imageUri }}
+                    style={[
+                      styles.previewImage,
+                      imageUri.toLowerCase().includes('.png') && styles.pngPreviewImage,
+                    ]}
+                  />
+                ) : (
+                  <View style={styles.imagePlaceholder}>
+                    <Ionicons name="camera" size={40} color="#888" />
+                    <Text style={styles.imagePlaceholderText}>
+                      {t('gifts.selectImage') || 'Выберите изображение'}
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
 
         <View style={styles.footer}>
           <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
@@ -474,22 +471,18 @@ const styles = StyleSheet.create({
     color: '#fff',
     flex: 1,
   },
-  listContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  listHeader: {
-    marginBottom: 8,
+  content: {
+    flex: 1,
+    padding: 20,
   },
   section: {
-    marginTop: 24,
-    marginBottom: 8,
+    marginBottom: 30,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 12,
+    marginBottom: 15,
   },
   searchRow: {
     flexDirection: 'row',
@@ -519,20 +512,19 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginLeft: 10,
   },
-  giftRow: {
-    gap: 10,
+  itemsScroll: {
     marginBottom: 10,
+    overflow: 'visible',
   },
   itemCardWrapper: {
     position: 'relative',
-    flex: 1,
-    maxWidth: '31%',
+    marginRight: 15,
     overflow: 'visible',
   },
   deleteItemButton: {
     position: 'absolute',
     top: -8,
-    right: -4,
+    right: -8,
     backgroundColor: '#fa2f40',
     borderRadius: 12,
     width: 24,
@@ -542,27 +534,28 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   itemCard: {
+    width: 120,
     backgroundColor: '#2a2a2a',
     borderRadius: 12,
     padding: 10,
     alignItems: 'center',
     borderWidth: 2,
     borderColor: 'transparent',
-    minHeight: 130,
   },
   selectedItemCard: {
     borderColor: '#fa2f40',
     backgroundColor: '#3a2a2a',
   },
   itemImage: {
-    width: 72,
-    height: 72,
+    width: 80,
+    height: 80,
     borderRadius: 8,
     marginBottom: 8,
+    backgroundColor: '#2a2430',
   },
   placeholderImage: {
-    width: 72,
-    height: 72,
+    width: 80,
+    height: 80,
     borderRadius: 8,
     backgroundColor: '#2a2430',
     justifyContent: 'center',
@@ -570,7 +563,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   itemName: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#fff',
     textAlign: 'center',
     fontFamily: 'Gilroy-Regular',
@@ -579,7 +572,6 @@ const styles = StyleSheet.create({
     color: '#888',
     textAlign: 'center',
     fontStyle: 'italic',
-    marginBottom: 8,
   },
   inputGroup: {
     marginBottom: 20,
