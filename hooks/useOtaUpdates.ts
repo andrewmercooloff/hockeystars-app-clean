@@ -8,7 +8,6 @@ import { markOtaJustUpdated, presentOtaReload } from '../utils/otaReloadSignal';
 const CHECK_COOLDOWN_MS = 5 * 60_000;
 const FOREGROUND_POLL_MS = 15 * 60_000;
 const INITIAL_DELAY_MS = 3_000;
-const FOREGROUND_RELOAD_DELAY_MS = 1_200;
 const PENDING_UPDATE_KEY = 'hs_ota_pending_reload_v1';
 
 const isAuthPath = (pathname: string | null): boolean =>
@@ -23,6 +22,23 @@ async function markPendingReload(pending: boolean): Promise<void> {
     }
   } catch {
     /* ignore */
+  }
+}
+
+/** Drop stale pending flags left when reloadAsync() killed JS before cleanup ran. */
+async function reconcileStalePendingReload(): Promise<boolean> {
+  try {
+    const pending = await AsyncStorage.getItem(PENDING_UPDATE_KEY);
+    if (pending !== '1') return false;
+
+    const check = await Updates.checkForUpdateAsync();
+    if (!check.isAvailable) {
+      await markPendingReload(false);
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
   }
 }
 
@@ -44,12 +60,12 @@ export async function applyOtaUpdateIfPending(): Promise<boolean> {
     return false;
   }
   try {
-    const pending = await AsyncStorage.getItem(PENDING_UPDATE_KEY);
-    if (pending !== '1') {
+    const pending = await reconcileStalePendingReload();
+    if (!pending) {
       return false;
     }
-    await reloadWithResurfacing(true);
     await markPendingReload(false);
+    await reloadWithResurfacing(true);
     return true;
   } catch {
     await markPendingReload(true);
@@ -62,7 +78,6 @@ export async function applyOtaUpdateIfPending(): Promise<boolean> {
  * - user leaves the app (background / inactive) — silent reload
  * - user opens login or register (critical auth fixes) — visible overlay
  * - periodic poll while app stays in foreground
- * - retry on next foreground if a background reload did not stick
  */
 export function useOtaUpdates(): void {
   const pathname = usePathname();
@@ -71,7 +86,6 @@ export function useOtaUpdates(): void {
   const pendingReloadRef = useRef(false);
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
   const pathnameRef = useRef(pathname);
-  const foregroundReloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     pathnameRef.current = pathname;
@@ -82,39 +96,24 @@ export function useOtaUpdates(): void {
       return;
     }
 
-    void AsyncStorage.getItem(PENDING_UPDATE_KEY).then((v) => {
-      pendingReloadRef.current = v === '1';
+    void reconcileStalePendingReload().then((pending) => {
+      pendingReloadRef.current = pending;
     });
-
-    const clearForegroundReloadTimer = () => {
-      if (foregroundReloadTimerRef.current) {
-        clearTimeout(foregroundReloadTimerRef.current);
-        foregroundReloadTimerRef.current = null;
-      }
-    };
 
     const applyPendingReload = async (visible: boolean) => {
       if (!pendingReloadRef.current) return;
+
+      // Must clear BEFORE reloadAsync — the process is replaced immediately and
+      // post-reload cleanup never runs (was causing reload on every background).
+      pendingReloadRef.current = false;
+      await markPendingReload(false);
+
       try {
         await reloadWithResurfacing(visible);
-        pendingReloadRef.current = false;
-        await markPendingReload(false);
       } catch {
         pendingReloadRef.current = true;
         await markPendingReload(true);
       }
-    };
-
-    const scheduleForegroundReload = () => {
-      clearForegroundReloadTimer();
-      foregroundReloadTimerRef.current = setTimeout(() => {
-        foregroundReloadTimerRef.current = null;
-        if (!pendingReloadRef.current || appStateRef.current !== 'active') {
-          return;
-        }
-        // Silent reload on main tabs — overlay flash here felt like a crash.
-        void applyPendingReload(false);
-      }, FOREGROUND_RELOAD_DELAY_MS);
     };
 
     const checkAndDownload = async (options?: { bypassCooldown?: boolean }) => {
@@ -132,7 +131,9 @@ export function useOtaUpdates(): void {
         const result = await Updates.checkForUpdateAsync();
         if (!result.isAvailable) return;
 
-        await Updates.fetchUpdateAsync();
+        const fetchResult = await Updates.fetchUpdateAsync();
+        if (!fetchResult.isNew) return;
+
         pendingReloadRef.current = true;
         await markPendingReload(true);
 
@@ -167,12 +168,8 @@ export function useOtaUpdates(): void {
     const subscription = AppState.addEventListener('change', (nextState) => {
       const wasActive = appStateRef.current === 'active';
       const leavingActive = nextState === 'background' || nextState === 'inactive';
-      const returningActive =
-        (appStateRef.current === 'background' || appStateRef.current === 'inactive') &&
-        nextState === 'active';
 
       if (wasActive && leavingActive) {
-        clearForegroundReloadTimer();
         if (pendingReloadRef.current) {
           void applyPendingReload(false);
         } else {
@@ -180,11 +177,8 @@ export function useOtaUpdates(): void {
         }
       }
 
-      if (returningActive) {
+      if (leavingActive === false && nextState === 'active') {
         void checkAndDownload();
-        if (pendingReloadRef.current) {
-          scheduleForegroundReload();
-        }
       }
 
       appStateRef.current = nextState;
@@ -193,7 +187,6 @@ export function useOtaUpdates(): void {
     return () => {
       clearTimeout(initialTimer);
       clearInterval(pollTimer);
-      clearForegroundReloadTimer();
       interactionTask.cancel?.();
       subscription.remove();
     };

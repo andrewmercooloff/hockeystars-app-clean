@@ -41,7 +41,9 @@ async function computeOtaBoot(): Promise<OtaBootResult> {
     const firstBundle = !!(current && !previous);
 
     const skipSplash = bundleChanged;
-    const showToast = justUpdatedFlag || bundleChanged;
+    // Toast only from the explicit reload marker — bundleChanged alone caused repeats
+    // when updateId persistence raced with reloadAsync().
+    const showToast = justUpdatedFlag;
 
     if (current && (bundleChanged || firstBundle)) {
       await AsyncStorage.setItem(LAST_OTA_UPDATE_ID_KEY, current);
