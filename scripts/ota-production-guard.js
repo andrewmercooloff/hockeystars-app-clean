@@ -39,7 +39,7 @@ if (!ALLOWED_BRANCHES.has(branch) && process.env.OTA_ALLOW_ANY_BRANCH !== '1') {
 const REQUIRED_MARKERS = [
   { file: 'utils/pickVideoFromLibrary.ts', needle: 'export async function pickVideoFromLibrary' },
   { file: 'utils/homeSceneSignal.ts', needle: 'markHomeSceneReady' },
-  { file: 'utils/otaLaunch.ts', needle: 'shouldSkipSplashAfterOta' },
+  { file: 'utils/otaLaunch.ts', needle: 'resolveOtaBoot' },
   { file: 'hooks/useOtaUpdates.ts', needle: 'reloadAsync' },
   { file: 'utils/playerStorage.ts', needle: 'peekCachedPlayersList' },
   { file: 'app/search.tsx', needle: 'scoutListSessionCache' },

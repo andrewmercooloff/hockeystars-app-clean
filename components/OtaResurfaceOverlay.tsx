@@ -4,14 +4,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useLanguage } from '../contexts/LanguageContext';
-import {
-  consumeOtaJustUpdated,
-  setOtaReloadPresenter,
-} from '../utils/otaReloadSignal';
+import { setOtaReloadPresenter } from '../utils/otaReloadSignal';
+import { resolveOtaBoot } from '../utils/otaLaunch';
 
 const SWEEP_MS = 1400;
 const FADE_IN_MS = 260;
 const TOAST_MS = 3200;
+const TOAST_DELAY_AFTER_SPLASH_MS = 900;
+const TOAST_DELAY_SILENT_BOOT_MS = 180;
 
 /**
  * "Ice resurfacing" transition for OTA reloads.
@@ -67,15 +67,16 @@ const OtaResurfaceOverlay: React.FC = () => {
     return () => setOtaReloadPresenter(null);
   }, [runSweep]);
 
-  // Post-reload confirmation toast.
+  // Post-reload confirmation toast (shared boot resolution with _layout splash skip).
   useEffect(() => {
     let cancelled = false;
-    void consumeOtaJustUpdated().then((justUpdated) => {
-      if (!justUpdated || cancelled) return;
+    void resolveOtaBoot().then(({ showToast, skipSplash }) => {
+      if (!showToast || cancelled) return;
       setMode('toast');
       toast.setValue(0);
+      const delay = skipSplash ? TOAST_DELAY_SILENT_BOOT_MS : TOAST_DELAY_AFTER_SPLASH_MS;
       Animated.sequence([
-        Animated.delay(900),
+        Animated.delay(delay),
         Animated.spring(toast, { toValue: 1, damping: 16, stiffness: 160, useNativeDriver: true }),
         Animated.delay(TOAST_MS),
         Animated.timing(toast, { toValue: 0, duration: 260, useNativeDriver: true }),

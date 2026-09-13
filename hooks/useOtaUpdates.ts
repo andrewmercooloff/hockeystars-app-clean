@@ -28,7 +28,7 @@ async function markPendingReload(pending: boolean): Promise<void> {
 
 /**
  * Reload into the downloaded bundle. Always mark for the post-reload "лед залит" toast.
- * Only visible reloads show the ice-resurfacing overlay (auth screen / foreground fallback).
+ * Visible overlay only on auth screens — main tabs always reload silently.
  */
 async function reloadWithResurfacing(visible: boolean): Promise<void> {
   await markOtaJustUpdated();
@@ -112,7 +112,8 @@ export function useOtaUpdates(): void {
         if (!pendingReloadRef.current || appStateRef.current !== 'active') {
           return;
         }
-        void applyPendingReload(true);
+        // Silent reload on main tabs — overlay flash here felt like a crash.
+        void applyPendingReload(false);
       }, FOREGROUND_RELOAD_DELAY_MS);
     };
 
@@ -139,7 +140,8 @@ export function useOtaUpdates(): void {
           appStateRef.current !== 'active' || isAuthPath(pathnameRef.current);
 
         if (canReloadNow) {
-          await applyPendingReload(appStateRef.current === 'active');
+          const visible = appStateRef.current === 'active' && isAuthPath(pathnameRef.current);
+          await applyPendingReload(visible);
         }
       } catch {
         /* OTA unavailable — ignore */

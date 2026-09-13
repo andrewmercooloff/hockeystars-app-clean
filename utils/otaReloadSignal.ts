@@ -35,6 +35,13 @@ export function presentOtaReload(maxWaitMs = 2600): Promise<void> {
 }
 
 const JUST_UPDATED_KEY = 'hs_ota_just_updated_v1';
+const JUST_UPDATED_MAX_AGE_MS = 10 * 60_000;
+
+function isFreshJustUpdated(raw: string | null): boolean {
+  if (!raw) return false;
+  const at = Number(raw);
+  return Number.isFinite(at) && Date.now() - at < JUST_UPDATED_MAX_AGE_MS;
+}
 
 /** Remember that the next launch is the result of an OTA reload (to show a short "updated" toast). */
 export async function markOtaJustUpdated(): Promise<void> {
@@ -45,14 +52,35 @@ export async function markOtaJustUpdated(): Promise<void> {
   }
 }
 
+/** Read the just-updated flag without consuming it (used by unified boot resolution). */
+export async function peekOtaJustUpdated(): Promise<boolean> {
+  try {
+    const raw = await AsyncStorage.getItem(JUST_UPDATED_KEY);
+    return isFreshJustUpdated(raw);
+  } catch {
+    return false;
+  }
+}
+
+/** Clear the just-updated flag after boot resolution consumed it. */
+export async function clearOtaJustUpdated(): Promise<void> {
+  try {
+    await AsyncStorage.removeItem(JUST_UPDATED_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
 /** Returns true once after an OTA reload (flag is consumed; stale flags older than 10 min are dropped). */
 export async function consumeOtaJustUpdated(): Promise<boolean> {
   try {
     const raw = await AsyncStorage.getItem(JUST_UPDATED_KEY);
-    if (!raw) return false;
+    if (!isFreshJustUpdated(raw)) {
+      if (raw) await AsyncStorage.removeItem(JUST_UPDATED_KEY);
+      return false;
+    }
     await AsyncStorage.removeItem(JUST_UPDATED_KEY);
-    const at = Number(raw);
-    return Number.isFinite(at) && Date.now() - at < 10 * 60_000;
+    return true;
   } catch {
     return false;
   }
