@@ -2103,10 +2103,7 @@ if (!canBrowse) return;
           <SearchNewcomersShareCard
             ref={newcomersShareRef}
             title={t('search.newcomers') || 'Newcomers'}
-            filterLine={ratingShareFilterLine || undefined}
-            countLine={t('search.shareNewcomersCount', { count: newcomerSharePlayers.length })}
             players={newcomerSharePlayers}
-            language={language}
             t={t}
           />
         </View>

@@ -3,14 +3,10 @@ import { Image, ImageBackground, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { type Player } from '../utils/playerStorage';
 import { getRatingShareCardWidth } from '../utils/ratingShareExport';
-import { birthYearOf } from '../utils/birthDate';
 
 export type SearchNewcomersShareCardProps = {
   title: string;
-  filterLine?: string;
-  countLine?: string;
   players: Player[];
-  language: string;
   t: (key: string, params?: Record<string, string | number>) => string;
 };
 
@@ -25,72 +21,29 @@ const LOGO_HEADER_H = 63;
 const LOGO_HEADER_W = 189;
 const LOGO_DESIGN_HEIGHT = Math.round(LOGO_DESIGN_WIDTH * (LOGO_HEADER_H / LOGO_HEADER_W));
 
-const ROW_AVATAR_RING = s(104);
-const ROW_AVATAR_IMAGE = s(96);
-const ROW_MIN_HEIGHT = s(118);
-const ROW_GAP = s(10);
-const HEADER_HEIGHT = s(300);
+/** ~3× previous row avatar (was 104 / 96). */
+const GRID_AVATAR_RING = s(312);
+const GRID_AVATAR_IMAGE = s(288);
+const GRID_COL_GAP = s(20);
+const GRID_ROW_GAP = s(24);
+const GRID_CELL_PADDING_V = s(16);
+const GRID_NAME_BLOCK = s(72);
+const HEADER_HEIGHT = s(280);
 const FOOTER_HEIGHT = s(72);
+
+const GRID_CELL_HEIGHT =
+  GRID_CELL_PADDING_V * 2 + GRID_AVATAR_RING + GRID_NAME_BLOCK;
 
 export function getNewcomersShareCardHeight(playerCount: number): number {
   const count = Math.max(playerCount, 1);
-  const listHeight = count * ROW_MIN_HEIGHT + Math.max(0, count - 1) * ROW_GAP;
-  const total = HEADER_HEIGHT + listHeight + FOOTER_HEIGHT;
+  const rows = Math.ceil(count / 2);
+  const gridHeight = rows * GRID_CELL_HEIGHT + Math.max(0, rows - 1) * GRID_ROW_GAP;
+  const total = HEADER_HEIGHT + gridHeight + FOOTER_HEIGHT;
   return Math.max(Math.round(NEWCOMERS_SHARE_CARD_WIDTH * 1.25), total);
 }
 
 function getAvatarUri(player: Player): string | undefined {
   return player.avatar || (player.photos && player.photos.length > 0 ? player.photos[0] : undefined);
-}
-
-function getPlayerMeta(player: Player, t: (key: string) => string): string {
-  return [
-    player.country
-      ? t(`profile.countries.${player.country}`) !== `profile.countries.${player.country}`
-        ? t(`profile.countries.${player.country}`)
-        : player.country
-      : null,
-    player.birthDate
-      ? String(birthYearOf(player.birthDate) ?? '')
-      : player.age
-        ? String(new Date().getFullYear() - player.age)
-        : null,
-  ]
-    .filter(Boolean)
-    .join(' · ');
-}
-
-function formatJoinedDate(createdAt: string | undefined, language: string): string {
-  if (!createdAt) return '';
-  try {
-    const locale =
-      language === 'ru'
-        ? 'ru-RU'
-        : language === 'de'
-          ? 'de-DE'
-          : language === 'fr'
-            ? 'fr-FR'
-            : language === 'pl'
-              ? 'pl-PL'
-              : language === 'cs'
-                ? 'cs-CZ'
-                : language === 'sk'
-                  ? 'sk-SK'
-                  : language === 'fi'
-                    ? 'fi-FI'
-                    : language === 'sv'
-                      ? 'sv-SE'
-                      : language === 'lt'
-                        ? 'lt-LT'
-                        : language === 'lv'
-                          ? 'lv-LV'
-                          : language === 'it'
-                            ? 'it-IT'
-                            : 'en-US';
-    return new Date(createdAt).toLocaleDateString(locale, { day: 'numeric', month: 'short' });
-  } catch {
-    return '';
-  }
 }
 
 function ShareAvatar({
@@ -144,7 +97,7 @@ function ShareAvatar({
 }
 
 const SearchNewcomersShareCard = React.forwardRef<View, SearchNewcomersShareCardProps>(
-  function SearchNewcomersShareCard({ title, filterLine, countLine, players, language, t }, ref) {
+  function SearchNewcomersShareCard({ title, players, t }, ref) {
     const footer =
       t('search.shareRatingFooter') === 'search.shareRatingFooter' ||
       t('search.shareRatingFooter') === 'hockeystars.com'
@@ -152,6 +105,7 @@ const SearchNewcomersShareCard = React.forwardRef<View, SearchNewcomersShareCard
         : t('search.shareRatingFooter');
 
     const cardHeight = getNewcomersShareCardHeight(players.length);
+    const cellWidth = (NEWCOMERS_SHARE_CARD_WIDTH - s(32) * 2 - GRID_COL_GAP) / 2;
 
     return (
       <View ref={ref} style={[styles.card, { height: cardHeight }]} collapsable={false}>
@@ -175,45 +129,33 @@ const SearchNewcomersShareCard = React.forwardRef<View, SearchNewcomersShareCard
             resizeMode="contain"
           />
           <Text style={styles.title}>{title}</Text>
-          {filterLine ? (
-            <View style={styles.filterLineWrap}>
-              <Text style={styles.filterLine}>{filterLine}</Text>
-            </View>
-          ) : null}
-          {countLine ? <Text style={styles.countLine}>{countLine}</Text> : null}
 
-          <View style={styles.list}>
+          <View style={styles.grid}>
             {players.map((player, index) => {
-              const meta = getPlayerMeta(player, t);
-              const joined = formatJoinedDate(player.createdAt, language);
+              const isLeftCol = index % 2 === 0;
+              const row = Math.floor(index / 2);
+              const totalRows = Math.ceil(players.length / 2);
               return (
                 <View
                   key={player.id}
-                  style={[styles.row, index < players.length - 1 ? styles.rowGap : null]}
+                  style={[
+                    styles.cell,
+                    {
+                      width: cellWidth,
+                      marginRight: isLeftCol ? GRID_COL_GAP : 0,
+                      marginBottom: row < totalRows - 1 ? GRID_ROW_GAP : 0,
+                    },
+                  ]}
                 >
-                  <View style={styles.rowAvatarWrap}>
-                    <ShareAvatar
-                      player={player}
-                      ringSize={ROW_AVATAR_RING}
-                      imageSize={ROW_AVATAR_IMAGE}
-                      iconSize={Math.round(40 * CARD_SCALE)}
-                    />
-                  </View>
-                  <View style={styles.rowText}>
-                    <Text style={styles.name} numberOfLines={2}>
-                      {player.name}
-                    </Text>
-                    {meta ? (
-                      <Text style={styles.meta} numberOfLines={1}>
-                        {meta}
-                      </Text>
-                    ) : null}
-                  </View>
-                  {joined ? (
-                    <Text style={styles.joined} numberOfLines={2}>
-                      {joined}
-                    </Text>
-                  ) : null}
+                  <ShareAvatar
+                    player={player}
+                    ringSize={GRID_AVATAR_RING}
+                    imageSize={GRID_AVATAR_IMAGE}
+                    iconSize={Math.round(120 * CARD_SCALE)}
+                  />
+                  <Text style={styles.name} numberOfLines={2}>
+                    {player.name}
+                  </Text>
                 </View>
               );
             })}
@@ -302,46 +244,21 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1.5,
   },
-  filterLineWrap: {
-    alignSelf: 'center',
-    backgroundColor: '#fa2f40',
-    borderRadius: s(10),
-    paddingHorizontal: s(16),
-    paddingVertical: s(6),
-    marginTop: s(8),
-  },
-  filterLine: {
-    color: '#fff',
-    fontSize: s(28),
-    fontFamily: 'Gilroy-Bold',
-    textAlign: 'center',
-  },
-  countLine: {
-    color: 'rgba(255,255,255,0.72)',
-    fontSize: s(24),
-    fontFamily: 'Gilroy-Bold',
-    textAlign: 'center',
-    marginTop: s(10),
-  },
-  list: {
+  grid: {
     marginTop: s(18),
-  },
-  row: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+  },
+  cell: {
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.06)',
     borderRadius: s(20),
     borderWidth: 1,
     borderColor: 'rgba(250, 47, 64, 0.28)',
-    paddingVertical: s(10),
-    paddingHorizontal: s(14),
-    minHeight: ROW_MIN_HEIGHT,
-  },
-  rowGap: {
-    marginBottom: ROW_GAP,
-  },
-  rowAvatarWrap: {
-    marginRight: s(14),
+    paddingVertical: GRID_CELL_PADDING_V,
+    paddingHorizontal: s(12),
+    minHeight: GRID_CELL_HEIGHT,
   },
   avatarRing: {
     overflow: 'hidden',
@@ -350,29 +267,14 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(250, 47, 64, 0.55)',
     borderWidth: 3,
   },
-  rowText: {
-    flex: 1,
-    minWidth: 0,
-    marginRight: s(10),
-  },
   name: {
     color: '#fff',
-    fontSize: s(28),
+    fontSize: s(26),
     fontFamily: 'Gilroy-Bold',
     textTransform: 'uppercase',
-  },
-  meta: {
-    color: 'rgba(255,255,255,0.65)',
-    fontSize: s(22),
-    fontFamily: 'Gilroy-Regular',
-    marginTop: s(4),
-  },
-  joined: {
-    color: '#fa2f40',
-    fontSize: s(24),
-    fontFamily: 'Gilroy-Bold',
-    minWidth: s(88),
-    textAlign: 'right',
+    textAlign: 'center',
+    marginTop: s(12),
+    width: '100%',
   },
   footer: {
     color: 'rgba(255,255,255,0.55)',
