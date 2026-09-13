@@ -3,6 +3,7 @@ import { Image, ImageBackground, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { type Player } from '../utils/playerStorage';
 import { getRatingShareCardWidth } from '../utils/ratingShareExport';
+import { birthYearOf } from '../utils/birthDate';
 
 export type SearchNewcomersShareCardProps = {
   title: string;
@@ -27,12 +28,12 @@ const GRID_AVATAR_IMAGE = s(288);
 const GRID_COL_GAP = s(20);
 const GRID_ROW_GAP = s(24);
 const GRID_CELL_PADDING_V = s(16);
-const GRID_NAME_BLOCK = s(72);
+const GRID_TEXT_BLOCK = s(110);
 const HEADER_HEIGHT = s(280);
 const FOOTER_HEIGHT = s(72);
 
 const GRID_CELL_HEIGHT =
-  GRID_CELL_PADDING_V * 2 + GRID_AVATAR_RING + GRID_NAME_BLOCK;
+  GRID_CELL_PADDING_V * 2 + GRID_AVATAR_RING + GRID_TEXT_BLOCK;
 
 export function getNewcomersShareCardHeight(playerCount: number): number {
   const count = Math.max(playerCount, 1);
@@ -44,6 +45,43 @@ export function getNewcomersShareCardHeight(playerCount: number): number {
 
 function getAvatarUri(player: Player): string | undefined {
   return player.avatar || (player.photos && player.photos.length > 0 ? player.photos[0] : undefined);
+}
+
+function getPlayerMeta(player: Player, t: (key: string) => string): string {
+  const parts: string[] = [];
+
+  if (player.birthDate) {
+    const year = birthYearOf(player.birthDate);
+    if (year) parts.push(String(year));
+  } else if (player.age) {
+    parts.push(String(new Date().getFullYear() - player.age));
+  }
+
+  if (player.country) {
+    const countryKey = `profile.countries.${player.country}`;
+    const countryTranslation = t(countryKey);
+    parts.push(countryTranslation !== countryKey ? countryTranslation : player.country);
+  }
+
+  if (player.position) {
+    const positionKey = `profile.positions.${player.position}`;
+    const positionTranslation = t(positionKey);
+    if (positionTranslation && positionTranslation !== positionKey) {
+      parts.push(positionTranslation);
+    }
+  }
+
+  if (player.grip) {
+    if (player.grip === 'Левый' || player.grip === 'Left') {
+      parts.push(t('search.left'));
+    } else if (player.grip === 'Правый' || player.grip === 'Right') {
+      parts.push(t('search.right'));
+    } else {
+      parts.push(player.grip);
+    }
+  }
+
+  return parts.join(' · ');
 }
 
 function ShareAvatar({
@@ -156,6 +194,14 @@ const SearchNewcomersShareCard = React.forwardRef<View, SearchNewcomersShareCard
                   <Text style={styles.name} numberOfLines={2}>
                     {player.name}
                   </Text>
+                  {(() => {
+                    const meta = getPlayerMeta(player, t);
+                    return meta ? (
+                      <Text style={styles.meta} numberOfLines={3}>
+                        {meta}
+                      </Text>
+                    ) : null;
+                  })()}
                 </View>
               );
             })}
@@ -275,6 +321,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: s(12),
     width: '100%',
+  },
+  meta: {
+    color: 'rgba(255,255,255,0.68)',
+    fontSize: s(20),
+    fontFamily: 'Gilroy-Regular',
+    textAlign: 'center',
+    marginTop: s(6),
+    width: '100%',
+    lineHeight: s(26),
   },
   footer: {
     color: 'rgba(255,255,255,0.55)',
