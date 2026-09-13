@@ -173,6 +173,7 @@ const SearchNewcomersShareCard = React.forwardRef<View, SearchNewcomersShareCard
               const isLeftCol = index % 2 === 0;
               const row = Math.floor(index / 2);
               const totalRows = Math.ceil(players.length / 2);
+              const meta = getPlayerMeta(player, t);
               return (
                 <View
                   key={player.id}
@@ -194,14 +195,11 @@ const SearchNewcomersShareCard = React.forwardRef<View, SearchNewcomersShareCard
                   <Text style={styles.name} numberOfLines={2}>
                     {player.name}
                   </Text>
-                  {(() => {
-                    const meta = getPlayerMeta(player, t);
-                    return meta ? (
-                      <Text style={styles.meta} numberOfLines={3}>
-                        {meta}
-                      </Text>
-                    ) : null;
-                  })()}
+                  {meta ? (
+                    <Text style={styles.meta} numberOfLines={3}>
+                      {meta}
+                    </Text>
+                  ) : null}
                 </View>
               );
             })}
