@@ -24,8 +24,8 @@ import {
   invalidateAdminGiftItemsCache,
   loadAdminGiftItems,
 } from '../utils/adminGiftItemsCache';
-import { giftImageThumbUrl, prefetchGiftImages } from '../utils/giftImage';
-import CachedImage from './CachedImage';
+import { prefetchGiftImages } from '../utils/giftImage';
+import GiftPickerImage from './GiftPickerImage';
 
 interface AdminGiftModalProps {
   visible: boolean;
@@ -359,10 +359,9 @@ const AdminGiftModal: React.FC<AdminGiftModalProps> = ({
                       }}
                     >
                       {item.image_url ? (
-                        <CachedImage
-                          imageUrl={giftImageThumbUrl(item.image_url)}
+                        <GiftPickerImage
+                          imageUrl={item.image_url}
                           style={styles.itemImage}
-                          resizeMode="contain"
                           fallbackIcon={getItemTypeIcon(item.item_type)}
                           fallbackSize={24}
                           fallbackColor="#fa2f40"

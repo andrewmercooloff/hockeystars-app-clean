@@ -3,9 +3,13 @@ import { rewriteSupabasePublicUrl } from './supabase';
 
 const GIFT_THUMB_PX = 160;
 
-/** Small Supabase transform URL for gift picker thumbnails (PNG gifts stay light). */
+export function giftImageDisplayUrl(url: string | null | undefined): string {
+  return typeof url === 'string' ? url.trim() : '';
+}
+
+/** Small Supabase transform URL when supported; otherwise same as original. */
 export function giftImageThumbUrl(url: string | null | undefined, size = GIFT_THUMB_PX): string {
-  const full = rewriteSupabasePublicUrl(typeof url === 'string' ? url.trim() : '') || '';
+  const full = rewriteSupabasePublicUrl(giftImageDisplayUrl(url)) || '';
   if (!full) return '';
   if (full.includes('/storage/v1/object/public/')) {
     return (
@@ -16,11 +20,16 @@ export function giftImageThumbUrl(url: string | null | undefined, size = GIFT_TH
   return full;
 }
 
-/** Warm expo-image disk cache for gift thumbnails. */
+/** Prefetch originals (reliable) and optional thumbs for the gift picker. */
 export async function prefetchGiftImages(urls: (string | null | undefined)[]): Promise<void> {
-  const unique = [...new Set(urls.map((u) => giftImageThumbUrl(u)).filter(Boolean))];
-  if (unique.length === 0) return;
-  const batch = unique.slice(0, 24);
+  const originals = [
+    ...new Set(urls.map((u) => rewriteSupabasePublicUrl(giftImageDisplayUrl(u)) || '').filter(Boolean)),
+  ];
+  const thumbs = originals
+    .map((original, index) => giftImageThumbUrl(original))
+    .filter((thumb, index) => thumb && thumb !== originals[index]);
+  const batch = [...new Set([...originals, ...thumbs])].slice(0, 32);
+  if (batch.length === 0) return;
   await Promise.allSettled(
     batch.map((uri) => Image.prefetch(uri, { cachePolicy: 'memory-disk' })),
   );
