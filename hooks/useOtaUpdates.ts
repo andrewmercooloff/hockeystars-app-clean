@@ -27,13 +27,12 @@ async function markPendingReload(pending: boolean): Promise<void> {
 }
 
 /**
- * Reload into the downloaded bundle. Visible reloads show the ice-resurfacing overlay
- * and a post-reload toast. Background reloads stay silent — no AsyncStorage writes
- * before reloadAsync or iOS may suspend the app before the bundle switches.
+ * Reload into the downloaded bundle. Always mark for the post-reload "лед залит" toast.
+ * Only visible reloads show the ice-resurfacing overlay (auth screen / foreground fallback).
  */
 async function reloadWithResurfacing(visible: boolean): Promise<void> {
+  await markOtaJustUpdated();
   if (visible) {
-    await markOtaJustUpdated();
     await presentOtaReload();
   }
   await Updates.reloadAsync();
