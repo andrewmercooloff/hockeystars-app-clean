@@ -4053,7 +4053,9 @@
     "giftReceivedFromStar": "Вы получили подарок от {starName}: {giftName}",
     "giftReceivedPush": "🎁 Подарок получен!",
     "giftReceivedFromAdminPush": "Вы получили подарок от администратора: {giftName}",
-    "giftReceivedFromStarPush": "Вы получили подарок от {starName}: {giftName}"
+    "giftReceivedFromStarPush": "Вы получили подарок от {starName}: {giftName}",
+    "searchByName": "Поиск по имени…",
+    "noSearchResults": "Ничего не найдено"
   },
   "TEMP_DELETE_ME": {
     "title": "Нормативы",

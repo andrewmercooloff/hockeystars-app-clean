@@ -4195,7 +4195,9 @@
     "selectGiftType": "Pasirinkite dovanos tipą",
     "selectGiftTypeMessage": "Kokio tipo dovaną norite sukurti?",
     "sendRequest": "Siųsti užklausą",
-    "sending": "Siunčiama..."
+    "sending": "Siunčiama...",
+    "searchByName": "Ieškoti pagal pavadinimą…",
+    "noSearchResults": "Nieko nerasta"
   },
   "videoNotification": {
     "added": "pridėjo",

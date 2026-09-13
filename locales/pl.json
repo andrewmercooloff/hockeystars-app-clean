@@ -3977,7 +3977,9 @@
     "giftReceivedPush": "🎁 Otrzymano prezent!",
     "giftReceivedFromAdminPush": "Otrzymałeś prezent od administratora: {giftName}",
     "giftReceivedFromStarPush": "Otrzymałeś prezent od {starName}: {giftName}",
-    "customGift": "Poproś o prezent"
+    "customGift": "Poproś o prezent",
+    "searchByName": "Szukaj po nazwie…",
+    "noSearchResults": "Nic nie znaleziono"
   },
   "TEMP_DELETE_ME": {
     "title": "Standardy",

@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { prefetchGiftImages } from './giftImage';
 
 export type AdminGiftItem = {
   id: string;
@@ -38,6 +39,7 @@ async function fetchAdminGiftItems(adminId: string): Promise<AdminGiftItem[]> {
 
   const items = (data ?? []) as AdminGiftItem[];
   cache.set(adminId, { items, fetchedAt: Date.now() });
+  void prefetchGiftImages(items.map((item) => item.image_url));
   return items;
 }
 

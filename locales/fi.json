@@ -4172,7 +4172,9 @@
     "giftReceivedFromStar": "Sait lahjan käyttäjältä {starName}: {giftName}",
     "giftReceivedFromStarPush": "Sait lahjan käyttäjältä {starName}: {giftName}",
     "giftReceivedPush": "🎁 Lahja vastaanotettu!",
-    "successGiftSent": "Lahja lähetetty pelaajalle {playerName}!"
+    "successGiftSent": "Lahja lähetetty pelaajalle {playerName}!",
+    "searchByName": "Hae nimellä…",
+    "noSearchResults": "Ei tuloksia"
   },
   "TEMP_DELETE_ME": {
     "title": "Standardit",

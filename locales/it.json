@@ -4179,7 +4179,9 @@
     "giftReceivedFromStar": "Hai ricevuto un regalo da {starName}: {giftName}",
     "giftReceivedFromStarPush": "Hai ricevuto un regalo da {starName}: {giftName}",
     "giftReceivedPush": "🎁 Regalo ricevuto!",
-    "successGiftSent": "Regalo inviato a {playerName}!"
+    "successGiftSent": "Regalo inviato a {playerName}!",
+    "searchByName": "Cerca per nome…",
+    "noSearchResults": "Nessun regalo trovato"
   },
   "TEMP_DELETE_ME": {
     "title": "Standard",

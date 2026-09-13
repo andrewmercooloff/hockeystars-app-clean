@@ -4133,7 +4133,9 @@
     "giftReceivedFromStar": "You received a gift from {starName}: {giftName}",
     "giftReceivedPush": "🎁 Gift Received!",
     "giftReceivedFromAdminPush": "You received a gift from Admin: {giftName}",
-    "giftReceivedFromStarPush": "You received a gift from {starName}: {giftName}"
+    "giftReceivedFromStarPush": "You received a gift from {starName}: {giftName}",
+    "searchByName": "Search by name…",
+    "noSearchResults": "No gifts found"
   },
   "editProfile": {
     "selectPhotoSource": "Select Photo Source",

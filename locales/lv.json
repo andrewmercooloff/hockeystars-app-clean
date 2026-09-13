@@ -4193,7 +4193,9 @@
     "giftReceivedPush": "🎁 Saņemta dāvana!",
     "giftReceivedFromAdminPush": "Jūs saņēmāt dāvanu no administratora: {giftName}",
     "giftReceivedFromStarPush": "Jūs saņēmāt dāvanu no {starName}: {giftName}",
-    "customGift": "Lūgt dāvanu"
+    "customGift": "Lūgt dāvanu",
+    "searchByName": "Meklēt pēc nosaukuma…",
+    "noSearchResults": "Nekas nav atrasts"
   },
   "TEMP_DELETE_ME": {
     "title": "Standarti",

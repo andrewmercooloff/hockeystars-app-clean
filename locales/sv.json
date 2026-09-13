@@ -4179,7 +4179,9 @@
     "giftReceivedFromStar": "Du fick en present från {starName}: {giftName}",
     "giftReceivedFromStarPush": "Du fick en present från {starName}: {giftName}",
     "giftReceivedPush": "🎁 Present mottagen!",
-    "successGiftSent": "Present skickad till {playerName}!"
+    "successGiftSent": "Present skickad till {playerName}!",
+    "searchByName": "Sök efter namn…",
+    "noSearchResults": "Inget hittades"
   },
   "TEMP_DELETE_ME": {
     "title": "Standarder",

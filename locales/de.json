@@ -4198,7 +4198,9 @@
     "giftReceivedFromStar": "Sie haben ein Geschenk von {starName} erhalten: {giftName}",
     "giftReceivedFromStarPush": "Sie haben ein Geschenk von {starName} erhalten: {giftName}",
     "giftReceivedPush": "🎁 Geschenk erhalten!",
-    "successGiftSent": "Geschenk an {playerName} gesendet!"
+    "successGiftSent": "Geschenk an {playerName} gesendet!",
+    "searchByName": "Nach Name suchen…",
+    "noSearchResults": "Nichts gefunden"
   },
   "TEMP_DELETE_ME": {
     "title": "Normen",

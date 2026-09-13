@@ -4174,7 +4174,9 @@
     "giftReceivedFromStar": "Dostali ste darček od {starName}: {giftName}",
     "giftReceivedFromStarPush": "Dostali ste darček od {starName}: {giftName}",
     "giftReceivedPush": "🎁 Darček prijatý!",
-    "successGiftSent": "Darček odoslaný hráčovi {playerName}!"
+    "successGiftSent": "Darček odoslaný hráčovi {playerName}!",
+    "searchByName": "Hľadať podľa názvu…",
+    "noSearchResults": "Nič sa nenašlo"
   },
   "TEMP_DELETE_ME": {
     "title": "Normy",

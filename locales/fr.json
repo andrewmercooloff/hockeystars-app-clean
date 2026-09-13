@@ -4180,7 +4180,9 @@
     "giftReceivedFromStar": "Vous avez reçu un cadeau de {starName} : {giftName}",
     "giftReceivedFromStarPush": "Vous avez reçu un cadeau de {starName} : {giftName}",
     "giftReceivedPush": "🎁 Cadeau reçu !",
-    "successGiftSent": "Cadeau envoyé à {playerName} !"
+    "successGiftSent": "Cadeau envoyé à {playerName} !",
+    "searchByName": "Rechercher par nom…",
+    "noSearchResults": "Aucun cadeau trouvé"
   },
   "TEMP_DELETE_ME": {
     "title": "Normes",
