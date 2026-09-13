@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Modal,
-  ScrollView,
+  FlatList,
   Image,
   Alert,
   ActivityIndicator,
@@ -18,6 +18,12 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { supabase } from '../utils/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Player } from '../utils/playerStorage';
+import {
+  type AdminGiftItem,
+  getCachedAdminGiftItems,
+  invalidateAdminGiftItemsCache,
+  loadAdminGiftItems,
+} from '../utils/adminGiftItemsCache';
 
 interface AdminGiftModalProps {
   visible: boolean;
@@ -29,15 +35,6 @@ interface AdminGiftModalProps {
   updateNotificationCount?: (user?: Player | null) => Promise<void>;
 }
 
-interface AdminItem {
-  id: string;
-  item_type: 'autograph' | 'stick' | 'puck' | 'jersey' | 'custom';
-  name: string;
-  description?: string;
-  image_url: string;
-  created_at: string;
-}
-
 const AdminGiftModal: React.FC<AdminGiftModalProps> = ({
   visible,
   onClose,
@@ -45,61 +42,61 @@ const AdminGiftModal: React.FC<AdminGiftModalProps> = ({
   adminId,
   playerId,
   playerName,
-  updateNotificationCount
 }) => {
   const { t } = useLanguage();
-  const [adminItems, setAdminItems] = useState<AdminItem[]>([]);
-  const [selectedItem, setSelectedItem] = useState<AdminItem | null>(null);
+  const [adminItems, setAdminItems] = useState<AdminGiftItem[]>([]);
+  const [selectedItem, setSelectedItem] = useState<AdminGiftItem | null>(null);
   const [customGiftName, setCustomGiftName] = useState('');
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingItems, setLoadingItems] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    if (visible) {
-      loadAdminItems();
-    }
-  }, [visible, adminId]);
-
-  const loadAdminItems = async () => {
-    try {
-      console.log('🔄 ADMIN: Загрузка подарков для админа:', adminId);
+  const hydrateItems = useCallback(async () => {
+    const cached = getCachedAdminGiftItems(adminId);
+    if (cached) {
+      setAdminItems(cached);
+      setLoadingItems(false);
+    } else {
       setLoadingItems(true);
-      const { data, error } = await supabase
-        .from('items')
-        .select('*')
-        .eq('owner_id', adminId)
-        .order('created_at', { ascending: false });
+    }
 
-      if (error) {
-        console.error('❌ ADMIN: Ошибка загрузки подарков админа:', error);
-        return;
+    try {
+      const items = await loadAdminGiftItems(adminId, { force: !!cached });
+      setAdminItems(items);
+    } catch {
+      if (!cached) {
+        Alert.alert(t('common.error') || 'Ошибка', t('gifts.failedToLoadItems') || 'Не удалось загрузить подарки');
       }
-
-      console.log('✅ ADMIN: Получено подарков из БД:', data?.length || 0);
-      setAdminItems(data || []);
-      console.log('✅ ADMIN: State обновлен, setAdminItems вызван');
-    } catch (error) {
-      console.error('❌ ADMIN: Ошибка загрузки подарков админа:', error);
     } finally {
       setLoadingItems(false);
     }
-  };
+  }, [adminId, t]);
+
+  useEffect(() => {
+    if (!visible) {
+      setSearchQuery('');
+      return;
+    }
+    void hydrateItems();
+  }, [visible, adminId, hydrateItems]);
+
+  const filteredItems = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return adminItems;
+    return adminItems.filter((item) => item.name.toLowerCase().includes(q));
+  }, [adminItems, searchQuery]);
 
   const pickImage = async () => {
     try {
-      // На Android 13+ (API 33+) используем Photo Picker без разрешений
-      // На старых версиях Android запрашиваем разрешения
       let result;
       if (Platform.OS === 'android' && Platform.Version >= 33) {
-        // Android 13+ использует Photo Picker автоматически, разрешения не нужны
         result = await ImagePicker.launchImageLibraryAsync({
           allowsEditing: false,
           quality: 0.8,
           mediaTypes: ['images'],
         });
       } else {
-        // Для старых версий Android запрашиваем разрешения
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
           Alert.alert('Ошибка', 'Нет доступа к галерее');
@@ -122,174 +119,101 @@ const AdminGiftModal: React.FC<AdminGiftModalProps> = ({
     }
   };
 
-  const uploadGiftImageToStorage = async (imageUri: string, fileName: string): Promise<string> => {
-    try {
-      // Сначала уменьшаем изображение до 600px по большей стороне, сохраняя PNG
-      const manipulatedImage = await ImageManipulator.manipulateAsync(
-        imageUri,
-        [{ resize: { width: 600 } }], // Уменьшаем до 600px по ширине
-        {
-          compress: 1.0, // Без сжатия для PNG
-          format: ImageManipulator.SaveFormat.PNG, // Сохраняем как PNG для прозрачности
-        }
-      );
+  const uploadGiftImageToStorage = async (uri: string): Promise<string> => {
+    const manipulatedImage = await ImageManipulator.manipulateAsync(
+      uri,
+      [{ resize: { width: 600 } }],
+      {
+        compress: 1.0,
+        format: ImageManipulator.SaveFormat.PNG,
+      },
+    );
 
-      // Читаем файл как ArrayBuffer для React Native
-      const response = await fetch(manipulatedImage.uri);
-      const arrayBuffer = await response.arrayBuffer();
-      
-      const fileExt = 'png'; // Всегда PNG для подарков
-      const filePath = `gifts/${Date.now()}.${fileExt}`;
-      
-      // Создаем Uint8Array из ArrayBuffer
-      const uint8Array = new Uint8Array(arrayBuffer);
-      
-      const { data, error } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, uint8Array, {
-          contentType: 'image/png',
-          upsert: false
-        });
+    const response = await fetch(manipulatedImage.uri);
+    const arrayBuffer = await response.arrayBuffer();
+    const filePath = `gifts/${Date.now()}.png`;
+    const uint8Array = new Uint8Array(arrayBuffer);
 
-      if (error) {
-        console.error('Ошибка загрузки изображения:', error);
-        throw error;
-      }
+    const { error } = await supabase.storage.from('avatars').upload(filePath, uint8Array, {
+      contentType: 'image/png',
+      upsert: false,
+    });
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
+    if (error) throw error;
 
-      return publicUrl;
-    } catch (error) {
-      console.error('Ошибка загрузки изображения подарка:', error);
-      throw error;
-    }
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('avatars').getPublicUrl(filePath);
+    return publicUrl;
   };
 
   const sendGift = async () => {
-    console.log('🎁 ADMIN: Начало отправки подарка');
-    console.log('🎁 ADMIN: playerId:', playerId);
-    console.log('🎁 ADMIN: playerName:', playerName);
-    console.log('🎁 ADMIN: selectedItem:', selectedItem?.id, selectedItem?.name);
-    console.log('🎁 ADMIN: customGiftName:', customGiftName);
-    
     if (!selectedItem && !customGiftName.trim()) {
-      console.log('🎁 ADMIN: ❌ Нет подарка для отправки');
       Alert.alert(t('common.error') || 'Ошибка', t('gifts.errorSelectOrCreate'));
       return;
     }
 
     try {
       setLoading(true);
-      console.log('🎁 ADMIN: Loading = true');
-      
-      let itemToSend: AdminItem;
-      
+
+      let itemToSend: AdminGiftItem;
+
       if (selectedItem) {
-        // Используем существующий подарок
-        console.log('🎁 ADMIN: Используем существующий подарок:', selectedItem.id);
         itemToSend = selectedItem;
       } else {
-        // Создаем новый подарок
-        console.log('🎁 ADMIN: Создаем новый подарок');
-        let imageUrl = null;
-        
+        let imageUrl: string | null = null;
+
         if (imageUri) {
-          console.log('🎁 ADMIN: Загружаем изображение...');
-          imageUrl = await uploadGiftImageToStorage(imageUri, `custom_gift_${Date.now()}.png`);
-          console.log('🎁 ADMIN: Изображение загружено:', imageUrl);
+          imageUrl = await uploadGiftImageToStorage(imageUri);
         }
 
         const { data: newItem, error: createError } = await supabase
           .from('items')
-          .insert([{
-            owner_id: adminId,
-            item_type: 'custom',
-            name: customGiftName.trim(),
-            description: `Подарок от администратора`,
-            image_url: imageUrl
-          }])
-          .select()
+          .insert([
+            {
+              owner_id: adminId,
+              item_type: 'custom',
+              name: customGiftName.trim(),
+              description: 'Подарок от администратора',
+              image_url: imageUrl,
+            },
+          ])
+          .select('id,item_type,name,image_url,created_at')
           .single();
 
-        if (createError) {
-          console.error('🎁 ADMIN: ❌ Ошибка создания подарка:', createError);
-          throw createError;
-        }
+        if (createError) throw createError;
 
-        console.log('🎁 ADMIN: ✅ Новый подарок создан:', newItem.id);
-        itemToSend = newItem;
+        itemToSend = newItem as AdminGiftItem;
+        invalidateAdminGiftItemsCache(adminId);
       }
 
-      console.log('🎁 ADMIN: Проверяем дубликаты для item_id:', itemToSend.id);
-      console.log('🎁 ADMIN: playerId:', playerId);
-      
-      // Проверяем, есть ли уже этот подарок у игрока
       const { data: existingGift, error: checkError } = await supabase
         .from('player_museum')
-        .select('id, item_id, received_at')
+        .select('id')
         .eq('player_id', playerId)
         .eq('item_id', itemToSend.id)
         .maybeSingle();
 
       if (checkError && checkError.code !== 'PGRST116') {
-        console.error('🎁 ADMIN: ❌ Ошибка проверки дубликатов:', checkError);
+        console.error('Ошибка проверки дубликатов:', checkError);
       }
 
-      console.log('🎁 ADMIN: Результат проверки дубликатов:', existingGift ? 'НАЙДЕН' : 'НЕ НАЙДЕН');
-      
       if (existingGift) {
-        console.log('🎁 ADMIN: ⚠️ Найденный подарок:', existingGift);
-        console.log('🎁 ADMIN: museum_id:', existingGift.id);
-        console.log('🎁 ADMIN: received_at:', existingGift.received_at);
-        
-        // Проверяем, действительно ли этот подарок существует в базе
-        // Возможно, это кеш или race condition
-        console.log('🎁 ADMIN: Делаем повторную проверку...');
-        
-        const { data: doubleCheck, error: doubleCheckError } = await supabase
-          .from('player_museum')
-          .select('id')
-          .eq('id', existingGift.id)
-          .maybeSingle();
-        
-        console.log('🎁 ADMIN: Результат повторной проверки:', doubleCheck ? 'ПОДТВЕРЖДЕНО' : 'НЕ НАЙДЕНО');
-        
-        if (!doubleCheck) {
-          console.log('🎁 ADMIN: ✅ Подарок был удален, продолжаем отправку');
-          // Подарок был удален, можно продолжить
-        } else {
-          console.log('🎁 ADMIN: ❌ Подарок действительно есть у игрока, отменяем отправку');
-          Alert.alert(
-            t('common.error') || 'Ошибка', 
-            t('gifts.errorGiftAlreadyExists', { playerName })
-          );
-          setLoading(false);
-          return;
-        }
+        Alert.alert(t('common.error') || 'Ошибка', t('gifts.errorGiftAlreadyExists', { playerName }));
+        return;
       }
 
-      console.log('🎁 ADMIN: Добавляем подарок в музей игрока...');
-      
-      // Добавляем подарок в музей игрока (используем ссылку на подарок, не копируем)
-      const { error: museumError } = await supabase
-        .from('player_museum')
-        .insert([{
+      const { error: museumError } = await supabase.from('player_museum').insert([
+        {
           player_id: playerId,
           item_id: itemToSend.id,
           received_from: adminId,
-          custom_name: `${selectedItem ? itemToSend.name : customGiftName.trim()} ${t('gifts.fromAdmin')}`
-        }]);
+          custom_name: `${selectedItem ? itemToSend.name : customGiftName.trim()} ${t('gifts.fromAdmin')}`,
+        },
+      ]);
 
-      if (museumError) {
-        console.error('🎁 ADMIN: ❌ Ошибка добавления в музей:', museumError);
-        throw museumError;
-      }
+      if (museumError) throw museumError;
 
-      console.log('🎁 ADMIN: ✅ Подарок успешно добавлен в музей');
-
-      // Отправляем уведомления
       try {
         const { sendGiftNotification } = await import('../utils/playerStorage');
         await sendGiftNotification(
@@ -299,231 +223,230 @@ const AdminGiftModal: React.FC<AdminGiftModalProps> = ({
           itemToSend.name,
           {
             giftReceived: t('gifts.giftReceived') || 'Подарок получен!',
-            giftReceivedMessage: t('gifts.giftReceivedFromAdmin', { giftName: itemToSend.name }) || `Вы получили подарок от администратора: ${itemToSend.name}`,
+            giftReceivedMessage:
+              t('gifts.giftReceivedFromAdmin', { giftName: itemToSend.name }) ||
+              `Вы получили подарок от администратора: ${itemToSend.name}`,
             giftReceivedPushTitle: t('gifts.giftReceivedPush') || '🎁 Подарок получен!',
-            giftReceivedPushBody: t('gifts.giftReceivedFromAdminPush', { giftName: itemToSend.name }) || `Вы получили подарок от администратора: ${itemToSend.name}`
+            giftReceivedPushBody:
+              t('gifts.giftReceivedFromAdminPush', { giftName: itemToSend.name }) ||
+              `Вы получили подарок от администратора: ${itemToSend.name}`,
           },
-          adminId // Передаем ID админа, чтобы не отправлять уведомление самому себе
+          adminId,
         );
-        
-        console.log('🎁 ADMIN: ✅ Уведомления отправлены');
       } catch (notificationError) {
-        console.error('🎁 ADMIN: ⚠️ Ошибка отправки уведомлений:', notificationError);
+        console.error('Ошибка отправки уведомлений:', notificationError);
       }
 
-      console.log('🎁 ADMIN: ✅ Все операции завершены успешно');
-      console.log('🎁 ADMIN: Очищаем форму и закрываем модальное окно');
-
-      // Очищаем форму
       setSelectedItem(null);
       setCustomGiftName('');
       setImageUri(null);
-      
-      console.log('🎁 ADMIN: Вызываем onGiftSent() для обновления родительского компонента');
       onGiftSent();
-      
-      console.log('🎁 ADMIN: Закрываем модальное окно');
       onClose();
-      
       Alert.alert(t('common.success') || 'Успех', t('gifts.successGiftSent', { playerName }));
     } catch (error) {
-      console.error('🎁 ADMIN: ❌❌❌ КРИТИЧЕСКАЯ ОШИБКА отправки подарка:', error);
+      console.error('Ошибка отправки подарка:', error);
       Alert.alert(t('common.error') || 'Ошибка', t('gifts.errorSendingGift'));
     } finally {
-      console.log('🎁 ADMIN: Loading = false');
       setLoading(false);
     }
   };
 
   const deleteAdminItem = async (itemId: string) => {
-    Alert.alert(
-      t('gifts.deleteGiftQuestion'),
-      t('gifts.deleteGiftConfirm'),
-      [
-        {
-          text: t('common.cancel'),
-          style: 'cancel'
-        },
-        {
-          text: t('common.delete') || 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              console.log('🗑️ ADMIN: Удаление подарка:', itemId);
-              console.log('🗑️ ADMIN: Вызываем серверную функцию delete_item_by_user...');
-              
-              // Используем серверную функцию для удаления (обходит RLS)
-              const { data, error } = await supabase
-                .rpc('delete_item_by_user', {
-                  item_id_param: itemId,
-                  requesting_user_id: adminId
-                });
+    Alert.alert(t('gifts.deleteGiftQuestion'), t('gifts.deleteGiftConfirm'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('common.delete') || 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            const { data, error } = await supabase.rpc('delete_item_by_user', {
+              item_id_param: itemId,
+              requesting_user_id: adminId,
+            });
 
-              console.log('🗑️ ADMIN: Результат RPC вызова - data:', data, 'error:', error);
-
-              if (error) {
-                console.error('🗑️ ADMIN: ❌ Error deleting gift:', error);
-                Alert.alert(t('common.error') || 'Error', t('gifts.errorDelete'));
-                return;
-              }
-
-              if (!data) {
-                console.log('🗑️ ADMIN: ❌ Функция вернула FALSE');
-                Alert.alert(t('common.error') || 'Error', t('gifts.errorDelete'));
-                return;
-              }
-
-              console.log('🗑️ ADMIN: ✅ Подарок успешно удален через серверную функцию');
-
-              // Если удаляемый подарок был выбран, сбрасываем выбор
-              if (selectedItem?.id === itemId) {
-                setSelectedItem(null);
-              }
-
-              // Обновляем список
-              await loadAdminItems();
-              
-              console.log('🗑️ ADMIN: ✅ Список обновлен');
-            } catch (error) {
-              console.error('🗑️ ADMIN: ❌ Error deleting gift:', error);
+            if (error || !data) {
               Alert.alert(t('common.error') || 'Error', t('gifts.errorDelete'));
+              return;
             }
+
+            if (selectedItem?.id === itemId) {
+              setSelectedItem(null);
+            }
+
+            invalidateAdminGiftItemsCache(adminId);
+            await hydrateItems();
+          } catch {
+            Alert.alert(t('common.error') || 'Error', t('gifts.errorDelete'));
           }
-        }
-      ]
-    );
+        },
+      },
+    ]);
   };
 
   const getItemTypeIcon = (type: string) => {
     switch (type) {
-      case 'autograph': return 'pencil';
-      case 'stick': return 'sports-hockey';
-      case 'puck': return 'ellipse';
-      case 'jersey': return 'shirt';
-      case 'custom': return 'gift';
-      default: return 'cube';
+      case 'autograph':
+        return 'pencil';
+      case 'stick':
+        return 'sports-hockey';
+      case 'puck':
+        return 'ellipse';
+      case 'jersey':
+        return 'shirt';
+      case 'custom':
+        return 'gift';
+      default:
+        return 'cube';
     }
   };
+
+  const renderGiftItem = ({ item }: { item: AdminGiftItem }) => (
+    <View style={styles.itemCardWrapper}>
+      <TouchableOpacity
+        style={[styles.itemCard, selectedItem?.id === item.id && styles.selectedItemCard]}
+        onPress={() => {
+          setSelectedItem(item);
+          setCustomGiftName('');
+          setImageUri(null);
+        }}
+      >
+        {item.image_url ? (
+          <Image source={{ uri: item.image_url }} style={styles.itemImage} />
+        ) : (
+          <View style={styles.placeholderImage}>
+            <Ionicons name={getItemTypeIcon(item.item_type)} size={24} color="#fa2f40" />
+          </View>
+        )}
+        <Text style={styles.itemName} numberOfLines={2}>
+          {item.name}
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.deleteItemButton} onPress={() => deleteAdminItem(item.id)}>
+        <Ionicons name="trash-outline" size={16} color="#fff" />
+      </TouchableOpacity>
+    </View>
+  );
+
+  const listHeader = (
+    <View style={styles.listHeader}>
+      <Text style={styles.sectionTitle}>{t('gifts.selectExistingGift')}</Text>
+
+      {adminItems.length > 0 ? (
+        <View style={styles.searchRow}>
+          <Ionicons name="search-outline" size={18} color="#888" />
+          <TextInput
+            style={styles.searchInput}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder={t('gifts.searchByName') || 'Поиск по имени…'}
+            placeholderTextColor="#888"
+            autoCorrect={false}
+            autoCapitalize="none"
+            clearButtonMode="while-editing"
+          />
+          {searchQuery.trim() ? (
+            <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={8}>
+              <Ionicons name="close-circle" size={18} color="#888" />
+            </TouchableOpacity>
+          ) : null}
+        </View>
+      ) : null}
+
+      {loadingItems && adminItems.length === 0 ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="small" color="#fa2f40" />
+          <Text style={styles.loadingText}>{t('common.loading') || 'Загрузка...'}</Text>
+        </View>
+      ) : null}
+
+      {!loadingItems && adminItems.length === 0 ? (
+        <Text style={styles.emptyText}>{t('gifts.noGiftsUploaded')}</Text>
+      ) : null}
+
+      {searchQuery.trim() && filteredItems.length === 0 && adminItems.length > 0 ? (
+        <Text style={styles.emptyText}>{t('gifts.noSearchResults') || 'Ничего не найдено'}</Text>
+      ) : null}
+    </View>
+  );
+
+  const listFooter = (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>{t('gifts.orCreateNew')}</Text>
+
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>{t('gifts.giftName')}</Text>
+        <TextInput
+          style={styles.input}
+          value={customGiftName}
+          onChangeText={setCustomGiftName}
+          placeholder={t('gifts.giftNamePlaceholder')}
+          placeholderTextColor="#888"
+          onFocus={() => setSelectedItem(null)}
+        />
+      </View>
+
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>{t('gifts.uploadImage')}</Text>
+        <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+          {imageUri ? (
+            <Image
+              source={{ uri: imageUri }}
+              style={[
+                styles.previewImage,
+                imageUri.toLowerCase().includes('.png') && styles.pngPreviewImage,
+              ]}
+            />
+          ) : (
+            <View style={styles.imagePlaceholder}>
+              <Ionicons name="camera" size={40} color="#888" />
+              <Text style={styles.imagePlaceholderText}>
+                {t('gifts.selectImage') || 'Выберите изображение'}
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.title}>
-            {t('gifts.sendGiftTo', { playerName })}
-          </Text>
+          <Text style={styles.title}>{t('gifts.sendGiftTo', { playerName })}</Text>
           <TouchableOpacity onPress={onClose}>
             <Ionicons name="close" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.content}>
-          {/* Выбор существующего подарка */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('gifts.selectExistingGift')}</Text>
-            
-            {loadingItems ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="small" color="#fa2f40" />
-                <Text style={styles.loadingText}>{t('common.loading') || 'Загрузка...'}</Text>
-              </View>
-            ) : adminItems.length > 0 ? (
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.itemsScroll}>
-                {adminItems.map((item) => (
-                  <View key={item.id} style={styles.itemCardWrapper}>
-                    <TouchableOpacity
-                      style={[
-                        styles.itemCard,
-                        selectedItem?.id === item.id && styles.selectedItemCard
-                      ]}
-                      onPress={() => {
-                        setSelectedItem(item);
-                        setCustomGiftName('');
-                        setImageUri(null);
-                      }}
-                    >
-                      {item.image_url ? (
-                        <Image source={{ uri: item.image_url }} style={styles.itemImage} />
-                      ) : (
-                        <View style={styles.placeholderImage}>
-                          <Ionicons name={getItemTypeIcon(item.item_type)} size={24} color="#fa2f40" />
-                        </View>
-                      )}
-                      <Text style={styles.itemName} numberOfLines={2}>{item.name}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.deleteItemButton}
-                      onPress={() => deleteAdminItem(item.id)}
-                    >
-                      <Ionicons name="trash-outline" size={16} color="#fff" />
-                    </TouchableOpacity>
-                  </View>
-                ))}
-              </ScrollView>
-            ) : (
-              <Text style={styles.emptyText}>{t('gifts.noGiftsUploaded')}</Text>
-            )}
-          </View>
-
-          {/* Создание нового подарка */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('gifts.orCreateNew')}</Text>
-            
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>{t('gifts.giftName')}</Text>
-              <TextInput
-                style={styles.input}
-                value={customGiftName}
-                onChangeText={setCustomGiftName}
-                placeholder={t('gifts.giftNamePlaceholder')}
-                placeholderTextColor="#888"
-                onFocus={() => setSelectedItem(null)}
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>{t('gifts.uploadImage')}</Text>
-              <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-                {imageUri ? (
-                  <Image 
-                    source={{ uri: imageUri }} 
-                    style={[
-                      styles.previewImage,
-                      // Для PNG изображений убираем фон и добавляем поддержку прозрачности
-                      imageUri.toLowerCase().includes('.png') && styles.pngPreviewImage
-                    ]} 
-                  />
-                ) : (
-                  <View style={styles.imagePlaceholder}>
-                    <Ionicons name="camera" size={40} color="#888" />
-                    <Text style={styles.imagePlaceholderText}>
-                      {t('gifts.selectImage') || 'Выберите изображение'}
-                    </Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
-        </ScrollView>
+        <FlatList
+          data={filteredItems}
+          keyExtractor={(item) => item.id}
+          renderItem={renderGiftItem}
+          numColumns={3}
+          columnWrapperStyle={styles.giftRow}
+          contentContainerStyle={styles.listContent}
+          ListHeaderComponent={listHeader}
+          ListFooterComponent={listFooter}
+          keyboardShouldPersistTaps="handled"
+          initialNumToRender={12}
+          maxToRenderPerBatch={12}
+          windowSize={5}
+        />
 
         <View style={styles.footer}>
           <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
             <Text style={styles.cancelButtonText}>{t('common.cancel') || 'Отмена'}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[
-              styles.sendButton,
-              (!selectedItem && !customGiftName.trim()) && styles.disabledButton
-            ]}
+            style={[styles.sendButton, !selectedItem && !customGiftName.trim() && styles.disabledButton]}
             onPress={sendGift}
             disabled={(!selectedItem && !customGiftName.trim()) || loading}
           >
             {loading ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
-              <Text style={styles.sendButtonText}>
-                {t('gifts.send')}
-              </Text>
+              <Text style={styles.sendButtonText}>{t('gifts.send')}</Text>
             )}
           </TouchableOpacity>
         </View>
@@ -551,18 +474,40 @@ const styles = StyleSheet.create({
     color: '#fff',
     flex: 1,
   },
-  content: {
-    flex: 1,
-    padding: 20,
+  listContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  listHeader: {
+    marginBottom: 8,
   },
   section: {
-    marginBottom: 30,
+    marginTop: 24,
+    marginBottom: 8,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 15,
+    marginBottom: 12,
+  },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#2a2a2a',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: Platform.OS === 'ios' ? 10 : 6,
+    borderWidth: 1,
+    borderColor: '#2a2430',
+    marginBottom: 12,
+  },
+  searchInput: {
+    flex: 1,
+    color: '#fff',
+    fontSize: 16,
+    padding: 0,
   },
   loadingContainer: {
     flexDirection: 'row',
@@ -574,19 +519,20 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginLeft: 10,
   },
-  itemsScroll: {
+  giftRow: {
+    gap: 10,
     marginBottom: 10,
-    overflow: 'visible',
   },
   itemCardWrapper: {
     position: 'relative',
-    marginRight: 15,
+    flex: 1,
+    maxWidth: '31%',
     overflow: 'visible',
   },
   deleteItemButton: {
     position: 'absolute',
     top: -8,
-    right: -8,
+    right: -4,
     backgroundColor: '#fa2f40',
     borderRadius: 12,
     width: 24,
@@ -596,27 +542,27 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   itemCard: {
-    width: 120,
     backgroundColor: '#2a2a2a',
     borderRadius: 12,
     padding: 10,
     alignItems: 'center',
     borderWidth: 2,
     borderColor: 'transparent',
+    minHeight: 130,
   },
   selectedItemCard: {
     borderColor: '#fa2f40',
     backgroundColor: '#3a2a2a',
   },
   itemImage: {
-    width: 80,
-    height: 80,
+    width: 72,
+    height: 72,
     borderRadius: 8,
     marginBottom: 8,
   },
   placeholderImage: {
-    width: 80,
-    height: 80,
+    width: 72,
+    height: 72,
     borderRadius: 8,
     backgroundColor: '#2a2430',
     justifyContent: 'center',
@@ -624,7 +570,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   itemName: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#fff',
     textAlign: 'center',
     fontFamily: 'Gilroy-Regular',
@@ -633,6 +579,7 @@ const styles = StyleSheet.create({
     color: '#888',
     textAlign: 'center',
     fontStyle: 'italic',
+    marginBottom: 8,
   },
   inputGroup: {
     marginBottom: 20,
@@ -676,7 +623,6 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   pngPreviewImage: {
-    // Для PNG изображений убираем фон и добавляем поддержку прозрачности
     backgroundColor: 'transparent',
   },
   footer: {

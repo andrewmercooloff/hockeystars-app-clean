@@ -77,6 +77,7 @@ import PlayerExercisesSection from '../../components/PlayerExercisesSection';
 import PlayerMuseum from '../../components/PlayerMuseum';
 import StarGiftModal from '../../components/StarGiftModal';
 import AdminGiftModal from '../../components/AdminGiftModal';
+import { prefetchAdminGiftItems } from '../../utils/adminGiftItemsCache';
 import CachedAvatar from '../../components/CachedAvatar';
 import ProfileReactionsBar from '../../components/ProfileReactionsBar';
 import LoadingCenter from '../../components/LoadingCenter';
@@ -1430,6 +1431,13 @@ export default function PlayerProfile() {
 
     initializeFriendshipStatus();
   }, [currentUser?.id, player?.id]);
+
+  // Prefetch admin gift catalog while viewing a player profile (modal opens instantly).
+  useEffect(() => {
+    if (currentUser?.status === 'admin' && currentUser.id && player && currentUser.id !== player.id) {
+      prefetchAdminGiftItems(currentUser.id);
+    }
+  }, [currentUser?.status, currentUser?.id, player?.id]);
 
   // Realtime подписка для синхронизации статуса дружбы
   useEffect(() => {
