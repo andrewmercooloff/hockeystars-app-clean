@@ -2,7 +2,11 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { giftImageDisplayUrl, giftImageThumbUrl } from '../utils/giftImage';
+import {
+  giftImageDisplayUrl,
+  giftImageThumbUrl,
+  isPngGiftUrl,
+} from '../utils/giftImage';
 import { rewriteSupabasePublicUrl } from '../utils/supabase';
 
 type GiftPickerImageProps = {
@@ -14,8 +18,8 @@ type GiftPickerImageProps = {
 };
 
 /**
- * Gift thumbnail for the admin picker: tries a small transform URL first,
- * falls back to the original asset when Supabase render/image rejects PNG gifts.
+ * Gift thumbnail for the admin picker: small Supabase thumb (PNG alpha preserved),
+ * falls back to original only if transform is unavailable.
  */
 const GiftPickerImage: React.FC<GiftPickerImageProps> = React.memo(
   ({
@@ -30,6 +34,7 @@ const GiftPickerImage: React.FC<GiftPickerImageProps> = React.memo(
       [imageUrl],
     );
     const thumbUrl = useMemo(() => giftImageThumbUrl(imageUrl), [imageUrl]);
+    const isPng = useMemo(() => isPngGiftUrl(imageUrl), [imageUrl]);
 
     const [activeUrl, setActiveUrl] = useState(() => thumbUrl || originalUrl);
 
@@ -62,7 +67,7 @@ const GiftPickerImage: React.FC<GiftPickerImageProps> = React.memo(
     return (
       <Image
         source={source}
-        style={[styles.fill, style]}
+        style={[styles.fill, style, isPng && styles.pngImage]}
         contentFit="contain"
         cachePolicy="memory-disk"
         recyclingKey={activeUrl}
@@ -79,6 +84,9 @@ const styles = StyleSheet.create({
   fill: {
     width: '100%',
     height: '100%',
+  },
+  pngImage: {
+    backgroundColor: 'transparent',
   },
   fallback: {
     backgroundColor: '#2a2430',

@@ -24,7 +24,7 @@ import {
   invalidateAdminGiftItemsCache,
   loadAdminGiftItems,
 } from '../utils/adminGiftItemsCache';
-import { prefetchGiftImages } from '../utils/giftImage';
+import { isPngGiftUrl, prefetchGiftImages } from '../utils/giftImage';
 import GiftPickerImage from './GiftPickerImage';
 
 interface AdminGiftModalProps {
@@ -361,7 +361,10 @@ const AdminGiftModal: React.FC<AdminGiftModalProps> = ({
                       {item.image_url ? (
                         <GiftPickerImage
                           imageUrl={item.image_url}
-                          style={styles.itemImage}
+                          style={[
+                            styles.itemImage,
+                            isPngGiftUrl(item.image_url) && styles.pngItemImage,
+                          ]}
                           fallbackIcon={getItemTypeIcon(item.item_type)}
                           fallbackSize={24}
                           fallbackColor="#fa2f40"
@@ -551,6 +554,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 8,
     backgroundColor: '#2a2430',
+  },
+  pngItemImage: {
+    backgroundColor: 'transparent',
   },
   placeholderImage: {
     width: 80,
