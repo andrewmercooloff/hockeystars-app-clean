@@ -7,6 +7,7 @@ const { albumHtml, PAGE } = require('./lib/album');
 const { execFileSync } = require('child_process');
 const { cardsHtml } = require('./lib/cards');
 const { withBrowser, htmlToPdf, pdfPreviews, exportShareCards } = require('./lib/render');
+const { printSpecHtml } = require('./lib/print-spec');
 
 function syncSharePages(slug, outDir) {
   const previewDir = path.join(outDir, 'preview');
@@ -66,11 +67,14 @@ async function main() {
 
   const albumPdf = path.join(outDir, `${slug}-album.pdf`);
   const cardsPdf = path.join(outDir, `${slug}-cards.pdf`);
+  const specPdf = path.join(outDir, `${slug}-ТЗ-печать.pdf`);
   await withBrowser(async (browser) => {
     const albumHtmlFile = await htmlToPdf(browser, album, albumPdf);
     console.log(`✔ ${path.relative(process.cwd(), albumPdf)}`);
     const cardsHtmlFile = await htmlToPdf(browser, cards, cardsPdf);
     console.log(`✔ ${path.relative(process.cwd(), cardsPdf)}`);
+    const specHtmlFile = await htmlToPdf(browser, printSpecHtml(data), specPdf);
+    console.log(`✔ ${path.relative(process.cwd(), specPdf)}`);
     if (args.preview) {
       const previewDir = path.join(outDir, 'preview');
       fs.rmSync(previewDir, { recursive: true, force: true });
@@ -84,6 +88,7 @@ async function main() {
     if (!args.keepHtml) {
       fs.rmSync(albumHtmlFile, { force: true });
       fs.rmSync(cardsHtmlFile, { force: true });
+      fs.rmSync(specHtmlFile, { force: true });
     }
   });
 
@@ -111,7 +116,7 @@ async function main() {
 
   const printReady = path.join(__dirname, 'print-ready', slug);
   fs.mkdirSync(printReady, { recursive: true });
-  for (const name of [`${slug}-album.pdf`, `${slug}-album-A3-spreads.pdf`, `${slug}-cards.pdf`, `${slug}-album-preview.pdf`, `${slug}-cards-preview.pdf`]) {
+  for (const name of [`${slug}-album.pdf`, `${slug}-album-A3-spreads.pdf`, `${slug}-cards.pdf`, `${slug}-album-preview.pdf`, `${slug}-cards-preview.pdf`, `${slug}-ТЗ-печать.pdf`]) {
     const src = path.join(outDir, name);
     if (fs.existsSync(src)) fs.copyFileSync(src, path.join(printReady, name));
   }
