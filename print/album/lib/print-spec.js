@@ -17,7 +17,7 @@ function printSpecHtml(data) {
 ${baseCss(team.colors)}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Roboto',sans-serif;font-size:10.5pt;line-height:1.45;color:var(--dark);background:#fff;}
-.page{width:210mm;min-height:297mm;padding:16mm 18mm 14mm;position:relative;page-break-after:always;}
+.page{width:210mm;min-height:297mm;padding:14mm 16mm 12mm;position:relative;page-break-after:always;}
 .page:last-child{page-break-after:auto;}
 .hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:10mm;margin-bottom:10mm;padding-bottom:6mm;border-bottom:1.2mm solid var(--secondary);}
 .hdr .logo{width:22mm;height:22mm;flex-shrink:0;}
@@ -48,7 +48,17 @@ td{background:#fff;}
       <div class="sub">ХК «${esc(team.name)}» · альбом ${esc(team.season)}</div>
     </div>
   </header>
-  <p class="meta"><strong>Файлы макетов:</strong> PDF из комплекта <code>${esc(slug)}</code>. Превью-файлы с суффиксом <code>-preview</code> — только для просмотра, в печать не передавать.</p>
+  <p class="meta"><strong>Способ печати:</strong> цифровая (не офсет). <strong>Файлы макетов:</strong> PDF из комплекта <code>${esc(slug)}</code>. Превью с суффиксом <code>-preview</code> — только для просмотра.</p>
+
+  <h2>Тираж</h2>
+  <table>
+    <tr><th>Журнал</th><td><strong>20 экз.</strong> (16 стр. A4, скрепка 2 скобы)</td></tr>
+    <tr><th>Карточки</th><td><strong>28 комплектов</strong> по ${count} шт. (= ${count * 28} карточек после реза)<br>
+      Минимум — 25 комплектов; рекомендуем 28: +8 комплектов на брак при резке/ламинации и запас тренерам</td></tr>
+    <tr><th>Спуск карточек</th><td>Лист SRA3 (320×450&nbsp;мм): ${cw + cb * 2}×${ch + cb * 2}&nbsp;мм → <strong>5×5 = 25 шт./сторона</strong><br>
+      25 компл. = ${count * 25} шт. → ${Math.ceil((count * 25) / 25)} листов SRA3 · 28 компл. = ${count * 28} шт. → ${Math.ceil((count * 28) / 25)} листов SRA3<br>
+      Типография собирает спуск из <code>${esc(slug)}-cards.pdf</code> (страница = 1 карточка с вылетами)</td></tr>
+  </table>
 
   <h2>1. Журнал (основной) — <code>${esc(slug)}-album-A3-spreads.pdf</code></h2>
   <table>
@@ -73,17 +83,18 @@ td{background:#fff;}
   <h2>3. Журнал (запасной) — <code>${esc(slug)}-album.pdf</code></h2>
   <p>Тот же журнал постранично A4 + вылеты ${pageBleed}&nbsp;мм — если типография сама делает спуск полос.</p>
 
-  <h2>4. Бумага и ламинация (рекомендуется)</h2>
+  <h2>4. Бумага и ламинация — цифровая печать</h2>
   <table>
-    <tr><th colspan="2">Журнал</th></tr>
-    <tr><th>Обложка</th><td><strong>300&nbsp;г/м²</strong>, мелованная матовая (допустимо 250&nbsp;г/м²)</td></tr>
-    <tr><th>Блок (внутренние стр.)</th><td><strong>170&nbsp;г/м²</strong>, мелованная матовая или silk (допустимо 150&nbsp;г/м²)</td></tr>
-    <tr><th>Ламинация обложки</th><td>Матовая, <strong>снаружи</strong> (1+0). Внутреннюю сторону обложки и блок <strong>не ламинировать</strong> — карточки вклеиваются в ячейки, на последних страницах — автографы</td></tr>
-    <tr><th colspan="2">Карточки</th></tr>
-    <tr><th>Бумага</th><td><strong>300&nbsp;г/м²</strong>, мелованная (допустимо 280&nbsp;г/м²; плотнее 350&nbsp;г/м² — только по согласованию)</td></tr>
-    <tr><th>Ламинация</th><td>Матовая <strong>с двух сторон</strong> (2+2) — как у коллекционных спортивных карточек, без бликов</td></tr>
+    <tr><th colspan="2">Журнал (20 экз.)</th></tr>
+    <tr><th>Обложка</th><td><strong>250–300&nbsp;г/м²</strong>, мелованная матовая — оптимально для подачи в цифровой машине</td></tr>
+    <tr><th>Блок</th><td><strong>150–170&nbsp;г/м²</strong>, мелованная матовая / silk (150 — стандарт цифры, 170 — плотнее на ощупь)</td></tr>
+    <tr><th>Ламинация</th><td>Обложка: матовая <strong>снаружи</strong> (1+0). Блок <strong>без ламинации</strong> — страница автографов, ручка по ламинации не пишет</td></tr>
+    <tr><th colspan="2">Карточки (фиксация фотоуголками в альбоме)</th></tr>
+    <tr><th>Бумага</th><td><strong>300&nbsp;г/м²</strong>, мелованная — стандарт «карточки» на цифре; 280&nbsp;г/м² допустимо</td></tr>
+    <tr><th>Ламинация</th><td>Матовая <strong>2+2</strong>, плёнка <strong>80–125&nbsp;мкм</strong> на сторону (не толстая 175&nbsp;мкм)</td></tr>
+    <tr><th>Толщина</th><td>После ламинации карточка ≈ <strong>0,45–0,52&nbsp;мм</strong> — стандартные ПВХ-фотоуголки рассчитаны до ~0,5&nbsp;мм; 350&nbsp;г/м² + толстая ламинация не использовать</td></tr>
   </table>
-  <p class="note">Оптимальный баланс цены и качества: журнал 300+170&nbsp;г/м² с матовой ламинацией обложки; карточки 300&nbsp;г/м², матовая ламинация 2+2. Soft-touch (soft-touch matte) на обложке — по желанию, уточнять у типографии.</p>
+  <p class="note">Карточки не вклеиваются — фиксируются фотоуголками в ячейках 60×85&nbsp;мм. Soft-touch на обложке журнала — по желанию.</p>
 
   <h2>Соответствие альбома и карточек</h2>
   <table>
@@ -92,8 +103,8 @@ td{background:#fff;}
     <tr><th>Страницы «Команда»</th><td>9 ячеек (3×3) на странице</td></tr>
   </table>
 
-  <p class="note">Превью для согласования: <code>${esc(slug)}-album-preview.pdf</code>, <code>${esc(slug)}-cards-preview.pdf</code>.</p>
-  <div class="footer"><span>HK «${esc(team.name)}» · ${esc(team.season)}</span><span>ТЗ на печать</span></div>
+  <p class="note">Превью: <code>${esc(slug)}-album-preview.pdf</code>, <code>${esc(slug)}-cards-preview.pdf</code>.</p>
+  <div class="footer"><span>HK «${esc(team.name)}» · ${esc(team.season)}</span><span>Цифровая печать · ТЗ</span></div>
 </section>
 </body></html>`;
 }
