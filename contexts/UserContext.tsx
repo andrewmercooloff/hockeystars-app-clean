@@ -217,7 +217,11 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         console.warn('⚠️ refreshUser: сеть недоступна, сохраняем предыдущего пользователя');
         setCurrentUser(previousUser);
       } else {
-        setCurrentUser(null);
+        try {
+          setCurrentUser(JSON.parse(storedUser));
+        } catch {
+          console.warn('⚠️ refreshUser: не удалось разобрать локальную сессию');
+        }
       }
     } catch (error) {
       console.error('Ошибка загрузки пользователя:', error);
@@ -238,7 +242,15 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       
       // Принудительно загружаем пользователя
       const user = await loadCurrentUser(true);
-      setCurrentUser(user);
+      if (user) {
+        setCurrentUser(user);
+      } else {
+        const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+        const storedUser = await AsyncStorage.getItem('hockeystars_current_user');
+        if (storedUser) {
+          setCurrentUser(JSON.parse(storedUser));
+        }
+      }
       
       console.log('✅ Пользователь обновлен после выполнения упражнения:', user?.exerciseStats);
     } catch (error) {

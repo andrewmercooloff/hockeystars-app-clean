@@ -35,7 +35,13 @@ const AdminHeader = () => {
       setCurrentUser(user);
     } catch (error) {
       console.error('Ошибка загрузки текущего пользователя:', error);
-      setCurrentUser(null);
+      try {
+        const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+        const raw = await AsyncStorage.getItem('hockeystars_current_user');
+        if (raw) setCurrentUser(JSON.parse(raw));
+      } catch {
+        /* keep previous currentUser */
+      }
     }
   };
 
@@ -129,6 +135,13 @@ export default function AdminScreen() {
       
     } catch (error) {
       console.error('❌ Ошибка загрузки данных:', error);
+      try {
+        const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+        const raw = await AsyncStorage.getItem('hockeystars_current_user');
+        if (raw) setCurrentUser(JSON.parse(raw));
+      } catch {
+        /* keep previous currentUser */
+      }
     }
   }, [t, router]);
 

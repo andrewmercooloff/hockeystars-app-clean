@@ -2298,6 +2298,27 @@ export const getFriendshipStatus = async (userId1: string, userId2: string, skip
   }
 };
 
+/** Stale-ok player snapshot when Supabase is down (never treat as "deleted"). */
+async function getPlayerByIdOfflineFallback(id: string): Promise<Player | null> {
+  const memCached = playersMemoryCache.get(id);
+  if (memCached?.player) return memCached.player;
+
+  const quick = peekCachedPlayerSync(id);
+  if (quick) return quick;
+
+  try {
+    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+    const cachedData = await AsyncStorage.getItem(`player_${id}`);
+    if (cachedData) {
+      const parsed = JSON.parse(cachedData);
+      if (parsed?.player?.id) return parsed.player as Player;
+    }
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
 // Получение игрока по ID с кешированием
 export const getPlayerById = async (
   id: string,
@@ -2344,10 +2365,17 @@ export const getPlayerById = async (
     
     if (error) {
       console.error('❌ Ошибка получения игрока:', error);
+      const fallback = await getPlayerByIdOfflineFallback(id);
+      if (fallback) {
+        console.warn('⚠️ getPlayerById: отдаём кеш — Supabase недоступен');
+        return fallback;
+      }
+      // Любая ошибка (сеть, неоплата, 5xx) — не считаем профиль удалённым.
       return null;
     }
     if (!data) {
-      // Нет строки — игрок не найден
+      const fallback = await getPlayerByIdOfflineFallback(id);
+      if (fallback) return fallback;
       return null;
     }
     
@@ -2371,6 +2399,8 @@ export const getPlayerById = async (
     return player;
   } catch (error) {
     console.error('❌ Ошибка получения игрока:', error);
+    const fallback = await getPlayerByIdOfflineFallback(id);
+    if (fallback) return fallback;
     return null;
   }
 };
@@ -2919,7 +2949,9 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
       // колонка players.unread_messages_count может отставать от триггеров.
       user.unreadMessagesCount = actualUnreadMessages;
 
-      if (!playerError && playerData) {
+      if (playerError) {
+        console.warn('⚠️ loadCurrentUser: Supabase недоступен, оставляем локальную сессию');
+      } else if (playerData) {
         // Обновляем критически важные поля из базы данных
         if (playerData.country && playerData.country !== user.country) {
           console.log('⚠️ [USER] Обнаружено несоответствие страны пользователя:', {
@@ -2954,7 +2986,6 @@ export const loadCurrentUser = async (forceRefresh = false): Promise<Player | nu
       }
     } catch (error) {
       console.error('❌ Ошибка загрузки данных пользователя из БД:', error);
-      user.unreadMessagesCount = 0;
     }
     
     // ВАЖНО: Обновляем данные пользователя в AsyncStorage, если они были изменены из базы данных

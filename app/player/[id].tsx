@@ -459,7 +459,6 @@ export default function PlayerProfile() {
   // Используем кэшированный аватар для QR-кода и других мест
   // Это гарантирует, что аватар обновится везде при изменении
   const cachedPlayerAvatar = useAvatarCache(player?.id || '', player?.avatar);
-  const [playerNotFoundTimeout, setPlayerNotFoundTimeout] = useState<NodeJS.Timeout | null>(null);
   const [friendshipStatus, setFriendshipStatus] = useState<'friends' | 'sent_request' | 'received_request' | 'none' | 'pending'>('none');
   
   // Ref для отслеживания времени последнего ручного изменения статуса
@@ -1066,24 +1065,17 @@ export default function PlayerProfile() {
         const retryPlayerData = await getPlayerById(normalizedId as string, { skipCache: true });
         
         if (!retryPlayerData) {
-          console.log('❌ Игрок не найден после повторной попытки');
-          // Проверяем, является ли это профилем текущего пользователя
-            const { loadCurrentUser } = await import('../../utils/playerStorage');
+          console.log('❌ Профиль недоступен после повторной попытки — пробуем локальный кеш');
+          const { loadCurrentUser } = await import('../../utils/playerStorage');
           const currentUserData = await loadCurrentUser();
           if (currentUserData && currentUserData.id === normalizedId) {
-            console.log('⚠️ Текущий пользователь не найден в базе, очищаем данные и редиректим');
-            await dataCache.remove(CACHE_KEYS.USER_PROFILE);
-            setGlobalCurrentUser(null);
-            goHome(router);
-            void logoutUser().catch(() => undefined);
+            console.log('⚠️ Supabase недоступен — показываем кешированный профиль текущего пользователя');
+            finalPlayerData = currentUserData;
+          } else {
+            console.log('⚠️ Игрок не загружен — возможно временная проблема с Supabase');
+            setLoading(false);
             return;
           }
-          // ВАЖНО: НЕ редиректим на главный экран если это не профиль текущего пользователя
-          // Это может быть временная проблема с загрузкой данных
-          // Просто показываем ошибку загрузки
-          console.log('⚠️ Игрок не найден, но не редиректим - возможно временная проблема');
-          setLoading(false);
-          return;
         } else {
           console.log('✅ Игрок найден после повторной попытки');
           finalPlayerData = retryPlayerData;
@@ -4865,39 +4857,6 @@ export default function PlayerProfile() {
   // Проверяем, является ли это профилем текущего пользователя
   const isCurrentUserProfile = currentUser && normalizedId && currentUser.id === normalizedId;
   
-  // Устанавливаем таймаут для автоматического редиректа, если игрок не найден
-  useEffect(() => {
-    if (!player && !loading && normalizedId) {
-      // Если игрок не найден и загрузка завершена, устанавливаем таймаут на 5 секунд
-      const timeout = setTimeout(async () => {
-        console.log('⏰ Таймаут: игрок не найден, выполняем редирект');
-        if (isCurrentUserProfile) {
-          try {
-            await dataCache.remove(CACHE_KEYS.USER_PROFILE);
-            setGlobalCurrentUser(null);
-            void logoutUser().catch(() => undefined);
-          } catch (error) {
-            console.error('❌ Ошибка при выходе:', error);
-          }
-        }
-        goHome(router);
-      }, 5000);
-      
-      setPlayerNotFoundTimeout(timeout);
-      
-      return () => {
-        clearTimeout(timeout);
-      };
-    } else {
-      // Если игрок найден или идет загрузка, очищаем таймаут
-      if (playerNotFoundTimeout) {
-        clearTimeout(playerNotFoundTimeout);
-        setPlayerNotFoundTimeout(null);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [player, loading, normalizedId, isCurrentUserProfile]);
-
   if (loading || playerRouteMismatch || slugResolving) {
     const hasReadyPlayer =
       Boolean(player) &&
@@ -4927,27 +4886,24 @@ export default function PlayerProfile() {
           <View style={styles.overlay}>
             <View style={styles.errorContainer}>
               <Text style={styles.errorText}>
-                {t('profile.playerNotFound') === 'profile.playerNotFound' ? 'Игрок не найден' : t('profile.playerNotFound')}
+                {isCurrentUserProfile
+                  ? (language === 'ru'
+                    ? 'Не удалось загрузить профиль. Проверьте интернет или повторите позже.'
+                    : 'Could not load profile. Check your connection or try again later.')
+                  : (t('profile.playerNotFound') === 'profile.playerNotFound' ? 'Игрок не найден' : t('profile.playerNotFound'))}
               </Text>
-              {isCurrentUserProfile && (
-                <TouchableOpacity
-                  style={[styles.button, { marginTop: 20, backgroundColor: '#fa2f40' }]}
-                  onPress={async () => {
-                    try {
-                      await dataCache.remove(CACHE_KEYS.USER_PROFILE);
-                      setGlobalCurrentUser(null);
-                      goHome(router);
-                      void logoutUser().catch(() => undefined);
-                    } catch (error) {
-                      console.error('❌ Ошибка при выходе:', error);
-                      setGlobalCurrentUser(null);
-                      goHome(router);
-                    }
-                  }}
-                >
-                  <Text style={styles.buttonText}>Выйти из аккаунта</Text>
-                </TouchableOpacity>
-              )}
+              <TouchableOpacity
+                style={[styles.button, { marginTop: 20, backgroundColor: '#fa2f40' }]}
+                onPress={() => {
+                  setLoading(true);
+                  currentLoadingIdRef.current = normalizedId as string;
+                  loadPlayerData();
+                }}
+              >
+                <Text style={styles.buttonText}>
+                  {language === 'ru' ? 'Повторить' : 'Retry'}
+                </Text>
+              </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.button, { marginTop: 10, backgroundColor: 'rgba(255, 255, 255, 0.2)' }]}
                 onPress={() => goHome(router)}
