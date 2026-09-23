@@ -50,7 +50,7 @@ def detect_root(client: paramiko.SSHClient) -> str:
 
 
 def build_config_local() -> str | None:
-    smtp_user = os.environ.get("HS_SMTP_USER", "noreply@hockey-stars.com").strip()
+    smtp_user = os.environ.get("HS_SMTP_USER", "support@hockey-stars.com").strip()
     smtp_pass = os.environ.get("HS_SMTP_PASS", "").strip()
     leads_to = os.environ.get("HS_LEADS_TO", "support@hockey-stars.com").strip()
     if not smtp_pass:

@@ -5,7 +5,7 @@
  * 2) Отправляет письмо через SMTP Timeweb (smtp.timeweb.ru)
  *
  * config.local.php (не в git):
- *   define('HS_SMTP_USER', 'noreply@hockey-stars.com');
+ *   define('HS_SMTP_USER', 'support@hockey-stars.com');
  *   define('HS_SMTP_PASS', 'пароль_ящика');
  *   define('HS_LEADS_TO', 'support@hockey-stars.com');
  */
