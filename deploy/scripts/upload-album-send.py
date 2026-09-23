@@ -94,7 +94,11 @@ def main() -> int:
     if config_body:
         with sftp.open(f"{root}/config.local.php", "w") as remote:
             remote.write(config_body)
-        run(client, f"chmod 640 {root}/config.local.php")
+        run(
+            client,
+            f"chown www-data:www-data {root}/config.local.php {root}/data && "
+            f"chmod 640 {root}/config.local.php && chmod 750 {root}/data",
+        )
         print("uploaded config.local.php from HS_SMTP_* env vars")
     else:
         print("WARN: HS_SMTP_PASS not set — email will fail until config.local.php is created")
