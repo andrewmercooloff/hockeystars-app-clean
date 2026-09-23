@@ -1,0 +1,10 @@
+# Block sensitive files (nginx may ignore .htaccess; upload script also patches nginx)
+<Files "error_log">
+    Require all denied
+</Files>
+<Files "config.local.php">
+    Require all denied
+</Files>
+<Files ".env">
+    Require all denied
+</Files>
