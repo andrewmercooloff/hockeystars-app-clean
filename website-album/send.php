@@ -1,7 +1,13 @@
 <?php
 /**
- * album.hockey-stars.com — order / sample request handler.
- * Saves every submission to Supabase + local NDJSON log; emails via Resend or mail().
+ * album.hockey-stars.com — заявки с лендинга.
+ * 1) Всегда пишет в data/leads.ndjson (резервная копия на сервере)
+ * 2) Отправляет письмо через SMTP Timeweb (smtp.timeweb.ru)
+ *
+ * config.local.php (не в git):
+ *   define('HS_SMTP_USER', 'noreply@hockey-stars.com');
+ *   define('HS_SMTP_PASS', 'пароль_ящика');
+ *   define('HS_LEADS_TO', 'support@hockey-stars.com');
  */
 declare(strict_types=1);
 
@@ -26,9 +32,7 @@ if (is_readable($configLocal)) {
     require $configLocal;
 }
 
-const HS_SUPABASE_URL = 'https://api.hockey-stars.com';
-const HS_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2c3lwZndpYWp1d3N5dXpreWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM5OTczNTcsImV4cCI6MjA2OTU3MzM1N30.8d8k7HK7lFgIirdHzackMYRn6gGgD5OyqgOUq2rk2RM';
-const HS_LEADS_TO = 'support@hockey-stars.com';
+const HS_LEADS_TO_DEFAULT = 'support@hockey-stars.com';
 const HS_RATE_SECONDS = 45;
 
 function sanitize_field(string $value, int $max): string
@@ -42,8 +46,7 @@ function sanitize_field(string $value, int $max): string
 
 function is_ajax(): bool
 {
-    $xhr = $_SERVER['HTTP_X_REQUESTED_WITH'] ?? '';
-    return strcasecmp($xhr, 'XMLHttpRequest') === 0;
+    return strcasecmp($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '', 'XMLHttpRequest') === 0;
 }
 
 function respond(int $sent, string $error = '', int $http = 200): void
@@ -57,8 +60,7 @@ function respond(int $sent, string $error = '', int $http = 200): void
         echo json_encode($payload, JSON_UNESCAPED_UNICODE);
         exit;
     }
-    $qs = 'sent=' . $sent . ($error !== '' ? '&err=' . rawurlencode($error) : '');
-    header('Location: index.html?' . $qs);
+    header('Location: index.html?sent=' . $sent . ($error !== '' ? '&err=' . rawurlencode($error) : ''));
     exit;
 }
 
@@ -66,8 +68,7 @@ function client_ip(): string
 {
     foreach (['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR'] as $key) {
         if (!empty($_SERVER[$key])) {
-            $raw = explode(',', (string) $_SERVER[$key])[0];
-            return trim($raw);
+            return trim(explode(',', (string) $_SERVER[$key])[0]);
         }
     }
     return '';
@@ -101,115 +102,97 @@ function append_local_log(array $row): bool
     return @file_put_contents($dir . '/leads.ndjson', $line, FILE_APPEND | LOCK_EX) !== false;
 }
 
-function save_to_supabase(array $row): bool
+/** Minimal SMTP client for smtp.timeweb.ru (STARTTLS on 587). */
+function send_via_timeweb_smtp(array $row, string $to, string $user, string $pass): bool
 {
-    $payload = json_encode([
-        'name' => $row['name'],
-        'email' => $row['email'],
-        'phone' => $row['phone'],
-        'club' => $row['club'],
-        'message' => $row['message'],
-        'source' => 'album.hockey-stars.com',
-        'ip' => $row['ip'],
-        'user_agent' => $row['user_agent'],
-        'email_sent' => $row['email_sent'],
-    ], JSON_UNESCAPED_UNICODE);
+    $host = 'smtp.timeweb.ru';
+    $port = 587;
+    $from = $user;
 
-    $ch = curl_init(HS_SUPABASE_URL . '/rest/v1/album_leads');
-    curl_setopt_array($ch, [
-        CURLOPT_POST => true,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER => [
-            'Content-Type: application/json',
-            'apikey: ' . HS_SUPABASE_ANON_KEY,
-            'Authorization: Bearer ' . HS_SUPABASE_ANON_KEY,
-            'Prefer: return=minimal',
-        ],
-        CURLOPT_POSTFIELDS => $payload,
-        CURLOPT_TIMEOUT => 12,
-    ]);
-    $body = curl_exec($ch);
-    $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
+    $subject = 'Album: ' . $row['club'] . ' — ' . $row['name'];
+    $body = "Новая заявка с album.hockey-stars.com\r\n\r\n"
+        . "Имя: {$row['name']}\r\n"
+        . "Email: {$row['email']}\r\n"
+        . "Телефон: {$row['phone']}\r\n"
+        . "Клуб: {$row['club']}\r\n"
+        . "Сообщение:\r\n{$row['message']}\r\n\r\n"
+        . "IP: {$row['ip']}\r\n"
+        . "Время: {$row['created_at']}\r\n";
 
-    if ($code >= 200 && $code < 300) {
-        return true;
-    }
-    error_log('album_leads insert failed HTTP ' . $code . ' body=' . (string) $body);
-    return false;
-}
-
-function send_via_resend(array $row, string $to): bool
-{
-    $apiKey = defined('HS_RESEND_API_KEY') ? HS_RESEND_API_KEY : (getenv('HS_RESEND_API_KEY') ?: '');
-    if ($apiKey === '') {
+    $socket = @stream_socket_client("tcp://{$host}:{$port}", $errno, $errstr, 15);
+    if (!$socket) {
+        error_log("album SMTP connect failed: $errstr ($errno)");
         return false;
     }
 
-    $subject = 'Album order: ' . $row['club'] . ' — ' . $row['name'];
-    $text = "New album sample request\n\n"
-        . "Name: {$row['name']}\n"
-        . "Email: {$row['email']}\n"
-        . "Phone: {$row['phone']}\n"
-        . "Club: {$row['club']}\n"
-        . "Message:\n{$row['message']}\n\n"
-        . "IP: {$row['ip']}\n"
-        . "Time: {$row['created_at']}\n"
-        . "Source: album.hockey-stars.com\n";
+    stream_set_timeout($socket, 15);
+    $read = static function () use ($socket): string {
+        $data = '';
+        while ($line = fgets($socket, 515)) {
+            $data .= $line;
+            if (isset($line[3]) && $line[3] === ' ') {
+                break;
+            }
+        }
+        return $data;
+    };
+    $write = static function (string $cmd) use ($socket, $read): string {
+        fwrite($socket, $cmd . "\r\n");
+        return $read();
+    };
 
-    $payload = json_encode([
-        'from' => 'HockeyStars Album <noreply@hockey-stars.com>',
-        'to' => [$to],
-        'reply_to' => $row['email'],
-        'subject' => $subject,
-        'text' => $text,
-    ], JSON_UNESCAPED_UNICODE);
-
-    $ch = curl_init('https://api.resend.com/emails');
-    curl_setopt_array($ch, [
-        CURLOPT_POST => true,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER => [
-            'Authorization: Bearer ' . $apiKey,
-            'Content-Type: application/json',
-        ],
-        CURLOPT_POSTFIELDS => $payload,
-        CURLOPT_TIMEOUT => 15,
-    ]);
-    $body = curl_exec($ch);
-    $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($code >= 200 && $code < 300) {
-        return true;
+    $read();
+    $write('EHLO album.hockey-stars.com');
+    $write('STARTTLS');
+    if (!stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
+        fclose($socket);
+        return false;
     }
-    error_log('album lead Resend failed HTTP ' . $code . ' body=' . (string) $body);
-    return false;
+    $write('EHLO album.hockey-stars.com');
+    $write('AUTH LOGIN');
+    $write(base64_encode($user));
+    $resp = $write(base64_encode($pass));
+    if (strpos($resp, '235') === false) {
+        error_log('album SMTP auth failed: ' . trim($resp));
+        fclose($socket);
+        return false;
+    }
+
+    $write('MAIL FROM:<' . $from . '>');
+    $write('RCPT TO:<' . $to . '>');
+    $write('DATA');
+
+    $encodedSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
+    $headers = "From: HockeyStars Album <{$from}>\r\n"
+        . "Reply-To: {$row['name']} <{$row['email']}>\r\n"
+        . "To: {$to}\r\n"
+        . "Subject: {$encodedSubject}\r\n"
+        . "MIME-Version: 1.0\r\n"
+        . "Content-Type: text/plain; charset=UTF-8\r\n"
+        . "Content-Transfer-Encoding: 8bit\r\n";
+    fwrite($socket, $headers . "\r\n" . $body . "\r\n.\r\n");
+    $final = $read();
+    $write('QUIT');
+    fclose($socket);
+
+    return strpos($final, '250') !== false;
 }
 
-function send_via_mail(array $row, string $to): bool
+function send_via_mail_fallback(array $row, string $to, string $from): bool
 {
-    $subject = 'Album order: ' . $row['club'] . ' — ' . $row['name'];
-    $body = "New album sample request\n\n"
-        . "Name: {$row['name']}\n"
-        . "Email: {$row['email']}\n"
-        . "Phone: {$row['phone']}\n"
-        . "Club: {$row['club']}\n"
-        . "Message:\n{$row['message']}\n\n"
-        . "IP: {$row['ip']}\n"
-        . "Time: {$row['created_at']}\n";
-
+    $subject = 'Album: ' . $row['club'] . ' — ' . $row['name'];
+    $body = "Новая заявка с album.hockey-stars.com\n\n"
+        . "Имя: {$row['name']}\nEmail: {$row['email']}\nТелефон: {$row['phone']}\n"
+        . "Клуб: {$row['club']}\n\n{$row['message']}\n";
     $headers = implode("\r\n", [
         'MIME-Version: 1.0',
-        'Content-type: text/plain; charset=utf-8',
-        'From: HockeyStars Album <noreply@hockey-stars.com>',
+        'Content-type: text/plain; charset=UTF-8',
+        'From: HockeyStars Album <' . $from . '>',
         'Reply-To: ' . $row['name'] . ' <' . $row['email'] . '>',
     ]);
-
-    return @mail($to, $subject, $body, $headers);
+    return @mail($to, $subject, $body, $headers, '-f' . $from);
 }
 
-// Honeypot (bots fill hidden fields)
 if (!empty($_POST['website'] ?? '')) {
     respond(0, 'bot', 400);
 }
@@ -241,24 +224,31 @@ $row = [
     'message' => $message,
     'ip' => client_ip(),
     'user_agent' => sanitize_field((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 512),
-    'email_sent' => false,
 ];
 
-$to = defined('HS_LEADS_TO_EMAIL') ? HS_LEADS_TO_EMAIL : HS_LEADS_TO;
+$to = defined('HS_LEADS_TO') ? HS_LEADS_TO : HS_LEADS_TO_DEFAULT;
+$smtpUser = defined('HS_SMTP_USER') ? HS_SMTP_USER : (getenv('HS_SMTP_USER') ?: '');
+$smtpPass = defined('HS_SMTP_PASS') ? HS_SMTP_PASS : (getenv('HS_SMTP_PASS') ?: '');
 
 $logged = append_local_log($row);
-$saved = save_to_supabase($row);
+$emailed = false;
 
-if (send_via_resend($row, $to) || send_via_mail($row, $to)) {
-    $row['email_sent'] = true;
+if ($smtpUser !== '' && $smtpPass !== '') {
+    $emailed = send_via_timeweb_smtp($row, $to, $smtpUser, $smtpPass);
+} else {
+    error_log('album send.php: HS_SMTP_USER/HS_SMTP_PASS not configured');
 }
 
-if (!$saved && !$logged) {
+if (!$emailed && $smtpUser !== '') {
+    $emailed = send_via_mail_fallback($row, $to, $smtpUser);
+}
+
+if (!$logged && !$emailed) {
     respond(0, 'mail', 500);
 }
 
-if (!$row['email_sent']) {
-    error_log('album lead saved but email not sent: ' . $email);
+if (!$emailed) {
+    error_log('album lead saved to file but email failed: ' . $email);
 }
 
 respond(1);
