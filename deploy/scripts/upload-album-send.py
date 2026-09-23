@@ -88,7 +88,7 @@ def main() -> int:
     print("Live test response:", test.strip())
 
     client.close()
-    print("OK — run database/album_leads.sql in Supabase if not done yet.")
+    print("OK — create config.local.php with HS_SMTP_USER/HS_SMTP_PASS (Timeweb mailbox).")
     return 0
 
 
