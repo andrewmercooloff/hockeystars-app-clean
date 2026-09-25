@@ -1,0 +1,67 @@
+{
+  "_comment": "Альбом СКА Стрельна — наклейки по годам рождения 2011–2018 + спецразворот. Составы: rosters/YYYY.csv (автозагрузка с fhspb.ru).",
+  "name": "СКА Стрельна",
+  "shortName": "СКА Стрельна",
+  "city": "Санкт-Петербург",
+  "yearRange": "2011–2018",
+  "season": "2026-2027",
+  "website": "https://strelna.ska.ru/",
+  "colors": {
+    "primary": "#003876",
+    "secondary": "#e4002b",
+    "accent": "#c8102e",
+    "dark": "#001a33",
+    "ice": "#eef3f8"
+  },
+  "stickers": {
+    "width": 45,
+    "height": 60,
+    "bleed": 2,
+    "sheet": "A4",
+    "layout": "sheet"
+  },
+  "album": {
+    "product": "stickers",
+    "years": ["2018", "2017", "2016", "2015", "2014", "2013", "2012", "2011"],
+    "pages": [
+      "cover",
+      "intro",
+      "history",
+      "special",
+      "year:2018",
+      "year:2017",
+      "year:2016",
+      "year:2015",
+      "year:2014",
+      "year:2013",
+      "year:2012",
+      "year:2011",
+      "quotes",
+      "facts",
+      "glossary",
+      "profile",
+      "autographs",
+      "backcover"
+    ]
+  },
+  "texts": {
+    "introTitle": "Альбом наклеек СКА Стрельна",
+    "introLead": "Собери наклейки всех команд школы — от {yearRange}. Каждый разворот — один год рождения.",
+    "steps": [
+      "Найди разворот своего года рождения",
+      "Наклей портреты игроков и тренеров в ячейки",
+      "Добавь командное фото года",
+      "На спецразвороте — руководство, арена и символ клуба"
+    ]
+  },
+  "history": {
+    "items": [
+      { "years": "2018", "title": "УТОЧНИТЬ", "text": "Ключевое событие года — из CDR или ваш текст" }
+    ],
+    "facts": [
+      { "value": "8", "label": "команд в альбоме" },
+      { "value": "2011–2018", "label": "годы рождения" }
+    ]
+  },
+  "qrUrl": "https://strelna.ska.ru/"
+}

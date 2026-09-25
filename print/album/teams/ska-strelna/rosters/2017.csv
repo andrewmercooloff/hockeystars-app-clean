@@ -1,0 +1,28 @@
+number;surname;name;position;role;photo;type
+;Богочанов;Данил Вячеславович;Главный тренер;;photos/2017/coach-богочанов.jpg;coach
+;Салимов;Марат Аксанович;Тренер;;photos/2017/coach-салимов.jpg;coach
+;Тихонов;Павел Александрович;Тренер вратарей;;photos/2017/coach-тихонов.jpg;coach
+;Сергеев;Федор Андреевич;Тренер вратарей;;;coach
+;Тищенко;Дмитрий Сергеевич;Тренер вратарей;;photos/2017/coach-тищенко.jpg;coach
+54;Скачков;Ярослав;;;photos/2017/54.jpg;player
+77;Коростелев;Данил;;;photos/2017/77.jpg;player
+3;Шаляпин;Александр;;;photos/2017/3.jpg;player
+7;Горохов;Назар;;;photos/2017/7.jpg;player
+9;Орищич;Дмитрий;;;photos/2017/9.jpg;player
+12;Деев;Ярослав;;;photos/2017/12.jpg;player
+13;Ефимов;Михаил;;;photos/2017/13.jpg;player
+15;Попов;Александр;;;photos/2017/15.jpg;player
+17;Фальковский;Тимофей;;;photos/2017/17.jpg;player
+18;Самыловский;Иван;;;photos/2017/18.jpg;player
+19;Вотинцев;Яков;;;photos/2017/19.jpg;player
+23;Донцов;Роман;;;photos/2017/23.jpg;player
+25;Корнеев;Алексей;;;photos/2017/25.jpg;player
+27;Анохин;Александр;;;photos/2017/27.jpg;player
+28;Калинкин;Иван;;;photos/2017/28.jpg;player
+42;Тищенко;Леонид;;;photos/2017/42.jpg;player
+47;Струков;Роман;;;photos/2017/47.jpg;player
+50;Немыкин;Лев;;;photos/2017/50.jpg;player
+55;Меньшиков;Иван;;;photos/2017/55.jpg;player
+86;Казачук;Кирилл;;;photos/2017/86.jpg;player
+87;Буряк;Александр;;;photos/2017/87.jpg;player
+98;Галибин;Кирилл;;;photos/2017/98.jpg;player

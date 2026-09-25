@@ -1,0 +1,28 @@
+number;surname;name;position;role;photo;type
+;Быков;Алексей Юрьевич;Главный тренер;;photos/2015/coach-быков.jpg;coach
+;Зимин;Николай Александрович;Тренер;;photos/2015/coach-зимин.jpg;coach
+;Сергеев;Федор Андреевич;Тренер вратарей;;photos/2015/coach-сергеев.jpg;coach
+29;Лукьянов;Петр;;;photos/2015/29.jpg;player
+42;Гришкин;Семен;;;photos/2015/42.jpg;player
+77;Хрищатый;Матвей;;;photos/2015/77.jpg;player
+5;Зябкин;Семен;;;photos/2015/5.jpg;player
+8;Литовченко;Михаил;;;photos/2015/8.jpg;player
+10;Вен;Ян;;;photos/2015/10.jpg;player
+11;Александров;Ефим;;;photos/2015/11.jpg;player
+12;Давудов;Тимур;;;photos/2015/12.jpg;player
+13;Бурцев;Сергей;;;photos/2015/13.jpg;player
+17;Прохоров;Максим;;;photos/2015/17.jpg;player
+20;Трусов;Михаил;;;photos/2015/20.jpg;player
+22;Степанов;Кирилл;;;photos/2015/22.jpg;player
+23;Соколов;Всеволод;;;photos/2015/23.jpg;player
+25;Хомаров;Марк;;;photos/2015/25.jpg;player
+27;Троян;Иван;;;photos/2015/27.jpg;player
+35;Беляков;Семен;;;photos/2015/35.jpg;player
+47;Лукичев;Елисей;;;photos/2015/47.jpg;player
+57;Нягин;Иван;;;photos/2015/57.jpg;player
+75;Пикин;Ростислав;;;photos/2015/75.jpg;player
+87;Аполинарьев;Игорь;;;photos/2015/87.jpg;player
+91;Дунаев;Владимир;;;photos/2015/91.jpg;player
+93;Бутузов;Ярослав;;;photos/2015/93.jpg;player
+97;Якимов;Егор;;;photos/2015/97.jpg;player
+99;Ашихмин;Артем;;;photos/2015/99.jpg;player

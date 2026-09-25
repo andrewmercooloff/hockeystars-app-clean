@@ -1,0 +1,11 @@
+number;surname;name;position;photo;type;source
+;Иванов;Артем Викторович;Генеральный директор;assets/staff-ivanov.jpg;staff;strelna.ska.ru
+;Ежов;Денис Владимирович;Заместитель генерального директора;assets/staff-ezhov.jpg;staff;strelna.ska.ru
+;Цыганов;Дмитрий Сергеевич;Главный тренер школы;assets/staff-tsyganov.jpg;staff;strelna.ska.ru
+;Калинин;Михаил Викторович;Зам. ген. директора по спортивной работе и скаутингу;assets/staff-kalinin.jpg;staff;strelna.ska.ru
+;УТОЧНИТЬ;Скаут;Скаут;;staff;cdr
+;УТОЧНИТЬ;Тренер по ОФП;Тренер по ОФП;;staff;cdr
+;УТОЧНИТЬ;PR-менеджер;PR-менеджер;;staff;cdr
+;УТОЧНИТЬ;Арена;Ледовый дворец / арена;;club;photo
+;УТОЧНИТЬ;Символ;Символ клуба;;club;cdr
+;УТОЧНИТЬ;Болельщики;Наши болельщики;;club;photo
