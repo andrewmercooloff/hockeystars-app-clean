@@ -1006,4 +1006,7 @@ function albumHtml(data) {
   return `<!doctype html><html lang="ru"><head><meta charset="utf-8"><style>${albumCss(data)}</style></head><body>${pages.join('\n')}</body></html>`;
 }
 
-module.exports = { albumHtml, PAGE: DEFAULT_PAGE, pageOf };
+module.exports = {
+  albumHtml, PAGE: DEFAULT_PAGE, pageOf, albumCss, deco, puckLabelHtml,
+  historyPage, quotesPage, factsPage, glossaryPage, profilePage, autographsPage, statsPage, notesPage, AUTOGRAPHS_PER_PAGE,
+};

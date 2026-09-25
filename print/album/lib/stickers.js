@@ -6,56 +6,69 @@ const SHEETS = {
   SRA3: { w: 320, h: 450 },
 };
 
+// Panini-style sticker: full-bleed portrait, navy name plate with a red rule, jersey number in a red tab,
+// club logo in the plate. The trim frame is a thin white keyline so cut tolerance never eats into the photo.
 function stickerCss(size) {
   const { w, h, bleed: B } = size;
   const W = w + B * 2;
   const H = h + B * 2;
+  const plate = h * 0.27;
   return `
-.sticker{position:relative;width:${W}mm;height:${H}mm;overflow:hidden;background:#fff;color:var(--dark);}
-.sticker .frame{position:absolute;inset:${B}mm;border-radius:2mm;overflow:hidden;
-  border:.45mm solid color-mix(in srgb,var(--primary) 70%,#fff);
-  box-shadow:inset 0 0 0 .35mm var(--secondary);}
-.sticker .frame::before{content:"";position:absolute;left:0;top:0;bottom:0;width:1.2mm;background:var(--secondary);z-index:2;}
-.sticker .frame::after{content:"";position:absolute;right:0;top:0;bottom:0;width:1.2mm;background:var(--primary);z-index:2;}
-.sticker .photo{position:absolute;left:${B + 1.2}mm;top:${B + 1.2}mm;right:${B + 1.2}mm;bottom:${B + 14}mm;overflow:hidden;background:#e4eaf0;}
+.sticker{position:relative;width:${W}mm;height:${H}mm;overflow:hidden;background:var(--primary);color:#fff;}
+.sticker .frame{position:absolute;inset:0;overflow:hidden;}
+.sticker .photo{position:absolute;inset:0;bottom:${B + plate - 1}mm;overflow:hidden;background:linear-gradient(180deg,#e9eef4,#c7d3e0);}
 .sticker .photo img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;}
-.sticker .num{position:absolute;left:${B + 2}mm;right:${B + 2}mm;top:${B + 2.5}mm;text-align:center;font-family:'Unbounded';font-weight:800;font-size:6.5mm;line-height:1;color:var(--secondary);
-  -webkit-text-stroke:.35mm var(--primary);paint-order:stroke fill;text-shadow:0 .3mm .6mm rgba(255,255,255,.9);z-index:3;}
-.sticker .bar{position:absolute;left:${B}mm;right:${B}mm;bottom:${B}mm;height:13mm;background:linear-gradient(180deg,var(--primary),var(--dark));z-index:3;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 1.5mm;text-align:center;}
-.sticker .bar .nm{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:3.2mm;line-height:1.05;color:#fff;}
-.sticker .bar .pos{font-family:'Roboto';font-weight:500;font-size:2.2mm;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.85);margin-top:.4mm;}
-.sticker.coach .num{font-size:4.2mm;}
+.sticker .photo::after{content:"";position:absolute;left:0;right:0;bottom:0;height:6mm;background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--primary) 55%,transparent));}
+.sticker .plate{position:absolute;left:0;right:0;bottom:0;height:${B + plate}mm;background:linear-gradient(180deg,var(--primary) 0%,var(--dark) 100%);
+  border-top:.7mm solid var(--secondary);padding:${1.4}mm ${B + 1.6}mm ${B}mm ${B + 1.8}mm;display:flex;flex-direction:column;justify-content:center;}
+.sticker .plate::before{content:"";position:absolute;left:0;top:-.7mm;width:38%;height:.7mm;background:#fff;}
+.sticker .nm{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;line-height:1.02;color:#fff;letter-spacing:.01em;padding-right:${w * 0.2}mm;}
+.sticker .nm small{display:block;font-weight:500;letter-spacing:.03em;opacity:.95;margin-top:.3mm;}
+.sticker .pos{font-family:'Roboto';font-weight:500;font-size:${(w * 0.05).toFixed(2)}mm;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb,var(--secondary) 45%,#fff);margin-top:${(h * 0.014).toFixed(2)}mm;padding-right:${w * 0.2}mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sticker .plogo{position:absolute;right:${B + 1.4}mm;bottom:${B + 1.2}mm;width:${(w * 0.17).toFixed(2)}mm;height:${(w * 0.17).toFixed(2)}mm;}
+.sticker .plogo img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 .3mm .6mm rgba(0,0,0,.5));}
+.sticker .num{position:absolute;left:${B}mm;top:${B}mm;min-width:${(w * 0.24).toFixed(2)}mm;height:${(h * 0.16).toFixed(2)}mm;padding:0 ${(w * 0.04).toFixed(2)}mm;background:var(--secondary);color:#fff;font-family:'Unbounded';font-weight:800;
+  font-size:${(h * 0.09).toFixed(2)}mm;line-height:${(h * 0.16).toFixed(2)}mm;text-align:center;border-radius:0 0 1.2mm 0;box-shadow:0 .5mm 1mm rgba(0,0,0,.3);}
+.sticker .num sup{font-size:55%;vertical-align:top;position:relative;top:-.2mm;margin-left:.2mm;}
+.sticker .idx{position:absolute;right:${B + 1}mm;top:${B + .8}mm;font-family:'Roboto';font-weight:700;font-size:${(h * 0.045).toFixed(2)}mm;color:#fff;text-shadow:0 0 .8mm rgba(0,0,0,.8);opacity:.9;}
+.sticker.coach .plate,.sticker.staff .plate{background:linear-gradient(180deg,var(--secondary) 0%,#8d0020 100%);border-top-color:#fff;}
+.sticker.coach .plate::before,.sticker.staff .plate::before{background:var(--primary);}
+.sticker.coach .pos,.sticker.staff .pos{color:rgba(255,255,255,.85);}
+.sticker.team .photo,.sticker.club .photo{bottom:0;} .sticker.team .photo img,.sticker.club .photo img{object-position:center center;}
+.sticker.team .plate,.sticker.club .plate{background:linear-gradient(90deg,var(--dark) 0%,var(--primary) 55%,transparent 100%);border-top:0;height:${B + h * 0.3}mm;justify-content:flex-end;}
+.sticker.team .plate::before,.sticker.club .plate::before{display:none;}
 .sticker.wide .photo img{object-position:center center;}
-.sticker.ghost .frame{border-style:dashed;border-color:color-mix(in srgb,var(--primary) 45%,#bbb);box-shadow:none;}
-.sticker.ghost .photo{filter:blur(.4mm);opacity:.85;}
-.sticker.ghost .bar{opacity:.75;}
+.sticker.ghost .photo::after{display:none;}
 `;
 }
 
-function stickerName(card) {
+function stickerName(card, size) {
+  const w = size.w;
   const surname = esc(card.surname).toUpperCase();
-  const name = esc(card.name).toUpperCase();
-  const fs = Math.min(3.2, 28 / Math.max(surname.length + name.length + 1, 1) * 3.2);
-  return `<div class="nm" style="font-size:${fs.toFixed(2)}mm">${surname}${name ? `<br>${name}` : ''}</div>`;
+  const first = card.type === 'coach' || card.type === 'staff' ? esc(card.name.split(' ')[0]).toUpperCase() : esc(card.name).toUpperCase();
+  const patronymic = card.type === 'coach' || card.type === 'staff' ? esc(card.name.split(' ').slice(1).join(' ')).toUpperCase() : '';
+  const base = w * 0.1; // 4 mm on a 40 mm sticker
+  const big = Math.min(base, (w * 0.72) / Math.max(surname.length, 1) * 1.85);
+  const smallSize = Math.min(base * 0.7, (w * 0.72) / Math.max(first.length + patronymic.length + 1, 1) * 1.7);
+  return `<div class="nm" style="font-size:${big.toFixed(2)}mm">${surname}${first ? `<small style="font-size:${smallSize.toFixed(2)}mm">${first}${patronymic ? ' ' + patronymic : ''}</small>` : ''}</div>`;
 }
 
 function stickerFront(card, data, opts = {}) {
-  const size = data.stickerSize;
+  const size = card.type === 'team' && data.stickerSize.teamW ? { w: data.stickerSize.teamW, h: data.stickerSize.teamH, bleed: data.stickerSize.bleed } : data.stickerSize;
   const ghost = opts.ghost ? ' ghost' : '';
-  const num = card.number
-    ? `<div class="num">#${esc(card.number)}${card.role ? esc(card.role) : ''}</div>`
-    : card.type === 'coach' || card.type === 'staff'
-      ? `<div class="num">${esc((card.position || 'Тренер').split(' ')[0])}</div>`
-      : '';
-  const pos = card.position && card.type !== 'club' ? `<div class="pos">${esc(card.position)}</div>` : '';
+  const num = card.number ? `<div class="num">${esc(card.number)}${card.role ? `<sup>${esc(card.role)}</sup>` : ''}</div>` : '';
+  const pos = card.position && card.type !== 'club' && card.type !== 'team' ? `<div class="pos">${esc(card.position)}</div>` : card.type === 'team' ? `<div class="pos">${esc(card.position || '')}</div>` : '';
   const cls = ['sticker', card.type, ghost, card.photoAspect > 1.1 ? 'wide' : ''].filter(Boolean).join(' ');
   const photo = opts.ghost ? card.photoSmall || card.photo : card.photo;
-  return `<div class="${cls}">
+  const logo = data.assets.logo && !opts.ghost ? `<div class="plogo"><img src="${data.assets.logo}"></div>` : '';
+  const style = card.type === 'team' ? `style="width:${size.w + size.bleed * 2}mm;height:${size.h + size.bleed * 2}mm"` : '';
+  return `<div class="${cls}" ${style}>
     <div class="frame">
       <div class="photo"><img src="${photo}"></div>
       ${num}
-      <div class="bar">${stickerName(card)}${pos}</div>
+      ${opts.ghost ? '' : `<div class="idx">${card.index}</div>`}
+      <div class="plate">${stickerName(card, size)}${pos}</div>
+      ${logo}
     </div>
   </div>`;
 }
@@ -97,7 +110,8 @@ function stickersHtml(data, opts = {}) {
   const sheetName = (opts.sheet || data.team.stickers?.sheet || 'SRA3').toUpperCase();
   const layout = opts.layout || data.team.stickers?.layout || 'sheet';
   const sheet = SHEETS[sheetName] || SHEETS.SRA3;
-  const all = data.allStickers || data.cards;
+  const all = (data.allStickers || data.cards).filter((c) => c.type !== 'team');
+  const teamStickers = (data.allStickers || data.cards).filter((c) => c.type === 'team');
   const total = all.length;
   const cw = size.w + size.bleed * 2;
   const ch = size.h + size.bleed * 2;
@@ -126,6 +140,21 @@ function stickersHtml(data, opts = {}) {
       pages += `<section class="page sheet">${marks}${label}${chunk
         .map((sticker, i) => `<div class="slot" style="${place(i)}">${stickerFront(sticker, data)}</div>`)
         .join('')}</section>`;
+    }
+    // Wide team-photo stickers: stacked on their own sheet(s), one column.
+    if (teamStickers.length) {
+      const tw = size.teamW + size.bleed * 2;
+      const th = size.teamH + size.bleed * 2;
+      const gutter = size.bleed * 2;
+      const perSheet = Math.floor((sheet.h - 8 + gutter) / (th + gutter));
+      for (let s = 0; s < Math.ceil(teamStickers.length / perSheet); s++) {
+        const chunk = teamStickers.slice(s * perSheet, (s + 1) * perSheet);
+        const my = (sheet.h - (chunk.length * th + (chunk.length - 1) * gutter)) / 2;
+        const mx = (sheet.w - tw) / 2;
+        pages += `<section class="page sheet"><div class="sheetlabel" style="top:4.2mm">${esc(data.team.name)} · командные наклейки ${size.teamW}×${size.teamH} мм · лист ${s + 1}</div>${chunk
+          .map((sticker, i) => `<div class="slot" style="left:${mx}mm;top:${my + i * (th + gutter)}mm">${stickerFront(sticker, data)}</div>`)
+          .join('')}</section>`;
+      }
     }
   }
 

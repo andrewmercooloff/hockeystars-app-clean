@@ -220,6 +220,7 @@ async function loadTeam(teamDir, cacheDir) {
   const ctx = { teamDir, photosDir, photoCache, colors, missingPhotos };
   const cards = [];
   const years = {};
+  const teamStickerIndex = {};
   let staff = [];
 
   if (isStickers) {
@@ -241,6 +242,20 @@ async function loadTeam(teamDir, cacheDir) {
         years[year].push(person);
         cards.push(person);
       }
+    }
+    // one wide team-photo sticker per year (photo: rosters/photos/YYYY/team.jpg, else the school-wide shot)
+    for (const year of yearList) {
+      if (!years[year]?.length) continue;
+      globalIndex += 1;
+      const teamPhoto = ['team.jpg', 'team.png', 'team.jpeg'].map((f) => path.join(rostersDir, 'photos', year, f)).find((p) => fs.existsSync(p))
+        || findAsset(assetsDir, ['team-wide', 'team']);
+      const person = await rowToPerson(
+        { surname: team.shortName || team.name, name: `${year} г.р.`, position: `Командное фото · сезон ${team.season || ''}`, type: 'team', photo: teamPhoto ? path.relative(teamDir, teamPhoto) : '' },
+        { ...ctx, photosDir: assetsDir, meta: { year, index: globalIndex } }
+      );
+      person.index = globalIndex;
+      teamStickerIndex[year] = globalIndex;
+      cards.push(person);
     }
     const staffCsv = path.join(teamDir, 'staff.csv');
     if (fs.existsSync(staffCsv)) {
@@ -279,6 +294,12 @@ async function loadTeam(teamDir, cacheDir) {
     puckBlack: await asset(['puck-black', 'puck_black', 'puck'], 800),
     puckOrange: await asset(['puck-orange', 'puck_orange'], 800),
     teamCutout: await asset(['team-cutout', 'cutout'], 3000),
+    // sticker-album skin (SKA Strelna CDR): full-page cover art, torn-stripe corner ornaments, wide team shot, cracked ice
+    coverBg: await asset(['cover-bg'], 3200),
+    ornTl: await asset(['orn-tl'], 2200),
+    ornBr: await asset(['orn-br'], 2600),
+    teamWide: await asset(['team-wide'], 2400),
+    iceCracked: await asset(['ice-cracked'], 1600),
     gallery: [],
   };
   assets.bg = fs.existsSync(path.join(assetsDir, 'bg-ice.jpg')) ? await prepareImage(path.join(assetsDir, 'bg-ice.jpg'), path.join(cacheDir, 'assets'), 1600) : null;
@@ -326,13 +347,13 @@ async function loadTeam(teamDir, cacheDir) {
     for (const f of team.history.facts || []) for (const k of ['value', 'label']) if (f[k]) f[k] = fill(f[k]);
   }
 
-  const allStickers = isStickers ? cards.filter((c) => !staff.includes(c) || c.type !== 'club') : cards;
   return {
     team,
     colors,
     cards,
     years,
     staff,
+    teamStickerIndex,
     assets,
     brand,
     missingPhotos,
@@ -341,7 +362,7 @@ async function loadTeam(teamDir, cacheDir) {
     pageSize,
     stickerSize,
     isStickers,
-    allStickers: isStickers ? cards : cards,
+    allStickers: cards,
   };
 }
 

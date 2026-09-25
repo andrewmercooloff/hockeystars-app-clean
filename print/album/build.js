@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { loadTeam } = require('./lib/data');
 const { albumHtml, pageOf } = require('./lib/album');
+const { stickerAlbumHtml } = require('./lib/album-stickers');
 const { execFileSync } = require('child_process');
 const { cardsHtml } = require('./lib/cards');
 const { stickersHtml } = require('./lib/stickers');
@@ -65,7 +66,7 @@ async function main() {
     console.log(`Нет фото (подставлена заглушка) — ${data.missingPhotos.length}:\n  ${data.missingPhotos.slice(0, 15).join('\n  ')}${data.missingPhotos.length > 15 ? `\n  … и ещё ${data.missingPhotos.length - 15}` : ''}`);
   }
 
-  const album = albumHtml(data);
+  const album = data.isStickers ? stickerAlbumHtml(data) : albumHtml(data);
   const productHtml = data.isStickers
     ? stickersHtml(data, { sheet: args.sheet, layout: args.layout })
     : cardsHtml(data, { sheet: args.sheet, layout: args.layout });
