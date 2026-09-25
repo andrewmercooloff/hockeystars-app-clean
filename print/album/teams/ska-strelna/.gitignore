@@ -1,0 +1,3 @@
+# CDR слишком тяжёлые для git — качаются скриптом lib/fetch-yadisk.py
+assets/reference/*.cdr
+assets/reference/yadisk-albums/*.cdr

@@ -10,10 +10,22 @@
 
 ### Обязательно
 
-1. **Яндекс.Диск** — скачать вручную и положить в `assets/reference/`:
-   - CDR «ска - альбом -совсем кривые.cdr»
-   - файл по ссылке https://disk.yandex.ru/i/owOwSLQj-jcCOw
-   - (автоматически не качается — капча Яндекса)
+1. **Яндекс.Диск** — скачивается автоматически (API `cloud-api.yandex.net`):
+
+```bash
+cd print/album
+python3 lib/fetch-yadisk.py "https://disk.yandex.ru/d/khSz66eC-SzC_g" teams/ska-strelna/assets/reference/yadisk-albums
+python3 -c "
+import json,urllib.request,urllib.parse
+from pathlib import Path
+url='https://disk.yandex.ru/i/owOwSLQj-jcCOw'
+d=json.loads(urllib.request.urlopen('https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key='+urllib.parse.quote(url)).read())
+Path('teams/ska-strelna/assets/reference/SKA_STRELNA_logo.ai').write_bytes(urllib.request.urlopen(d['href']).read())
+"
+```
+
+   Уже локально: `SKA_STRELNA_logo.ai`, превью CDR (`assets/reference/cdr-previews/`), фото из папки «Альбомы СКА Стрельна».
+   CDR (~73 MB) в git не хранятся — только на диске после загрузки.
 
 2. **Из CDR — фото и ФИО** (в `staff.csv` помечены `УТОЧНИТЬ`):
    - скаут

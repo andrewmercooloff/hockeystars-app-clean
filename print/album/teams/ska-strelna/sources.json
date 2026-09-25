@@ -10,8 +10,9 @@
     "2011": "https://fhspb.ru/Team?TournamentID=6573&TeamID=3bfa8c2f-2de8-4d97-aa52-365a9e67ba4a"
   },
   "yandex": {
-    "cdr_album": "https://disk.yandex.ru/d/7aOi47QB6To2fg",
-    "file": "https://disk.yandex.ru/i/owOwSLQj-jcCOw"
+    "albums_folder": "https://disk.yandex.ru/d/khSz66eC-SzC_g",
+    "logo_ai": "https://disk.yandex.ru/i/owOwSLQj-jcCOw",
+    "cdr_album": "https://disk.yandex.ru/d/7aOi47QB6To2fg"
   },
   "management": "https://strelna.ska.ru/about/management/"
 }
