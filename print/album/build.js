@@ -3,9 +3,10 @@
 const fs = require('fs');
 const path = require('path');
 const { loadTeam } = require('./lib/data');
-const { albumHtml, PAGE } = require('./lib/album');
+const { albumHtml, pageOf } = require('./lib/album');
 const { execFileSync } = require('child_process');
 const { cardsHtml } = require('./lib/cards');
+const { stickersHtml } = require('./lib/stickers');
 const { withBrowser, htmlToPdf, pdfPreviews, exportShareCards } = require('./lib/render');
 const { printSpecHtml } = require('./lib/print-spec');
 
@@ -21,7 +22,7 @@ function syncSharePages(slug, outDir) {
         path.join(__dirname, 'lib', 'export-share-pages.py'),
         previewDir,
         pagesDir,
-        path.join(outDir, `${slug}-album-A3-spreads.pdf`),
+        path.join(outDir, `${slug}-album-spreads.pdf`),
       ],
       { stdio: 'pipe' }
     );
@@ -57,42 +58,52 @@ async function main() {
   fs.mkdirSync(outDir, { recursive: true });
 
   const data = await loadTeam(teamDir, path.join(outDir, 'cache'));
-  console.log(`Команда: ${data.team.name} (${data.team.season}) — ${data.cards.length} карточек`);
+  const productLabel = data.isStickers ? 'наклеек' : 'карточек';
+  const rosterCount = data.isStickers ? Object.values(data.years || {}).reduce((n, a) => n + a.length, 0) : data.cards.length;
+  console.log(`Команда: ${data.team.name} (${data.team.season}) — ${rosterCount} ${productLabel}`);
   if (data.missingPhotos.length) {
-    console.log(`Нет фото (подставлена заглушка) — ${data.missingPhotos.length}:\n  ${data.missingPhotos.join('\n  ')}`);
+    console.log(`Нет фото (подставлена заглушка) — ${data.missingPhotos.length}:\n  ${data.missingPhotos.slice(0, 15).join('\n  ')}${data.missingPhotos.length > 15 ? `\n  … и ещё ${data.missingPhotos.length - 15}` : ''}`);
   }
 
   const album = albumHtml(data);
-  const cards = cardsHtml(data, { sheet: args.sheet, layout: args.layout });
+  const productHtml = data.isStickers
+    ? stickersHtml(data, { sheet: args.sheet, layout: args.layout })
+    : cardsHtml(data, { sheet: args.sheet, layout: args.layout });
 
   const albumPdf = path.join(outDir, `${slug}-album.pdf`);
-  const cardsPdf = path.join(outDir, `${slug}-cards.pdf`);
+  const productPdf = path.join(outDir, `${slug}-${data.isStickers ? 'stickers' : 'cards'}.pdf`);
   const specPdf = path.join(outDir, `${slug}-ТЗ-печать.pdf`);
+  const page = pageOf(data);
+  const spreadsName = `${slug}-album-spreads.pdf`;
+
   await withBrowser(async (browser) => {
     const albumHtmlFile = await htmlToPdf(browser, album, albumPdf);
     console.log(`✔ ${path.relative(process.cwd(), albumPdf)}`);
-    const cardsHtmlFile = await htmlToPdf(browser, cards, cardsPdf);
-    console.log(`✔ ${path.relative(process.cwd(), cardsPdf)}`);
-    const specHtmlFile = await htmlToPdf(browser, printSpecHtml(data), specPdf);
-    console.log(`✔ ${path.relative(process.cwd(), specPdf)}`);
+    const productHtmlFile = await htmlToPdf(browser, productHtml, productPdf);
+    console.log(`✔ ${path.relative(process.cwd(), productPdf)}`);
+    if (!data.isStickers) {
+      const specHtmlFile = await htmlToPdf(browser, printSpecHtml(data), specPdf);
+      console.log(`✔ ${path.relative(process.cwd(), specPdf)}`);
+      if (!args.keepHtml) fs.rmSync(specHtmlFile, { force: true });
+    }
     if (args.preview) {
       const previewDir = path.join(outDir, 'preview');
       fs.rmSync(previewDir, { recursive: true, force: true });
       await pdfPreviews(browser, albumPdf, albumHtmlFile, previewDir, 'album');
-      await pdfPreviews(browser, cardsPdf, cardsHtmlFile, previewDir, 'cards');
-      const sharePagesDir = path.join(__dirname, 'print-ready', slug, 'pages');
-      await exportShareCards(browser, cardsHtmlFile, sharePagesDir, data.cards.length);
-      console.log(`✔ карточки для share → ${path.relative(process.cwd(), sharePagesDir)}/card-*.jpg`);
+      await pdfPreviews(browser, productPdf, productHtmlFile, previewDir, data.isStickers ? 'stickers' : 'cards');
+      if (!data.isStickers) {
+        const sharePagesDir = path.join(__dirname, 'print-ready', slug, 'pages');
+        await exportShareCards(browser, productHtmlFile, sharePagesDir, data.cards.length);
+        console.log(`✔ карточки для share → ${path.relative(process.cwd(), sharePagesDir)}/card-*.jpg`);
+      }
       console.log(`✔ превью: ${path.relative(process.cwd(), previewDir)}/`);
     }
     if (!args.keepHtml) {
       fs.rmSync(albumHtmlFile, { force: true });
-      fs.rmSync(cardsHtmlFile, { force: true });
-      fs.rmSync(specHtmlFile, { force: true });
+      fs.rmSync(productHtmlFile, { force: true });
     }
   });
 
-  // Finishing (PyMuPDF): smaller files, A3 saddle-stitch spreads of the album, light copies for phones.
   const post = (cmd, src, dst, extra = []) => {
     try {
       execFileSync('python3', [path.join(__dirname, 'lib', 'postprocess.py'), cmd, src, dst, ...extra], { stdio: 'pipe' });
@@ -101,14 +112,14 @@ async function main() {
       console.warn(`⚠ ${cmd}: ${e.stderr?.toString().trim().split('\n').pop() || e.message} (pip install pymupdf)`);
     }
   };
-  for (const f of [albumPdf, cardsPdf]) {
+  for (const f of [albumPdf, productPdf]) {
     const tmp = f + '.tmp';
     post('optimize', f, tmp);
     if (fs.existsSync(tmp)) fs.renameSync(tmp, f);
   }
-  post('impose', albumPdf, path.join(outDir, `${slug}-album-A3-spreads.pdf`), [String(PAGE.bleed)]);
+  post('impose', albumPdf, path.join(outDir, spreadsName), [String(page.bleed)]);
   post('light', albumPdf, path.join(outDir, `${slug}-album-preview.pdf`));
-  post('light', cardsPdf, path.join(outDir, `${slug}-cards-preview.pdf`));
+  post('light', productPdf, path.join(outDir, `${slug}-${data.isStickers ? 'stickers' : 'cards'}-preview.pdf`));
 
   if (args.preview) {
     syncSharePages(slug, outDir);
@@ -116,7 +127,15 @@ async function main() {
 
   const printReady = path.join(__dirname, 'print-ready', slug);
   fs.mkdirSync(printReady, { recursive: true });
-  for (const name of [`${slug}-album.pdf`, `${slug}-album-A3-spreads.pdf`, `${slug}-cards.pdf`, `${slug}-album-preview.pdf`, `${slug}-cards-preview.pdf`, `${slug}-ТЗ-печать.pdf`]) {
+  const copyNames = [
+    `${slug}-album.pdf`,
+    spreadsName,
+    `${slug}-${data.isStickers ? 'stickers' : 'cards'}.pdf`,
+    `${slug}-album-preview.pdf`,
+    `${slug}-${data.isStickers ? 'stickers' : 'cards'}-preview.pdf`,
+  ];
+  if (!data.isStickers) copyNames.push(`${slug}-ТЗ-печать.pdf`);
+  for (const name of copyNames) {
     const src = path.join(outDir, name);
     if (fs.existsSync(src)) fs.copyFileSync(src, path.join(printReady, name));
   }

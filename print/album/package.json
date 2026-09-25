@@ -5,7 +5,8 @@
   "description": "Генератор печатных файлов альбома с карточками (журнал + карточки) для хоккейных команд",
   "scripts": {
     "build": "node build.js",
-    "dobrynya": "node build.js dobrynya --preview"
+    "dobrynya": "node build.js dobrynya --preview",
+    "ska-strelna": "node build.js ska-strelna --preview"
   },
   "dependencies": {
     "puppeteer-core": "^23.11.1",

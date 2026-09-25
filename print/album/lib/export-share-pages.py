@@ -16,7 +16,7 @@ def main() -> None:
     preview_dir, pages_dir, *_ = sys.argv[1:4]
     os.makedirs(pages_dir, exist_ok=True)
 
-    for kind in ('album', 'cards'):
+    for kind in ('album', 'cards', 'stickers'):
         for src in sorted(glob.glob(os.path.join(preview_dir, f'{kind}-*.png'))):
             base = os.path.splitext(os.path.basename(src))[0]
             png_to_jpg(src, os.path.join(pages_dir, f'{base}.jpg'))

@@ -73,6 +73,15 @@ function normalizePosition(raw) {
   return POSITIONS[key] || (raw || '').trim();
 }
 
+function resolvePhotoPath(teamDir, photosDir, row) {
+  if (row.photo) {
+    const rel = String(row.photo).replace(/\\/g, '/');
+    const bases = [path.join(teamDir, rel), path.join(teamDir, 'rosters', rel), path.join(photosDir, path.basename(rel))];
+    for (const p of bases) if (fs.existsSync(p) && fs.statSync(p).isFile()) return p;
+  }
+  return findPhoto(photosDir, row);
+}
+
 // Photo lookup order: explicit `photo` column → jersey number (7, 07) → "Фамилия", "Фамилия Имя", "Фамилия_Имя".
 function findPhoto(photosDir, row) {
   const candidates = [];
@@ -152,11 +161,54 @@ function listGallery(assetsDir, name = 'gallery') {
     .map((f) => path.join(dir, f));
 }
 
+async function rowToPerson(row, ctx) {
+  const { teamDir, photosDir, photoCache, colors, missingPhotos, meta = {} } = ctx;
+  const number = (row.number || row['номер'] || '').replace(/^#/, '');
+  const surname = row.surname || row['фамилия'] || '';
+  const name = row.name || row['имя'] || '';
+  const type = (row.type || row['тип'] || 'player').toLowerCase();
+  const position = normalizePosition(row.position || row['амплуа'] || (type === 'coach' ? 'Тренер' : type === 'staff' ? row.position || 'Сотрудник' : ''));
+  const photoPath = resolvePhotoPath(teamDir, photosDir, { ...row, number, surname, name });
+  const label = `${meta.year ? meta.year + ' · ' : ''}${number ? '#' + number + ' ' : ''}${surname} ${name}`.trim();
+  if (!photoPath && surname && !surname.startsWith('УТОЧНИТЬ')) missingPhotos.push(label);
+  return {
+    ...meta,
+    number,
+    surname,
+    name,
+    type,
+    position,
+    height: row.height || row['рост'] || '',
+    weight: row.weight || row['вес'] || '',
+    grip: row.grip || row['хват'] || '',
+    birthdate: row.birthdate || row['дата рождения'] || row['дата_рождения'] || '',
+    role: (row.role || row['роль'] || '').trim().toUpperCase().replace('A', 'А').replace('K', 'К'),
+    ribbon: row.ribbon || row['метка'] || (type === 'coach' ? 'Тренерский штаб' : type === 'team' ? 'Команда' : type === 'club' ? 'Клуб' : type === 'legend' ? 'Легенда' : type === 'staff' ? 'Руководство' : ''),
+    photo: photoPath ? await prepareImage(photoPath, photoCache, 1600) : placeholderPhoto(number, colors.primary),
+    photoSmall: photoPath ? await prepareImage(photoPath, photoCache, 500) : placeholderPhoto(number, colors.primary),
+    photoBack: (row.photo2 || row['оборот'])
+      ? type === 'club' || type === 'team'
+        ? await prepareImage(resolvePhotoPath(teamDir, photosDir, { photo: row.photo2 || row['оборот'] }), photoCache, 1600)
+        : await backCloseup(resolvePhotoPath(teamDir, photosDir, { photo: row.photo2 || row['оборот'] }), photoCache)
+      : photoPath && (type === 'player' || type === 'coach' || type === 'legend' || type === 'staff') ? await backCloseup(photoPath, photoCache) : null,
+    hasPhoto: Boolean(photoPath),
+    photo2Aspect: (row.photo2 || row['оборот']) ? await imageAspect(resolvePhotoPath(teamDir, photosDir, { photo: row.photo2 || row['оборот'] })) : null,
+    photoAspect: photoPath ? await imageAspect(photoPath) : 0.75,
+    focus: Number(String(row.focus || row['фокус'] || '50').replace('%', '')) || 50,
+    logoSide: String(row.logoSide || row['лого'] || '').toLowerCase(),
+    backOffset: Number(row.backOffset || row['сдвиг'] || 0) || 0,
+    backFocusY: Number(row.backFocusY || row['фокус_y'] || 0) || 0,
+    zoom: Number(row.zoom || row['масштаб'] || 1) || 1,
+    large: String(row.large || row['крупная'] || '').toLowerCase() === '1' || String(row.large || row['крупная'] || '').toLowerCase() === 'true',
+  };
+}
+
 async function loadTeam(teamDir, cacheDir) {
   const team = JSON.parse(fs.readFileSync(path.join(teamDir, 'team.json'), 'utf8'));
   const photosDir = path.join(teamDir, 'photos');
   const assetsDir = path.join(teamDir, 'assets');
-  const rows = parseCsv(fs.readFileSync(path.join(teamDir, 'players.csv'), 'utf8'));
+  const rostersDir = path.join(teamDir, 'rosters');
+  const isStickers = team.album?.product === 'stickers' || (!fs.existsSync(path.join(teamDir, 'players.csv')) && fs.existsSync(rostersDir));
 
   const colors = Object.assign(
     { primary: '#0b2a5b', secondary: '#c8102e', accent: '#f2b632', dark: '#071a3a', ice: '#eef3f9' },
@@ -165,51 +217,50 @@ async function loadTeam(teamDir, cacheDir) {
 
   const photoCache = path.join(cacheDir, 'photos');
   const missingPhotos = [];
+  const ctx = { teamDir, photosDir, photoCache, colors, missingPhotos };
   const cards = [];
-  for (const [index, row] of rows.entries()) {
-    const number = (row.number || row['номер'] || '').replace(/^#/, '');
-    const surname = row.surname || row['фамилия'] || '';
-    const name = row.name || row['имя'] || '';
-    const type = (row.type || row['тип'] || 'player').toLowerCase();
-    const position = normalizePosition(row.position || row['амплуа'] || (type === 'coach' ? 'Тренер' : ''));
-    const photoPath = findPhoto(photosDir, { ...row, number, surname, name });
-    if (!photoPath) missingPhotos.push(`${number ? '#' + number + ' ' : ''}${surname} ${name}`.trim());
-    cards.push({
-      index: index + 1,
-      number,
-      surname,
-      name,
-      type,
-      position,
-      height: row.height || row['рост'] || '',
-      weight: row.weight || row['вес'] || '',
-      grip: row.grip || row['хват'] || '',
-      birthdate: row.birthdate || row['дата рождения'] || row['дата_рождения'] || '',
-      // К / A — captain / alternate captain, printed after the jersey number like on real cards
-      role: (row.role || row['роль'] || '').trim().toUpperCase().replace('A', 'А').replace('K', 'К'),
-      ribbon: row.ribbon || row['метка'] || (type === 'coach' ? 'Тренерский штаб' : type === 'team' ? 'Команда' : type === 'club' ? 'Клуб' : type === 'legend' ? 'Легенда' : ''),
-      photo: photoPath ? await prepareImage(photoPath, photoCache, 1600) : placeholderPhoto(number, colors.primary),
-      // low-res copy for the faded "paste here" ghosts in the album
-      photoSmall: photoPath ? await prepareImage(photoPath, photoCache, 500) : placeholderPhoto(number, colors.primary),
-      // optional second photo for the back (column photo2 / оборот); people get the faded close-up of the main photo
-      photoBack: (row.photo2 || row['оборот'])
-        ? type === 'club' || type === 'team'
-          ? await prepareImage(findPhoto(photosDir, { photo: row.photo2 || row['оборот'] }), photoCache, 1600)
-          : await backCloseup(findPhoto(photosDir, { photo: row.photo2 || row['оборот'] }), photoCache)
-        : photoPath && (type === 'player' || type === 'coach' || type === 'legend') ? await backCloseup(photoPath, photoCache) : null,
-      hasPhoto: Boolean(photoPath),
-      photo2Aspect: (row.photo2 || row['оборот']) ? await imageAspect(findPhoto(photosDir, { photo: row.photo2 || row['оборот'] })) : null,
-      photoAspect: photoPath ? await imageAspect(photoPath) : 0.75,
-      // horizontal position of the face in the photo (0–100 %), used to place the close-up on the card back
-      focus: Number(String(row.focus || row['фокус'] || '50').replace('%', '')) || 50,
-      // optional: force logo on back to left or right (otherwise derived from focus for club/team cards)
-      logoSide: String(row.logoSide || row['лого'] || '').toLowerCase(),
-      // optional vertical shift of the back photo in mm (positive = down)
-      backOffset: Number(row.backOffset || row['сдвиг'] || 0) || 0,
-      backFocusY: Number(row.backFocusY || row['фокус_y'] || 0) || 0,
-      // relative size of the close-up on the back (1 = default); <1 for photos that are already tightly cropped
-      zoom: Number(row.zoom || row['масштаб'] || 1) || 1,
-    });
+  const years = {};
+  let staff = [];
+
+  if (isStickers) {
+    const yearList = team.album?.years || [];
+    let globalIndex = 0;
+    for (const year of yearList) {
+      const csvPath = path.join(rostersDir, `${year}.csv`);
+      if (!fs.existsSync(csvPath)) {
+        years[year] = [];
+        continue;
+      }
+      const yearPhotos = path.join(rostersDir, 'photos', year);
+      const rows = parseCsv(fs.readFileSync(csvPath, 'utf8'));
+      years[year] = [];
+      for (const row of rows) {
+        globalIndex += 1;
+        const person = await rowToPerson(row, { ...ctx, photosDir: yearPhotos, meta: { year, index: globalIndex } });
+        person.index = globalIndex;
+        years[year].push(person);
+        cards.push(person);
+      }
+    }
+    const staffCsv = path.join(teamDir, 'staff.csv');
+    if (fs.existsSync(staffCsv)) {
+      const rows = parseCsv(fs.readFileSync(staffCsv, 'utf8'));
+      staff = [];
+      for (const row of rows) {
+        globalIndex += 1;
+        const person = await rowToPerson(row, { ...ctx, photosDir: assetsDir, meta: { index: globalIndex } });
+        person.index = globalIndex;
+        staff.push(person);
+        cards.push(person);
+      }
+    }
+  } else {
+    const rows = parseCsv(fs.readFileSync(path.join(teamDir, 'players.csv'), 'utf8'));
+    for (const [index, row] of rows.entries()) {
+      const person = await rowToPerson(row, ctx);
+      person.index = index + 1;
+      cards.push(person);
+    }
   }
 
   const asset = async (names, maxPx) => {
@@ -249,17 +300,49 @@ async function loadTeam(teamDir, cacheDir) {
 
   const c = team.cards || {};
   const cardSize = { w: Number(c.width) || 55, h: Number(c.height) || 77, bleed: Number(c.bleed ?? 2) };
+  const p = team.page || {};
+  const pageSize = { w: Number(p.width) || 210, h: Number(p.height) || 297, bleed: Number(p.bleed ?? 3) };
+  const s = team.stickers || {};
+  const stickerSize = {
+    w: Number(s.width) || 40,
+    h: Number(s.height) || 45,
+    bleed: Number(s.bleed ?? 2),
+    teamW: Number(s.teamWidth) || 210,
+    teamH: Number(s.teamHeight) || 30,
+  };
 
-  // {count} / {team} / {season} / {year} placeholders inside free texts
-  const vars = { count: String(cards.length), team: team.name, season: team.season || '', year: team.year || '' };
-  const fill = (v) => (typeof v === 'string' ? v.replace(/\{(count|team|season|year)\}/g, (_, k) => vars[k]) : Array.isArray(v) ? v.map(fill) : v);
+  const rosterCount = isStickers ? Object.values(years).reduce((n, arr) => n + arr.length, 0) : cards.length;
+  const vars = {
+    count: String(rosterCount || cards.length),
+    team: team.name,
+    season: team.season || '',
+    year: team.year || '',
+    yearRange: team.yearRange || '',
+  };
+  const fill = (v) => (typeof v === 'string' ? v.replace(/\{(count|team|season|year|yearRange)\}/g, (_, k) => vars[k]) : Array.isArray(v) ? v.map(fill) : v);
   if (team.texts) for (const k of Object.keys(team.texts)) team.texts[k] = fill(team.texts[k]);
   if (team.history) {
     for (const it of team.history.items || []) for (const k of ['years', 'title', 'text']) if (it[k]) it[k] = fill(it[k]);
     for (const f of team.history.facts || []) for (const k of ['value', 'label']) if (f[k]) f[k] = fill(f[k]);
   }
 
-  return { team, colors, cards, assets, brand, missingPhotos, teamDir, cardSize };
+  const allStickers = isStickers ? cards.filter((c) => !staff.includes(c) || c.type !== 'club') : cards;
+  return {
+    team,
+    colors,
+    cards,
+    years,
+    staff,
+    assets,
+    brand,
+    missingPhotos,
+    teamDir,
+    cardSize,
+    pageSize,
+    stickerSize,
+    isStickers,
+    allStickers: isStickers ? cards : cards,
+  };
 }
 
 module.exports = { loadTeam };

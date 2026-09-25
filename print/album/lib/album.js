@@ -1,6 +1,12 @@
 const { baseCss, esc } = require('./styles');
 const { cardFront, cardCss } = require('./cards');
+const { stickerFront, stickerCss } = require('./stickers');
 const { rinkSvg, puckSvg, sticksSvg, goalSvg, scratchesSvg } = require('./hockey');
+
+const DEFAULT_PAGE = { w: 210, h: 297, bleed: 3 };
+function pageOf(data) {
+  return data.pageSize || DEFAULT_PAGE;
+}
 
 function puckFactFontSize(text) {
   const len = String(text).length;
@@ -20,7 +26,6 @@ function puckLabelHtml(data, text, opts = {}) {
   return `<span class="puck-label">${puck}<b style="font-size:${fs}mm">${esc(String(text))}</b></span>`;
 }
 
-const PAGE = { w: 210, h: 297, bleed: 3 };
 // Slots per "Команда" page: always 3 columns; rows depend on the card height (3 rows for 55x77, 2 rows for 60x85).
 // Each slot is exactly the card size so the card can be fixed with photo corners; the caption sits below the slot.
 const SLOT_COLS = 3;
@@ -28,39 +33,43 @@ const SLOT_GAP = 7;
 const CAPTION_H = 9;
 // Dense mode (3 rows of 60x85 on A4): compact header, 4 mm between slots, caption printed inside the slot.
 const DENSE = { header: 25, gap: 4, bottom: 7 };
-function denseRows(size) {
-  return Math.floor((PAGE.h - DENSE.header - DENSE.bottom + DENSE.gap) / (size.h + DENSE.gap));
+function denseRows(page, size) {
+  return Math.floor((page.h - DENSE.header - DENSE.bottom + DENSE.gap) / (size.h + DENSE.gap));
 }
-function isDense(size) {
-  return denseRows(size) >= 3;
+function isDense(page, size) {
+  return denseRows(page, size) >= 3;
 }
-function slotRows(size) {
-  if (isDense(size)) return denseRows(size);
-  const avail = PAGE.h - 36 - 12;
+function slotRows(page, size) {
+  if (isDense(page, size)) return denseRows(page, size);
+  const avail = page.h - 36 - 12;
   return Math.max(1, Math.floor((avail + SLOT_GAP) / (size.h + CAPTION_H + SLOT_GAP)));
 }
-function gridGap(size) {
-  if (isDense(size)) return DENSE.gap;
-  const rows = slotRows(size);
-  const free = PAGE.h - 36 - 14 - rows * (size.h + CAPTION_H);
+function gridGap(page, size) {
+  if (isDense(page, size)) return DENSE.gap;
+  const rows = slotRows(page, size);
+  const free = page.h - 36 - 14 - rows * (size.h + CAPTION_H);
   return rows > 1 ? Math.min(22, Math.max(SLOT_GAP, free / (rows - 1) - 8)) : SLOT_GAP;
 }
-function gridTop(size) {
-  if (isDense(size)) return DENSE.header;
-  const rows = slotRows(size);
-  const content = rows * (size.h + CAPTION_H) + (rows - 1) * gridGap(size);
-  return 36 + Math.max(0, (PAGE.h - 36 - 14 - content) / 2);
+function gridTop(page, size) {
+  if (isDense(page, size)) return DENSE.header;
+  const rows = slotRows(page, size);
+  const content = rows * (size.h + CAPTION_H) + (rows - 1) * gridGap(page, size);
+  return 36 + Math.max(0, (page.h - 36 - 14 - content) / 2);
 }
-function slotsPerPage(size) {
-  return SLOT_COLS * slotRows(size);
+function slotsPerPage(page, size) {
+  return SLOT_COLS * slotRows(page, size);
 }
 
 function albumCss(data) {
+  const PAGE = pageOf(data);
   const { w, h, bleed } = PAGE;
-  const size = data.cardSize;
+  const size = data.isStickers ? data.stickerSize : data.cardSize;
+  const slotSize = data.isStickers ? data.stickerSize : data.cardSize;
+  const yg = data.team.album?.yearGrid || { cols: 8, rows: 6 };
+  const yearCols = yg.cols / 2;
   return `
 ${baseCss(data.colors)}
-${cardCss(size)}
+${data.isStickers ? stickerCss(data.stickerSize) : cardCss(data.cardSize)}
 @page{size:${w + bleed * 2}mm ${h + bleed * 2}mm;margin:0;}
 .page{position:relative;width:${w + bleed * 2}mm;height:${h + bleed * 2}mm;overflow:hidden;page-break-after:always;background:#fff;}
 .safe{position:absolute;left:${bleed + 7}mm;top:${bleed + 7}mm;right:${bleed + 7}mm;bottom:${bleed + 7}mm;}
@@ -223,9 +232,42 @@ ${cardCss(size)}
 .team .hdr .logo img{max-width:100%;max-height:100%;object-fit:contain;}
 .team .hdr .title{font-size:10mm;}
 .team .hdr .sub{font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:3.6mm;letter-spacing:.14em;color:var(--secondary);text-align:right;margin-top:2mm;}
-.team .grid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${(bleed + gridTop(size)).toFixed(1)}mm;display:grid;
-  grid-template-columns:repeat(${SLOT_COLS},${size.w}mm);justify-content:space-between;row-gap:${gridGap(size).toFixed(1)}mm;}
+.team .grid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${(bleed + gridTop(PAGE, size)).toFixed(1)}mm;display:grid;
+  grid-template-columns:repeat(${SLOT_COLS},${size.w}mm);justify-content:space-between;row-gap:${gridGap(PAGE, size).toFixed(1)}mm;}
 .cell{position:relative;width:${size.w}mm;}
+.year .hdr{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 8}mm;height:18mm;display:flex;align-items:center;justify-content:space-between;}
+.year .hdr .logo{width:18mm;height:18mm;display:flex;align-items:center;justify-content:center;}
+.year .hdr .logo img{max-width:100%;max-height:100%;object-fit:contain;}
+.year .hdr .title{font-size:9.5mm;}
+.year .hdr .sub{font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:3.4mm;letter-spacing:.12em;color:var(--secondary);text-align:right;margin-top:1.5mm;}
+.year .grid{position:absolute;left:${bleed + 8}mm;right:${bleed + 8}mm;top:${bleed + 28}mm;bottom:${bleed + 42}mm;display:grid;
+  grid-template-columns:repeat(${yearCols},${slotSize.w}mm);grid-template-rows:repeat(${yg.rows},${slotSize.h}mm);justify-content:space-between;align-content:space-between;}
+.year .cell{width:${slotSize.w}mm;height:${slotSize.h}mm;}
+.year .slot{width:${slotSize.w}mm;height:${slotSize.h}mm;}
+.year .slot .ghost{position:absolute;inset:0;transform:scale(1);filter:blur(.45mm);opacity:.14;}
+.year .slot .ghost .sticker{width:100%;height:100%;}
+.year .slot .ghost .sticker .frame{inset:0;}
+.year .slot.outline{background:linear-gradient(160deg,#fff,var(--ice));border:.35mm dashed color-mix(in srgb,var(--primary) 40%,#ccc);}
+.year .slot.outline .lbl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1mm;}
+.year .slot.outline .lbl .n{font-family:'Fira Sans Extra Condensed';font-weight:700;font-size:4.2mm;color:color-mix(in srgb,var(--primary) 25%,#bbb);}
+.year .slot.outline .lbl .p{font-family:'Roboto';font-size:2.2mm;color:color-mix(in srgb,var(--primary) 20%,#ccc);margin-top:.8mm;text-transform:uppercase;}
+.year .teamstrip{position:absolute;left:50%;transform:translateX(-50%);bottom:${bleed + 8}mm;width:${data.stickerSize?.teamW || 210}mm;height:${data.stickerSize?.teamH || 30}mm;
+  border:.4mm dashed color-mix(in srgb,var(--secondary) 55%,#bbb);border-radius:1mm;background:rgba(255,255,255,.85);
+  display:flex;align-items:center;justify-content:center;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:3.2mm;color:var(--primary);letter-spacing:.08em;}
+.special .hdr{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 8}mm;}
+.special .hdr .title{font-size:9mm;}
+.special .hdr .sub{font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:3.4mm;letter-spacing:.12em;color:var(--secondary);margin-top:1.5mm;}
+.special .grid{position:absolute;left:${bleed + 10}mm;right:${bleed + 10}mm;top:${bleed + 30}mm;bottom:${bleed + 12}mm;display:grid;
+  grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr);gap:4mm 5mm;align-content:space-between;}
+.special .cell{display:flex;align-items:center;justify-content:center;}
+.special .slot{position:relative;border:.35mm dashed color-mix(in srgb,var(--primary) 50%,transparent);border-radius:1.2mm;background:#fff;overflow:hidden;}
+.special .slot.wide{width:100%;height:100%;}
+.special .slot.norm{width:${slotSize.w}mm;height:${slotSize.h}mm;}
+.special .slot .ghost{position:absolute;inset:0;filter:blur(.45mm);opacity:.14;}
+.special .slot .ghost .sticker{width:100%;height:100%;}
+.special .slot .cap{position:absolute;left:0;right:0;bottom:0;padding:1.2mm 1.5mm;background:rgba(255,255,255,.92);text-align:center;border-top:.3mm solid color-mix(in srgb,var(--primary) 20%,transparent);}
+.special .slot .cap .n{font-family:'Fira Sans Extra Condensed';font-weight:700;font-size:2.8mm;text-transform:uppercase;line-height:1.05;color:var(--dark);}
+.special .slot .cap .p{font-family:'Roboto';font-size:2mm;color:#5b6b80;margin-top:.4mm;text-transform:uppercase;}
 .cell .cap{height:${CAPTION_H}mm;padding-top:1.6mm;text-align:center;}
 .team.dense .hdr{top:${bleed + 5}mm;height:16mm;}
 .team.dense .hdr .logo{width:16mm;height:16mm;}
@@ -421,6 +463,7 @@ function coverPuckSvg(colors) {
 
 function coverPage(data) {
   const t = data.team;
+  const PAGE = pageOf(data);
   const { w, h, bleed } = PAGE;
   const aspect = data.assets.coverAspect || 0;
   let photo = `<div class="nophoto"></div>`;
@@ -441,11 +484,11 @@ function coverPage(data) {
     ${photo}
     <div class="deco">${rinkSvg('rgba(255,255,255,.55)', data.colors.secondary, 0.22)}</div>
     <div class="orn tl"></div><div class="orn br"></div>
-    <div class="season"><span>${sticksSvg('#fff', data.colors.accent, '#111')}Альбом с карточками <b>★</b> ${esc(t.season)}</span></div>
+    <div class="season"><span>${sticksSvg('#fff', data.colors.accent, '#111')}${data.isStickers ? 'Альбом с наклейками' : 'Альбом с карточками'} <b>★</b> ${esc(data.isStickers ? t.yearRange || t.season : t.season)}</span></div>
     ${data.assets.logo ? `<div class="teamname">${esc(t.name)}<small>${esc(t.city || '')}</small></div>` : ''}
     <div class="logo">${logo}</div>
-    <div class="count${data.assets.puck ? ' real' : ''}">${data.assets.puck ? `<img src="${data.assets.puck}">` : coverPuckSvg(data.colors)}<div class="in"><b>${data.cards.length}</b><span>карточек</span></div></div>
-    <div class="year">${esc(t.year || '')}</div>
+    <div class="count${data.assets.puck ? ' real' : ''}">${data.assets.puck ? `<img src="${data.assets.puck}">` : coverPuckSvg(data.colors)}<div class="in"><b>${data.isStickers ? Object.values(data.years || {}).reduce((n, a) => n + a.length, 0) : data.cards.length}</b><span>${data.isStickers ? 'наклеек' : 'карточек'}</span></div></div>
+    <div class="year">${esc(data.isStickers ? (t.yearRange || '').split('–')[0] || t.year || '' : t.year || '')}</div>
     <div class="brand"><img src="${data.brand.hockeystarsWhite}"></div>
   </section>`;
 }
@@ -454,8 +497,10 @@ function introPage(data, pageNo) {
   const t = data.team;
   const texts = t.texts || {};
   const intro =
-    texts.intro ||
-    `Этот альбом — твой личный трофей сезона <b>${esc(t.season)}</b>!\nКаждая победа команды <b>${esc(t.name)}${t.year ? '-' + esc(t.year) : ''}</b> приближает тебя к заветной цели — собрать все <b>${data.cards.length}</b> карточек.`;
+    texts.introLead || texts.intro ||
+    (data.isStickers
+      ? `Собери наклейки всех команд школы — от <b>${esc(t.yearRange || t.season)}</b>. Каждый разворот — один год рождения.`
+      : `Этот альбом — твой личный трофей сезона <b>${esc(t.season)}</b>!\nКаждая победа команды <b>${esc(t.name)}${t.year ? '-' + esc(t.year) : ''}</b> приближает тебя к заветной цели — собрать все <b>${data.cards.length}</b> карточек.`);
   const steps = texts.steps || [
     'После каждой победы команды ты вытягиваешь карточки.',
     `Собери всех игроков команды, тренеров и легенд ${esc(t.shortName || t.name)}.`,
@@ -467,12 +512,14 @@ function introPage(data, pageNo) {
     : `<div class="ph">Общее фото команды — assets/team.jpg</div>`;
   const bigName = (t.shortName || t.name).toUpperCase();
   const bigSize = Math.min(34, (170 / Math.max(6, bigName.length)) * 1.75);
+  const introTitle = texts.introTitle || 'Альбом';
+  const sampleHtml = sample ? (data.isStickers ? stickerFront(sample, data) : cardFront(sample, data)) : '';
   return `<section class="page intro ice">
     ${deco(data)}
     <div class="orn tr"></div>
-    <div class="hdr"><div class="title">Альбом</div></div>
+    <div class="hdr"><div class="title">${esc(introTitle)}</div></div>
     <div class="lead">${intro.replace(/\n/g, '<br>')}</div>
-    <div class="sample">${sample ? cardFront(sample, data) : ''}</div>
+    <div class="sample">${sampleHtml}</div>
     <div class="how"><h3>Как это работает:</h3>
       ${steps.map((s, i) => `<div class="step"><span class="pucknum">${puckLabelHtml(data, i + 1, { index: i, fontSize: 4.2 })}</span><div>${s}</div></div>`).join('')}
     </div>
@@ -484,28 +531,99 @@ function introPage(data, pageNo) {
   </section>`;
 }
 
+function slotHtml(c, data, style) {
+  const ghost = data.isStickers
+    ? stickerFront({ ...c, photo: c.photoSmall }, data, { ghost: true })
+    : cardFront({ ...c, photo: c.photoSmall }, data);
+  return `<div class="cell"><div class="slot ${style}">
+    <div class="ghost">${ghost}</div>
+    ${style === 'outline' ? `<div class="bignum">${esc(c.number)}</div>` : ''}
+    <div class="tag">${c.index}</div>
+    <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+  </div>
+  <div class="cap"><div class="n">${c.number ? `<span>#${esc(c.number)}${esc(c.role || '')}</span>` : ''}${esc(c.surname)} ${esc(c.name)}</div><div class="p">${esc(c.position)}</div></div>
+  </div>`;
+}
+
+function yearSlotHtml(c, data) {
+  if (!c) {
+    return `<div class="cell"><div class="slot outline"><div class="lbl"><div class="n">—</div><div class="p">свободно</div></div></div></div>`;
+  }
+  const style = c.hasPhoto ? 'ghost' : 'outline';
+  const inner = c.hasPhoto
+    ? `<div class="ghost">${stickerFront({ ...c, photo: c.photoSmall }, data, { ghost: true })}</div>`
+    : `<div class="lbl">${c.number ? `<div class="n">#${esc(c.number)}</div>` : `<div class="n">${esc(c.position || '—')}</div>`}<div class="p">${esc(c.surname)} ${esc(c.name)}</div></div>`;
+  return `<div class="cell"><div class="slot ${style}">${inner}</div></div>`;
+}
+
+function yearGridPage(data, year, slots, pageNo, side) {
+  const t = data.team;
+  const logo = data.assets.logo ? `<img src="${data.assets.logo}">` : '';
+  const count = (data.years[year] || []).length;
+  const grid = slots.map((c) => yearSlotHtml(c, data)).join('');
+  const teamStrip = side === 'right'
+    ? `<div class="teamstrip">Командное фото · ${esc(year)}</div>`
+    : '';
+  return `<section class="page year ice">
+    ${deco(data, 0.1)}
+    <div class="orn br" style="opacity:.85"></div>
+    <div class="hdr"><div class="logo">${logo}</div><div style="text-align:right"><div class="title">${side === 'left' ? 'Команда' : esc(year)}</div><div class="sub">${esc(t.name)} · ${esc(year)} г.р. · ${count} чел.</div></div></div>
+    <div class="grid">${grid}</div>
+    ${teamStrip}
+    <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
+  </section>`;
+}
+
+function yearSpreadPages(data, year, pageNo) {
+  const yg = data.team.album?.yearGrid || { cols: 8, rows: 6 };
+  const perPage = (yg.cols / 2) * yg.rows;
+  const people = [...(data.years[year] || [])];
+  while (people.length < yg.cols * yg.rows) people.push(null);
+  return [
+    yearGridPage(data, year, people.slice(0, perPage), pageNo, 'left'),
+    yearGridPage(data, year, people.slice(perPage, yg.cols * yg.rows), pageNo + 1, 'right'),
+  ];
+}
+
+function specialSlotHtml(c, data, wide) {
+  const cls = wide ? 'wide' : 'norm';
+  const ghost = c.hasPhoto ? `<div class="ghost">${stickerFront({ ...c, photo: c.photoSmall }, data, { ghost: true })}</div>` : '';
+  const cap = `<div class="cap"><div class="n">${esc(c.surname)} ${esc(c.name)}</div><div class="p">${esc(c.position)}</div></div>`;
+  return `<div class="cell"><div class="slot ${cls}">${ghost}${cap}<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i></div></div>`;
+}
+
+function specialSpreadPages(data, pageNo) {
+  const people = data.staff || [];
+  const slots = [...people];
+  while (slots.length < 12) slots.push(null);
+  const left = slots.slice(0, 6);
+  const right = slots.slice(6, 12);
+  const renderSide = (items, no, title) => {
+    const cells = items
+      .map((c) => (c ? specialSlotHtml(c, data, c.large || c.type === 'club') : `<div class="cell"><div class="slot norm outline"><div class="cap"><div class="n">—</div><div class="p">свободно</div></div></div></div>`))
+      .join('');
+    return `<section class="page special ice">
+      ${deco(data, 0.1)}
+      <div class="orn br" style="opacity:.85"></div>
+      <div class="hdr"><div class="title">${esc(title)}</div><div class="sub">${esc(data.team.name)} · руководство и клуб</div></div>
+      <div class="grid">${cells}</div>
+      <div class="pgnum ${no % 2 === 0 ? 'l' : 'r'}">${no}</div>
+    </section>`;
+  };
+  return [renderSide(left, pageNo, 'Спецразворот'), renderSide(right, pageNo + 1, 'Школа')];
+}
+
 function teamPage(data, cards, pageNo, idx, total) {
   const t = data.team;
+  const PAGE = pageOf(data);
   const style = (t.album && t.album.slotStyle) || 'ghost';
   const logo = data.assets.logo ? `<img src="${data.assets.logo}">` : '';
-  const slots = cards
-    .map(
-      (c) => `<div class="cell"><div class="slot ${style}">
-        <div class="ghost">${cardFront({ ...c, photo: c.photoSmall }, data)}</div>
-        ${style === 'outline' ? `<div class="bignum">${esc(c.number)}</div>` : ''}
-        <div class="tag">${c.index}</div>
-        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-      </div>
-      <div class="cap"><div class="n">${c.number ? `<span>#${esc(c.number)}${esc(c.role || '')}</span>` : ''}${esc(c.surname)} ${esc(c.name)}</div><div class="p">${esc(c.position)}</div></div>
-      </div>`
-    )
-    .join('');
+  const slots = cards.map((c) => slotHtml(c, data, style)).join('');
   const even = pageNo % 2 === 0;
-  const allCoach = cards.every((c) => c.type === 'coach' || c.photo === undefined || c.type === 'club');
   const ribbons = new Set(cards.map((c) => c.ribbon));
   const title = cards.some((c) => c.type === 'coach') && !cards.some((c) => c.type === 'player') ? 'Тренерский штаб'
     : ribbons.size === 1 && cards[0].ribbon && !cards.some((c) => c.type === 'player') ? cards[0].ribbon : 'Команда';
-  return `<section class="page team ice${isDense(data.cardSize) ? ' dense' : ''}">
+  return `<section class="page team ice${isDense(PAGE, data.cardSize) ? ' dense' : ''}">
     ${deco(data, 0.1)}
     <div class="orn br" style="opacity:.9"></div>
     <div class="hdr"><div class="logo">${logo}</div><div style="text-align:right"><div class="title">${esc(title)}</div><div class="sub">${esc(t.name)} · карточки ${cards[0].index}–${cards[cards.length - 1].index} из ${data.cards.length}</div></div></div>
@@ -767,14 +885,20 @@ function backCoverPage(data) {
   const texts = t.texts || {};
   const qr = data.assets.qr ? `<img src="${data.assets.qr}">` : `<div class="ph">QR-код<br>assets/qr.png</div>`;
   const logo = data.assets.logo ? `<img src="${data.assets.logo}">` : '';
-  const wall = data.cards
-    .map((c) => `<div class="mini"><div class="mc">${cardFront({ ...c, photo: c.photoSmall }, data)}</div><span>${c.index}</span></div>`)
-    .join('');
+  const wall = data.isStickers
+    ? ''
+    : data.cards
+        .map((c) => `<div class="mini"><div class="mc">${cardFront({ ...c, photo: c.photoSmall }, data)}</div><span>${c.index}</span></div>`)
+        .join('');
+  const collectBlock = data.isStickers
+    ? `<div class="collect"><div class="ttl">Собери все наклейки<span>${esc(t.yearRange || t.season)}</span></div>
+       <p style="color:rgba(255,255,255,.88);font-size:4mm;line-height:1.35;margin-top:4mm;max-width:130mm">${Object.keys(data.years || {}).length} команд · ${Object.values(data.years || {}).reduce((n, a) => n + a.length, 0)} наклеек · от ${esc(t.yearRange || '')}</p></div>`
+    : `<div class="collect"><div class="ttl">Собери все карточки<span>до конца сезона</span></div><div class="wall">${wall}</div></div>`;
   const overlay = data.assets.history || data.assets.back;
   return `<section class="page backcover">
     ${overlay ? `<div class="photo"><img src="${overlay}"></div><div class="tint"></div>` : ''}<div class="pattern"></div>
     <div class="top"><div class="name">${esc(t.name)}<small>${esc(t.city || '')}${t.city ? ' · ' : ''}Сезон ${esc(t.season)}</small></div>${logo}</div>
-    <div class="collect"><div class="ttl">Собери все карточки<span>до конца сезона</span></div><div class="wall">${wall}</div></div>
+    ${collectBlock}
     <div class="cta"><h2>${texts.backTitle || 'Ты есть в <span>HockeyStars</span>?'}</h2><p>${esc(texts.backText || 'Твоя команда уже там, устанавливай по QR-коду')}</p></div>
     <div class="qr">${qr}</div>
     <div class="brand"><img src="${data.brand.hockeystarsWhite}">${texts.backFooter ? `<small>${esc(texts.backFooter)}</small>` : ''}</div>
@@ -782,8 +906,9 @@ function backCoverPage(data) {
 }
 
 function albumHtml(data) {
+  const PAGE = pageOf(data);
   const chunks = [];
-  const per = slotsPerPage(data.cardSize);
+  const per = slotsPerPage(PAGE, data.cardSize);
   for (let i = 0; i < data.cards.length; i += per) chunks.push(data.cards.slice(i, i + per));
 
   // Inner page order. With `album.pages` in team.json the whole order is explicit ("team" takes the next chunk of cards);
@@ -809,8 +934,17 @@ function albumHtml(data) {
     autographOffset += chunk.length;
     return chunk;
   };
+  const pushPages = (fn, count = 1) => {
+    fn._pages = count;
+    inner.push(fn);
+  };
   for (const kind of extra) {
-    if (kind === 'team') { if (chunkIdx < chunks.length) pushTeamPage(inner, data, chunks[chunkIdx++]); }
+    if (kind.startsWith('year:')) {
+      const year = kind.slice(5);
+      pushPages((n) => yearSpreadPages(data, year, n), 2);
+    } else if (kind === 'special') {
+      pushPages((n) => specialSpreadPages(data, n), 2);
+    } else if (kind === 'team') { if (chunkIdx < chunks.length) pushTeamPage(inner, data, chunks[chunkIdx++]); }
     else if (kind === 'intro') inner.push((n) => introPage(data, n));
     else if (kind === 'history') inner.push((n) => historyPage(data, n));
     else if (kind === 'facts') inner.push((n) => factsPage(data, n));
@@ -836,10 +970,11 @@ function albumHtml(data) {
       if (tiles.length) inner.push((n) => galleryPage(data, n, tiles, title));
     }
   }
-  while (chunkIdx < chunks.length) pushTeamPage(inner, data, chunks[chunkIdx++]);
+  if (!data.isStickers) while (chunkIdx < chunks.length) pushTeamPage(inner, data, chunks[chunkIdx++]);
+  const innerPages = () => inner.reduce((n, fn) => n + (fn._pages || 1), 0);
   // Saddle-stitched booklet: pad to a multiple of 4 pages — leftover gallery photos, then autographs, then the match log.
   let statsUsed = extra.includes('stats');
-  while ((inner.length + 2) % 4 !== 0) {
+  while ((innerPages() + 2) % 4 !== 0) {
     const { tiles, used } = galleryLayout(data.assets.gallery.slice(galleryOffset, galleryOffset + 12));
     if (tiles.length >= 4) {
       galleryOffset += used;
@@ -855,8 +990,20 @@ function albumHtml(data) {
     }
   }
 
-  const pages = [coverPage(data), ...inner.map((fn, i) => fn(i + 2)), backCoverPage(data)];
+  const flat = [];
+  let n = 2;
+  for (const fn of inner) {
+    const out = fn(n);
+    if (Array.isArray(out)) {
+      flat.push(...out);
+      n += out.length;
+    } else {
+      flat.push(out);
+      n += 1;
+    }
+  }
+  const pages = [coverPage(data), ...flat, backCoverPage(data)];
   return `<!doctype html><html lang="ru"><head><meta charset="utf-8"><style>${albumCss(data)}</style></head><body>${pages.join('\n')}</body></html>`;
 }
 
-module.exports = { albumHtml, PAGE };
+module.exports = { albumHtml, PAGE: DEFAULT_PAGE, pageOf };
