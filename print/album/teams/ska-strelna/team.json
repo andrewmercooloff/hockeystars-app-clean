@@ -13,15 +13,23 @@
     "dark": "#001a33",
     "ice": "#eef3f8"
   },
+  "page": {
+    "width": 245,
+    "height": 335,
+    "bleed": 3
+  },
   "stickers": {
-    "width": 45,
-    "height": 60,
+    "width": 40,
+    "height": 45,
     "bleed": 2,
-    "sheet": "A4",
+    "teamWidth": 210,
+    "teamHeight": 30,
+    "sheet": "SRA3",
     "layout": "sheet"
   },
   "album": {
     "product": "stickers",
+    "yearGrid": { "cols": 8, "rows": 6, "spread": true },
     "years": ["2018", "2017", "2016", "2015", "2014", "2013", "2012", "2011"],
     "pages": [
       "cover",
