@@ -1,4 +1,6 @@
 number;surname;name;position;role;photo;type;height;weight;grip;birthdate
+;УТОЧНИТЬ;Главный тренер;Главный тренер;;;coach;;;;
+;УТОЧНИТЬ;Тренер;Тренер;;;coach;;;;
 ;Алтыев;Давид;Игрок;;;player;;;;17.11.2019
 ;Бабенко;Сергей;Игрок;;;player;;;;04.04.2019
 ;Баландин;Макар;Игрок;;;player;;;;08.02.2019
