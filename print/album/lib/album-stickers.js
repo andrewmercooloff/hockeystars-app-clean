@@ -161,18 +161,22 @@ ${shared.albumCss(data)}
 .txt .hdr{position:absolute;left:${bleed + SIDE}mm;top:${bleed + 12}mm;z-index:2;}
 .txt .hdr .title{font-size:11mm;}
 .txt .lead{position:absolute;left:${bleed + SIDE}mm;right:${bleed + SIDE}mm;top:${bleed + 32}mm;font-size:4.1mm;line-height:1.4;color:#1b2940;z-index:2;}
-.hist .tl{position:absolute;left:${bleed + SIDE}mm;right:${bleed + SIDE + 52}mm;top:${bleed + 52}mm;bottom:${bleed + 14}mm;z-index:2;display:flex;flex-direction:column;justify-content:space-between;}
-.hist .tl::before{content:"";position:absolute;left:38mm;top:6mm;bottom:10mm;width:1.6mm;background:linear-gradient(180deg,var(--primary),var(--secondary));border-radius:1mm;opacity:.35;}
-.hist .era{position:relative;display:flex;gap:5mm;align-items:flex-start;}
-.hist .era .img{flex:0 0 32mm;height:32mm;display:flex;align-items:center;justify-content:center;background:#fff;border:.45mm solid var(--primary);border-radius:50%;overflow:hidden;box-shadow:0 1.5mm 4mm rgba(0,20,60,.15);}
+.hist .tl{position:absolute;left:${bleed + SIDE}mm;top:${bleed + 52}mm;bottom:${bleed + 14}mm;width:${m.inner - 50}mm;z-index:2;}
+.hist .tl svg.snake{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:3;pointer-events:none;}
+.hist .era{position:absolute;left:0;right:0;}
+.hist .era .img{position:absolute;top:0;width:30mm;height:30mm;z-index:4;display:flex;align-items:center;justify-content:center;background:#fff;border:.5mm solid var(--primary);border-radius:50%;overflow:hidden;box-shadow:0 1.5mm 4mm rgba(0,20,60,.18);}
 .hist .era .img img{width:84%;height:84%;object-fit:contain;}
 .hist .era .img.photo img{width:100%;height:100%;object-fit:cover;}
-.hist .era .body{flex:1;padding-top:1mm;}
-.hist .era .pill{display:inline-flex;align-items:center;gap:3mm;background:linear-gradient(90deg,var(--dark),var(--primary));color:#fff;border-radius:6mm;padding:1.2mm 6mm 1.2mm 1.2mm;box-shadow:0 1.2mm 3mm rgba(0,20,60,.25);max-width:100%;}
-.hist .era .pill .n{flex:none;width:8.5mm;height:8.5mm;border-radius:50%;background:var(--secondary);color:#fff;font-family:'Unbounded';font-weight:900;font-size:4.4mm;display:flex;align-items:center;justify-content:center;border:.6mm solid #fff;}
-.hist .era .pill .yr{font-family:'Fira Sans Extra Condensed';font-weight:600;font-size:3.6mm;letter-spacing:.06em;white-space:nowrap;}
-.hist .era .pill .yr b{font-family:'Unbounded';font-weight:800;font-size:4mm;text-transform:uppercase;display:block;letter-spacing:0;line-height:1.05;}
-.hist .era p{font-size:3.9mm;line-height:1.4;color:#1b2940;margin:2.2mm 0 0 3mm;}
+.hist .era.l .img{left:0;} .hist .era.r .img{right:0;}
+.hist .era .body{position:absolute;top:0;left:34mm;right:34mm;z-index:2;}
+.hist .era .pill{position:relative;display:flex;align-items:center;gap:3mm;height:10mm;background:linear-gradient(90deg,var(--dark),var(--primary));color:#fff;border-radius:5mm;padding:0 6mm 0 1mm;box-shadow:0 1.2mm 3mm rgba(0,20,60,.3);width:100%;}
+.hist .era.r .pill{flex-direction:row-reverse;padding:0 1mm 0 6mm;margin-left:auto;background:linear-gradient(270deg,var(--dark),var(--primary));}
+.hist .era .pill .n{flex:none;width:8mm;height:8mm;border-radius:50%;background:var(--secondary);color:#fff;font-family:'Unbounded';font-weight:900;font-size:4.2mm;display:flex;align-items:center;justify-content:center;border:.6mm solid #fff;}
+.hist .era .pill .yr{font-family:'Fira Sans Extra Condensed';font-weight:500;font-size:3.3mm;letter-spacing:.04em;white-space:nowrap;line-height:1;}
+.hist .era .pill .yr b{font-family:'Unbounded';font-weight:800;font-size:3.3mm;text-transform:uppercase;display:block;letter-spacing:0;line-height:1.05;margin-top:.5mm;}
+.hist .era.r .pill .yr{text-align:right;}
+.hist .era p{font-size:3.7mm;line-height:1.38;color:#1b2940;margin:2.4mm 4mm 0;}
+.hist .era.r p{text-align:right;}
 .hist .hnums{position:absolute;right:${bleed + SIDE}mm;top:${bleed + 52}mm;bottom:${bleed + 14}mm;width:44mm;background:#fff;border:.5mm solid var(--primary);border-radius:22mm;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:6mm 3mm;box-shadow:0 2mm 5mm rgba(0,20,60,.12);z-index:2;}
 .hist .hnums h5{font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:3.6mm;color:var(--dark);text-align:center;line-height:1.1;}
 .hist .hnums h5::after{content:"";display:block;width:14mm;height:.8mm;background:var(--secondary);margin:2mm auto 0;border-radius:1mm;}
@@ -524,15 +528,36 @@ function legendsSpread(data, pageNo) {
 function skaHistoryPage(data, pageNo) {
   const h = data.team.skaHistory || {};
   const a = data.assets;
-  const imgs = [a.skates, a.tarasov, a.spengler, a.medal, a.arenaCups];
-  const photo = [false, false, false, false, false];
-  if (a.oldteam) { imgs[0] = a.oldteam; photo[0] = true; }
+  const m = metrics(data);
+  const eras = h.eras || [];
+  const imgs = [a.oldteam || a.skates, a.tarasov, a.spengler, a.medal, a.arenaCups];
+  const photo = [Boolean(a.oldteam), false, false, false, false];
   const icons = [a.cup, a.cup, a.spengler, a.medal, a.medal];
+  // geometry in mm inside .tl: alternating rows, a blue "snake" with red arrowheads links the pills
+  const W = m.inner - 50;
+  const H = m.h + m.bleed - 14 - (m.bleed + 52);
+  const rh = H / Math.max(eras.length, 1);
+  const py = 5; // pill centre from row top
+  const padL = 34, padR = 34;
+  const snake = eras.slice(0, -1).map((_, i) => {
+    const y0 = i * rh + py, y1 = (i + 1) * rh + py;
+    const left = i % 2 === 0; // this row's pill starts on the left → its end is on the right
+    if (left) {
+      const x0 = W - padR - 2, xe = W - padR + 1.5;
+      return `<path d="M ${x0} ${y0} C ${x0 + 26} ${y0}, ${xe + 26} ${y1}, ${xe} ${y1}" />`;
+    }
+    const x0 = padL + 2, xe = padL - 1.5;
+    return `<path d="M ${x0} ${y0} C ${x0 - 26} ${y0}, ${xe - 26} ${y1}, ${xe} ${y1}" />`;
+  }).join('');
+  const svg = `<svg class="snake" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="${data.colors.secondary}"/></marker></defs>
+    <g fill="none" stroke="${data.colors.primary}" stroke-width="3" stroke-linecap="round" marker-end="url(#ah)" opacity=".92">${snake}</g>
+  </svg>`;
   return `<section class="page txt hist ice">
     ${shared.deco(data, 0.06)}${orn(data, 'br')}
     <div class="hdr"><div class="title">${esc(h.title || 'История СКА')}</div></div>
     <div class="lead">${esc(h.lead || '')}</div>
-    <div class="tl">${(h.eras || []).map((e, i) => `<div class="era">
+    <div class="tl">${svg}${eras.map((e, i) => `<div class="era ${i % 2 === 0 ? 'l' : 'r'}" style="top:${(i * rh).toFixed(1)}mm;height:${rh.toFixed(1)}mm">
         <div class="img${photo[i] ? ' photo' : ''}">${imgs[i] ? `<img src="${imgs[i]}">` : ''}</div>
         <div class="body"><div class="pill"><span class="n">${i + 1}</span><span class="yr">${esc(e.years)}<b>${esc(e.title)}</b></span></div><p>${esc(e.text)}</p></div>
       </div>`).join('')}</div>
