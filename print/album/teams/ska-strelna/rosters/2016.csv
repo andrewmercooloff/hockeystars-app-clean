@@ -1,0 +1,31 @@
+number;surname;name;position;role;photo;type
+;Глезеров;Сергей Михайлович;Главный тренер;;photos/2016/coach-глезеров.jpg;coach
+;Барабанов;Иван Дмитриевич;Тренер;;photos/2016/coach-барабанов.jpg;coach
+;Тищенко;Дмитрий Сергеевич;Тренер вратарей;;photos/2016/coach-тищенко.jpg;coach
+;Тихонов;Павел Александрович;Тренер вратарей;;photos/2016/coach-тихонов.jpg;coach
+;Сергеев;Федор Андреевич;Тренер вратарей;;photos/2016/coach-сергеев.jpg;coach
+1;Гречкосей;Илья;;;photos/2016/1.jpg;player
+7;Чернухин;Михаил;;;photos/2016/7.jpg;player
+54;Стародубов;Артем;;;photos/2016/54.jpg;player
+72;Мокеев;Мирон;;;photos/2016/72.jpg;player
+9;Книга;Никита;;;photos/2016/9.jpg;player
+11;Бондаренко;Даниил;;;photos/2016/11.jpg;player
+14;Лебедев;Михаил;;;photos/2016/14.jpg;player
+17;Соколов;Арсений;;;photos/2016/17.jpg;player
+18;Крупко;Илья;;;photos/2016/18.jpg;player
+19;Лапшин;Демьян;;;photos/2016/19.jpg;player
+23;Романенков;Александр;;;photos/2016/23.jpg;player
+28;Комаров;Владислав;;;photos/2016/28.jpg;player
+29;Мустафин;Платон;;;photos/2016/29.jpg;player
+31;Горелик;Никита;;;photos/2016/31.jpg;player
+33;Крайнова;Елизавета;;;photos/2016/33.jpg;player
+39;Саенко;Григорий;;;photos/2016/39.jpg;player
+43;Ефимов;Виктор;;;photos/2016/43.jpg;player
+47;Багаев;Максим;;;photos/2016/47.jpg;player
+55;Григорян;Дамир;;;photos/2016/55.jpg;player
+58;Самойлов;Иван;;;photos/2016/58.jpg;player
+86;Рытиков;Филипп;;;photos/2016/86.jpg;player
+87;Тураев;Асадбек;;;photos/2016/87.jpg;player
+89;Пискунов;Вадим;;;photos/2016/89.jpg;player
+95;Соколов;Михаил;;;photos/2016/95.jpg;player
+97;Нарбут;Александр;;;photos/2016/97.jpg;player

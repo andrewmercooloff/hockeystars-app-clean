@@ -1,0 +1,47 @@
+number;surname;name;position;role;photo;type
+;Калинин;Михаил Викторович;Главный тренер;;photos/2018/coach-калинин.jpg;coach
+;Катосонов;Владислав Игоревич;Тренер;;photos/2018/coach-катосонов.jpg;coach
+;Тихонов;Павел Александрович;Тренер вратарей;;photos/2018/coach-тихонов.jpg;coach
+;Сергеев;Федор Андреевич;Тренер вратарей;;photos/2018/coach-сергеев.jpg;coach
+28;Шкахов;Лев;;;photos/2018/28.jpg;player
+30;Разводов;Арсений;;;photos/2018/30.jpg;player
+30;Смирнов;Арсений;;;photos/2018/30.jpg;player
+73;Белоусов;Андрей;;;photos/2018/73.jpg;player
+3;Николаев;Федор;;;photos/2018/3.jpg;player
+4;Кордон;Святослав;;;photos/2018/4.jpg;player
+5;Дмитриев;Святослав;;;photos/2018/5.jpg;player
+7;Марков;Артемий;;;photos/2018/7.jpg;player
+8;Бабенко;Сергей;;;photos/2018/8.jpg;player
+8;Глухов;Клим;;;photos/2018/8.jpg;player
+10;Гамзатов;Тимур;;;photos/2018/10.jpg;player
+11;Митрофанов;Матвей;;;photos/2018/11.jpg;player
+12;Зверев;Даниил;;;photos/2018/12.jpg;player
+12;Шаляпин;Тимофей;;;photos/2018/12.jpg;player
+15;Ковальчук;Демид;;;photos/2018/15.jpg;player
+17;Круглицкий;Егор;;;photos/2018/17.jpg;player
+17;Погребицкий;Давид;;;photos/2018/17.jpg;player
+18;Алексеев;Алексей;;;photos/2018/18.jpg;player
+20;Владимиров;Даниил;;;photos/2018/20.jpg;player
+20;Константинов;Роман;;;photos/2018/20.jpg;player
+21;Киргетов;Максим;;;photos/2018/21.jpg;player
+23;Перфильев;Артем;;;photos/2018/23.jpg;player
+25;Грохотов;Таймас;;;photos/2018/25.jpg;player
+26;Баландин;Макар;;;photos/2018/26.jpg;player
+26;Калинкин;Григорий;;;photos/2018/26.jpg;player
+27;Пророк;Егор;;;photos/2018/27.jpg;player
+29;Корнеенков;Евгений;;;photos/2018/29.jpg;player
+34;Волгин;Андрей;;;photos/2018/34.jpg;player
+41;Меркулов;Петр;;;photos/2018/41.jpg;player
+42;Тищенко;Остап;;;photos/2018/42.jpg;player
+44;Петросян;Рафаэль;;;photos/2018/44.jpg;player
+62;Путин;Мирон;;;photos/2018/62.jpg;player
+71;Загорулькин;Егор;;;photos/2018/71.jpg;player
+77;Минков;Демид;;;photos/2018/77.jpg;player
+78;Егоров;Дмитрий;;;photos/2018/78.jpg;player
+85;Кузенный;Василий;;;photos/2018/85.jpg;player
+86;Грачев;Андрей;;;photos/2018/86.jpg;player
+87;Ларионов;Владимир;;;photos/2018/87.jpg;player
+89;Рассадников;Дэнни;;;photos/2018/89.jpg;player
+92;Большаков;Захар;;;photos/2018/92.jpg;player
+98;Василенок;Арсений;;;photos/2018/98.jpg;player
+99;Иванов;Демид;;;photos/2018/99.jpg;player

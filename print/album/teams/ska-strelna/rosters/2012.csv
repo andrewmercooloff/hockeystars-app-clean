@@ -1,0 +1,32 @@
+number;surname;name;position;role;photo;type
+;Цыганов;Дмитрий Сергеевич;Главный тренер;;assets/staff-tsyganov.jpg;coach
+;Салимов;Марат Аксанович;Тренер;;assets/staff-salimov.jpg;coach
+;Алёхин;Дмитрий Борисович;Тренер;;assets/staff-alekhin.jpg;coach
+;Фаизов;Радмир Рифович;Тренер;;assets/staff-faizov.jpg;coach
+;Казакова;Яна Владимировна;Тренер по физподготовке;;assets/staff-kazakova.jpg;coach
+;Яковлев;Александр Олегович;Врач команды;;assets/staff-yakovlev.jpg;coach
+20;Батрак;Авдей;;;photos/2012/20.jpg;player
+50;Созинов;Федор;;;photos/2012/50.jpg;player
+99;Клименко;Иван;;;photos/2012/99.jpg;player
+3;Шишигин;Матвей;;;photos/2012/3.jpg;player
+4;Меркулов;Иван;;;photos/2012/4.jpg;player
+5;Герасимов;Андрей;;;photos/2012/5.jpg;player
+7;Мирошниченко;Александр;;;photos/2012/7.jpg;player
+8;Зайцев;Иван;;;photos/2012/8.jpg;player
+11;Каратаев;Семен;;;photos/2012/11.jpg;player
+12;Воронов;Роман;;;photos/2012/12.jpg;player
+13;Гришин;Степан;;;photos/2012/13.jpg;player
+14;Бунин;Даниил;;;photos/2012/14.jpg;player
+17;Кравченко;Глеб;;;photos/2012/17.jpg;player
+18;Борисов;Иван;;;photos/2012/18.jpg;player
+19;Солей;Савелий;;;photos/2012/19.jpg;player
+24;Болоболов;Иван;;;photos/2012/24.jpg;player
+25;Михайлов;Андрей;;;photos/2012/25.jpg;player
+27;Торикин;Иван;;;photos/2012/27.jpg;player
+48;Сотников;Ярослав;;;photos/2012/48.jpg;player
+72;Чернышей;Денис;;;photos/2012/72.jpg;player
+77;Фальковский;Ярослав;;;photos/2012/77.jpg;player
+91;Кузьмин;Матвей;;;photos/2012/91.jpg;player
+92;Романенко;Мирон;;;photos/2012/92.jpg;player
+94;Ольховик;Тимофей;;;photos/2012/94.jpg;player
+98;Дегтярев;Ярослав;;;photos/2012/98.jpg;player

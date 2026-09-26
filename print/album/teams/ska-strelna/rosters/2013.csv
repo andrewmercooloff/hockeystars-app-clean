@@ -1,0 +1,33 @@
+number;surname;name;position;role;photo;type
+;Проничев;Константин Антонович;Главный тренер;;photos/2013/coach-проничев.jpg;coach
+;Романов;Григорий Владимирович;Тренер;;photos/2013/coach-романов.jpg;coach
+;Тищенко;Дмитрий Сергеевич;Тренер вратарей;;photos/2013/coach-тищенко.jpg;coach
+;Казакова;Яна Владимировна;Тренер по физподготовке;;photos/2013/coach-казакова.jpg;coach
+20;Иваков;Михаил;;;photos/2013/20.jpg;player
+72;Тарасов;Федор;;;photos/2013/72.jpg;player
+92;Беседин;Артем;;;photos/2013/92.jpg;player
+99;Дерюшев;Михаил;;;photos/2013/99.jpg;player
+5;Смирнов;Илья;;;photos/2013/5.jpg;player
+8;Брежнев;Александр;;;photos/2013/8.jpg;player
+9;Лепешков;Платон;;;photos/2013/9.jpg;player
+10;Гонтовой;Богдан;;;photos/2013/10.jpg;player
+11;Богаутдинов;Марсель;;;photos/2013/11.jpg;player
+12;Завалишин;Лев;;;photos/2013/12.jpg;player
+17;Беляев;Тимофей;;;photos/2013/17.jpg;player
+24;Храпунов;Артем;;;photos/2013/24.jpg;player
+29;Лебедев;Максим;;;photos/2013/29.jpg;player
+33;Крайнов;Михаил;;;photos/2013/33.jpg;player
+45;Негинский;Стефан;;;photos/2013/45.jpg;player
+47;Мирзаянов;Радмир;;;photos/2013/47.jpg;player
+51;Никулин;Самсон;;;photos/2013/51.jpg;player
+55;Скворцов;Максимилиан;;;photos/2013/55.jpg;player
+59;Лукьяненко;Михаил;;;photos/2013/59.jpg;player
+71;Лихачев;Никита;;;photos/2013/71.jpg;player
+73;Палеха;Максим;;;photos/2013/73.jpg;player
+77;Торопилов;Михаил;;;photos/2013/77.jpg;player
+79;Окуловский;Кирилл;;;photos/2013/79.jpg;player
+86;Проничев;Глеб;;;photos/2013/86.jpg;player
+88;Коротков;Семен;;;photos/2013/88.jpg;player
+93;Салимов;Аллан;;;photos/2013/93.jpg;player
+97;Севостьянов;Егор;;;photos/2013/97.jpg;player
+98;Эсминович;Даниэль;;;photos/2013/98.jpg;player
