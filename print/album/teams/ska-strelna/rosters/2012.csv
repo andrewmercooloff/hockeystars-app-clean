@@ -1,10 +1,10 @@
 number;surname;name;position;role;photo;type
 ;Цыганов;Дмитрий Сергеевич;Главный тренер;;assets/staff-tsyganov.jpg;coach
-;Салимов;Марат Аксанович;Тренер;;photos/2017/coach-салимов.jpg;coach
-;Алёхин;Дмитрий Борисович;Тренер;;photos/2014/coach-алехин.jpg;coach
-;Фаизов;Радмир Рифович;Тренер;;;coach
-;Казакова;Яна Владимировна;Тренер по физподготовке;;photos/2013/coach-казакова.jpg;coach
-;Яковлев;Александр Олегович;Врач команды;;;coach
+;Салимов;Марат Аксанович;Тренер;;assets/staff-salimov.jpg;coach
+;Алёхин;Дмитрий Борисович;Тренер;;assets/staff-alekhin.jpg;coach
+;Фаизов;Радмир Рифович;Тренер;;assets/staff-faizov.jpg;coach
+;Казакова;Яна Владимировна;Тренер по физподготовке;;assets/staff-kazakova.jpg;coach
+;Яковлев;Александр Олегович;Врач команды;;assets/staff-yakovlev.jpg;coach
 20;Батрак;Авдей;;;photos/2012/20.jpg;player
 50;Созинов;Федор;;;photos/2012/50.jpg;player
 99;Клименко;Иван;;;photos/2012/99.jpg;player

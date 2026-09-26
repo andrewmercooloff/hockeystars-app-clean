@@ -3,11 +3,10 @@ number;surname;name;position;photo;type;group;double;source
 ;Ежов;Денис Владимирович;Заместитель генерального директора;assets/staff-ezhov.jpg;staff;mgmt;;strelna.ska.ru
 ;Калинин;Михаил Викторович;Зам. ген. директора по спортивной работе и скаутингу;assets/staff-kalinin.jpg;staff;mgmt;;strelna.ska.ru
 ;Цыганов;Дмитрий Сергеевич;Главный тренер школы;assets/staff-tsyganov.jpg;staff;mgmt;;strelna.ska.ru
-;Сахаров;Михаил Николаевич;Скаут;;staff;team;;album2012
-;Яковлев;Александр Олегович;Врач школы;;staff;team;;album2012
-;Новиков;Кирилл;PR-менеджер;;staff;team;;album2012
-;Шевцова;Ксения;Фотограф;;staff;team;;album2012
+;Сахаров;Михаил Николаевич;Скаут;assets/staff-sakharov.jpg;staff;team;;album2012
+;Яковлев;Александр Олегович;Врач школы;assets/staff-yakovlev.jpg;staff;team;;album2012
+;Новиков;Кирилл;PR-менеджер;assets/staff-novikov.jpg;staff;team;;album2012
 ;УТОЧНИТЬ;Тренер по ОФП;Тренер по ОФП;;staff;team;;cdr
-;Конь-Огонь;;Маскот школы;;club;club;;album2012
+;Конь-Огонь;;Маскот школы;assets/mascot-photo.jpg;club;club;;album2012
 ;АСК-С;;Наша арена;assets/ask-s.png;club;club;1;album2012
-;Мамы и папы;;Наши болельщики;;club;club;1;album2012
+;Мамы и папы;;Наши болельщики;assets/fans-2.jpg;club;club;1;album2012
