@@ -12,13 +12,14 @@ function stickerCss(size) {
   const { w, h, bleed: B } = size;
   const W = w + B * 2;
   const H = h + B * 2;
-  const plate = h * 0.27;
+  const plate = h * 0.24;
+  const under = 6; // photo continues under the plate → head and shoulders instead of only the head
   return `
 .sticker{position:relative;width:${W}mm;height:${H}mm;overflow:hidden;background:var(--primary);color:#fff;}
 .sticker .frame{position:absolute;inset:0;overflow:hidden;}
-.sticker .photo{position:absolute;inset:0;bottom:${B + plate - 1}mm;overflow:hidden;background:linear-gradient(180deg,#e9eef4,#c7d3e0);}
-.sticker .photo img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;}
-.sticker .photo::after{content:"";position:absolute;left:0;right:0;bottom:0;height:6mm;background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--primary) 55%,transparent));}
+.sticker .photo{position:absolute;inset:0;bottom:${B + plate - under}mm;overflow:hidden;background:linear-gradient(180deg,#e9eef4,#c7d3e0);}
+.sticker .photo img{width:100%;height:100%;object-fit:cover;object-position:center 12%;display:block;}
+.sticker .photo::after{content:"";position:absolute;left:0;right:0;bottom:0;height:${under + 4}mm;background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--primary) 70%,transparent));}
 .sticker .plate{position:absolute;left:0;right:0;bottom:0;height:${B + plate}mm;background:linear-gradient(180deg,var(--primary) 0%,var(--dark) 100%);
   border-top:.7mm solid var(--secondary);padding:${1.4}mm ${B + 1.6}mm ${B}mm ${B + 1.8}mm;display:flex;flex-direction:column;justify-content:center;}
 .sticker .plate::before{content:"";position:absolute;left:0;top:-.7mm;width:38%;height:.7mm;background:#fff;}
@@ -51,7 +52,7 @@ function stickerCss(size) {
 .sticker.legend .plate::before{background:#f2c14e;}
 .sticker.legend .pos{color:#f2c14e;font-size:${(w * 0.042).toFixed(2)}mm;}
 .sticker.legend .photo{background:linear-gradient(180deg,#0b3d91,#041f4d);}
-.sticker.legend .photo img{object-fit:contain;object-position:center bottom;}
+.sticker.legend .photo img{object-fit:cover;object-position:center top;}
 .sticker.club .plate{background:linear-gradient(180deg,rgba(4,31,77,0) 0%,var(--dark) 45%);border-top:0;height:${B + h * 0.34}mm;justify-content:flex-end;}
 .sticker.club .plate::before{display:none;}
 .sticker.ghost .photo::after{display:none;}

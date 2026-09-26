@@ -11,6 +11,8 @@ const ROW_GAP = 2.5;
 const SIDE = 12; // inner margin from trim
 const GRID_TOP = 38; // from trim top
 const BAND_H = 30;
+const mmPx = 96 / 25.4; // CSS px per mm (clip-path paths take px)
+const HIST_IMG = 36, HIST_PL = 42, HIST_PILL = 9.5, HIST_FACTS = 42; // history page: image column, pill start, pill height, facts column
 
 function metrics(data) {
   const { w, h, bleed } = shared.pageOf(data);
@@ -161,50 +163,46 @@ ${shared.albumCss(data)}
 .txt .hdr{position:absolute;left:${bleed + SIDE}mm;top:${bleed + 12}mm;z-index:2;}
 .txt .hdr .title{font-size:11mm;}
 .txt .lead{position:absolute;left:${bleed + SIDE}mm;right:${bleed + SIDE}mm;top:${bleed + 32}mm;font-size:4.1mm;line-height:1.4;color:#1b2940;z-index:2;}
-.hist .tl{position:absolute;left:${bleed + SIDE}mm;top:${bleed + 52}mm;bottom:${bleed + 14}mm;width:${m.inner - 50}mm;z-index:2;}
-.hist .tl svg.snake{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:3;pointer-events:none;}
+.hist .bandtxt .t2{text-transform:none;letter-spacing:.03em;font-size:3.7mm;max-width:${m.inner - 40}mm;line-height:1.3;}
+.hist .tl{position:absolute;left:${bleed + SIDE}mm;right:${bleed + SIDE}mm;top:${bleed + BAND_H + 8}mm;bottom:${bleed + 12}mm;z-index:2;}
+.hist .tl svg.snake{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:1;pointer-events:none;}
 .hist .era{position:absolute;left:0;right:0;}
-.hist .era .img{position:absolute;top:0;width:30mm;height:30mm;z-index:4;display:flex;align-items:center;justify-content:center;background:#fff;border:.5mm solid var(--primary);border-radius:50%;overflow:hidden;box-shadow:0 1.5mm 4mm rgba(0,20,60,.18);}
-.hist .era .img img{width:84%;height:84%;object-fit:contain;}
-.hist .era .img.photo img{width:100%;height:100%;object-fit:cover;}
-.hist .era.l .img{left:0;} .hist .era.r .img{right:0;}
-.hist .era .body{position:absolute;top:0;left:34mm;right:34mm;z-index:2;}
-.hist .era .pill{position:relative;display:flex;align-items:center;gap:3mm;height:10mm;background:linear-gradient(90deg,var(--dark),var(--primary));color:#fff;border-radius:5mm;padding:0 6mm 0 1mm;box-shadow:0 1.2mm 3mm rgba(0,20,60,.3);width:100%;}
-.hist .era.r .pill{flex-direction:row-reverse;padding:0 1mm 0 6mm;margin-left:auto;background:linear-gradient(270deg,var(--dark),var(--primary));}
-.hist .era .pill .n{flex:none;width:8mm;height:8mm;border-radius:50%;background:var(--secondary);color:#fff;font-family:'Unbounded';font-weight:900;font-size:4.2mm;display:flex;align-items:center;justify-content:center;border:.6mm solid #fff;}
-.hist .era .pill .yr{font-family:'Fira Sans Extra Condensed';font-weight:500;font-size:3.3mm;letter-spacing:.04em;white-space:nowrap;line-height:1;}
-.hist .era .pill .yr b{font-family:'Unbounded';font-weight:800;font-size:3.3mm;text-transform:uppercase;display:block;letter-spacing:0;line-height:1.05;margin-top:.5mm;}
-.hist .era.r .pill .yr{text-align:right;}
-.hist .era p{font-size:3.7mm;line-height:1.38;color:#1b2940;margin:2.4mm 4mm 0;}
-.hist .era.r p{text-align:right;}
-.hist .hnums{position:absolute;right:${bleed + SIDE}mm;top:${bleed + 52}mm;bottom:${bleed + 14}mm;width:44mm;background:#fff;border:.5mm solid var(--primary);border-radius:22mm;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:6mm 3mm;box-shadow:0 2mm 5mm rgba(0,20,60,.12);z-index:2;}
-.hist .hnums h5{font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:3.6mm;color:var(--dark);text-align:center;line-height:1.1;}
+.hist .era .img{position:absolute;left:0;top:-4mm;width:${HIST_IMG}mm;height:${HIST_IMG + 8}mm;z-index:3;display:flex;align-items:center;justify-content:center;}
+.hist .era .img img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 1.2mm 2.4mm rgba(0,20,60,.28));}
+.hist .era .img.photo{top:0;height:${HIST_IMG}mm;} .hist .era .img.photo img{width:100%;height:100%;object-fit:cover;border:1mm solid #fff;box-shadow:0 1.5mm 4mm rgba(0,20,60,.25);filter:none;border-radius:1.5mm;}
+.hist .era .body{position:absolute;top:0;left:${HIST_PL}mm;right:0;z-index:2;}
+.hist .era.short .body{right:${HIST_FACTS + 6}mm;}
+.hist .era .pill{position:relative;display:flex;align-items:center;gap:3mm;height:${HIST_PILL}mm;background:linear-gradient(90deg,var(--dark),var(--primary) 60%,var(--primary));color:#fff;border-radius:${HIST_PILL / 2}mm 0 0 ${HIST_PILL / 2}mm;padding:0 6mm 0 .8mm;box-shadow:0 1.2mm 3mm rgba(0,20,60,.3);width:100%;clip-path:polygon(0 0,calc(100% - 3mm) 0,100% 100%,0 100%);}
+.hist .era .pill .n{flex:none;width:${HIST_PILL - 1.6}mm;height:${HIST_PILL - 1.6}mm;border-radius:50%;background:var(--secondary);color:#fff;font-family:'Unbounded';font-weight:900;font-size:4.4mm;display:flex;align-items:center;justify-content:center;border:.6mm solid #fff;}
+.hist .era .pill .yr{font-family:'Fira Sans Extra Condensed';font-weight:500;font-size:3.4mm;letter-spacing:.04em;white-space:nowrap;line-height:1;display:flex;align-items:baseline;gap:2.5mm;}
+.hist .era .pill .yr b{font-family:'Unbounded';font-weight:800;font-size:3.6mm;text-transform:uppercase;letter-spacing:0;line-height:1.05;}
+.hist .era p{font-size:3.7mm;line-height:1.38;color:#1b2940;margin:2.6mm 2mm 0 ${HIST_PILL + 3}mm;}
+.hist .oldteam{position:absolute;right:0;top:${HIST_PILL + 3}mm;width:${HIST_FACTS + 4}mm;height:${(HIST_FACTS + 4) * 0.72}mm;z-index:3;border:1mm solid #fff;border-radius:1.5mm;overflow:hidden;box-shadow:0 1.5mm 4mm rgba(0,20,60,.25);transform:rotate(2deg);} .hist .oldteam img{width:100%;height:100%;object-fit:cover;}
+.hist .hnums{position:absolute;right:${bleed + SIDE}mm;top:${bleed + BAND_H + 8 + 2.5 * 56.6}mm;bottom:${bleed + 12}mm;width:${HIST_FACTS}mm;background:linear-gradient(180deg,#f3f6fa,#e6ecf3);border-radius:${HIST_FACTS / 2}mm ${HIST_FACTS / 2}mm 4mm 4mm;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:6mm 3mm 5mm;box-shadow:0 2mm 5mm rgba(0,20,60,.14);z-index:2;}
+.hist .hnums h5{font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:3.4mm;color:var(--dark);text-align:center;line-height:1.1;}
 .hist .hnums h5::after{content:"";display:block;width:14mm;height:.8mm;background:var(--secondary);margin:2mm auto 0;border-radius:1mm;}
 .hist .hnums .f{text-align:center;}
-.hist .hnums .f i{display:block;width:12mm;height:12mm;margin:0 auto 1.5mm;} .hist .hnums .f i img{width:100%;height:100%;object-fit:contain;}
-.hist .hnums .f b{display:block;font-family:'Unbounded';font-weight:900;font-size:7.5mm;line-height:1;color:var(--primary);}
-.hist .hnums .f span{display:block;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;letter-spacing:.1em;font-size:2.7mm;color:var(--dark);margin-top:1mm;line-height:1.2;}
+.hist .hnums .f i{display:block;width:10mm;height:10mm;margin:0 auto 1.2mm;} .hist .hnums .f i img{width:100%;height:100%;object-fit:contain;}
+.hist .hnums .f b{display:block;font-family:'Unbounded';font-weight:900;font-size:6.4mm;line-height:1;color:var(--primary);}
+.hist .hnums .f span{display:block;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;letter-spacing:.1em;font-size:2.6mm;color:var(--dark);margin-top:1mm;line-height:1.2;}
 
-/* ---------- SCHOOL: big shield like the 2012 album ---------- */
-.school .shield{position:absolute;left:${bleed + SIDE}mm;right:${bleed + SIDE}mm;top:${bleed + 30}mm;bottom:${bleed + 14}mm;background:linear-gradient(180deg,var(--primary) 0%,var(--dark) 100%);color:#fff;z-index:2;overflow:hidden;
-  clip-path:polygon(0 0,100% 0,100% 62%,50% 100%,0 62%);border-radius:4mm;box-shadow:0 3mm 8mm rgba(0,20,60,.3);}
-.school .shield::before{content:"";position:absolute;inset:2.5mm;clip-path:polygon(0 0,100% 0,100% 62%,50% 100%,0 62%);border:.6mm solid rgba(255,255,255,.35);border-radius:3mm;}
-.school .shield .lead{position:absolute;left:10mm;right:10mm;top:8mm;font-size:3.9mm;line-height:1.4;color:#fff;}
-.school .items{position:absolute;left:10mm;right:10mm;top:38mm;}
-.school .it{position:relative;padding-left:12mm;margin-bottom:5mm;}
+.school .shield{position:absolute;left:${bleed + SIDE}mm;right:${bleed + SIDE}mm;top:${bleed + BAND_H + 6}mm;bottom:${bleed + 10}mm;background:linear-gradient(180deg,#0e4fae 0%,var(--primary) 45%,var(--dark) 100%);color:#fff;z-index:2;overflow:hidden;
+  clip-path:url(#shieldClip);filter:drop-shadow(0 3mm 6mm rgba(0,20,60,.35));}
+.school .shield::before{content:"";position:absolute;inset:2.5mm;clip-path:url(#shieldClipIn);border:.6mm solid rgba(255,255,255,.35);}
+.school .shield .lead{position:absolute;left:12mm;right:12mm;top:9mm;font-size:3.9mm;line-height:1.4;color:#fff;}
+.school .items{position:absolute;left:12mm;right:12mm;top:40mm;}
+.school .it{position:relative;padding-left:12mm;margin-bottom:4.5mm;}
 .school .it .n{position:absolute;left:0;top:0;width:8.5mm;height:8.5mm;border-radius:50%;background:var(--secondary);color:#fff;font-family:'Unbounded';font-weight:900;font-size:4.4mm;display:flex;align-items:center;justify-content:center;border:.6mm solid #fff;}
 .school .it h4{font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:4.4mm;line-height:1.1;margin:1mm 0 1.6mm;}
 .school .it p{font-size:3.5mm;line-height:1.38;color:rgba(255,255,255,.92);}
-.school .it.narrow{padding-right:52mm;}
-.school .arrow{position:absolute;right:8mm;top:40mm;width:56mm;} .school .arrow img{width:100%;}
-.school .cups{position:absolute;right:10mm;top:72mm;width:40mm;} .school .cups img{width:100%;}
-.school .chips{position:absolute;left:10mm;right:10mm;display:flex;gap:2.5mm;justify-content:center;}
-.school .chips .c{background:rgba(255,255,255,.12);border:.35mm solid rgba(255,255,255,.4);border-radius:6mm;padding:1.6mm 4mm;text-align:center;min-width:34mm;}
-.school .chips .c b{display:block;font-family:'Unbounded';font-weight:800;font-size:5.4mm;line-height:1;}
-.school .chips .c span{display:block;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-size:2.5mm;margin-top:.8mm;opacity:.9;}
-.school .foot{position:absolute;left:32mm;right:32mm;text-align:center;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:3.6mm;line-height:1.25;color:#fff;}
-.school .slogo{position:absolute;left:50%;top:234mm;transform:translateX(-50%);width:26mm;height:26mm;} .school .slogo img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 1mm 2mm rgba(0,0,0,.4));}
-.school .arena{position:absolute;left:50%;transform:translateX(-50%);width:70mm;height:32mm;border-radius:3mm;overflow:hidden;border:.6mm solid rgba(255,255,255,.6);} .school .arena img{width:100%;height:100%;object-fit:cover;object-position:center top;}
+.school .it.i0{padding-left:60mm;} .school .it.i0 .n{left:48mm;}
+.school .it.i1{padding-right:40mm;}
+.school .it.i3,.school .it.i4{padding-right:40mm;}
+.school .arrow{position:absolute;left:10mm;top:38mm;width:44mm;} .school .arrow img{width:100%;}
+.school .cups{position:absolute;right:12mm;top:62mm;width:32mm;} .school .cups img{width:100%;}
+.school .slogo{position:absolute;right:14mm;top:118mm;width:28mm;height:28mm;} .school .slogo img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 1mm 2mm rgba(0,0,0,.4));}
+.school .foot{position:absolute;left:36mm;right:36mm;text-align:center;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:3.6mm;line-height:1.25;color:#fff;}
+.school .arena{position:absolute;left:50%;transform:translateX(-50%);width:76mm;height:34mm;border-radius:2mm;overflow:hidden;border:.6mm solid rgba(255,255,255,.6);} .school .arena img{width:100%;height:100%;object-fit:cover;object-position:center top;}
 
 /* ---------- LEGENDS spread: alternating round-portrait rows, blue pill tags (2012 album) ---------- */
 .legends .lrow{position:absolute;left:${m.left}mm;right:${m.left}mm;display:flex;gap:5mm;align-items:flex-start;z-index:2;}
@@ -487,7 +485,6 @@ function clubSpread(data, pageNo) {
   const rightUsed = rowsOf(rightCells);
   const rightTop = m.gridTop + rightUsed * m.pitch;
   const posterH = m.gridBottom - rightTop - 62;
-  const askH = m.inner / 2.35;
   const right = `<section class="page club right ice">
     ${shared.deco(data, 0.06)}${orn(data, 'br')}
     <div class="band red"><div class="stripes"></div></div><div class="bandtxt solo"><div class="t1 big">Наш клуб</div><div class="t2">арена · маскот · болельщики</div></div>${logo}
@@ -498,8 +495,8 @@ function clubSpread(data, pageNo) {
         <div class="b"><h5><small>Маскот</small>Конь-Огонь</h5><p>Талисман школы и главный заводила на трибунах.</p></div>
         <div class="b two"><h5><small>Болельщики</small>Мамы и папы</h5><p>Самые верные фанаты: они на каждой тренировке, на каждом выезде и на каждом матче — в любую погоду.</p></div>
       </div>
-      ${data.assets.askS ? `<div class="poster" style="height:${askH.toFixed(1)}mm;margin-top:4mm"><img src="${data.assets.askS}"><div class="pc">Ледовый комплекс АСК-С<small>${esc(t.name)} · дом школы</small></div></div>` : ''}
-      ${data.assets.back ? `<div class="poster" style="height:${(posterH - (data.assets.askS ? askH + 4 : 0)).toFixed(1)}mm;margin-top:4mm"><img src="${data.assets.back}"><div class="pc">Большой лёд СКА<small>цель каждого воспитанника школы</small></div></div>` : ''}
+      ${data.assets.arenaWide ? `<div class="poster" style="height:${(posterH * 0.56).toFixed(1)}mm;margin-top:4mm"><img src="${data.assets.arenaWide}"><div class="pc">Ледовый комплекс АСК-С<small>наш дом в Стрельне · тренировки и домашние матчи всех команд</small></div></div>` : ''}
+      ${data.assets.fans ? `<div class="poster" style="height:${(posterH * 0.44 - 4).toFixed(1)}mm;margin-top:4mm"><img src="${data.assets.fans}" style="object-position:center 30%"><div class="pc">Команда — это семья<small>вместе на льду и вне его</small></div></div>` : ''}
     </div>
     <div class="pgnum r">${pageNo + 1}</div>
   </section>`;
@@ -530,37 +527,38 @@ function skaHistoryPage(data, pageNo) {
   const a = data.assets;
   const m = metrics(data);
   const eras = h.eras || [];
-  const imgs = [a.oldteam || a.skates, a.tarasov, a.spengler, a.medal, a.arenaCups];
-  const photo = [Boolean(a.oldteam), false, false, false, false];
+  const imgs = [a.skates, a.tarasov, a.spengler, a.medal, a.arenaCups];
   const icons = [a.cup, a.cup, a.spengler, a.medal, a.medal];
-  // geometry in mm inside .tl: alternating rows, a blue "snake" with red arrowheads links the pills
-  const W = m.inner - 50;
-  const H = m.h + m.bleed - 14 - (m.bleed + 52);
+  // Layout follows the club's 2012 journal: pictures in the left column, one thick blue "snake" that runs
+  // right → left → right and widens into a labelled pill on every era; the numbers sit at the pill starts.
+  const W = m.inner;
+  const H = m.h + m.bleed - 12 - (m.bleed + BAND_H + 8);
   const rh = H / Math.max(eras.length, 1);
-  const py = 5; // pill centre from row top
-  const padL = 34, padR = 34;
-  const snake = eras.slice(0, -1).map((_, i) => {
+  const py = HIST_PILL / 2; // pill centre from row top
+  const factsFrom = 2.5; // the facts column occupies the right side from the middle of era 3
+  const shortRow = (i) => (i === 0 && Boolean(a.oldteam)) || i + 0.5 >= factsFrom; // room for the old photo / the facts column
+  const rightEnd = (i) => (shortRow(i) ? W - HIST_FACTS - 6 : W);
+  const segs = eras.slice(0, -1).map((_, i) => {
     const y0 = i * rh + py, y1 = (i + 1) * rh + py;
-    const left = i % 2 === 0; // this row's pill starts on the left → its end is on the right
-    if (left) {
-      const x0 = W - padR - 2, xe = W - padR + 1.5;
-      return `<path d="M ${x0} ${y0} C ${x0 + 26} ${y0}, ${xe + 26} ${y1}, ${xe} ${y1}" />`;
+    if (i % 2 === 0) { // U-turn on the right: end of pill i → end of pill i+1
+      const x0 = rightEnd(i) - 6, x1 = rightEnd(i + 1) - 6, bx = Math.max(x0, x1) + 14;
+      return `<path d="M ${x0} ${y0} C ${bx} ${y0}, ${bx} ${y1}, ${x1} ${y1}" />`;
     }
-    const x0 = padL + 2, xe = padL - 1.5;
-    return `<path d="M ${x0} ${y0} C ${x0 - 26} ${y0}, ${xe - 26} ${y1}, ${xe} ${y1}" />`;
+    const x0 = HIST_PL + 4, bx = HIST_PL - 34; // U-turn on the left, behind the picture column
+    return `<path d="M ${x0} ${y0} C ${bx} ${y0}, ${bx} ${y1}, ${x0} ${y1}" />`;
   }).join('');
   const svg = `<svg class="snake" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-    <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="${data.colors.secondary}"/></marker></defs>
-    <g fill="none" stroke="${data.colors.primary}" stroke-width="3" stroke-linecap="round" marker-end="url(#ah)" opacity=".92">${snake}</g>
+    <g fill="none" stroke="${data.colors.primary}" stroke-width="4.2" stroke-linecap="round">${segs}</g>
+    <g fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1" stroke-linecap="round">${segs}</g>
   </svg>`;
-  return `<section class="page txt hist ice">
+  const oldteam = a.oldteam ? `<div class="oldteam"><img src="${a.oldteam}"></div>` : '';
+  return `<section class="page txt hist ice right">
     ${shared.deco(data, 0.06)}${orn(data, 'br')}
-    <div class="hdr"><div class="title">${esc(h.title || 'История СКА')}</div></div>
-    <div class="lead">${esc(h.lead || '')}</div>
-    <div class="tl">${svg}${eras.map((e, i) => `<div class="era ${i % 2 === 0 ? 'l' : 'r'}" style="top:${(i * rh).toFixed(1)}mm;height:${rh.toFixed(1)}mm">
-        <div class="img${photo[i] ? ' photo' : ''}">${imgs[i] ? `<img src="${imgs[i]}">` : ''}</div>
+    <div class="band"><div class="stripes"></div></div><div class="bandtxt solo"><div class="t1 big">${esc(h.title || 'История СКА')}</div><div class="t2">${esc(h.lead || '')}</div></div>
+    <div class="tl">${svg}${eras.map((e, i) => `<div class="era${shortRow(i) ? ' short' : ''}" style="top:${(i * rh).toFixed(1)}mm;height:${rh.toFixed(1)}mm">
+        <div class="img">${imgs[i] ? `<img src="${imgs[i]}">` : ''}</div>
         <div class="body"><div class="pill"><span class="n">${i + 1}</span><span class="yr">${esc(e.years)}<b>${esc(e.title)}</b></span></div><p>${esc(e.text)}</p></div>
-      </div>`).join('')}</div>
+      </div>`).join('')}${oldteam}</div>
     <div class="hnums"><h5>${esc(h.factsTitle || 'Цифры успеха')}</h5>${(h.facts || []).map((f, i) => `<div class="f">${icons[i] ? `<i><img src="${icons[i]}"></i>` : ''}<b>${esc(f.value)}</b><span>${esc(f.label).replace(/\n/g, '<br>')}</span></div>`).join('')}</div>
     <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
   </section>`;
@@ -569,19 +567,27 @@ function skaHistoryPage(data, pageNo) {
 function schoolPage(data, pageNo) {
   const sc = data.team.school || {};
   const a = data.assets;
+  const m = metrics(data);
   const items = sc.items || [];
-  return `<section class="page txt school ice">
-    ${shared.deco(data, 0.06)}${orn(data, 'bl')}
-    <div class="hdr"><div class="title">${esc(sc.title || 'Школа')}</div></div>
+  // Shield outline in mm (objectBoundingBox clip-paths would distort the corner radii)
+  const W = m.inner, H = m.h + m.bleed - 10 - (m.bleed + BAND_H + 6), r = 12;
+  const shield = (inset) => {
+    const w = W - inset * 2, hh = H - inset * 2, k = mmPx;
+    const d = `M ${r} 0 H ${w - r} Q ${w} 0 ${w} ${r} V ${hh * 0.6} Q ${w} ${hh * 0.82} ${w / 2} ${hh} Q 0 ${hh * 0.82} 0 ${hh * 0.6} V ${r} Q 0 0 ${r} 0 Z`;
+    return d.replace(/-?\d+(\.\d+)?/g, (n) => (parseFloat(n) * k).toFixed(2));
+  };
+  const clips = `<svg width="0" height="0" style="position:absolute"><defs><clipPath id="shieldClip">${'<path d="' + shield(0) + '"/>'}</clipPath><clipPath id="shieldClipIn">${'<path d="' + shield(2.5) + '"/>'}</clipPath></defs></svg>`;
+  return `<section class="page txt school ice left">
+    ${shared.deco(data, 0.06)}${orn(data, 'bl')}${clips}
+    <div class="band"><div class="stripes"></div></div><div class="bandtxt solo"><div class="t1 big">${esc(sc.title || 'Школа')}</div><div class="t2">${esc(data.team.name)} · ${esc(data.team.city || 'Санкт-Петербург')}</div></div>
     <div class="shield">
       <div class="lead">${esc(sc.lead || '')}</div>
       ${a.arrowLeagues ? `<div class="arrow"><img src="${a.arrowLeagues}"></div>` : ''}
       ${a.arenaCups ? `<div class="cups"><img src="${a.arenaCups}"></div>` : ''}
-      <div class="items">${items.map((e, i) => `<div class="it${i < 3 ? ' narrow' : ''}"><div class="n">${i + 1}</div><h4>${esc(e.title)}</h4><p>${esc(e.text)}</p></div>`).join('')}</div>
-      ${(sc.facts || []).length ? `<div class="chips" style="top:158mm">${sc.facts.map((f) => `<div class="c"><b>${esc(f.value)}</b><span>${esc(f.label).replace(/\n/g, ' ')}</span></div>`).join('')}</div>` : ''}
-      <div class="foot" style="top:174mm">${esc(sc.footer || '')}</div>
-      ${a.askS ? `<div class="arena" style="top:194mm"><img src="${a.askS}"></div>` : ''}
+      <div class="items">${items.map((e, i) => `<div class="it i${i}"><div class="n">${i + 1}</div><h4>${esc(e.title)}</h4><p>${esc(e.text)}</p></div>`).join('')}</div>
       ${a.logo ? `<div class="slogo"><img src="${a.logo}"></div>` : ''}
+      <div class="foot" style="top:${(H * 0.63).toFixed(1)}mm">${esc(sc.footer || '')}</div>
+      ${a.askS ? `<div class="arena" style="top:${(H * 0.63 + 14).toFixed(1)}mm"><img src="${a.askS}"></div>` : ''}
     </div>
     <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
   </section>`;

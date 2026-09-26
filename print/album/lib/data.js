@@ -307,6 +307,8 @@ async function loadTeam(teamDir, cacheDir) {
     ornBr: await asset(['orn-br'], 2600),
     iceCracked: await asset(['ice-cracked'], 1600),
     askS: await asset(['ask-s'], 2000),
+    arenaWide: await asset(['arena-wide', 'arena'], 2400),
+    fans: await asset(['fans-3', 'fans'], 2400),
     gallery: [],
   };
   // assets/history/*.png → assets.<camelCase> (cup, medal, oldteam, arena-cups → arenaCups …) for the text pages
