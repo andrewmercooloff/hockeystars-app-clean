@@ -49,16 +49,19 @@ ${shared.albumCss(data)}
 .pgnum.l{left:${bleed + 10}mm;} .pgnum.r{right:${bleed + 10}mm;}
 
 /* ---------- shared: band header, grid of sticker slots ---------- */
-.band{position:absolute;left:0;right:0;top:0;height:${bleed + BAND_H}mm;background:linear-gradient(90deg,var(--dark),var(--primary));overflow:hidden;}
-.band::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1.8mm;background:linear-gradient(90deg,var(--secondary) 0 62%,#fff 62% 66%,var(--secondary) 66%);}
+.band{position:absolute;left:0;right:0;top:0;height:${bleed + BAND_H + 6}mm;background:linear-gradient(90deg,var(--dark),var(--primary));overflow:hidden;
+  clip-path:polygon(0 0,100% 0,100% calc(100% - 7mm),0 100%);}
+.right .band{clip-path:polygon(0 0,100% 0,100% 100%,0 calc(100% - 7mm));}
+.band::after{content:"";position:absolute;left:-3mm;right:-3mm;bottom:2.4mm;height:2mm;background:linear-gradient(90deg,var(--secondary) 0 62%,#fff 62% 66%,var(--secondary) 66%);transform:rotate(-1.55deg);transform-origin:left center;}
+.right .band::after{transform:rotate(1.55deg);transform-origin:right center;}
 .band .stripes{position:absolute;right:-20mm;top:-10mm;width:120mm;height:70mm;transform:skewX(-25deg);background:repeating-linear-gradient(90deg,rgba(255,255,255,.06) 0 6mm,transparent 6mm 16mm);}
 .left .band .stripes{right:auto;left:-20mm;}
 .band.red{background:linear-gradient(90deg,var(--secondary),#a3001f);} .band.red::after{background:linear-gradient(90deg,var(--primary) 0 62%,#fff 62% 66%,var(--primary) 66%);}
 .band.gold{background:linear-gradient(90deg,#02132b,#0b3d91);} .band.gold::after{background:linear-gradient(90deg,#f2c14e 0 62%,#fff 62% 66%,#f2c14e 66%);}
-.bignum{position:absolute;top:${bleed + 3}mm;font-family:'Unbounded';font-weight:900;font-size:22mm;line-height:1;color:#fff;letter-spacing:-.02em;z-index:1;}
+.bignum{position:absolute;top:${bleed + 5}mm;font-family:'Unbounded';font-weight:900;font-size:25mm;line-height:1;color:#fff;letter-spacing:-.02em;z-index:1;font-style:italic;text-shadow:0 1.5mm 3mm rgba(0,0,0,.35);}
 .left .bignum{left:${bleed + SIDE}mm;} .right .bignum{right:${bleed + SIDE}mm;}
 .bandtxt{position:absolute;top:${bleed + 7}mm;color:#fff;z-index:1;}
-.left .bandtxt{left:${bleed + 82}mm;} .right .bandtxt{right:${bleed + 82}mm;text-align:right;}
+.left .bandtxt{left:${bleed + 96}mm;} .right .bandtxt{right:${bleed + 96}mm;text-align:right;}
 .bandtxt.solo{left:${bleed + SIDE}mm;right:auto;text-align:left;} .right .bandtxt.solo{left:auto;right:${bleed + SIDE}mm;text-align:right;}
 .bandtxt .t1{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:7mm;line-height:1;}
 .bandtxt .t1.big{font-family:'Unbounded';font-weight:900;font-size:10mm;}
@@ -67,16 +70,20 @@ ${shared.albumCss(data)}
 .left .bandlogo{right:${bleed + SIDE}mm;} .right .bandlogo{left:${bleed + SIDE}mm;}
 .bandlogo img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 .6mm 1.2mm rgba(0,0,0,.4));}
 
-.grid{position:absolute;left:${m.left}mm;right:${m.left}mm;top:${m.gridTop}mm;display:grid;grid-template-columns:repeat(${COLS},${s.w}mm);grid-auto-rows:${m.rowH}mm;justify-content:space-between;row-gap:${ROW_GAP}mm;z-index:2;}
+.grid{position:absolute;left:${m.left}mm;right:${m.left}mm;top:${m.gridTop + 4}mm;display:grid;grid-template-columns:repeat(${COLS},${s.w}mm);grid-auto-rows:${m.rowH}mm;justify-content:space-between;row-gap:${ROW_GAP}mm;z-index:2;}
 .cell{width:${s.w}mm;height:${m.rowH}mm;position:relative;}
 .cell.dbl{grid-column:span 2;width:auto;}
-.slot{position:relative;width:${s.w}mm;height:${s.h}mm;border:.4mm solid var(--primary);border-radius:1.2mm;background:#fff;box-shadow:inset 0 0 0 .9mm #fff,inset 0 0 0 1.25mm color-mix(in srgb,var(--secondary) 70%,#fff);overflow:hidden;}
+.slot{position:relative;width:${s.w}mm;height:${s.h}mm;border:.4mm solid var(--primary);border-radius:2.4mm;background:#fff;box-shadow:inset 0 0 0 .9mm #fff,inset 0 0 0 1.25mm color-mix(in srgb,var(--secondary) 70%,#fff);overflow:hidden;}
 .slot.dbl{width:100%;}
 .slot .ghost{position:absolute;inset:1.3mm;filter:blur(.25mm) grayscale(.15);opacity:.24;}
 .slot .ghost .sticker{width:100%;height:100%;} .slot .ghost .sticker .frame{inset:0;border:0;box-shadow:none;}
 .slot .ghost img.full{width:100%;height:100%;object-fit:cover;display:block;}
-.slot .no{position:absolute;left:1.3mm;top:1.3mm;min-width:8mm;height:5.2mm;padding:0 1.4mm;background:var(--secondary);color:#fff;font-family:'Unbounded';font-weight:800;font-size:2.9mm;line-height:5.2mm;text-align:center;border-radius:0 0 1.2mm 0;z-index:2;}
-.slot .no.r{left:auto;right:1.3mm;border-radius:0 0 0 1.2mm;}
+.slot .no{position:absolute;left:1.3mm;top:1.3mm;min-width:9mm;height:5.2mm;padding:0 2.2mm 0 1.4mm;background:var(--secondary);color:#fff;font-family:'Unbounded';font-weight:800;font-size:2.9mm;line-height:5.2mm;text-align:center;z-index:2;
+  clip-path:polygon(0 0,100% 0,calc(100% - 1.8mm) 100%,0 100%);}
+.slot .no.r{left:auto;right:1.3mm;padding:0 1.4mm 0 2.2mm;clip-path:polygon(0 0,100% 0,100% 100%,1.8mm 100%);}
+.cell.coach .slot{border-color:var(--secondary);box-shadow:inset 0 0 0 .9mm #fff,inset 0 0 0 1.25mm color-mix(in srgb,var(--primary) 70%,#fff);background:linear-gradient(180deg,#fff,#fff5f6);}
+.cell.coach .slot .no{background:var(--primary);}
+.cell.coach .cap .p{color:var(--secondary);font-weight:700;}
 .slot .jn{position:absolute;right:1.6mm;bottom:.8mm;font-family:'Unbounded';font-weight:900;font-size:9mm;line-height:1;color:color-mix(in srgb,var(--primary) 14%,transparent);}
 .slot .split{position:absolute;top:1.3mm;bottom:1.3mm;left:50%;width:0;border-left:.35mm dashed color-mix(in srgb,var(--primary) 45%,#fff);}
 .slot .lbl{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:3.6mm;letter-spacing:.14em;color:var(--primary);}
@@ -89,17 +96,18 @@ ${shared.albumCss(data)}
 /* free area fillers */
 .fill{position:absolute;left:${m.left}mm;right:${m.left}mm;z-index:2;}
 .info{display:flex;gap:3mm;height:30mm;}
-.info .box{flex:1;background:linear-gradient(135deg,var(--primary),var(--dark));color:#fff;border-radius:1.2mm;padding:2.5mm 3.5mm;position:relative;overflow:hidden;border-left:1.6mm solid var(--secondary);}
+.info .box{flex:1;background:linear-gradient(135deg,var(--primary),var(--dark));color:#fff;padding:2.5mm 3.5mm 2.5mm 5mm;position:relative;overflow:hidden;border-left:1.6mm solid var(--secondary);
+  clip-path:polygon(0 0,100% 0,calc(100% - 4mm) 100%,0 100%);}
 .info .box b{display:block;font-family:'Unbounded';font-weight:800;font-size:7.5mm;line-height:1;}
 .info .box span{display:block;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;letter-spacing:.14em;font-size:2.7mm;margin-top:1.4mm;color:rgba(255,255,255,.85);}
-.info .box.q{flex:2.4;background:#fff;color:var(--dark);border:.4mm solid var(--primary);border-left-width:1.6mm;border-left-color:var(--secondary);}
+.info .box.q{flex:2.4;background:#fff;color:var(--dark);border:.4mm solid var(--primary);border-left-width:1.6mm;border-left-color:var(--secondary);clip-path:none;border-radius:0 6mm 0 6mm;}
 .info .box.q p{font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:3.6mm;line-height:1.2;}
 .info .box.q small{display:block;font-family:'Roboto';font-size:2.5mm;letter-spacing:.12em;text-transform:uppercase;color:var(--secondary);margin-top:1.4mm;font-weight:700;}
 .sign{display:flex;gap:3mm;margin-top:4mm;height:40mm;}
-.sign .sb{flex:1;position:relative;background:rgba(255,255,255,.9);border:.4mm dashed color-mix(in srgb,var(--primary) 55%,#fff);border-radius:1.2mm;}
+.sign .sb{flex:1;position:relative;background:rgba(255,255,255,.9);border:.4mm dashed color-mix(in srgb,var(--primary) 55%,#fff);border-radius:0 6mm 0 6mm;}
 .sign .sb span{position:absolute;left:3mm;right:3mm;bottom:2.5mm;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-size:2.8mm;color:var(--primary);border-top:.35mm solid color-mix(in srgb,var(--secondary) 55%,#fff);padding-top:1.5mm;}
-.check{background:rgba(255,255,255,.92);border:.4mm solid var(--primary);border-radius:1.2mm;overflow:hidden;box-shadow:inset 0 0 0 .9mm #fff,inset 0 0 0 1.25mm color-mix(in srgb,var(--secondary) 70%,#fff);padding:1.3mm;display:flex;flex-direction:column;}
-.check .rh{display:flex;align-items:baseline;justify-content:space-between;background:linear-gradient(90deg,var(--dark),var(--primary));color:#fff;padding:1.8mm 3.5mm;flex:none;}
+.check{background:rgba(255,255,255,.92);border:.4mm solid var(--primary);border-radius:0 8mm 0 8mm;overflow:hidden;box-shadow:inset 0 0 0 .9mm #fff,inset 0 0 0 1.25mm color-mix(in srgb,var(--secondary) 70%,#fff);padding:1.3mm;display:flex;flex-direction:column;}
+.check .rh{display:flex;align-items:baseline;justify-content:space-between;background:linear-gradient(90deg,var(--dark),var(--primary));color:#fff;padding:1.8mm 3.5mm;flex:none;border-radius:0 6mm 0 0;clip-path:polygon(0 0,100% 0,100% 100%,0 100%);}
 .check .rh b{font-family:'Unbounded';font-weight:800;font-size:3.6mm;text-transform:uppercase;}
 .check .rh span{font-family:'Fira Sans Extra Condensed';font-weight:500;font-size:2.8mm;letter-spacing:.1em;text-transform:uppercase;opacity:.85;}
 .check .items{flex:1;display:grid;grid-auto-flow:column;padding:2.5mm 3mm;column-gap:4mm;align-content:start;}
@@ -149,62 +157,79 @@ ${shared.albumCss(data)}
 .intro .teamphoto{top:8mm;bottom:${bleed + 14}mm;left:${bleed + 12}mm;right:${bleed + 12}mm;border-radius:2mm;border:1.2mm solid #fff;box-shadow:0 3mm 8mm rgba(0,20,60,.22);}
 .intro .teamcap{position:absolute;left:${bleed + 12}mm;bottom:${bleed + 14}mm;background:var(--primary);color:#fff;padding:2mm 5mm;font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:4mm;letter-spacing:.1em;clip-path:polygon(0 0,100% 0,calc(100% - 3mm) 100%,0 100%);z-index:2;}
 
-/* ---------- SKA HISTORY / SCHOOL text pages ---------- */
+/* ---------- SKA HISTORY (winding timeline like the 2012 album) ---------- */
 .txt .hdr{position:absolute;left:${bleed + SIDE}mm;top:${bleed + 12}mm;z-index:2;}
-.txt .lead{position:absolute;left:${bleed + SIDE}mm;right:${bleed + SIDE}mm;top:${bleed + 30}mm;font-size:4.2mm;line-height:1.4;color:#1b2940;z-index:2;}
-.txt .cols{position:absolute;left:${bleed + SIDE}mm;right:${bleed + SIDE}mm;top:${bleed + 52}mm;display:flex;gap:8mm;z-index:2;}
-.txt .main{flex:1;} .txt .side{flex:0 0 62mm;display:flex;flex-direction:column;gap:4mm;}
-.txt .era{position:relative;padding-left:17mm;margin-bottom:9mm;}
-.txt .era .n{position:absolute;left:0;top:0;width:12mm;height:12mm;background:var(--secondary);color:#fff;font-family:'Unbounded';font-weight:900;font-size:5.2mm;display:flex;align-items:center;justify-content:center;border-radius:1mm;transform:skewX(-6deg);}
-.txt .era .yr{font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;letter-spacing:.14em;font-size:3mm;color:var(--secondary);}
-.txt .era h4{font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:4.8mm;line-height:1.1;color:var(--dark);margin:.8mm 0 2mm;}
-.txt .era p{font-size:3.9mm;line-height:1.4;color:#1b2940;}
-.txt .pic{position:relative;background:#fff;border:.45mm solid var(--primary);border-radius:1.4mm;padding:2.5mm;box-shadow:0 1.5mm 4mm rgba(0,20,60,.12);}
-.txt .pic img{width:100%;display:block;object-fit:contain;}
-.txt .pic .c{font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;letter-spacing:.1em;font-size:2.7mm;color:var(--dark);text-align:center;margin-top:1.5mm;}
-.txt .pic.dark{background:linear-gradient(180deg,var(--primary),var(--dark));} .txt .pic.dark .c{color:#fff;}
-.txt .factsrow{position:absolute;left:${bleed + SIDE}mm;right:${bleed + SIDE}mm;bottom:${bleed + 16}mm;display:flex;gap:3mm;z-index:2;}
-.txt .factsrow .f{flex:1;background:linear-gradient(135deg,var(--primary),var(--dark));color:#fff;border-radius:1.2mm;padding:3mm 3.5mm;border-left:1.6mm solid var(--secondary);}
-.txt .factsrow .f b{display:block;font-family:'Unbounded';font-weight:800;font-size:8mm;line-height:1;}
-.txt .factsrow .f span{display:block;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-size:2.7mm;margin-top:1.6mm;color:rgba(255,255,255,.85);line-height:1.2;}
-.txt .factsttl{position:absolute;left:${bleed + SIDE}mm;bottom:${bleed + 16 + 26}mm;font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:4.6mm;color:var(--dark);z-index:2;}
-.txt .foot{position:absolute;left:${bleed + SIDE}mm;right:${bleed + SIDE}mm;bottom:${bleed + 16}mm;background:linear-gradient(135deg,var(--dark),var(--primary));color:#fff;border-radius:1.6mm;padding:5mm 7mm;border-left:2mm solid var(--secondary);z-index:2;
-  font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:4.2mm;line-height:1.25;}
-.txt .foot .star{position:absolute;right:-6mm;top:-9mm;font-size:46mm;line-height:1;color:rgba(255,255,255,.08);}
+.txt .hdr .title{font-size:11mm;}
+.txt .lead{position:absolute;left:${bleed + SIDE}mm;right:${bleed + SIDE}mm;top:${bleed + 32}mm;font-size:4.1mm;line-height:1.4;color:#1b2940;z-index:2;}
+.hist .tl{position:absolute;left:${bleed + SIDE}mm;right:${bleed + SIDE + 52}mm;top:${bleed + 52}mm;bottom:${bleed + 14}mm;z-index:2;display:flex;flex-direction:column;justify-content:space-between;}
+.hist .tl::before{content:"";position:absolute;left:38mm;top:6mm;bottom:10mm;width:1.6mm;background:linear-gradient(180deg,var(--primary),var(--secondary));border-radius:1mm;opacity:.35;}
+.hist .era{position:relative;display:flex;gap:5mm;align-items:flex-start;}
+.hist .era .img{flex:0 0 32mm;height:32mm;display:flex;align-items:center;justify-content:center;background:#fff;border:.45mm solid var(--primary);border-radius:50%;overflow:hidden;box-shadow:0 1.5mm 4mm rgba(0,20,60,.15);}
+.hist .era .img img{width:84%;height:84%;object-fit:contain;}
+.hist .era .img.photo img{width:100%;height:100%;object-fit:cover;}
+.hist .era .body{flex:1;padding-top:1mm;}
+.hist .era .pill{display:inline-flex;align-items:center;gap:3mm;background:linear-gradient(90deg,var(--dark),var(--primary));color:#fff;border-radius:6mm;padding:1.2mm 6mm 1.2mm 1.2mm;box-shadow:0 1.2mm 3mm rgba(0,20,60,.25);max-width:100%;}
+.hist .era .pill .n{flex:none;width:8.5mm;height:8.5mm;border-radius:50%;background:var(--secondary);color:#fff;font-family:'Unbounded';font-weight:900;font-size:4.4mm;display:flex;align-items:center;justify-content:center;border:.6mm solid #fff;}
+.hist .era .pill .yr{font-family:'Fira Sans Extra Condensed';font-weight:600;font-size:3.6mm;letter-spacing:.06em;white-space:nowrap;}
+.hist .era .pill .yr b{font-family:'Unbounded';font-weight:800;font-size:4mm;text-transform:uppercase;display:block;letter-spacing:0;line-height:1.05;}
+.hist .era p{font-size:3.9mm;line-height:1.4;color:#1b2940;margin:2.2mm 0 0 3mm;}
+.hist .hnums{position:absolute;right:${bleed + SIDE}mm;top:${bleed + 52}mm;bottom:${bleed + 14}mm;width:44mm;background:#fff;border:.5mm solid var(--primary);border-radius:22mm;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:6mm 3mm;box-shadow:0 2mm 5mm rgba(0,20,60,.12);z-index:2;}
+.hist .hnums h5{font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:3.6mm;color:var(--dark);text-align:center;line-height:1.1;}
+.hist .hnums h5::after{content:"";display:block;width:14mm;height:.8mm;background:var(--secondary);margin:2mm auto 0;border-radius:1mm;}
+.hist .hnums .f{text-align:center;}
+.hist .hnums .f i{display:block;width:12mm;height:12mm;margin:0 auto 1.5mm;} .hist .hnums .f i img{width:100%;height:100%;object-fit:contain;}
+.hist .hnums .f b{display:block;font-family:'Unbounded';font-weight:900;font-size:7.5mm;line-height:1;color:var(--primary);}
+.hist .hnums .f span{display:block;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;letter-spacing:.1em;font-size:2.7mm;color:var(--dark);margin-top:1mm;line-height:1.2;}
 
-/* ---------- LEGENDS spread ---------- */
-.legends .lrow{position:absolute;left:${m.left}mm;right:${m.left}mm;display:flex;gap:6mm;align-items:flex-start;z-index:2;}
-.legends.right .lrow{flex-direction:row-reverse;text-align:right;}
+/* ---------- SCHOOL: big shield like the 2012 album ---------- */
+.school .shield{position:absolute;left:${bleed + SIDE}mm;right:${bleed + SIDE}mm;top:${bleed + 30}mm;bottom:${bleed + 14}mm;background:linear-gradient(180deg,var(--primary) 0%,var(--dark) 100%);color:#fff;z-index:2;overflow:hidden;
+  clip-path:polygon(0 0,100% 0,100% 62%,50% 100%,0 62%);border-radius:4mm;box-shadow:0 3mm 8mm rgba(0,20,60,.3);}
+.school .shield::before{content:"";position:absolute;inset:2.5mm;clip-path:polygon(0 0,100% 0,100% 62%,50% 100%,0 62%);border:.6mm solid rgba(255,255,255,.35);border-radius:3mm;}
+.school .shield .lead{position:absolute;left:10mm;right:10mm;top:8mm;font-size:3.9mm;line-height:1.4;color:#fff;}
+.school .items{position:absolute;left:10mm;right:10mm;top:38mm;}
+.school .it{position:relative;padding-left:12mm;margin-bottom:5mm;}
+.school .it .n{position:absolute;left:0;top:0;width:8.5mm;height:8.5mm;border-radius:50%;background:var(--secondary);color:#fff;font-family:'Unbounded';font-weight:900;font-size:4.4mm;display:flex;align-items:center;justify-content:center;border:.6mm solid #fff;}
+.school .it h4{font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:4.4mm;line-height:1.1;margin:1mm 0 1.6mm;}
+.school .it p{font-size:3.5mm;line-height:1.38;color:rgba(255,255,255,.92);}
+.school .it.narrow{padding-right:52mm;}
+.school .arrow{position:absolute;right:8mm;top:40mm;width:56mm;} .school .arrow img{width:100%;}
+.school .cups{position:absolute;right:10mm;top:72mm;width:40mm;} .school .cups img{width:100%;}
+.school .chips{position:absolute;left:10mm;right:10mm;display:flex;gap:2.5mm;justify-content:center;}
+.school .chips .c{background:rgba(255,255,255,.12);border:.35mm solid rgba(255,255,255,.4);border-radius:6mm;padding:1.6mm 4mm;text-align:center;min-width:34mm;}
+.school .chips .c b{display:block;font-family:'Unbounded';font-weight:800;font-size:5.4mm;line-height:1;}
+.school .chips .c span{display:block;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-size:2.5mm;margin-top:.8mm;opacity:.9;}
+.school .foot{position:absolute;left:32mm;right:32mm;text-align:center;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;font-size:3.6mm;line-height:1.25;color:#fff;}
+.school .slogo{position:absolute;left:50%;top:234mm;transform:translateX(-50%);width:26mm;height:26mm;} .school .slogo img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 1mm 2mm rgba(0,0,0,.4));}
+.school .arena{position:absolute;left:50%;transform:translateX(-50%);width:70mm;height:32mm;border-radius:3mm;overflow:hidden;border:.6mm solid rgba(255,255,255,.6);} .school .arena img{width:100%;height:100%;object-fit:cover;object-position:center top;}
+
+/* ---------- LEGENDS spread: alternating round-portrait rows, blue pill tags (2012 album) ---------- */
+.legends .lrow{position:absolute;left:${m.left}mm;right:${m.left}mm;display:flex;gap:5mm;align-items:flex-start;z-index:2;}
+.legends .lrow.alt{flex-direction:row-reverse;text-align:right;}
 .legends .lrow .cell{flex:none;}
-.legends .lt{flex:1;padding-top:1mm;}
-.legends .lt h4{font-family:'Unbounded';font-weight:900;text-transform:uppercase;font-size:5.6mm;line-height:1;color:var(--dark);}
-.legends .lt .sub{font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;letter-spacing:.14em;font-size:3.1mm;color:var(--secondary);margin:1.4mm 0 2mm;}
-.legends .lt p{font-size:3.8mm;line-height:1.4;color:#1b2940;}
-.legends .lrow::after{content:"";position:absolute;left:0;right:0;bottom:-4mm;height:.3mm;background:linear-gradient(90deg,var(--secondary),transparent);}
-.legends.right .lrow::after{background:linear-gradient(270deg,var(--secondary),transparent);}
+.legends .lt{flex:1;padding-top:.5mm;}
+.legends .lt h4{font-family:'Unbounded';font-weight:900;text-transform:uppercase;font-size:5.4mm;line-height:1;color:var(--dark);}
+.legends .lt .sub{display:inline-block;background:linear-gradient(90deg,var(--dark),var(--primary));color:#fff;border-radius:5mm;padding:1mm 4mm;font-family:'Fira Sans Extra Condensed';font-weight:600;text-transform:uppercase;letter-spacing:.1em;font-size:2.9mm;margin:1.6mm 0 2mm;}
+.legends .lt p{font-size:3.6mm;line-height:1.38;color:#1b2940;}
+.legends .lrow::after{content:"";position:absolute;left:0;right:0;bottom:-3.5mm;height:.3mm;background:linear-gradient(90deg,var(--secondary),transparent);}
+.legends .lrow.alt::after{background:linear-gradient(270deg,var(--secondary),transparent);}
 .legends .cup{position:absolute;top:${bleed + 2}mm;height:${BAND_H - 4}mm;z-index:1;} .legends .cup img{height:100%;filter:drop-shadow(0 .6mm 1.2mm rgba(0,0,0,.4));}
-.legends.left .cup{right:${bleed + SIDE + 28}mm;} .legends.right .cup{left:${bleed + SIDE + 28}mm;}
+.legends.left .cup{right:${bleed + SIDE + 36}mm;} .legends.right .cup{left:${bleed + SIDE + 36}mm;}
 .legends .bandtxt .t1.big{font-size:8.2mm;}
 
 /* ---------- CLUB spread ---------- */
-.club .motto{background:linear-gradient(135deg,var(--dark),var(--primary));color:#fff;border-radius:1.6mm;padding:6mm 8mm;overflow:hidden;box-shadow:0 2mm 5mm rgba(0,20,60,.2);border-left:2mm solid var(--secondary);position:relative;}
+.club .motto{background:linear-gradient(135deg,var(--dark),var(--primary));color:#fff;border-radius:2mm 14mm 2mm 14mm;padding:6mm 8mm;overflow:hidden;box-shadow:0 2mm 5mm rgba(0,20,60,.2);border-left:2mm solid var(--secondary);position:relative;}
 .club .motto .star{position:absolute;right:-8mm;top:-10mm;font-size:70mm;line-height:1;color:rgba(255,255,255,.07);}
 .club .motto h4{font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:6.4mm;line-height:1.05;}
 .club .motto h4 span{color:var(--accent);}
 .club .motto p{font-size:3.6mm;line-height:1.35;margin-top:3mm;color:rgba(255,255,255,.9);max-width:160mm;}
 .club .motto .site{position:absolute;right:8mm;bottom:5mm;font-family:'Fira Sans Extra Condensed';font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:3.2mm;color:rgba(255,255,255,.75);}
-.club .coaches{margin-top:4mm;background:rgba(255,255,255,.92);border:.4mm solid var(--primary);border-left:1.6mm solid var(--secondary);border-radius:1.2mm;padding:3mm 4mm 3.5mm;}
-.club .coaches h5{font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:3.8mm;color:var(--dark);margin-bottom:2.5mm;}
-.club .coaches .cg{display:grid;grid-template-columns:repeat(3,1fr);gap:2mm 5mm;}
-.club .coaches .cy{display:flex;gap:2.5mm;align-items:flex-start;font-size:3mm;line-height:1.3;color:#1b2940;}
-.club .coaches .cy b{flex:none;font-family:'Unbounded';font-weight:800;font-size:3.6mm;color:var(--secondary);line-height:1.1;}
 .club .trio{display:flex;gap:3mm;}
-.club .trio .b{flex:1;background:rgba(255,255,255,.92);border:.4mm solid var(--primary);border-left:1.6mm solid var(--secondary);border-radius:1.2mm;padding:3mm 3.5mm;}
+.club .trio .b{flex:1;background:rgba(255,255,255,.92);border:.4mm solid var(--primary);border-left:1.6mm solid var(--secondary);border-radius:0 6mm 0 6mm;padding:3mm 4mm;}
 .club .trio .b.two{flex:2;}
 .club .trio h5{font-family:'Unbounded';font-weight:800;text-transform:uppercase;font-size:3.8mm;color:var(--dark);}
 .club .trio h5 small{display:block;font-family:'Fira Sans Extra Condensed';font-weight:600;letter-spacing:.14em;font-size:2.7mm;color:var(--secondary);margin-bottom:1mm;}
 .club .trio p{font-size:3.2mm;line-height:1.35;color:#1b2940;margin-top:1.5mm;}
-.club .poster{position:relative;border:1.2mm solid #fff;border-radius:2mm;overflow:hidden;box-shadow:0 3mm 8mm rgba(0,20,60,.22);background:var(--dark);}
+.club .poster{position:relative;border:1.2mm solid #fff;border-radius:2mm 14mm 2mm 14mm;overflow:hidden;box-shadow:0 3mm 8mm rgba(0,20,60,.22);background:var(--dark);}
 .club .poster img{width:100%;height:100%;object-fit:cover;display:block;}
 .club .poster .pc{position:absolute;left:0;bottom:0;background:var(--primary);color:#fff;padding:2mm 5mm;font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:3.8mm;letter-spacing:.1em;clip-path:polygon(0 0,100% 0,calc(100% - 3mm) 100%,0 100%);}
 .club .poster .pc small{display:block;font-weight:500;font-size:2.6mm;letter-spacing:.16em;opacity:.85;}
@@ -299,7 +324,7 @@ function personCell(c, data, opts = {}) {
   const name = c.type === 'club' ? c.surname : c.surname.startsWith('УТОЧНИТЬ') ? c.name : `${c.surname} ${first}`;
   const pos = c.position || (c.number ? `№ ${c.number}` : '');
   const ghost = c.hasPhoto ? ghostOf(c, data) : c.type === 'staff' || c.type === 'club' ? `<div class="ph">${esc(c.position)}</div>` : '';
-  return `<div class="cell"><div class="slot">${ghost}${jn}<div class="no">${c.index}</div></div>
+  return `<div class="cell${c.type === 'coach' ? ' coach' : ''}"><div class="slot">${ghost}${jn}<div class="no">${c.index}</div></div>
     <div class="cap"><div class="n">${esc(name)}</div><div class="p">${esc(pos)}</div></div></div>`;
 }
 
@@ -374,7 +399,7 @@ function yearPage(data, year, cells, pageNo, side, opts = {}) {
     fill = `<div class="fill" style="top:${m.gridTop}mm"><div class="info"><div class="box q"><p>Состав команды ${esc(year)} года рождения формируется</p><small>наклейки появятся в следующем выпуске</small></div></div></div>`;
   } else if (opts.fill === 'info' && freeH >= 30) {
     const sign = freeH >= 78
-      ? `<div class="sign"><div class="sb"><span>Автограф главного тренера</span></div><div class="sb"><span>Автограф капитана</span></div><div class="sb"><span>Мой автограф</span></div></div>`
+      ? `<div class="sign"><div class="sb"><span>Автограф главного тренера</span></div><div class="sb"><span>Автограф капитана</span></div></div>`
       : '';
     fill = `<div class="fill" style="top:${freeTop.toFixed(1)}mm">${infoBoxes(data, year)}${sign}</div>`;
   } else if (opts.fill === 'check' && freeH >= 40) {
@@ -440,10 +465,6 @@ function clubSpread(data, pageNo) {
         <p>${esc(t.texts?.clubMotto || '')}</p>
         <div class="site">${esc((t.website || '').replace(/^https?:\/\//, '').replace(/\/$/, ''))}</div></div>
       ${facts.length ? `<div class="info" style="margin-top:4mm">${facts.map((f) => `<div class="box"><b>${esc(f.value)}</b><span>${esc(f.label).replace(/\n/g, '<br>')}</span></div>`).join('')}</div>` : ''}
-      <div class="coaches"><h5>Тренерские штабы команд</h5><div class="cg">${Object.entries(data.years || {})
-        .filter(([, arr]) => arr.some((p) => p.type === 'coach'))
-        .map(([y, arr]) => `<div class="cy"><b>${esc(y)}</b><span>${arr.filter((p) => p.type === 'coach').map((p) => `${esc(p.surname)} ${esc(p.name.split(' ')[0])}`).join(', ')}</span></div>`)
-        .join('')}</div></div>
     </div>
     ${data.assets.logo ? `<div class="wm"><img src="${data.assets.logo}"></div>` : ''}
     <div class="pgnum l">${pageNo}</div>
@@ -459,6 +480,7 @@ function clubSpread(data, pageNo) {
   const rightUsed = rowsOf(rightCells);
   const rightTop = m.gridTop + rightUsed * m.pitch;
   const posterH = m.gridBottom - rightTop - 62;
+  const askH = m.inner / 2.35;
   const right = `<section class="page club right ice">
     ${shared.deco(data, 0.06)}${orn(data, 'br')}
     <div class="band red"><div class="stripes"></div></div><div class="bandtxt solo"><div class="t1 big">Наш клуб</div><div class="t2">арена · маскот · болельщики</div></div>${logo}
@@ -469,7 +491,8 @@ function clubSpread(data, pageNo) {
         <div class="b"><h5><small>Маскот</small>Конь-Огонь</h5><p>Талисман школы и главный заводила на трибунах.</p></div>
         <div class="b two"><h5><small>Болельщики</small>Мамы и папы</h5><p>Самые верные фанаты: они на каждой тренировке, на каждом выезде и на каждом матче — в любую погоду.</p></div>
       </div>
-      <div class="poster" style="height:${posterH.toFixed(1)}mm;margin-top:4mm">${data.assets.back ? `<img src="${data.assets.back}">` : ''}<div class="pc">Большой лёд СКА<small>цель каждого воспитанника школы</small></div></div>
+      ${data.assets.askS ? `<div class="poster" style="height:${askH.toFixed(1)}mm;margin-top:4mm"><img src="${data.assets.askS}"><div class="pc">Ледовый комплекс АСК-С<small>${esc(t.name)} · дом школы</small></div></div>` : ''}
+      ${data.assets.back ? `<div class="poster" style="height:${(posterH - (data.assets.askS ? askH + 4 : 0)).toFixed(1)}mm;margin-top:4mm"><img src="${data.assets.back}"><div class="pc">Большой лёд СКА<small>цель каждого воспитанника школы</small></div></div>` : ''}
     </div>
     <div class="pgnum r">${pageNo + 1}</div>
   </section>`;
@@ -482,61 +505,56 @@ function legendsSpread(data, pageNo) {
   const t = data.team;
   const legends = data.legends || [];
   const per = 4;
-  const rowH = (m.gridBottom - m.gridTop) / per;
+  const rowH = (m.gridBottom - m.gridTop - 4) / per;
   const logo = data.assets.logo ? `<div class="bandlogo"><img src="${data.assets.logo}"></div>` : '';
   const cup = data.assets.cup ? `<div class="cup"><img src="${data.assets.cup}"></div>` : '';
   const page = (list, side, n) => `<section class="page legends ${side} ice">
     ${shared.deco(data, 0.06)}${orn(data, side === 'left' ? 'bl' : 'br')}
     <div class="band gold"><div class="stripes"></div></div><div class="bandtxt solo"><div class="t1 big">${esc(t.legendsTitle || 'Легенды и звёзды СКА')}</div><div class="t2">${side === 'left' ? 'от Ленинграда до НХЛ · серия «Легенды»' : `${legends.length} наклеек · соберите всех`}</div></div>${logo}${cup}
-    ${list.map((c, i) => `<div class="lrow" style="top:${(m.gridTop + i * rowH).toFixed(1)}mm;height:${(rowH - 6).toFixed(1)}mm">${personCell(c, data)}<div class="lt"><h4>${esc(c.surname)} ${esc(c.name)}</h4><div class="sub">${esc(c.position)}</div><p>${esc(c.text)}</p></div></div>`).join('')}
+    ${list.map((c, i) => `<div class="lrow${i % 2 ? ' alt' : ''}" style="top:${(m.gridTop + 4 + i * rowH).toFixed(1)}mm;height:${(rowH - 6).toFixed(1)}mm">${personCell(c, data)}<div class="lt"><h4>${esc(c.name)} ${esc(c.surname)}</h4><div class="sub">${esc(c.position)}</div><p>${esc(c.text)}</p></div></div>`).join('')}
     <div class="pgnum ${n % 2 === 0 ? 'l' : 'r'}">${n}</div>
   </section>`;
   return [page(legends.slice(0, per), 'left', pageNo), page(legends.slice(per, per * 2), 'right', pageNo + 1)];
 }
 
-// ---- SKA history & school text pages -----------------------------------------------------------
+// ---- SKA history & school pages (layout follows the club's 2012 album) --------------------------
 function skaHistoryPage(data, pageNo) {
   const h = data.team.skaHistory || {};
   const a = data.assets;
-  const pics = [
-    a.oldteam && { src: a.oldteam, c: 'Ленинградский хоккей, 1940-е' },
-    a.tarasov && { src: a.tarasov, c: 'Анатолий Тарасов' },
-    a.spengler && { src: a.spengler, c: 'Кубок Шпенглера', dark: true },
-    a.medal && { src: a.medal, c: 'Бронза чемпионата СССР', dark: true },
-  ].filter(Boolean);
-  return `<section class="page txt ice">
+  const imgs = [a.skates, a.tarasov, a.spengler, a.medal, a.arenaCups];
+  const photo = [false, false, false, false, false];
+  if (a.oldteam) { imgs[0] = a.oldteam; photo[0] = true; }
+  const icons = [a.cup, a.cup, a.spengler, a.medal, a.medal];
+  return `<section class="page txt hist ice">
     ${shared.deco(data, 0.06)}${orn(data, 'br')}
     <div class="hdr"><div class="title">${esc(h.title || 'История СКА')}</div></div>
     <div class="lead">${esc(h.lead || '')}</div>
-    <div class="cols">
-      <div class="main">${(h.eras || []).map((e, i) => `<div class="era"><div class="n">${i + 1}</div><div class="yr">${esc(e.years)}</div><h4>${esc(e.title)}</h4><p>${esc(e.text)}</p></div>`).join('')}</div>
-      <div class="side">${pics.map((p) => `<div class="pic${p.dark ? ' dark' : ''}"><img src="${p.src}" style="max-height:${p.dark ? 34 : 44}mm"><div class="c">${esc(p.c)}</div></div>`).join('')}</div>
-    </div>
-    <div class="factsttl">${esc(h.factsTitle || 'Цифры успеха')}</div>
-    <div class="factsrow">${(h.facts || []).map((f) => `<div class="f"><b>${esc(f.value)}</b><span>${esc(f.label).replace(/\n/g, '<br>')}</span></div>`).join('')}</div>
+    <div class="tl">${(h.eras || []).map((e, i) => `<div class="era">
+        <div class="img${photo[i] ? ' photo' : ''}">${imgs[i] ? `<img src="${imgs[i]}">` : ''}</div>
+        <div class="body"><div class="pill"><span class="n">${i + 1}</span><span class="yr">${esc(e.years)}<b>${esc(e.title)}</b></span></div><p>${esc(e.text)}</p></div>
+      </div>`).join('')}</div>
+    <div class="hnums"><h5>${esc(h.factsTitle || 'Цифры успеха')}</h5>${(h.facts || []).map((f, i) => `<div class="f">${icons[i] ? `<i><img src="${icons[i]}"></i>` : ''}<b>${esc(f.value)}</b><span>${esc(f.label).replace(/\n/g, '<br>')}</span></div>`).join('')}</div>
     <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
   </section>`;
 }
 
 function schoolPage(data, pageNo) {
-  const s = data.team.school || {};
+  const sc = data.team.school || {};
   const a = data.assets;
-  const pics = [
-    a.arenaCups && { src: a.arenaCups, c: 'Витрина трофеев школы' },
-    a.cup && { src: a.cup, c: 'Кубок Гагарина — цель вертикали СКА', dark: true },
-    a.skates && { src: a.skates, c: 'Первые шаги на льду — с 5 лет' },
-  ].filter(Boolean);
-  return `<section class="page txt ice">
+  const items = sc.items || [];
+  return `<section class="page txt school ice">
     ${shared.deco(data, 0.06)}${orn(data, 'bl')}
-    <div class="hdr"><div class="title">${esc(s.title || 'Школа')}</div></div>
-    <div class="lead">${esc(s.lead || '')}</div>
-    <div class="cols" style="top:${data.pageSize.bleed + 60}mm">
-      <div class="main">${(s.items || []).map((e, i) => `<div class="era"><div class="n">${i + 1}</div><h4>${esc(e.title)}</h4><p>${esc(e.text)}</p></div>`).join('')}</div>
-      <div class="side" style="flex-basis:56mm">${pics.map((p) => `<div class="pic${p.dark ? ' dark' : ''}"><img src="${p.src}" style="max-height:${p.dark ? 40 : 34}mm"><div class="c">${esc(p.c)}</div></div>`).join('')}</div>
+    <div class="hdr"><div class="title">${esc(sc.title || 'Школа')}</div></div>
+    <div class="shield">
+      <div class="lead">${esc(sc.lead || '')}</div>
+      ${a.arrowLeagues ? `<div class="arrow"><img src="${a.arrowLeagues}"></div>` : ''}
+      ${a.arenaCups ? `<div class="cups"><img src="${a.arenaCups}"></div>` : ''}
+      <div class="items">${items.map((e, i) => `<div class="it${i < 3 ? ' narrow' : ''}"><div class="n">${i + 1}</div><h4>${esc(e.title)}</h4><p>${esc(e.text)}</p></div>`).join('')}</div>
+      ${(sc.facts || []).length ? `<div class="chips" style="top:158mm">${sc.facts.map((f) => `<div class="c"><b>${esc(f.value)}</b><span>${esc(f.label).replace(/\n/g, ' ')}</span></div>`).join('')}</div>` : ''}
+      <div class="foot" style="top:174mm">${esc(sc.footer || '')}</div>
+      ${a.askS ? `<div class="arena" style="top:194mm"><img src="${a.askS}"></div>` : ''}
+      ${a.logo ? `<div class="slogo"><img src="${a.logo}"></div>` : ''}
     </div>
-    ${(s.facts || []).length ? `<div class="factsttl" style="bottom:${data.pageSize.bleed + 16 + 26 + 30}mm">Школа в цифрах</div>
-    <div class="factsrow" style="bottom:${data.pageSize.bleed + 16 + 30}mm">${s.facts.map((f) => `<div class="f"><b>${esc(f.value)}</b><span>${esc(f.label).replace(/\n/g, '<br>')}</span></div>`).join('')}</div>` : ''}
-    <div class="foot"><div class="star">★</div>${esc(s.footer || '')}</div>
     <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
   </section>`;
 }
