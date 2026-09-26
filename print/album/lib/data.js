@@ -316,6 +316,12 @@ async function loadTeam(teamDir, cacheDir) {
     const key = path.basename(f, path.extname(f)).replace(/-(\w)/g, (_, ch) => ch.toUpperCase());
     assets[key] = await prepareImage(path.join(histDir, f), path.join(cacheDir, 'assets'), 1400);
   }
+  // assets/pages/* → full-page artwork usable as "image:<file>" in album.pages
+  assets.pages = {};
+  const pagesArtDir = path.join(assetsDir, 'pages');
+  for (const f of fs.existsSync(pagesArtDir) ? fs.readdirSync(pagesArtDir) : []) {
+    if (IMAGE_EXT.includes(path.extname(f).toLowerCase())) assets.pages[f] = await prepareImage(path.join(pagesArtDir, f), path.join(cacheDir, 'pages'), 3600);
+  }
   assets.bg = fs.existsSync(path.join(assetsDir, 'bg-ice.jpg')) ? await prepareImage(path.join(assetsDir, 'bg-ice.jpg'), path.join(cacheDir, 'assets'), 1600) : null;
   assets.coverAspect = await imageAspect(assets.cover);
   // No qr.png but a link in team.json → generate the QR code (python `qrcode` package).

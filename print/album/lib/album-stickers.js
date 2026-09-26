@@ -234,6 +234,9 @@ ${shared.albumCss(data)}
 .club .poster .pc{position:absolute;left:0;bottom:0;background:var(--primary);color:#fff;padding:2mm 5mm;font-family:'Fira Sans Extra Condensed';font-weight:700;text-transform:uppercase;font-size:3.8mm;letter-spacing:.1em;clip-path:polygon(0 0,100% 0,calc(100% - 3mm) 100%,0 100%);}
 .club .poster .pc small{display:block;font-weight:500;font-size:2.6mm;letter-spacing:.16em;opacity:.85;}
 
+/* ---------- full-page artwork ---------- */
+.artpage{background:#fff;} .artpage .art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;}
+
 /* ---------- QUOTES on cracked ice ---------- */
 .quotes.dark{background:#02132b;}
 .quotes.dark .cracked{position:absolute;inset:0;} .quotes.dark .cracked img{width:100%;height:100%;object-fit:cover;opacity:.55;filter:saturate(1.1);}
@@ -559,6 +562,16 @@ function schoolPage(data, pageNo) {
   </section>`;
 }
 
+// Full-page artwork taken as is (e.g. a page of the club's own 2012 album): assets/pages/<file>, album.pages "image:<file>".
+function imagePage(data, file, pageNo) {
+  const src = data.assets.pages?.[file];
+  if (!src) return `<section class="page ice"><div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div></section>`;
+  return `<section class="page artpage">
+    <img class="art" src="${src}">
+    <div class="pgnum ${pageNo % 2 === 0 ? 'l' : 'r'}">${pageNo}</div>
+  </section>`;
+}
+
 function quotesPage(data, pageNo) {
   const html = shared.quotesPage(data, pageNo);
   if (!data.assets.iceCracked) return html;
@@ -600,6 +613,7 @@ function stickerAlbumHtml(data) {
     else if (kind === 'special' || kind === 'club') push((n) => clubSpread(data, n), 2);
     else if (kind === 'legends') push((n) => legendsSpread(data, n), 2);
     else if (kind === 'ska-history') push((n) => skaHistoryPage(data, n));
+    else if (kind.startsWith('image:')) push((n) => imagePage(data, kind.slice(6), n));
     else if (kind === 'school') push((n) => schoolPage(data, n));
     else if (kind === 'intro') push((n) => introPage(data, n));
     else if (kind === 'history') push((n) => shared.historyPage(data, n));
