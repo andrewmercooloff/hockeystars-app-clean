@@ -44,7 +44,7 @@ function stampViewer(slug, pagesDir) {
   const html = fs
     .readFileSync(viewer, 'utf8')
     .replace(/const BUILD = '[^']*'; \/\/ BUILD_STAMP/, `const BUILD = '${stamp}'; // BUILD_STAMP`)
-    .replace(/const COUNTS = \{[^}]*\}; \/\/ PAGE_COUNTS/, `const COUNTS = { album: ${count('album')}, stickers: ${count('stickers')} }; // PAGE_COUNTS`);
+    .replace(/const COUNTS = \{[^}]*\}; \/\/ PAGE_COUNTS/, `const COUNTS = { album: ${count('album')}, spreads: ${count('spreads')}, stickers: ${count('stickers')} }; // PAGE_COUNTS`);
   fs.writeFileSync(viewer, html);
 }
 

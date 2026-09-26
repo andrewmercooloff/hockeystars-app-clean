@@ -33,8 +33,9 @@
       <p>2011–2019 · макет для согласования</p>
     </div>
     <div class="tabs">
-      <button id="tab-album" class="active">Альбом</button>
-      <button id="tab-stickers">Наклейки</button>
+      <button data-mode="album" class="active">Альбом</button>
+      <button data-mode="spreads">Развороты (печать)</button>
+      <button data-mode="stickers">Наклейки</button>
     </div>
   </header>
   <main>
@@ -46,12 +47,14 @@
   <script>
     // raw.githubusercontent (short cache) + build stamp so a fresh build never shows stale pages
     const BASE = 'https://raw.githubusercontent.com/andrewmercooloff/hockeystars-app-clean/cursor/ska-strelna-sticker-album-a9a3/print/album/print-ready/ska-strelna/pages/';
-    const BUILD = '202609261021'; // BUILD_STAMP
-    const COUNTS = { album: 32, stickers: 7 }; // PAGE_COUNTS
+    const BUILD = '202609261053'; // BUILD_STAMP
+    const COUNTS = { album: 32, spreads: 16, stickers: 7 }; // PAGE_COUNTS
     const sets = {
       album: Array.from({ length: COUNTS.album }, (_, i) => `${BASE}album-${String(i + 1).padStart(2, '0')}.jpg?v=${BUILD}`),
+      spreads: Array.from({ length: COUNTS.spreads }, (_, i) => `${BASE}spreads-${String(i + 1).padStart(2, '0')}.jpg?v=${BUILD}`),
       stickers: Array.from({ length: COUNTS.stickers }, (_, i) => `${BASE}stickers-${String(i + 1).padStart(2, '0')}.jpg?v=${BUILD}`),
     };
+    const labels = { album: 'стр.', spreads: 'лист (лицо/оборот)', stickers: 'лист' };
     let mode = 'album', idx = 0;
     const view = document.getElementById('view');
     const counter = document.getElementById('counter');
@@ -60,14 +63,13 @@
     function render() {
       const list = sets[mode];
       view.src = list[idx];
-      counter.textContent = `${idx + 1} / ${list.length}`;
+      counter.textContent = `${labels[mode]} ${idx + 1} / ${list.length}`;
       prev.disabled = idx === 0;
       next.disabled = idx === list.length - 1;
     }
     prev.onclick = () => { if (idx > 0) { idx--; render(); } };
     next.onclick = () => { if (idx < sets[mode].length - 1) { idx++; render(); } };
-    document.getElementById('tab-album').onclick = () => { mode = 'album'; idx = 0; document.getElementById('tab-album').classList.add('active'); document.getElementById('tab-stickers').classList.remove('active'); render(); };
-    document.getElementById('tab-stickers').onclick = () => { mode = 'stickers'; idx = 0; document.getElementById('tab-stickers').classList.add('active'); document.getElementById('tab-album').classList.remove('active'); render(); };
+    document.querySelectorAll('.tabs button').forEach((b) => { b.onclick = () => { mode = b.dataset.mode; idx = 0; document.querySelectorAll('.tabs button').forEach((x) => x.classList.toggle('active', x === b)); render(); }; });
     document.onkeydown = (e) => { if (e.key === 'ArrowLeft') prev.click(); if (e.key === 'ArrowRight') next.click(); };
     render();
   </script>

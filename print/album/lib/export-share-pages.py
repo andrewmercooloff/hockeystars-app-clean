@@ -21,6 +21,17 @@ def main() -> None:
             base = os.path.splitext(os.path.basename(src))[0]
             png_to_jpg(src, os.path.join(pages_dir, f'{base}.jpg'))
 
+    # printer's spreads (imposed pairs, as they come off the press) → spreads-NN.jpg
+    spreads_pdf = sys.argv[3] if len(sys.argv) > 3 else ''
+    if spreads_pdf and os.path.exists(spreads_pdf):
+        import pymupdf
+
+        for old in glob.glob(os.path.join(pages_dir, 'spreads-*.jpg')):
+            os.remove(old)
+        with pymupdf.open(spreads_pdf) as doc:
+            for i, page in enumerate(doc, start=1):
+                page.get_pixmap(dpi=72).save(os.path.join(pages_dir, f'spreads-{i:02d}.jpg'), jpg_quality=86)
+
 
 if __name__ == '__main__':
     main()
