@@ -1,11 +1,13 @@
-number;surname;name;position;photo;type;source
-;Иванов;Артем Викторович;Генеральный директор;assets/staff-ivanov.jpg;staff;strelna.ska.ru
-;Ежов;Денис Владимирович;Заместитель генерального директора;assets/staff-ezhov.jpg;staff;strelna.ska.ru
-;Цыганов;Дмитрий Сергеевич;Главный тренер школы;assets/staff-tsyganov.jpg;staff;strelna.ska.ru
-;Калинин;Михаил Викторович;Зам. ген. директора по спортивной работе и скаутингу;assets/staff-kalinin.jpg;staff;strelna.ska.ru
-;УТОЧНИТЬ;Скаут;Скаут школы;;staff;cdr
-;УТОЧНИТЬ;Тренер по ОФП;Тренер по ОФП;;staff;cdr
-;УТОЧНИТЬ;PR-менеджер;PR-менеджер;;staff;cdr
-;УТОЧНИТЬ;Наша арена;Ледовая арена СКА Стрельна;assets/arena.jpg;club;photo
-;УТОЧНИТЬ;Символ клуба;Талисман школы;;club;cdr
-;УТОЧНИТЬ;Наши болельщики;Родители и друзья на трибунах;assets/team.jpg;club;photo
+number;surname;name;position;photo;type;group;double;source
+;Иванов;Артем Викторович;Генеральный директор;assets/staff-ivanov.jpg;staff;mgmt;;strelna.ska.ru
+;Ежов;Денис Владимирович;Заместитель генерального директора;assets/staff-ezhov.jpg;staff;mgmt;;strelna.ska.ru
+;Калинин;Михаил Викторович;Зам. ген. директора по спортивной работе и скаутингу;assets/staff-kalinin.jpg;staff;mgmt;;strelna.ska.ru
+;Цыганов;Дмитрий Сергеевич;Главный тренер школы;assets/staff-tsyganov.jpg;staff;mgmt;;strelna.ska.ru
+;Сахаров;Михаил Николаевич;Скаут;;staff;team;;album2012
+;Яковлев;Александр Олегович;Врач школы;;staff;team;;album2012
+;Новиков;Кирилл;PR-менеджер;;staff;team;;album2012
+;Шевцова;Ксения;Фотограф;;staff;team;;album2012
+;УТОЧНИТЬ;Тренер по ОФП;Тренер по ОФП;;staff;team;;cdr
+;Конь-Огонь;;Маскот школы;;club;club;;album2012
+;АСК-С;;Наша арена;assets/arena.jpg;club;club;1;photo
+;Мамы и папы;;Наши болельщики;;club;club;1;album2012
