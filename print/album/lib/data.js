@@ -200,6 +200,9 @@ async function rowToPerson(row, ctx) {
     backFocusY: Number(row.backFocusY || row['фокус_y'] || 0) || 0,
     zoom: Number(row.zoom || row['масштаб'] || 1) || 1,
     large: String(row.large || row['крупная'] || '').toLowerCase() === '1' || String(row.large || row['крупная'] || '').toLowerCase() === 'true',
+    group: (row.group || row['группа'] || '').toLowerCase(),
+    text: row.text || row['текст'] || '',
+    half: row.half || '',
   };
 }
 
@@ -220,21 +223,37 @@ async function loadTeam(teamDir, cacheDir) {
   const ctx = { teamDir, photosDir, photoCache, colors, missingPhotos };
   const cards = [];
   const years = {};
-  const teamStickerIndex = {};
-  let staff = [];
+  const teamStickers = {};
+  const staff = [];
+  const legends = [];
 
   if (isStickers) {
-    const yearList = team.album?.years || [];
+    // Numbering follows the album: legends → club (staff, arena, mascot…) → birth years (roster + double team photo).
     let globalIndex = 0;
+    const loadList = async (csvName, photosBase, target) => {
+      const csvPath = path.join(teamDir, csvName);
+      if (!fs.existsSync(csvPath)) return;
+      for (const row of parseCsv(fs.readFileSync(csvPath, 'utf8'))) {
+        // `double=1` → two regular-size halves (left / right) of one wide photo, glued side by side in the album
+        const halves = String(row.double || row['двойная'] || '') === '1' ? ['l', 'r'] : [''];
+        for (const half of halves) {
+          globalIndex += 1;
+          const person = await rowToPerson({ ...row, half }, { ...ctx, photosDir: photosBase, meta: { index: globalIndex } });
+          person.index = globalIndex;
+          target.push(person);
+          cards.push(person);
+        }
+      }
+    };
+    await loadList('legends.csv', path.join(assetsDir, 'legends'), legends);
+    await loadList('staff.csv', assetsDir, staff);
+    const yearList = team.album?.years || [];
     for (const year of yearList) {
       const csvPath = path.join(rostersDir, `${year}.csv`);
-      if (!fs.existsSync(csvPath)) {
-        years[year] = [];
-        continue;
-      }
+      years[year] = [];
+      if (!fs.existsSync(csvPath)) continue;
       const yearPhotos = path.join(rostersDir, 'photos', year);
       const rows = parseCsv(fs.readFileSync(csvPath, 'utf8'));
-      years[year] = [];
       for (const row of rows) {
         globalIndex += 1;
         const person = await rowToPerson(row, { ...ctx, photosDir: yearPhotos, meta: { year, index: globalIndex } });
@@ -242,30 +261,18 @@ async function loadTeam(teamDir, cacheDir) {
         years[year].push(person);
         cards.push(person);
       }
-    }
-    // one wide team-photo sticker per year (photo: rosters/photos/YYYY/team.jpg, else the school-wide shot)
-    for (const year of yearList) {
-      if (!years[year]?.length) continue;
-      globalIndex += 1;
+      // Double team-photo sticker: two regular-size halves (left / right) glued side by side in the album.
       const teamPhoto = ['team.jpg', 'team.png', 'team.jpeg'].map((f) => path.join(rostersDir, 'photos', year, f)).find((p) => fs.existsSync(p))
-        || findAsset(assetsDir, ['team-wide', 'team']);
-      const person = await rowToPerson(
-        { surname: team.shortName || team.name, name: `${year} г.р.`, position: `Командное фото · сезон ${team.season || ''}`, type: 'team', photo: teamPhoto ? path.relative(teamDir, teamPhoto) : '' },
-        { ...ctx, photosDir: assetsDir, meta: { year, index: globalIndex } }
-      );
-      person.index = globalIndex;
-      teamStickerIndex[year] = globalIndex;
-      cards.push(person);
-    }
-    const staffCsv = path.join(teamDir, 'staff.csv');
-    if (fs.existsSync(staffCsv)) {
-      const rows = parseCsv(fs.readFileSync(staffCsv, 'utf8'));
-      staff = [];
-      for (const row of rows) {
+        || findAsset(assetsDir, ['team-photo', 'team']);
+      teamStickers[year] = [];
+      for (const half of ['l', 'r']) {
         globalIndex += 1;
-        const person = await rowToPerson(row, { ...ctx, photosDir: assetsDir, meta: { index: globalIndex } });
+        const person = await rowToPerson(
+          { surname: team.shortName || team.name, name: `${year} г.р.`, position: `Командное фото · ${half === 'l' ? 'левая' : 'правая'} часть`, type: 'team', half, photo: teamPhoto ? path.relative(teamDir, teamPhoto) : '' },
+          { ...ctx, photosDir: assetsDir, meta: { year, index: globalIndex } }
+        );
         person.index = globalIndex;
-        staff.push(person);
+        teamStickers[year].push(person);
         cards.push(person);
       }
     }
@@ -285,7 +292,7 @@ async function loadTeam(teamDir, cacheDir) {
   const assets = {
     logo: await asset(['logo'], 1500),
     cover: await asset(['cover', 'team'], 3200),
-    teamPhoto: await asset(['team', 'cover'], 3200),
+    teamPhoto: await asset(['team-photo', 'team', 'cover'], 3200),
     back: await asset(['back', 'arena'], 3200),
     qr: await asset(['qr'], 1200),
     history: await asset(['history'], 1600),
@@ -298,10 +305,16 @@ async function loadTeam(teamDir, cacheDir) {
     coverBg: await asset(['cover-bg'], 3200),
     ornTl: await asset(['orn-tl'], 2200),
     ornBr: await asset(['orn-br'], 2600),
-    teamWide: await asset(['team-wide'], 2400),
     iceCracked: await asset(['ice-cracked'], 1600),
     gallery: [],
   };
+  // assets/history/*.png → assets.<camelCase> (cup, medal, oldteam, arena-cups → arenaCups …) for the text pages
+  const histDir = path.join(assetsDir, 'history');
+  for (const f of fs.existsSync(histDir) ? fs.readdirSync(histDir) : []) {
+    if (!IMAGE_EXT.includes(path.extname(f).toLowerCase())) continue;
+    const key = path.basename(f, path.extname(f)).replace(/-(\w)/g, (_, ch) => ch.toUpperCase());
+    assets[key] = await prepareImage(path.join(histDir, f), path.join(cacheDir, 'assets'), 1400);
+  }
   assets.bg = fs.existsSync(path.join(assetsDir, 'bg-ice.jpg')) ? await prepareImage(path.join(assetsDir, 'bg-ice.jpg'), path.join(cacheDir, 'assets'), 1600) : null;
   assets.coverAspect = await imageAspect(assets.cover);
   // No qr.png but a link in team.json → generate the QR code (python `qrcode` package).
@@ -328,8 +341,6 @@ async function loadTeam(teamDir, cacheDir) {
     w: Number(s.width) || 40,
     h: Number(s.height) || 45,
     bleed: Number(s.bleed ?? 2),
-    teamW: Number(s.teamWidth) || 210,
-    teamH: Number(s.teamHeight) || 30,
   };
 
   const rosterCount = isStickers ? Object.values(years).reduce((n, arr) => n + arr.length, 0) : cards.length;
@@ -346,6 +357,12 @@ async function loadTeam(teamDir, cacheDir) {
     for (const it of team.history.items || []) for (const k of ['years', 'title', 'text']) if (it[k]) it[k] = fill(it[k]);
     for (const f of team.history.facts || []) for (const k of ['value', 'label']) if (f[k]) f[k] = fill(f[k]);
   }
+  for (const block of [team.school, team.skaHistory]) {
+    if (!block) continue;
+    for (const it of block.items || block.eras || []) for (const k of ['years', 'title', 'text']) if (it[k]) it[k] = fill(it[k]);
+    for (const f of block.facts || []) for (const k of ['value', 'label']) if (f[k]) f[k] = fill(f[k]);
+    for (const k of ['lead', 'footer']) if (block[k]) block[k] = fill(block[k]);
+  }
 
   return {
     team,
@@ -353,7 +370,8 @@ async function loadTeam(teamDir, cacheDir) {
     cards,
     years,
     staff,
-    teamStickerIndex,
+    legends,
+    teamStickers,
     assets,
     brand,
     missingPhotos,

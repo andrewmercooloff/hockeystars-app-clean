@@ -44,10 +44,13 @@
     <footer id="counter"></footer>
   </main>
   <script>
-    const BASE = 'https://cdn.jsdelivr.net/gh/andrewmercooloff/hockeystars-app-clean@cursor/ska-strelna-sticker-album-a9a3/print/album/print-ready/ska-strelna/pages/';
+    // raw.githubusercontent (short cache) + build stamp so a fresh build never shows stale pages
+    const BASE = 'https://raw.githubusercontent.com/andrewmercooloff/hockeystars-app-clean/cursor/ska-strelna-sticker-album-a9a3/print/album/print-ready/ska-strelna/pages/';
+    const BUILD = '202609260708'; // BUILD_STAMP
+    const COUNTS = { album: 32, stickers: 7 }; // PAGE_COUNTS
     const sets = {
-      album: Array.from({ length: 28 }, (_, i) => `${BASE}album-${String(i + 1).padStart(2, '0')}.jpg`),
-      stickers: Array.from({ length: 6 }, (_, i) => `${BASE}stickers-${String(i + 1).padStart(2, '0')}.jpg`),
+      album: Array.from({ length: COUNTS.album }, (_, i) => `${BASE}album-${String(i + 1).padStart(2, '0')}.jpg?v=${BUILD}`),
+      stickers: Array.from({ length: COUNTS.stickers }, (_, i) => `${BASE}stickers-${String(i + 1).padStart(2, '0')}.jpg?v=${BUILD}`),
     };
     let mode = 'album', idx = 0;
     const view = document.getElementById('view');

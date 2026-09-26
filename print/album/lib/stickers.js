@@ -38,6 +38,22 @@ function stickerCss(size) {
 .sticker.team .plate,.sticker.club .plate{background:linear-gradient(90deg,var(--dark) 0%,var(--primary) 55%,transparent 100%);border-top:0;height:${B + h * 0.3}mm;justify-content:flex-end;}
 .sticker.team .plate::before,.sticker.club .plate::before{display:none;}
 .sticker.wide .photo img{object-position:center center;}
+/* double sticker: each half shows its own half of a 2:1 crop of the team photo */
+.sticker.half .photo img{width:200%;object-position:center center;}
+.sticker.half-r .photo img{margin-left:-100%;}
+.sticker.half-l .plate{background:linear-gradient(90deg,var(--dark) 0%,var(--primary) 70%,color-mix(in srgb,var(--primary) 60%,transparent) 100%);}
+.sticker.half-r .plate{background:linear-gradient(270deg,var(--dark) 0%,var(--primary) 70%,color-mix(in srgb,var(--primary) 60%,transparent) 100%);align-items:flex-end;text-align:right;}
+.sticker.half-r .nm,.sticker.half-r .pos{padding-right:0;padding-left:${(w * 0.2).toFixed(1)}mm;}
+.sticker.half-r .plogo{right:auto;left:${B + 1.4}mm;}
+.sticker.half-r .num{left:auto;right:${B}mm;border-radius:0 0 0 1.2mm;}
+.sticker.half-r .idx{right:auto;left:${B + 1}mm;}
+.sticker.legend .plate{background:linear-gradient(180deg,#8d0020 0%,#4a0010 100%);border-top-color:#f2c14e;}
+.sticker.legend .plate::before{background:#f2c14e;}
+.sticker.legend .pos{color:#f2c14e;font-size:${(w * 0.042).toFixed(2)}mm;}
+.sticker.legend .photo{background:linear-gradient(180deg,#0b3d91,#041f4d);}
+.sticker.legend .photo img{object-fit:contain;object-position:center bottom;}
+.sticker.club .plate{background:linear-gradient(180deg,rgba(4,31,77,0) 0%,var(--dark) 45%);border-top:0;height:${B + h * 0.34}mm;justify-content:flex-end;}
+.sticker.club .plate::before{display:none;}
 .sticker.ghost .photo::after{display:none;}
 `;
 }
@@ -54,15 +70,14 @@ function stickerName(card, size) {
 }
 
 function stickerFront(card, data, opts = {}) {
-  const size = card.type === 'team' && data.stickerSize.teamW ? { w: data.stickerSize.teamW, h: data.stickerSize.teamH, bleed: data.stickerSize.bleed } : data.stickerSize;
+  const size = data.stickerSize;
   const ghost = opts.ghost ? ' ghost' : '';
   const num = card.number ? `<div class="num">${esc(card.number)}${card.role ? `<sup>${esc(card.role)}</sup>` : ''}</div>` : '';
-  const pos = card.position && card.type !== 'club' && card.type !== 'team' ? `<div class="pos">${esc(card.position)}</div>` : card.type === 'team' ? `<div class="pos">${esc(card.position || '')}</div>` : '';
-  const cls = ['sticker', card.type, ghost, card.photoAspect > 1.1 ? 'wide' : ''].filter(Boolean).join(' ');
+  const pos = card.position ? `<div class="pos">${esc(card.position)}</div>` : '';
+  const cls = ['sticker', card.type, ghost, card.half ? `half half-${card.half}` : card.photoAspect > 1.1 ? 'wide' : ''].filter(Boolean).join(' ');
   const photo = opts.ghost ? card.photoSmall || card.photo : card.photo;
   const logo = data.assets.logo && !opts.ghost ? `<div class="plogo"><img src="${data.assets.logo}"></div>` : '';
-  const style = card.type === 'team' ? `style="width:${size.w + size.bleed * 2}mm;height:${size.h + size.bleed * 2}mm"` : '';
-  return `<div class="${cls}" ${style}>
+  return `<div class="${cls}">
     <div class="frame">
       <div class="photo"><img src="${photo}"></div>
       ${num}
@@ -110,8 +125,7 @@ function stickersHtml(data, opts = {}) {
   const sheetName = (opts.sheet || data.team.stickers?.sheet || 'SRA3').toUpperCase();
   const layout = opts.layout || data.team.stickers?.layout || 'sheet';
   const sheet = SHEETS[sheetName] || SHEETS.SRA3;
-  const all = (data.allStickers || data.cards).filter((c) => c.type !== 'team');
-  const teamStickers = (data.allStickers || data.cards).filter((c) => c.type === 'team');
+  const all = data.allStickers || data.cards;
   const total = all.length;
   const cw = size.w + size.bleed * 2;
   const ch = size.h + size.bleed * 2;
@@ -140,21 +154,6 @@ function stickersHtml(data, opts = {}) {
       pages += `<section class="page sheet">${marks}${label}${chunk
         .map((sticker, i) => `<div class="slot" style="${place(i)}">${stickerFront(sticker, data)}</div>`)
         .join('')}</section>`;
-    }
-    // Wide team-photo stickers: stacked on their own sheet(s), one column.
-    if (teamStickers.length) {
-      const tw = size.teamW + size.bleed * 2;
-      const th = size.teamH + size.bleed * 2;
-      const gutter = size.bleed * 2;
-      const perSheet = Math.floor((sheet.h - 8 + gutter) / (th + gutter));
-      for (let s = 0; s < Math.ceil(teamStickers.length / perSheet); s++) {
-        const chunk = teamStickers.slice(s * perSheet, (s + 1) * perSheet);
-        const my = (sheet.h - (chunk.length * th + (chunk.length - 1) * gutter)) / 2;
-        const mx = (sheet.w - tw) / 2;
-        pages += `<section class="page sheet"><div class="sheetlabel" style="top:4.2mm">${esc(data.team.name)} · командные наклейки ${size.teamW}×${size.teamH} мм · лист ${s + 1}</div>${chunk
-          .map((sticker, i) => `<div class="slot" style="left:${mx}mm;top:${my + i * (th + gutter)}mm">${stickerFront(sticker, data)}</div>`)
-          .join('')}</section>`;
-      }
     }
   }
 

@@ -28,9 +28,24 @@ function syncSharePages(slug, outDir) {
       { stdio: 'pipe' }
     );
     console.log(`✔ share pages → ${path.relative(process.cwd(), pagesDir)}/`);
+    stampViewer(slug, pagesDir);
   } catch (e) {
     console.warn(`⚠ share pages: ${e.stderr?.toString().trim().split('\n').pop() || e.message}`);
   }
+}
+
+// Keep share/<slug>/index.html in sync: page counts + build stamp (cache-busting for the CDN).
+function stampViewer(slug, pagesDir) {
+  const viewer = path.join(__dirname, 'share', slug, 'index.html');
+  if (!fs.existsSync(viewer)) return;
+  const files = fs.readdirSync(pagesDir);
+  const count = (kind) => files.filter((f) => f.startsWith(`${kind}-`) && f.endsWith('.jpg')).length;
+  const stamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 12);
+  const html = fs
+    .readFileSync(viewer, 'utf8')
+    .replace(/const BUILD = '[^']*'; \/\/ BUILD_STAMP/, `const BUILD = '${stamp}'; // BUILD_STAMP`)
+    .replace(/const COUNTS = \{[^}]*\}; \/\/ PAGE_COUNTS/, `const COUNTS = { album: ${count('album')}, stickers: ${count('stickers')} }; // PAGE_COUNTS`);
+  fs.writeFileSync(viewer, html);
 }
 
 function parseArgs(argv) {
